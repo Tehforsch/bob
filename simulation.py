@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, Union
 import shutil
 import config
 from paramFile import getParamFile
@@ -8,6 +8,7 @@ import logging
 import util
 from exceptions import CompilationError
 import localConfig
+import argparse
 
 
 class Simulation:
@@ -39,11 +40,12 @@ class Simulation:
 
     def substituteParameter(self, k: str, v: Any) -> None:
         paramFilesWithThisParameter = [paramFile for paramFile in self.paramFiles if k in paramFile]
+        assert len(paramFilesWithThisParameter) != 0, f"No file contains this parameter: {k}"
         assert len(paramFilesWithThisParameter) == 1, f"Multiple files contain this parameter: {k}: {paramFilesWithThisParameter}"
         paramFile = paramFilesWithThisParameter[0]
         paramFile[k] = v
 
-    def compileArepo(self, verbose=False) -> None:
+    def compileArepo(self, verbose: bool = False) -> None:
         self.copyConfigFile()
         logging.info("Compiling arepo.")
         process = util.runCommand(config.arepoCompilationCommand, path=config.arepoDir, printOutput=verbose, shell=True)
@@ -54,15 +56,16 @@ class Simulation:
     def copyConfigFile(self) -> None:
         targetConfigFile = Path(config.arepoDir, config.configFilename)
         if targetConfigFile.is_file():
-            if filecmp.cmp(self.configFile.filename, targetConfigFile):
+            if filecmp.cmp(str(self.configFile.filename), str(targetConfigFile)):
                 logging.info("Config file identical, not copying again to preserve compilation state.")
-                return None
+                return
         shutil.copyfile(self.configFile.filename, targetConfigFile)
 
-    def copyBinary(self):
+    def copyBinary(self) -> None:
         sourceFile = Path(config.arepoDir, config.binaryName)
         targetFile = Path(self.folder, config.binaryName)
         shutil.copyfile(sourceFile, targetFile)
+        shutil.copymode(sourceFile, targetFile)
 
-    def run(self, args) -> None:
-        pass
+    def run(self, args: argparse.Namespace) -> None:
+        util.runCommand([localConfig.runJobCommand, str(self.jobFile.filename.name)], path=self.jobFile.filename.parent, shell=False, printOutput=args.verbose)

@@ -1,7 +1,7 @@
 import logging
 import sys
 from subprocess import Popen, PIPE
-from typing import Callable, Any, List, Dict, Union, Tuple
+from typing import Callable, Any, List, Dict, Union
 from pathlib import Path
 
 

@@ -1,11 +1,11 @@
-#!/bin/python3.8
 from typing import List, Dict, Any
 from pathlib import Path
+import logging
 import argparse
 import yaml
+
 import config
 from simulation import Simulation
-import logging
 import localConfig
 
 
