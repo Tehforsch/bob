@@ -1,12 +1,13 @@
 from pathlib import Path
+import localConfig
 
-
+cartesianIdentifier = "cartesian"
 bobPath = Path(__file__).parent.resolve()
 bobJobFilesPath = Path(bobPath, "jobFiles")
 arepoCompilationCommand = "make build"
 binaryName = "Arepo"
 jobFileName = "job"
-arepoDir = Path("~/projects/arepo/").expanduser()
+srcArepoConfigFile = Path(localConfig.arepoDir, "src/arepoconfig.h")
 substitutionFileName = "sims"
 inputFilename = "param.txt"
 jobFilename = "job"

@@ -1,5 +1,6 @@
 from typing import Dict, Any, Union
 import shutil
+import os
 import config
 from paramFile import getParamFile
 from pathlib import Path
@@ -48,13 +49,15 @@ class Simulation:
     def compileArepo(self, verbose: bool = False) -> None:
         self.copyConfigFile()
         logging.info("Compiling arepo.")
-        process = util.runCommand(config.arepoCompilationCommand, path=config.arepoDir, printOutput=verbose, shell=True)
+        if config.srcArepoConfigFile.is_file():
+            os.remove(config.srcArepoConfigFile)
+        process = util.runCommand(config.arepoCompilationCommand, path=localConfig.arepoDir, printOutput=verbose, shell=True)
         if process.returncode != 0:
             raise CompilationError()
         self.copyBinary()
 
     def copyConfigFile(self) -> None:
-        targetConfigFile = Path(config.arepoDir, config.configFilename)
+        targetConfigFile = Path(localConfig.arepoDir, config.configFilename)
         if targetConfigFile.is_file():
             if filecmp.cmp(str(self.configFile.filename), str(targetConfigFile)):
                 logging.info("Config file identical, not copying again to preserve compilation state.")
@@ -62,7 +65,7 @@ class Simulation:
         shutil.copyfile(self.configFile.filename, targetConfigFile)
 
     def copyBinary(self) -> None:
-        sourceFile = Path(config.arepoDir, config.binaryName)
+        sourceFile = Path(localConfig.arepoDir, config.binaryName)
         targetFile = Path(self.folder, config.binaryName)
         shutil.copyfile(sourceFile, targetFile)
         shutil.copymode(sourceFile, targetFile)
