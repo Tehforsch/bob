@@ -1,11 +1,7 @@
-from typing import Optional, IO, Any
-
-
 class BobException(Exception):
-    def __init__(self, message: str) -> None:
-        super().__init__(message)
+    pass
 
 
 class CompilationError(BobException):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Compilation error. Run with -v to see the error. I'm lazy.")

@@ -5,7 +5,7 @@ from typing import Callable, Any, List, Dict, Union
 from pathlib import Path
 
 
-def runCommand(command: Union[str, List[str]], path: Path, printOutput: bool = False, shell: bool = False) -> Popen:
+def runCommand(command: Union[str, List[str]], path: Union[str, Path], printOutput: bool = False, shell: bool = False) -> Popen:
     logging.debug("Running {}".format(command))
     if printOutput:
         process = Popen(command, cwd=path, shell=shell, stdout=sys.stdout, stderr=sys.stderr)

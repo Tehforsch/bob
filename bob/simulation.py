@@ -1,15 +1,14 @@
-from typing import Dict, Any, Union
+from typing import Dict, Any, List
 import shutil
 import os
-import config
-from paramFile import getParamFile
+import argparse
 from pathlib import Path
 import filecmp
 import logging
-import util
-from exceptions import CompilationError
-import localConfig
-import argparse
+
+from bob import localConfig, config, util
+from bob.exceptions import CompilationError
+from bob.paramFile import ParamFile, ConfigFile, InputFile, JobFile
 
 
 class Simulation:
@@ -26,10 +25,10 @@ class Simulation:
         shutil.copytree(self.inputFolder, self.folder)
 
     def readFiles(self) -> None:
-        self.configFile = getParamFile(Path(self.folder, config.configFilename))
-        self.inputFile = getParamFile(Path(self.folder, config.inputFilename))
-        self.jobFile = getParamFile(Path(self.folder, config.jobFilename))
-        self.paramFiles = [self.configFile, self.inputFile, self.jobFile]
+        self.configFile = ConfigFile(Path(self.folder, config.configFilename))
+        self.inputFile = InputFile(Path(self.folder, config.inputFilename))
+        self.jobFile = JobFile(Path(self.folder, config.jobFilename))
+        self.paramFiles: List[ParamFile] = [self.configFile, self.inputFile, self.jobFile]
 
     def writeFiles(self) -> None:
         for paramFile in self.paramFiles:

@@ -1,5 +1,6 @@
 from pathlib import Path
-import localConfig
+
+from bob import localConfig
 
 cartesianIdentifier = "cartesian"
 bobPath = Path(__file__).parent.resolve()

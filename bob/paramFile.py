@@ -2,13 +2,25 @@ from typing import Any, Tuple, Union
 import re
 from pathlib import Path
 from string import Formatter
-import localConfig
-import config
+from abc import ABC, abstractmethod
+
+from bob import localConfig
+from bob import config
 
 
-class ParamFile(dict):
+class ParamFile(ABC, dict):
     def __init__(self, filename: Path) -> None:
+        super().__init__([])
         self.filename = filename
+
+    @abstractmethod
+    def write(self) -> None:
+        pass
+
+
+class LineParamFile(ParamFile):
+    def __init__(self, filename: Path) -> None:
+        super().__init__(filename)
         self.commentString = "#"
         with filename.open("r") as f:
             self.lines = f.readlines()
@@ -25,29 +37,33 @@ class ParamFile(dict):
         with open(self.filename, "w") as f:
             f.write(result)
 
-    def readLine(self, s: str) -> Tuple[str, Any]:
-        raise NotImplementedError
+    @abstractmethod
+    def readLine(self, line: str) -> Tuple[str, Any]:
+        pass
 
+    @abstractmethod
     def writeLine(self, param: Tuple[str, Any]) -> str:
-        raise NotImplementedError
+        pass
 
 
-class InputFile(ParamFile):
+class InputFile(LineParamFile):
     def __init__(self, filename: Path):
         self.commentString = "%"
         super().__init__(filename)
 
     def readLine(self, line: str) -> Tuple[str, Any]:
         matches = re.match(r"([^\s]*)\s*([^\s]*)", line)
+        if matches is None:
+            return ("", "")
         groups = matches.groups()
-        return groups
+        return (groups[0], groups[1])
 
     def writeLine(self, param: Tuple[str, Any]) -> str:
         k, v = param
         return f"{k}\t{v}"
 
 
-class ConfigFile(ParamFile):
+class ConfigFile(LineParamFile):
     def __init__(self, filename: Path):
         self.commentString = "#"
         super().__init__(filename)
@@ -66,7 +82,7 @@ class ConfigFile(ParamFile):
         return f"{k}={v}"
 
 
-def convertValue(s):
+def convertValue(s: str) -> Union[int, float, str]:
     try:
         return int(s)
     except ValueError:
@@ -78,7 +94,7 @@ def convertValue(s):
 
 class JobFile(ParamFile):
     def __init__(self, filename: Path) -> None:
-        self.filename = filename
+        super().__init__(filename)
         for _, fieldname, _, _ in Formatter().parse(localConfig.jobTemplate):
             if fieldname:
                 self[fieldname] = None
@@ -89,18 +105,8 @@ class JobFile(ParamFile):
         with self.filename.open("w") as f:
             f.write(localConfig.jobTemplate.format(**self))
 
-    def addLocalParameters(self):
-        if not "jobParameters" in dir(localConfig):
+    def addLocalParameters(self) -> None:
+        if "jobParameters" not in dir(localConfig):
             return
         for param in localConfig.jobParameters:
             self[param] = localConfig.jobParameters[param]
-
-
-def getParamFile(filename: Path) -> Union[ParamFile, JobFile]:
-    if config.inputFilename == filename.name:
-        return InputFile(filename)
-    if config.configFilename == filename.name:
-        return ConfigFile(filename)
-    if config.jobFilename == filename.name:
-        return JobFile(filename)
-    raise NotImplementedError
