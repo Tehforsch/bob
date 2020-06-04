@@ -1,5 +1,5 @@
 from pathlib import Path
-import config
+from bob import config
 
 arepoDir = "/beegfs/work/ws/hd_hp240-arepoTest-0/arepoSweep/arepo"
 

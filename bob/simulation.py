@@ -54,6 +54,7 @@ class Simulation:
         if process.returncode != 0:
             raise CompilationError()
         self.copyBinary()
+        self.copySource()
 
     def copyConfigFile(self) -> None:
         targetConfigFile = Path(localConfig.arepoDir, config.configFilename)
@@ -66,8 +67,16 @@ class Simulation:
     def copyBinary(self) -> None:
         sourceFile = Path(localConfig.arepoDir, config.binaryName)
         targetFile = Path(self.folder, config.binaryName)
-        shutil.copyfile(sourceFile, targetFile)
-        shutil.copymode(sourceFile, targetFile)
+        shutil.copy(sourceFile, targetFile)
+
+    def copySource(self) -> None:
+        for srcFile in config.srcFiles:
+            source = Path(localConfig.arepoDir, srcFile)
+            target = Path(self.folder, config.sourceOutputFolderName, srcFile)
+            if source.is_file():
+                shutil.copy(source, target)
+            else:
+                shutil.copytree(source, target)
 
     def run(self, args: argparse.Namespace) -> None:
         util.runCommand([localConfig.runJobCommand, str(self.jobFile.filename.name)], path=self.jobFile.filename.parent, shell=False, printOutput=args.verbose)

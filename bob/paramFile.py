@@ -5,7 +5,7 @@ from string import Formatter
 import math
 from abc import ABC, abstractmethod
 
-from bob import localConfig
+from bob import localConfig, config
 
 
 class ParamFile(ABC, dict):
@@ -98,6 +98,7 @@ class JobFile(ParamFile):
         for _, fieldname, _, _ in Formatter().parse(localConfig.jobTemplate):
             if fieldname:
                 self[fieldname] = None
+        self["runParams"] = None
 
     def write(self) -> None:
         for param in self:
@@ -111,5 +112,10 @@ class JobFile(ParamFile):
         for param in localConfig.jobParameters:
             if self[param] is None:
                 self[param] = localConfig.jobParameters[param]
+        self.setRunCommand()
         if "numNodes" in self:
             self["numNodes"] = math.ceil(self["numCores"] / self["processorsPerNode"])
+
+    def setRunCommand(self):
+        runParams = self["runParams"]
+        self["runCommand"] = f"./{config.binaryName} {config.inputFilename} {runParams}"

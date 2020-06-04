@@ -1,2 +1,5 @@
 bob/localConfig.py
 test
+*.hdf5
+*.dat
+*.bin

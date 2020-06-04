@@ -1,0 +1,4 @@
+cartesian: True
+MultipleDomains: [1, 8]
+numCores: [1,2,4,8,16,32,64]
+runParams: ["21 2 1 1"]

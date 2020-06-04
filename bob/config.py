@@ -3,17 +3,24 @@ from pathlib import Path
 from bob import localConfig
 
 cartesianIdentifier = "cartesian"
+
 bobPath = Path(__file__).parent.resolve()
-bobJobFilesPath = Path(bobPath, "jobFiles")
-arepoCompilationCommand = "make build"
+
+
+# Arepo names
 binaryName = "Arepo"
-jobFileName = "job"
 srcArepoConfigFile = Path(localConfig.arepoDir, "src/arepoconfig.h")
-substitutionFileName = "sims"
 inputFilename = "param.txt"
-jobFilename = "job"
 configFilename = "Config.sh"
-paramFiles = [inputFilename, configFilename, jobFilename]
+arepoCompilationCommand = "make build"
+srcFiles = ["src", "Makefile", "Makefile.systype", "prepare-config.py", "config-makefile", "git_version.sh", "Config.sh"]
+
+# Bob names
+substitutionFileName = "sims"
+jobFilename = "job"
+sourceOutputFolderName = "arepo"
+
+
 configParameters = [
     "NTYPES",
     "PERIODIC",
