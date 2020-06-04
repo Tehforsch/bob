@@ -17,8 +17,8 @@ class Simulation:
         self.folder = simFolder
         self.copyFiles()
         self.readFiles()
-        self.jobFile.addLocalParameters()
         self.makeSubstitutions(substitutions)
+        self.jobFile.addLocalParameters()
         self.writeFiles()
 
     def copyFiles(self) -> None:

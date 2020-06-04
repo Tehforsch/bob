@@ -2,10 +2,10 @@ from typing import Any, Tuple, Union
 import re
 from pathlib import Path
 from string import Formatter
+import math
 from abc import ABC, abstractmethod
 
 from bob import localConfig
-from bob import config
 
 
 class ParamFile(ABC, dict):
@@ -109,4 +109,7 @@ class JobFile(ParamFile):
         if "jobParameters" not in dir(localConfig):
             return
         for param in localConfig.jobParameters:
-            self[param] = localConfig.jobParameters[param]
+            if self[param] is None:
+                self[param] = localConfig.jobParameters[param]
+        if "numNodes" in self:
+            self["numNodes"] = math.ceil(self["numCores"] / self["processorsPerNode"])
