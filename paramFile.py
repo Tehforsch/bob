@@ -4,6 +4,7 @@ from pathlib import Path
 from string import Formatter
 import localConfig
 import config
+import math
 
 
 class ParamFile(dict):
@@ -93,7 +94,10 @@ class JobFile(ParamFile):
         if not "jobParameters" in dir(localConfig):
             return
         for param in localConfig.jobParameters:
-            self[param] = localConfig.jobParameters[param]
+            if self[param] == None:
+                self[param] = localConfig.jobParameters[param]
+        if "numNodes" in self:
+            self["numNodes"] = math.ceil(self["numCores"] / self["processorsPerNode"])
 
 
 def getParamFile(filename: Path) -> Union[ParamFile, JobFile]:
