@@ -1,6 +1,6 @@
 from pathlib import Path
 
-arepoDir = "/home/toni/projects/arepo"
+arepoDir = "/home/toni/projects/phd/arepo"
 
 jobParameters = {"numCores": 1}
 runJobCommand = "bash"
