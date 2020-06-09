@@ -25,3 +25,17 @@ def printArgs(func: Callable[..., Any]) -> Callable[..., Any]:
         return result
 
     return wrapper
+
+
+def memoize(func: Callable[..., Any]) -> Callable[..., Any]:
+    cache = {}
+
+    def wrapper(*args: List[Any], **kwargs: Dict[str, Any]) -> Any:
+        key = str(args) + str(kwargs)
+        if key in cache:
+            return cache[key]
+        result = func(*args, **kwargs)
+        cache[key] = result
+        return result
+
+    return wrapper

@@ -25,7 +25,8 @@ class LineParamFile(ParamFile):
         with filename.open("r") as f:
             self.lines = f.readlines()
             self.update(self.readLine(self.getLineWithoutComment(line)) for line in self.lines)
-            del self[""]
+            if "" in self:
+                del self[""]
 
     def getLineWithoutComment(self, line: str) -> str:
         if self.commentString not in line:
@@ -66,6 +67,8 @@ class InputFile(LineParamFile):
 class ConfigFile(LineParamFile):
     def __init__(self, filename: Path):
         self.commentString = "#"
+        for param in config.configParams:
+            self[param] = False  # Ensure all possible config parameters exist in the dictionary, even if they are commented out in the file
         super().__init__(filename)
 
     def readLine(self, line: str) -> Tuple[str, Any]:
