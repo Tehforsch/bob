@@ -99,10 +99,12 @@ def convertValue(s: str) -> Union[int, float, str]:
 class JobFile(ParamFile):
     def __init__(self, filename: Path) -> None:
         super().__init__(filename)
+        self["numCores"] = 1
         for _, fieldname, _, _ in Formatter().parse(localConfig.jobTemplate):
             if fieldname:
                 self[fieldname] = None
         self["runParams"] = None
+        self["maxCoresPerNode"] = None
 
     def write(self) -> None:
         for param in self:

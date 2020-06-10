@@ -16,6 +16,7 @@ from bob.util import memoize
 class Simulation:
     def __init__(self, createSim: bool, name: str, inputFolder: Path, simFolder: Path, substitutions: Dict[str, Any]) -> None:
         self.name = name
+        logging.info(f"Creating sim {name}")
         self.inputFolder = inputFolder
         self.folder = simFolder
         if createSim:
