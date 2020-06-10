@@ -19,6 +19,8 @@ def setupArgs() -> argparse.Namespace:
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 
     args = parser.parse_args()
+    args.inputFolder = args.inputFolder.expanduser()
+    args.outputFolder = args.outputFolder.expanduser()
     return args
 
 
