@@ -3,10 +3,10 @@ from bob import config
 
 arepoDir = "/beegfs/work/ws/hd_hp240-arepoTest-0/arepoSweep/arepo"
 
-jobParameters = {"numNodes": 4, "processorsPerNode": 16, "wallTime": "3:00:00", "jobName": "arepoTest", "logFile": "output.log"}
+jobParameters = {"wallTime": "3:00:00", "jobName": "arepoTest", "logFile": "output.log", "maxCoresPerNode": 16}
 runJobCommand = "msub"
 
-jobTemplate = """ #MSUB -l nodes={numNodes}:ppn={processorsPerNode}
+jobTemplate = """ #MSUB -l nodes={numNodes}:ppn={coresPerNode}
 #MSUB -l walltime={wallTime}
 #MSUB -l pmem=4000mb
 #MSUB -N {jobName}
@@ -17,6 +17,6 @@ module load lib/hdf5/1.8-intel-16.0
 module load numlib/gsl/2.2.1-intel-16.0
 module load numlib/fftw/3.3.5-impi-5.1.3-intel-16.0
 
-startexe="mpirun -n {numCores} {runCommand}"
+startexe="mpirun --bind-to core --map-by core --report-bindings {runCommand}"
 cd $MOAB_SUBMITDIR
 exec $startexe """

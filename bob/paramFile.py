@@ -4,6 +4,7 @@ from pathlib import Path
 from string import Formatter
 import math
 from abc import ABC, abstractmethod
+import logging
 
 from bob import localConfig, config
 
@@ -116,9 +117,18 @@ class JobFile(ParamFile):
             if self[param] is None:
                 self[param] = localConfig.jobParameters[param]
         self.setRunCommand()
-        if "numNodes" in self:
-            self["numNodes"] = math.ceil(self["numCores"] / self["processorsPerNode"])
+        if "numNodes" in self and "coresPerNode" in self:
+            numCores = self["numCores"]
+            if numCores < self["maxCoresPerNode"]:
+                self["coresPerNode"] = numCores
+                self["numNodes"] = 1
+            else:
+                self["coresPerNode"] = self["maxCoresPerNode"]
+                self["numNodes"] = math.ceil(numCores / self["coresPerNode"])
+                realNumCores = self["coresPerNode"] * self["numNodes"]
+                if realNumCores != numCores:
+                    logging.info(f"Cannot run with {numCores} cores (not divisible by max num of cores per node). Running on {realNumCores} instead.")
 
-    def setRunCommand(self):
+    def setRunCommand(self) -> None:
         runParams = self["runParams"]
         self["runCommand"] = f"./{config.binaryName} {config.inputFilename} {runParams}"
