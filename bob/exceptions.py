@@ -4,4 +4,4 @@ class BobException(Exception):
 
 class CompilationError(BobException):
     def __init__(self) -> None:
-        super().__init__("Compilation error. Run with -v to see the error. I'm lazy.")
+        super().__init__("Compilation error.")

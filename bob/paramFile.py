@@ -103,8 +103,6 @@ class JobFile(ParamFile):
             if fieldname:
                 self[fieldname] = None
         self["runParams"] = None
-        self["maxCoresPerNode"] = None
-        self["numCores"] = None
 
     def write(self) -> None:
         for param in self:
@@ -131,6 +129,8 @@ class JobFile(ParamFile):
     def addLocalParameters(self) -> None:
         if "jobParameters" not in dir(localConfig):
             return
+        self["maxCoresPerNode"] = None
+        self["numCores"] = None
         for param in localConfig.jobParameters:
             if self[param] is None:
                 self[param] = localConfig.jobParameters[param]

@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 import shutil
 import os
 import argparse
@@ -14,24 +14,30 @@ from bob.util import memoize
 
 
 class Simulation:
-    def __init__(self, createSim: bool, name: str, inputFolder: Path, simFolder: Path, substitutions: Dict[str, Any]) -> None:
+    def __init__(self, args: argparse.Namespace, name: str, substitutions: Dict[str, Any] = None) -> None:
         self.name = name
-        if createSim:
+        if args.create:
             logging.info(f"Creating sim {name}")
         else:
             logging.info(f"Loading sim {name}")
-        self.inputFolder = inputFolder
-        self.folder = simFolder
-        if createSim:
-            self.copyFiles()
+        self.folder = Path(args.simFolder, self.name)
+        if args.delete:
+            self.deleteFiles()
+        if args.create:
+            self.copyFiles(args.inputFolder)
         self.readFiles()
-        self.makeSubstitutions(substitutions)
+        if args.create:
+            self.makeSubstitutions(substitutions)
         self.jobFile.addLocalParameters()
-        if createSim:
+        if args.create:
             self.writeFiles()
+        self.binaryFile = Path(self.folder, config.binaryName)
 
-    def copyFiles(self) -> None:
-        shutil.copytree(self.inputFolder, self.folder)
+    def deleteFiles(self) -> None:
+        shutil.rmtree(self.folder)
+
+    def copyFiles(self, inputFolder) -> None:
+        shutil.copytree(inputFolder, self.folder)
 
     def readFiles(self) -> None:
         self.configFile = ConfigFile(Path(self.folder, config.configFilename))
@@ -54,12 +60,12 @@ class Simulation:
         paramFile = paramFilesWithThisParameter[0]
         paramFile[k] = v
 
-    def compileArepo(self, verbose: bool = False) -> None:
+    def compileArepo(self, quiet: bool = False) -> None:
         self.copyConfigFile()
         logging.info("Compiling arepo.")
         if config.srcArepoConfigFile.is_file():
             os.remove(config.srcArepoConfigFile)
-        process = util.runCommand(config.arepoCompilationCommand, path=localConfig.arepoDir, printOutput=verbose, shell=True)
+        process = util.runCommand(config.arepoCompilationCommand, path=localConfig.arepoDir, printOutput=not quiet, shell=True)
         if process.returncode != 0:
             raise CompilationError()
         self.copyBinary()
@@ -76,8 +82,7 @@ class Simulation:
 
     def copyBinary(self) -> None:
         sourceFile = Path(localConfig.arepoDir, config.binaryName)
-        targetFile = Path(self.folder, config.binaryName)
-        shutil.copy(sourceFile, targetFile)
+        shutil.copy(sourceFile, self.binaryFile)
 
     def copySource(self) -> None:
         for srcFile in config.srcFiles:
@@ -96,6 +101,8 @@ class Simulation:
         shutil.copy(source, target)
 
     def run(self, args: argparse.Namespace) -> None:
+        assert self.binaryFile.is_file(), "Binary does not exist. Not starting job. Did you forget to specify -m (tell bob to compile arepo)?"
+
         util.runCommand([localConfig.runJobCommand, str(self.jobFile.filename.name)], path=self.jobFile.filename.parent, shell=False, printOutput=args.verbose)
 
     @property
