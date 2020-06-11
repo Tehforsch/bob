@@ -1,7 +1,7 @@
 from pathlib import Path
 from bob import config
 
-arepoDir = "/beegfs/work/ws/hd_hp240-arepoTest-0/arepoSweep/arepo"
+arepoDir = "/beegfs/home/hd/hd_hd/hd_hp240/projects/phd/arepo"
 
 jobParameters = {"wallTime": "3:00:00", "jobName": "arepoTest", "logFile": "output.log", "maxCoresPerNode": 16}
 runJobCommand = "msub"
