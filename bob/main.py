@@ -12,7 +12,8 @@ def setupArgs() -> argparse.Namespace:
     postprocessingFunctions = [f.__name__ for f in postprocess.functions]
     parser.add_argument("inputFolder", type=Path, help="Folder containing the simulation input data.")
     parser.add_argument("outputFolder", type=Path, help="Folder into which the simulation is written.")
-    parser.add_argument("-c", "--create", action="store_true", help="Copy files and compile arepo if config file has changed")
+    parser.add_argument("-c", "--create", action="store_true", help="Copy files for all simulations")
+    parser.add_argument("-m", "--make", action="store_true", help="Compile arepo if config file changed and copy executable")
     parser.add_argument("-r", "--run", action="store_true", help="Run and compile the simulations after writing them")
     parser.add_argument("-p", "--postprocess", action="store_true", help="Run postprocessing scripts on an already run simulation")
     parser.add_argument("--functions", choices=postprocessingFunctions, help="Which postprocessing functions to run")
@@ -31,18 +32,23 @@ def setupLogging(args: argparse.Namespace) -> None:
         logging.basicConfig(level=logging.INFO)
 
 
-def runSimulations(args: argparse.Namespace, sims: SimulationSet) -> None:
+def makeSimulations(args: argparse.Namespace, sims: SimulationSet) -> None:
     for sim in sims:
         sim.compileArepo(args.verbose)
-        if args.run:
-            sim.run(args)
+
+
+def runSimulations(args: argparse.Namespace, sims: SimulationSet) -> None:
+    for sim in sims:
+        sim.run(args)
 
 
 def main() -> None:
     args = setupArgs()
     setupLogging(args)
     sims = fromFolder(args.create, args)
-    if args.create:
+    if args.make:
+        makeSimulations(args, sims)
+    if args.run:
         runSimulations(args, sims)
     if args.postprocess:
         postprocess.main(args, sims)
