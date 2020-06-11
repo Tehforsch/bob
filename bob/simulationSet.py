@@ -48,21 +48,26 @@ def getSimNames(dicts: List[Dict[str, Any]]) -> List[str]:
     return names
 
 
-def createSimsFromFolder(args: argparse.Namespace) -> SimulationSet:
+def getAllSubstitutions(args: argparse.Namespace) -> Dict[str, Any]:
     if args.create:
-        allSubstitutions = readSubstitutionsFile(args.inputFolder)
-        if allSubstitutions == {}:
-            return SimulationSet([Simulation(args, "sim", {})])
-        if allSubstitutions.get(config.cartesianIdentifier, False):
-            del allSubstitutions[config.cartesianIdentifier]
-            dicts = getProductSubstitutions(allSubstitutions)
-        else:
-            numSims = len(next(iter(allSubstitutions.values())))
-            for v in allSubstitutions.values():
-                assert len(v) == numSims
-            dicts = [dict((k, v[i]) for (k, v) in allSubstitutions.items()) for i in range(numSims)]
-        names = getSimNames(dicts)
-        return SimulationSet(Simulation(args, name, d) for (name, d) in zip(names, dicts))
+        return readSubstitutionsFile(args.inputFolder)
     else:
-        simNames = args.simFolder.glob("*")
-        return SimulationSet([Simulation(args, name, {}) for name in simNames])
+        simNames = list(args.simFolder.glob("*"))
+        assert len(simNames) > 0, "No simulation in output folder."
+        return readSubstitutionsFile(Path(args.simFolder, simNames[0]))
+
+
+def createSimsFromFolder(args: argparse.Namespace) -> SimulationSet:
+    allSubstitutions = getAllSubstitutions(args)
+    if allSubstitutions == {}:
+        return SimulationSet([Simulation(args, "sim", {})])
+    if allSubstitutions.get(config.cartesianIdentifier, False):
+        del allSubstitutions[config.cartesianIdentifier]
+        dicts = getProductSubstitutions(allSubstitutions)
+    else:
+        numSims = len(next(iter(allSubstitutions.values())))
+        for v in allSubstitutions.values():
+            assert len(v) == numSims
+        dicts = [dict((k, v[i]) for (k, v) in allSubstitutions.items()) for i in range(numSims)]
+    names = getSimNames(dicts)
+    return SimulationSet(Simulation(args, name, d) for (name, d) in zip(names, dicts))

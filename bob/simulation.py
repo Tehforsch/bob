@@ -27,8 +27,7 @@ class Simulation:
         if args.create:
             self.copyFiles(args.inputFolder)
         self.params = self.readFiles()
-        if args.create:
-            self.params.updateParams(substitutions)
+        self.params.updateParams(substitutions)
         self.params.setDerivedParams()
         if args.create:
             self.params.writeFiles()
