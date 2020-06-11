@@ -1,4 +1,4 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import shutil
 import os
 import argparse
@@ -104,14 +104,17 @@ class Simulation:
 
     @property  # type: ignore
     @memoize
-    def log(self):
+    def log(self) -> List[str]:
         with Path(self.folder, self.jobFile["logFile"]).open("r") as f:
             return f.readlines()
 
     @property
-    def runTime(self):
+    def runTime(self) -> float:
         for line in self.log[::-1]:
             match = re.match(config.runTimePattern, line)
             if match is not None:
                 return float(match.groups()[0])
-        return None
+        assert False, f"Could not read runtime from log. Did the simulation finish? ({str(self)})"
+
+    def __repr__(self) -> str:
+        return f"Sim{self.name}"
