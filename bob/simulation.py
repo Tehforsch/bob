@@ -9,12 +9,13 @@ import re
 
 from bob import localConfig, config, util
 from bob.exceptions import CompilationError
-from bob.paramFile import ParamFile, ConfigFile, InputFile, JobFile
+from bob.paramFile import ConfigFile, InputFile, JobFile
 from bob.util import memoize
+from bob.params import Params
 
 
 class Simulation:
-    def __init__(self, args: argparse.Namespace, name: str, substitutions: Dict[str, Any] = None) -> None:
+    def __init__(self, args: argparse.Namespace, name: str, substitutions: Dict[str, Any]) -> None:
         self.name = name
         if args.create:
             logging.info(f"Creating sim {name}")
@@ -25,40 +26,25 @@ class Simulation:
             self.deleteFiles()
         if args.create:
             self.copyFiles(args.inputFolder)
-        self.readFiles()
+        self.params = self.readFiles()
         if args.create:
-            self.makeSubstitutions(substitutions)
-        self.jobFile.addLocalParameters()
+            self.params.updateParams(substitutions)
+        self.params.setDerivedParams()
         if args.create:
-            self.writeFiles()
+            self.params.writeFiles()
         self.binaryFile = Path(self.folder, config.binaryName)
 
     def deleteFiles(self) -> None:
         shutil.rmtree(self.folder)
 
-    def copyFiles(self, inputFolder) -> None:
+    def copyFiles(self, inputFolder: Path) -> None:
         shutil.copytree(inputFolder, self.folder)
 
-    def readFiles(self) -> None:
+    def readFiles(self) -> Params:
         self.configFile = ConfigFile(Path(self.folder, config.configFilename))
         self.inputFile = InputFile(Path(self.folder, config.inputFilename))
-        self.jobFile = JobFile(Path(self.folder, config.jobFilename))
-        self.paramFiles: List[ParamFile] = [self.configFile, self.inputFile, self.jobFile]
-
-    def writeFiles(self) -> None:
-        for paramFile in self.paramFiles:
-            paramFile.write()
-
-    def makeSubstitutions(self, substitutions: Dict[str, Any]) -> None:
-        for (k, v) in substitutions.items():
-            self.substituteParameter(k, v)
-
-    def substituteParameter(self, k: str, v: Any) -> None:
-        paramFilesWithThisParameter = [paramFile for paramFile in self.paramFiles if k in paramFile]
-        assert len(paramFilesWithThisParameter) != 0, f"No file contains this parameter: {k}"
-        assert len(paramFilesWithThisParameter) == 1, f"Multiple files contain this parameter: {k}: {paramFilesWithThisParameter}"
-        paramFile = paramFilesWithThisParameter[0]
-        paramFile[k] = v
+        self.jobFile = JobFile(Path(self.folder, config.jobFilename), localConfig.jobParams)
+        return Params([self.configFile, self.inputFile, self.jobFile])
 
     def compileArepo(self, quiet: bool = False) -> None:
         self.copyConfigFile()
@@ -104,10 +90,6 @@ class Simulation:
         assert self.binaryFile.is_file(), "Binary does not exist. Not starting job. Did you forget to specify -m (tell bob to compile arepo)?"
 
         util.runCommand([localConfig.runJobCommand, str(self.jobFile.filename.name)], path=self.jobFile.filename.parent, shell=False, printOutput=args.verbose)
-
-    @property
-    def params(self) -> Dict[str, Any]:
-        return dict((k, v) for paramFile in self.paramFiles for (k, v) in paramFile.items())
 
     @property  # type: ignore
     @memoize

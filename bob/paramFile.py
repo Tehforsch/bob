@@ -1,4 +1,4 @@
-from typing import Any, Tuple, Union
+from typing import Any, Tuple, Union, List, Optional, Dict
 import re
 from pathlib import Path
 from string import Formatter
@@ -10,12 +10,19 @@ from bob import localConfig, config
 
 
 class ParamFile(ABC, dict):
-    def __init__(self, filename: Path) -> None:
+    def __init__(self, filename: Path, defaults: Optional[Dict[str, Any]] = None) -> None:
         super().__init__([])
         self.filename = filename
+        if defaults is not None:
+            self.update(defaults)
+        self.unusedParameters: List[str] = []
+        self.derivedParameters: List[str] = []
 
     @abstractmethod
     def write(self) -> None:
+        pass
+
+    def setDerivedParameters(self) -> None:
         pass
 
 
@@ -97,12 +104,18 @@ def convertValue(s: str) -> Union[int, float, str]:
 
 
 class JobFile(ParamFile):
-    def __init__(self, filename: Path) -> None:
-        super().__init__(filename)
+    def __init__(self, filename: Path, defaults: Dict[str, Any]) -> None:
+        super().__init__(filename, defaults)
         for _, fieldname, _, _ in Formatter().parse(localConfig.jobTemplate):
             if fieldname:
-                self[fieldname] = None
-        self["runParams"] = None
+                if not fieldname in self:
+                    self[fieldname] = None
+        self.unusedParameters = [
+            "numCores",
+            "runParams",
+            "maxCoresPerNode",
+        ]  # Parameters that we might not use (numCores might be specified but coresPerNode and numNodes will be used)
+        self.derivedParameters = ["numNodes", "coresPerNode", "runCommand"]  # Parameters that are not interesting for postprocessing (we care about numCores)
 
     def write(self) -> None:
         for param in self:
@@ -110,42 +123,22 @@ class JobFile(ParamFile):
         with self.filename.open("w") as f:
             f.write(localConfig.jobTemplate.format(**self))
 
-    def __getitem__(self, key: str) -> Any:
-        if key == "numNodes":
-            numCores = self["numCores"]
-            if numCores < self["maxCoresPerNode"]:
-                return 1
-            else:
-                return math.ceil(numCores / self["coresPerNode"])
-        if key == "coresPerNode":
-            numCores = self["numCores"]
-            if numCores < self["maxCoresPerNode"]:
-                return numCores
-            else:
-                return self["maxCoresPerNode"]
-
-        return super().__getitem__(key)
-
-    def addLocalParameters(self) -> None:
-        if "jobParameters" not in dir(localConfig):
-            return
-        self["maxCoresPerNode"] = None
-        self["numCores"] = None
-        for param in localConfig.jobParameters:
-            if self[param] is None:
-                self[param] = localConfig.jobParameters[param]
+    def setDerivedParameters(self) -> None:
         self.setRunCommand()
-        # if "numNodes" in self and "coresPerNode" in self:
-        #     numCores = self["numCores"]
-        #     if numCores < self["maxCoresPerNode"]:
-        #         self["coresPerNode"] = numCores
-        #         self["numNodes"] = 1
-        #     else:
-        #         self["coresPerNode"] = self["maxCoresPerNode"]
-        #         self["numNodes"] = math.ceil(numCores / self["coresPerNode"])
-        #         realNumCores = self["coresPerNode"] * self["numNodes"]
-        #         if realNumCores != numCores:
-        #             logging.info(f"Cannot run with {numCores} cores (not divisible by max num of cores per node). Running on {realNumCores} instead.")
+        self.setNumCores()
+
+    def setNumCores(self) -> None:
+        if "numNodes" in self and "coresPerNode" in self:
+            numCores = self["numCores"]
+            if numCores < self["maxCoresPerNode"]:
+                self["coresPerNode"] = numCores
+                self["numNodes"] = 1
+            else:
+                self["coresPerNode"] = self["maxCoresPerNode"]
+                self["numNodes"] = math.ceil(numCores / self["coresPerNode"])
+                realNumCores = self["coresPerNode"] * self["numNodes"]
+                if realNumCores != numCores:
+                    logging.info(f"Cannot run with {numCores} cores (not divisible by max num of cores per node). Running on {realNumCores} instead.")
 
     def setRunCommand(self) -> None:
         runParams = self["runParams"]
