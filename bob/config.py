@@ -25,6 +25,10 @@ substitutionFileName = "sims"
 jobFilename = "job"
 sourceOutputFolderName = "arepo"
 
+# Gprof settings
+gprofPartFilePattern = "gmon.out.*"
+gprofSumFile = "gmon.sum"
+
 configParams = [
     "NTYPES",
     "PERIODIC",

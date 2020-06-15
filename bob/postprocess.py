@@ -1,6 +1,7 @@
 import argparse
 from bob.simulationSet import SimulationSet
-from bob.scaling import scaling
+import bob.scaling
+import bob.gprof
 
 
 def checkNoDoubledNames() -> None:
@@ -16,5 +17,5 @@ def main(args: argparse.Namespace, sims: SimulationSet) -> None:
         postprocessingFunction(sims)
 
 
-functions = [scaling]
+functions = [bob.scaling.speedup, bob.scaling.runTime, bob.gprof.runGprof]
 checkNoDoubledNames()

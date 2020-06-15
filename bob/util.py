@@ -1,6 +1,6 @@
 import logging
 import sys
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, check_output
 from typing import Callable, Any, List, Dict, Union
 from pathlib import Path
 
@@ -13,6 +13,11 @@ def runCommand(command: Union[str, List[str]], path: Union[str, Path], printOutp
         process = Popen(command, cwd=path, shell=shell, stdout=PIPE, stderr=PIPE)
     process.communicate()
     return process
+
+
+def checkOutput(command: Union[str, List[str]], path: Union[str, Path], printOutput: bool = False, shell: bool = False) -> str:
+    output = check_output(command, cwd=path, shell=shell)
+    return str(output)
 
 
 def printArgs(func: Callable[..., Any]) -> Callable[..., Any]:
