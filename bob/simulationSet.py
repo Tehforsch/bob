@@ -13,7 +13,8 @@ class SimulationSet(list):
         super().__init__(sims)
         for sim in self[1:]:
             assert sim.params.keys() == self[0].params.keys()
-        self.variedParams = set(k for k in self[0].params if self.doesVary(k))
+        self.derivedParams = set.union(*(f.params.getDerivedParams() for f in self))
+        self.variedParams = set(k for k in self[0].params if self.doesVary(k) and not k in self.derivedParams)
         self.commonParams = self[0].params.keys() - self.variedParams
 
     def doesVary(self, k: str) -> bool:

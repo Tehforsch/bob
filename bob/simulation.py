@@ -102,7 +102,8 @@ class Simulation:
             match = re.match(config.runTimePattern, line)
             if match is not None:
                 return float(match.groups()[0])
-        assert False, f"Could not read runtime from log. Did the simulation finish? ({str(self)})"
+        # assert False, f"Could not read runtime from log. Did the simulation finish? ({str(self)})"
+        return None
 
     def __repr__(self) -> str:
         return f"Sim{self.name}"

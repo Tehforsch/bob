@@ -1,4 +1,4 @@
-from typing import Any, Tuple, Union, List, Optional, Dict
+from typing import Any, Tuple, Union, List, Optional, Dict, Set
 import re
 from pathlib import Path
 from string import Formatter
@@ -15,14 +15,14 @@ class ParamFile(ABC, dict):
         self.filename = filename
         if defaults is not None:
             self.update(defaults)
-        self.unusedParameters: List[str] = []
-        self.derivedParameters: List[str] = []
+        self.unusedParams: Set[str] = set()
+        self.derivedParams: Set[str] = set()
 
     @abstractmethod
     def write(self) -> None:
         pass
 
-    def setDerivedParameters(self) -> None:
+    def setDerivedParams(self) -> None:
         pass
 
 
@@ -110,12 +110,10 @@ class JobFile(ParamFile):
             if fieldname:
                 if not fieldname in self:
                     self[fieldname] = None
-        self.unusedParameters = [
-            "numCores",
-            "runParams",
-            "maxCoresPerNode",
-        ]  # Parameters that we might not use (numCores might be specified but coresPerNode and numNodes will be used)
-        self.derivedParameters = ["numNodes", "coresPerNode", "runCommand"]  # Parameters that are not interesting for postprocessing (we care about numCores)
+        self.unusedParams = set(
+            ["numCores", "runParams", "maxCoresPerNode"]
+        )  # Parameters that we might not use (numCores might be specified but coresPerNode and numNodes will be used)
+        self.derivedParams = set(["numNodes", "coresPerNode", "runCommand"])  # Parameters that are not interesting for postprocessing (we care about numCores)
 
     def write(self) -> None:
         for param in self:
@@ -123,7 +121,7 @@ class JobFile(ParamFile):
         with self.filename.open("w") as f:
             f.write(localConfig.jobTemplate.format(**self))
 
-    def setDerivedParameters(self) -> None:
+    def setDerivedParams(self) -> None:
         self.setRunCommand()
         self.setNumCores()
 
