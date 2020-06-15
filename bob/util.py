@@ -33,7 +33,7 @@ def printArgs(func: Callable[..., Any]) -> Callable[..., Any]:
 
 
 def memoize(func: Callable[..., Any]) -> Callable[..., Any]:
-    cache = {}
+    cache: Dict[Any, Any] = {}
 
     def wrapper(*args: List[Any], **kwargs: Dict[str, Any]) -> Any:
         key = str(args) + str(kwargs)
