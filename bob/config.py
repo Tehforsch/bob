@@ -28,6 +28,7 @@ sourceOutputFolderName = "arepo"
 # Gprof settings
 gprofPartFilePattern = "gmon.out.*"
 gprofSumFile = "gmon.sum"
+gprofOutFile = "gprof.log"
 
 configParams = [
     "NTYPES",

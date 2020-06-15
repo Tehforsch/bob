@@ -15,9 +15,8 @@ def runCommand(command: Union[str, List[str]], path: Union[str, Path], printOutp
     return process
 
 
-def checkOutput(command: Union[str, List[str]], path: Union[str, Path], printOutput: bool = False, shell: bool = False) -> str:
-    output = check_output(command, cwd=path, shell=shell)
-    return str(output)
+def checkOutput(command: Union[str, List[str]], path: Union[str, Path], printOutput: bool = False, shell: bool = False) -> bytes:
+    return check_output(command, cwd=path, shell=shell)
 
 
 def printArgs(func: Callable[..., Any]) -> Callable[..., Any]:
