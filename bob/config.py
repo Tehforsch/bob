@@ -24,6 +24,11 @@ runTimePattern = "Code run for ([0-9.]*) seconds!"
 substitutionFileName = "sims"
 jobFilename = "job"
 sourceOutputFolderName = "arepo"
+picFolder = "pics"
+
+# Plot settings
+dpi = 300
+fontSize = 9
 
 # Gprof settings
 gprofPartFilePattern = "gmon.out.*"

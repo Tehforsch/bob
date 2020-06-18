@@ -6,33 +6,33 @@ import matplotlib.pyplot as plt
 
 def getScalingSimSets(sims: SimulationSet) -> List[Any]:
     sims.sort(key=lambda sim: sim.params["numCores"])
-    return sims.quotient(["numCores"])
+    quotient = sims.quotient(["numCores"])
+    quotient.sort(key=lambda sims: (sims[0]["SX_SWEEP"], sims[0]["MultipleDomains"]))
+    return quotient
 
 
-def speedup(sims: SimulationSet) -> None:
+def speedup(ax: plt.axes, sims: SimulationSet) -> None:
     for (params, simSet) in getScalingSimSets(sims):
         numCores = [sim.params["numCores"] for sim in simSet]
         runTimes = [sim.runTime for sim in simSet]
-        # plt.xscale("log")
+        # ax.xscale("log")
         baseTime = runTimes[0]
         speedup = [None if runTime is None else baseTime / runTime for runTime in runTimes]
-        plt.xlabel("N")
-        plt.ylabel("Speedup")
-        plt.plot(numCores, speedup, label=str(params))
+        ax.xlabel("N")
+        ax.ylabel("Speedup")
+        ax.plot(numCores, speedup, label=str(params))
 
-    # plt.plot(numCores, numCores, label="Ideal")
-    plt.legend()
-    plt.show()
+    ax.plot(numCores, numCores, label="Ideal")
+    ax.legend()
 
 
-def runTime(sims: SimulationSet) -> None:
+def runTime(ax: plt.axes, sims: SimulationSet) -> None:
     for (params, simSet) in getScalingSimSets(sims):
         numCores = [sim.params["numCores"] for sim in simSet]
         runTimes = [sim.runTime for sim in simSet]
-        plt.xlabel("N")
-        plt.ylabel("run time [s]")
-        plt.plot(numCores, runTimes, label=str(params))
+        ax.xlabel("N")
+        ax.ylabel("run time [s]")
+        ax.plot(numCores, runTimes, label=str(params))
 
     # plt.plot(numCores, numCores, label="Ideal")
-    plt.legend()
-    plt.show()
+    ax.legend()

@@ -9,8 +9,9 @@ from bob.simulation import Simulation
 
 
 class SimulationSet(list):
-    def __init__(self, sims: Iterable[Simulation]) -> None:
+    def __init__(self, folder: Path, sims: Iterable[Simulation]) -> None:
         super().__init__(sims)
+        self.folder = folder
         for sim in self[1:]:
             assert sim.params.keys() == self[0].params.keys()
         self.derivedParams = set.union(*(f.params.getDerivedParams() for f in self))
@@ -24,7 +25,10 @@ class SimulationSet(list):
         remainingVariedParams = self.variedParams - set(parameters)
         getConfiguration = lambda sim: tuple((k, sim.params[k]) for k in remainingVariedParams)
         configurations = set(getConfiguration(sim) for sim in self)
-        return [(configuration, SimulationSet([sim for sim in self if getConfiguration(sim) == configuration])) for configuration in configurations]
+        return [
+            (dict(configuration), SimulationSet(self.folder, [sim for sim in self if getConfiguration(sim) == configuration]))
+            for configuration in configurations
+        ]
 
 
 def readSubstitutionsFile(inputFolder: Path) -> Dict[str, Any]:
@@ -61,7 +65,7 @@ def getAllSubstitutions(args: argparse.Namespace) -> Dict[str, Any]:
 def createSimsFromFolder(args: argparse.Namespace) -> SimulationSet:
     allSubstitutions = getAllSubstitutions(args)
     if allSubstitutions == {}:
-        return SimulationSet([Simulation(args, "sim", {})])
+        return SimulationSet(args.simFolder, [Simulation(args, "sim", {})])
     if allSubstitutions.get(config.cartesianIdentifier, False):
         del allSubstitutions[config.cartesianIdentifier]
         dicts = getProductSubstitutions(allSubstitutions)
@@ -71,4 +75,4 @@ def createSimsFromFolder(args: argparse.Namespace) -> SimulationSet:
             assert len(v) == numSims
         dicts = [dict((k, v[i]) for (k, v) in allSubstitutions.items()) for i in range(numSims)]
     names = getSimNames(dicts)
-    return SimulationSet(Simulation(args, name, d) for (name, d) in zip(names, dicts))
+    return SimulationSet(args.simFolder, (Simulation(args, name, d) for (name, d) in zip(names, dicts)))
