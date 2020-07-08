@@ -13,7 +13,7 @@ jobTemplate = """ #MSUB -l nodes={numNodes}:ppn={coresPerNode}
 #MSUB -N {jobName}
 #MSUB -o {logFile}
 #MSUB -v HDF5_DISABLE_VERSION_CHECK=2
-#MSUB -v GMON_OUT_PREFIX=gmon.out
+{jobLines}
 module load compiler/intel/16.0
 module load mpi/impi/5.1.3-intel-16.0
 module load numlib/gsl/2.2.1-intel-16.0
