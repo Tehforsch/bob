@@ -36,7 +36,8 @@ class Simulation:
         self.binaryFile = Path(self.folder, config.binaryName)
 
     def deleteFiles(self) -> None:
-        shutil.rmtree(self.folder)
+        if self.folder.is_dir():
+            shutil.rmtree(self.folder)
 
     def copyFiles(self, inputFolder: Path) -> None:
         shutil.copytree(inputFolder, self.folder)
