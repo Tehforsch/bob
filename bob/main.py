@@ -21,6 +21,7 @@ def setupArgs() -> argparse.Namespace:
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     parser.add_argument("-q", "--quiet", action="store_true", help="Suppress compilation output")
     parser.add_argument("-s", "--showFigures", action="store_true", help="Show figures instead of saving them")
+    parser.add_argument("--gdb", action="store_true", help="Run arepo with gdb")
 
     args = parser.parse_args()
     if args.create is not None:

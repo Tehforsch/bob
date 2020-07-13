@@ -26,6 +26,8 @@ class Simulation:
             self.deleteFiles()
         if args.create:
             self.copyFiles(args.inputFolder)
+        if args.gdb:
+            localConfig.jobParams["gdb"] = localConfig.defaultGdbCommand
         self.params = self.readFiles()
         self.params.updateParams(substitutions)
         self.params.setDerivedParams()
@@ -87,7 +89,6 @@ class Simulation:
 
     def run(self, args: argparse.Namespace) -> None:
         assert self.binaryFile.is_file(), "Binary does not exist. Not starting job. Did you forget to specify -m (tell bob to compile arepo)?"
-
         util.runCommand([localConfig.runJobCommand, str(self.jobFile.filename.name)], path=self.jobFile.filename.parent, shell=False, printOutput=args.verbose)
 
     @property  # type: ignore
