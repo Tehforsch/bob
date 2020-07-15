@@ -18,7 +18,7 @@ def setupArgs() -> argparse.Namespace:
     parser.add_argument("-r", "--run", action="store_true", help="Run and compile the simulations after writing them")
     parser.add_argument("-p", "--postprocess", action="store_true", help="Run postprocessing scripts on an already run simulation")
     parser.add_argument("-d", "--delete", action="store_true", help="Delete old simulations if they exist")
-    parser.add_argument("--functions", nargs="*", choices=functionNames, help="Which postprocessing functions to run")
+    parser.add_argument("--functions", choices=postprocessingFunctions, nargs="*", help="Which postprocessing functions to run")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     parser.add_argument("-q", "--quiet", action="store_true", help="Suppress compilation output")
     parser.add_argument("--showFigures", action="store_true", help="Show figures instead of saving them")

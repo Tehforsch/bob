@@ -30,6 +30,7 @@ specialFolders = [picFolder]
 # Plot settings
 dpi = 300
 fontSize = 9
+picFileEnding = ".png"
 
 # Gprof settings
 gprofPartFilePattern = "gmon.out.*"

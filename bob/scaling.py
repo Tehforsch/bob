@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 def getScalingSimSets(sims: SimulationSet) -> List[Any]:
     sims.sort(key=lambda sim: sim.params["numCores"])
     quotient = sims.quotient(["numCores"])
-    quotient.sort(key=lambda sims: (sims[0]["SX_SWEEP"], sims[0]["MultipleDomains"]))
+    quotient.sort(key=lambda sims: (sims[0]["SX_SWEEP"]))
     return quotient
 
 
