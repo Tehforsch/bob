@@ -9,7 +9,7 @@ class Scatter3D:
         self.vmin = 0
         self.vmax = 1
         self.vFilterTreshold = treshold
-        self.array = self.snapshot.getField(*field)
+        self.array = field.getData(snapshot)
 
     def plot(self, ax, **plotSettings):
         where = np.where(self.array >= self.vFilterTreshold)

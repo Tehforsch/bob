@@ -1,5 +1,5 @@
 import argparse
-from typing import Callable, List, Any
+from typing import Sequence
 from pathlib import Path
 from bob.simulationSet import SimulationSet
 from bob import config
@@ -8,17 +8,15 @@ import bob.gprof
 import matplotlib.pyplot as plt
 import bob.plot
 import bob.physicalPlots
+import bob.compareSimulations
+from bob.postprocessingFunctions import postprocessingFunctions, PostprocessingFunction, PlotFunction, SingleSimPlotFunction, SingleSnapshotPlotFunction
 
 
-def checkNoDoubledNames() -> None:
-    assert len(set(functionNames)) == len(functionNames), "Two functions with the same name in postprocessing functions!"
-
-
-def getSpecifiedFunctions(args: argparse.Namespace, functions: List[Callable[..., Any]]) -> List[Callable[..., Any]]:
+def getSpecifiedFunctions(args: argparse.Namespace, functions: Sequence[PostprocessingFunction]) -> Sequence[PostprocessingFunction]:
     if args.functions is None:
         return functions
     else:
-        return [function for function in functions if function.__name__ in args.functions]
+        return [function for function in functions if function.name in args.functions]
 
 
 def setFontSizes() -> None:
@@ -33,13 +31,12 @@ def main(args: argparse.Namespace, sims: SimulationSet) -> None:
     setFontSizes()
     picFolder = Path(args.simFolder, config.picFolder)
     picFolder.mkdir(exist_ok=True)
-    for function in getSpecifiedFunctions(args, postprocessFunctions):
-        function(sims)
-    for function in getSpecifiedFunctions(args, plotFunctions):
-        bob.plot.runPlot(function, sims, args)
-
-
-plotFunctions: List[Callable[[plt.axes, SimulationSet], None]] = [bob.scaling.speedup, bob.scaling.runTime, bob.physicalPlots.expansion]
-postprocessFunctions: List[Callable[[SimulationSet], None]] = [bob.gprof.runGprof]
-functionNames: List[str] = [f.__name__ for f in plotFunctions] + [f.__name__ for f in postprocessFunctions]
-checkNoDoubledNames()
+    for function in getSpecifiedFunctions(args, postprocessingFunctions):
+        if isinstance(function, PlotFunction):
+            bob.plot.runPlot(function, sims, args)
+        elif isinstance(function, SingleSimPlotFunction):
+            bob.plot.runSingleSimPlot(function, sims, args)
+        elif isinstance(function, SingleSnapshotPlotFunction):
+            bob.plot.runSingleSnapshotPlot(function, sims, args)
+        elif type(function) == PostprocessingFunction:
+            function(sims)

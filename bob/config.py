@@ -25,6 +25,7 @@ substitutionFileName = "sims"
 jobFilename = "job"
 sourceOutputFolderName = "arepo"
 picFolder = "pics"
+specialFolders = [picFolder]
 
 # Plot settings
 dpi = 300

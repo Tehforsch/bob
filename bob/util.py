@@ -3,6 +3,8 @@ import sys
 from subprocess import Popen, PIPE, check_output
 from typing import Callable, Any, List, Dict, Union
 from pathlib import Path
+from bob.field import Field
+from math import isclose
 
 
 def runCommand(command: Union[str, List[str]], path: Union[str, Path], printOutput: bool = False, shell: bool = False) -> Popen:
@@ -43,3 +45,10 @@ def memoize(func: Callable[..., Any]) -> Callable[..., Any]:
         return result
 
     return wrapper
+
+
+def getNiceTimeUnitName(value: float) -> str:
+    if isclose(value, 31557605363103.023):
+        return "Myr"
+
+    assert False, f"Found no nice name for time unit with value {value}"

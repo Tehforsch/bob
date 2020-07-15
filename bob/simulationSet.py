@@ -57,7 +57,7 @@ def getAllSubstitutions(args: argparse.Namespace) -> Dict[str, Any]:
     if args.create:
         return readSubstitutionsFile(args.inputFolder)
     else:
-        simNames = list(args.simFolder.glob("*"))
+        simNames = list(f for f in args.simFolder.glob("*") if not f.name in config.specialFolders)
         assert len(simNames) > 0, "No simulation in output folder."
         return readSubstitutionsFile(Path(args.simFolder, simNames[0]))
 
@@ -75,4 +75,4 @@ def createSimsFromFolder(args: argparse.Namespace) -> SimulationSet:
             assert len(v) == numSims
         dicts = [dict((k, v[i]) for (k, v) in allSubstitutions.items()) for i in range(numSims)]
     names = getSimNames(dicts)
-    return SimulationSet(args.simFolder, (Simulation(args, name, d) for (name, d) in zip(names, dicts)))
+    return SimulationSet(args.simFolder, (Simulation(args, name, d) for (name, d) in zip(names, dicts) if args.select is None or name in args.select))

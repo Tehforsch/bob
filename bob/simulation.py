@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Iterable
+from typing import Dict, Any, List
 import shutil
 import os
 import argparse
@@ -116,7 +116,7 @@ class Simulation:
         return Path(self.folder, self.params["OutputDir"])
 
     @property
-    def snapshots(self) -> Iterable[Snapshot]:
+    def snapshots(self) -> List[Snapshot]:
         snapshotFileBase = self.params["SnapshotFileBase"]
         snapshotGlob = "{}_*.hdf5".format(snapshotFileBase)
         snapshotFiles = list(self.outputDir.glob(snapshotGlob))
