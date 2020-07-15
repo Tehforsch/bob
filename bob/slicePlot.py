@@ -1,9 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from bob.snapshot import Snapshot
+from bob.field import Field
 
 
 class Slice:
-    def __init__(self, snapshot, field, start, axis):
+    def __init__(self, snapshot: Snapshot, field: Field, start: np.array, axis: np.array):
         self.snapshot = snapshot
         self.field = field
         self.start = start
@@ -12,17 +14,15 @@ class Slice:
         self.vmax = 1
         self.thickness = 0.02
 
-    def plot(self, ax, **plotSettings):
-        field = self.snapshot.getField(*self.field)
+    def plot(self, ax: plt.axes, **plotSettings):
+        field = self.snapshot.getField(self.field)
         coordinates = self.snapshot.coordinates
-        ax.set_title(self.title)
         coord1, coord2, values = getSlice(field, coordinates, self.start, self.axis, self.thickness)
-        print(np.mean(values))
-        ax.scatter(coord1, coord2, c=values, alpha=0.2, **plotSettings, vmin=self.vmin, vmax=self.vmax)
+        ax.scatter(coord1, coord2, c=values, alpha=1.0, **plotSettings, vmin=self.vmin, vmax=self.vmax)
 
-    @property
-    def title(self):
-        return "{} @ {:.2f} {:.2f} {:.2f} @ {}".format(getNiceFieldName(self.field), *self.start, getNiceSnapshotName(self.snapshot))
+    # @property
+    # def title(self):
+    #     return "{} @ {:.2f} {:.2f} {:.2f} @ {}".format(getNiceFieldName(self.field), *self.start, getNiceSnapshotName(self.snapshot))
 
 
 def getSlice(array, coordinates, start, axis, thickness):

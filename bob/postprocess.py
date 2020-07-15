@@ -7,6 +7,7 @@ import bob.scaling
 import bob.gprof
 import matplotlib.pyplot as plt
 import bob.plot
+import bob.physicalPlots
 
 
 def checkNoDoubledNames() -> None:
@@ -38,7 +39,7 @@ def main(args: argparse.Namespace, sims: SimulationSet) -> None:
         bob.plot.runPlot(function, sims, args)
 
 
-plotFunctions: List[Callable[[plt.axes, SimulationSet], None]] = [bob.scaling.speedup, bob.scaling.runTime]
+plotFunctions: List[Callable[[plt.axes, SimulationSet], None]] = [bob.scaling.speedup, bob.scaling.runTime, bob.physicalPlots.expansion]
 postprocessFunctions: List[Callable[[SimulationSet], None]] = [bob.gprof.runGprof]
 functionNames: List[str] = [f.__name__ for f in plotFunctions] + [f.__name__ for f in postprocessFunctions]
 checkNoDoubledNames()

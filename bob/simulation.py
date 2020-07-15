@@ -1,4 +1,4 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Iterable
 import shutil
 import os
 import argparse
@@ -12,6 +12,7 @@ from bob.exceptions import CompilationError
 from bob.paramFile import ConfigFile, InputFile, JobFile
 from bob.util import memoize
 from bob.params import Params
+from bob.snapshot import Snapshot
 
 
 class Simulation:
@@ -107,3 +108,15 @@ class Simulation:
 
     def __repr__(self) -> str:
         return f"Sim{self.name}"
+
+    @property
+    def outputDir(self) -> Path:
+        return Path(self.folder, self.params["OutputDir"])
+
+    @property
+    def snapshots(self) -> Iterable[Snapshot]:
+        snapshotFileBase = self.params["SnapshotFileBase"]
+        snapshotGlob = "{}_*.hdf5".format(snapshotFileBase)
+        snapshotFiles = list(self.outputDir.glob(snapshotGlob))
+        snapshotFiles.sort()
+        return [Snapshot(s) for s in snapshotFiles]
