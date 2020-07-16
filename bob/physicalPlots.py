@@ -39,18 +39,25 @@ def expansion(ax: plt.axes, sims: SimulationSet) -> None:
                 Slice(snapshot, BasicField("ChemicalAbundances", i), (0.5, 0.5, 0.5), (1, 0, 0)).plot(ax_)
 
 
+slicePlots = []
+
+
 def createSlicePlots() -> None:
     for basicField in basicFields:
         for (axis, axisName) in zip([[1, 0, 0], [0, 1, 0], [0, 0, 1]], ["X", "Y", "Z"]):
 
-            def thisSlicePlot(ax: plt.axes, snap: Snapshot) -> None:
+            center = [0.5, 0.5, 0.5]
+
+            def thisSlicePlot(ax: plt.axes, snap: Snapshot, basicField=basicField) -> None:
                 # center = sim.boxSize * 0.5
-                center = [0.5, 0.5, 0.5]
+                print(basicField)
                 Slice(snap, basicField, center, axis).plot(ax)
 
             name = f"centerSlice{axisName}{basicField.niceName}"
+            thisSlicePlot.__name__ = name
+            slicePlots.append(thisSlicePlot)
             # Register plot in list
-            addSingleSnapshotPlot(name)(thisSlicePlot)
+            addSingleSnapshotPlot(name)(slicePlots[-1])
 
 
 createSlicePlots()

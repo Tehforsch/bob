@@ -22,6 +22,10 @@ class SingleSnapshotPlotFunction(PostprocessingFunction):
     pass
 
 
+class CompareSimSingleSnapshotPlotFunction(PostprocessingFunction):
+    pass
+
+
 # Giving up on mypy hints on this one
 def addToList(name: Optional[str], cls: Any) -> Callable[[Callable[..., Any]], Any]:
     def wrapper(f: Callable[..., Any]) -> Any:
@@ -49,6 +53,10 @@ def addSingleSimPlot(name: Optional[str]) -> Callable[[Callable[..., Any]], Sing
 
 def addSingleSnapshotPlot(name: Optional[str]) -> Callable[[Callable[..., Any]], SingleSnapshotPlotFunction]:
     return addToList(name, SingleSnapshotPlotFunction)
+
+
+def addCompareSimSingleSnapshotPlot(name: Optional[str]) -> Callable[[Callable[..., Any]], CompareSimSingleSnapshotPlotFunction]:
+    return addToList(name, CompareSimSingleSnapshotPlotFunction)
 
 
 def checkNoDoubledNames() -> None:

@@ -2,36 +2,37 @@ import itertools
 import logging
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import Callable, Any, List
 
-from bob.field import Field
+from typing import Callable, Any
+from bob.field import Field, RelativeDifference
+from bob.basicField import BasicField
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
 from bob.simulation import Simulation
 from bob.util import getNiceTimeUnitName
+from bob.postprocessingFunctions import addCompareSimSingleSnapshotPlot
+from bob.slicePlot import Slice
 
 
-# def fieldDifference(ax: plt.axes, sim1: Simulation, sim2: Simulation, field: Field) -> None:
-#     data = []
-#     times = []
-#     for (snap1, snap2) in zip(sim1.snapshots, sim2.snapshots):
-#         assert snap1.time == snap2.time
-#         f1 = field.getData(snap1)
-#         f2 = field.getData(snap2)
-#         assert f1.shape == f2.shape
-#         diff = np.abs(getRelativeDifference(f1, f2))
-#         maxDiff = np.max(diff)
-#         minDiff = np.min(diff)
-#         averageDiff = np.mean(diff)
-#         times.append(snap1.time)
-#         data.append(averageDiff)
-#         numCells = np.where(diff > 0.5)
-#         logging.info(f"Relative difference for chemical abundance 1: Max: {maxDiff}, Min: {minDiff}, Average: {averageDiff}")
-#         logging.info("#Cells with difference > 0.5: {}".format(len(numCells[0])))
-#     ax.plot(times, data)
-#     niceTimeUnitName = getNiceTimeUnitName(sim1.snapshots[0].t_unit)
-#     ax.xlabel(f"Time [{niceTimeUnitName}]")
-#     ax.ylabel(f"Relative error {field.niceName}")
+@addCompareSimSingleSnapshotPlot(None)
+def fieldDifference(ax: plt.axes, sim1: Simulation, sim2: Simulation, snap1: Snapshot, snap2: Snapshot) -> None:
+    field = BasicField("ChemicalAbundances", 1)
+    diff = RelativeDifference(field, snap1)
+    Slice(snap2, diff, (0.5, 0.5, 0.5), (1.0, 0.0, 0.0)).plot(ax)
+    # maxDiff = np.max(diff)
+    # minDiff = np.min(diff)
+    # averageDiff = np.mean(diff)
+    # data = []
+    # times = []
+    # times.append(snap1.time)
+    # data.append(averageDiff)
+    # numCells = np.where(diff > 0.5)
+    # logging.info(f"Relative difference for chemical abundance 1: Max: {maxDiff}, Min: {minDiff}, Average: {averageDiff}")
+    # logging.info("#Cells with difference > 0.5: {}".format(len(numCells[0])))
+    # ax.plot(times, data)
+    # niceTimeUnitName = getNiceTimeUnitName(sim1.snapshots[0].t_unit)
+    # ax.xlabel(f"Time [{niceTimeUnitName}]")
+    # ax.ylabel(f"Relative error {field.niceName}")
 
 
 # def plotFieldDifference(ax: plt.axes, sim1: Simulation, sim2: Simulation, field: Field) -> None:
@@ -82,7 +83,3 @@ def compareSimSet(sims: SimulationSet, compareFunction: Callable[..., Any]) -> N
         for param in sims.variedParams:
             logging.info("{}: {} {}".format(param, sim1.params[param], sim2.params[param]))
         compareFunction(sim1, sim2)
-
-
-postprocessFunctions: List[Callable[[SimulationSet], None]] = []
-plotFunctions: List[Callable[[plt.axes, SimulationSet], None]] = []

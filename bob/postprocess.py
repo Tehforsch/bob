@@ -9,7 +9,14 @@ import matplotlib.pyplot as plt
 import bob.plot
 import bob.physicalPlots
 import bob.compareSimulations
-from bob.postprocessingFunctions import postprocessingFunctions, PostprocessingFunction, PlotFunction, SingleSimPlotFunction, SingleSnapshotPlotFunction
+from bob.postprocessingFunctions import (
+    postprocessingFunctions,
+    PostprocessingFunction,
+    PlotFunction,
+    SingleSimPlotFunction,
+    SingleSnapshotPlotFunction,
+    CompareSimSingleSnapshotPlotFunction,
+)
 
 
 def getSpecifiedFunctions(args: argparse.Namespace, functions: Sequence[PostprocessingFunction]) -> Sequence[PostprocessingFunction]:
@@ -38,5 +45,7 @@ def main(args: argparse.Namespace, sims: SimulationSet) -> None:
             bob.plot.runSingleSimPlot(function, sims, args)
         elif isinstance(function, SingleSnapshotPlotFunction):
             bob.plot.runSingleSnapshotPlot(function, sims, args)
+        elif isinstance(function, CompareSimSingleSnapshotPlotFunction):
+            bob.plot.runCompareSimSingleSnapPlot(function, sims, args)
         elif type(function) == PostprocessingFunction:
             function(sims)

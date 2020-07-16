@@ -18,17 +18,32 @@ class Field(ABC):
 
 
 class RelativeDifference(Field):
-    def __init__(self, field1: Field, field2: Field) -> None:
-        self.field1 = field1
-        self.field2 = field2
+    def __init__(self, field: Field, reference: "Snapshot") -> None:
+        self.field = field
+        self.reference = reference
 
     def getData(self, snapshot: "Snapshot") -> np.ndarray:
         epsilon = 1e-10
-        data1 = self.field1.getData(snapshot)
-        data2 = self.field2.getData(snapshot)
+        data1 = self.field.getData(snapshot)
+        data2 = self.field.getData(self.reference)
+        # data2 = reorder(data2, snapshot.coordinates, self.reference.coordinates)
+        assert (snapshot.coordinates == self.reference.coordinates).all()
+        for (x1, x2, y1, y2) in zip(snapshot.coordinates, self.reference.coordinates, data1, data2):
+            assert (x1 == x2).all()
+            if np.abs(y1 - y2) > 0.01:
+                print(x1, x2, y1, y2)
+        print(snapshot, self.reference)
+        print(np.sum(np.abs(data1 - data2)))
         return (data1 - data2) / (0.5 * (np.abs(data1) + np.abs(data2)) + epsilon)
 
-    def getNiceName(self) -> str:
-        f1 = self.field1.niceName
-        f2 = self.field2.niceName
-        return f"Rel. Difference ({f1} - {f2})"
+    @property
+    def niceName(self) -> str:
+        name = self.field.niceName
+        return f"Rel. Difference {name}"
+
+
+def reorder(values: np.ndarray, l1: np.ndarray, l2: np.ndarray) -> np.ndarray:
+    """Shuffle the order of values and l1 in the same way, such that l1 == l2 and then return the shuffled values"""
+    indices = [l2.index(x) for x in l1]
+    print(indices)
+    return values[indices]
