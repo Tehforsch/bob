@@ -45,6 +45,6 @@ def runCompareSimSingleSnapPlot(function: CompareSimSingleSnapshotPlotFunction, 
 
 def saveAndShow(filename: Path, show: bool) -> None:
     filename.parent.mkdir(exist_ok=True)
-    plt.savefig(filename, dpi=config.dpi)
+    plt.savefig(str(filename) + ".png", dpi=config.dpi)
     if show:
         plt.show()
