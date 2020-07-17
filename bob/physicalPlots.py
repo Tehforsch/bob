@@ -7,7 +7,6 @@ from bob.snapshot import Snapshot
 from bob.slicePlot import Slice
 from bob.basicField import BasicField
 from bob.postprocessingFunctions import addPlot, addSingleSnapshotPlot
-from bob.util import getNiceTimeUnitName
 from bob.constants import alphaB
 
 basicFields = [
@@ -51,24 +50,31 @@ def getIonization(coordinates: np.ndarray, data: np.ndarray, center: np.ndarray,
     return np.mean(1 - data[insideShell])
 
 
-def getIonizationRadius(snapshot: Snapshot, center: np.ndarray) -> float:
+def getIonizationRadius(snapshot: Snapshot, center: np.ndarray, val=0.5) -> float:
     coordinates = snapshot.coordinates
     field = BasicField("ChemicalAbundances", 1)
     data = field.getData(snapshot)
     valueFunction = lambda radius: getIonization(coordinates, data, center, radius)
-    return bisect(valueFunction, 0.5, 0, 1, precision=0.001) * snapshot.l_unit
+    return bisect(valueFunction, val, 0, 1, precision=0.00001) * snapshot.l_unit
+
+
+def analyticalRTypeExpansion(t: np.ndarray) -> np.ndarray:
+    return (1 - np.exp(-t)) ** (1.0 / 3)
 
 
 @addPlot(None)
 def expansion(ax: plt.axes, sims: SimulationSet) -> None:
-    ax.xlim(0, 1)
-    ax.ylim(0, 1)
+    _, (ax1, ax2) = ax.subplots(2, sharex=True, sharey=False)
+    ax1.set_xlim(0, 0.4)
+    ax1.set_ylim(0, 1)
+    ax2.set_ylim(0, 0.2)
+    ax2.set_xlabel("$t / t_{\\mathrm{rec}}$")
+    ax2.set_ylabel("$R / R_s$")
+    ax1.set_ylabel("relative error")
+
     for sim in sims:
-        niceTimeUnitName = getNiceTimeUnitName(sim.snapshots[0].t_unit)
-        ax.xlabel("$t / t_{\\mathrm{rec}}$")
-        ax.ylabel("$R / R_s$")
         initialSnap = sim.snapshots[0]
-        nH = np.mean(BasicField("Density").getData(initialSnap) * initialSnap.dens_prev * initialSnap.dens_to_ndens)
+        nH = np.mean(BasicField("Density").getData(initialSnap) * initialSnap.dens_prev * initialSnap.dens_to_ndens) * 1.22
         recombinationTime = 1 / (alphaB * nH)
         recombinationTime.units = "Myr"
         nE = nH  # We can probably assume this
@@ -78,16 +84,17 @@ def expansion(ax: plt.axes, sims: SimulationSet) -> None:
         stroemgrenRadius.units = "kpc"
         print("Recombination time: {}, Stroemgren radius: {}".format(recombinationTime, stroemgrenRadius))
         times = [(snapshot.time / recombinationTime).simplified for snapshot in sim.snapshots]
-        radii = [(getIonizationRadius(snapshot, np.array([0.5, 0.5, 0.5])) / stroemgrenRadius).simplified for snapshot in sim.snapshots]
-        ax.plot(times, radii, label=sims.getNiceSimName(sim))
-        ax.legend()
+        radii = [(getIonizationRadius(snapshot, np.array([0.5, 0.5, 0.5]), 0.5) / stroemgrenRadius).simplified for snapshot in sim.snapshots]
+        error = [
+            np.abs(radius - analyticalRTypeExpansion(time)) / (1e-10 + analyticalRTypeExpansion(time)) if time > 0 else 0
+            for (time, radius) in zip(times, radii)
+        ]
+        ax1.plot(times, radii, label=sims.getNiceSimName(sim))
+        ax2.plot(times, error, label="Relative error")
 
-    def analytical(t: np.ndarray) -> np.ndarray:
-        return (1 - np.exp(-t)) ** (1.0 / 3)
-
-    ts = np.linspace(0, 1, num=100)
-    # print(ts, [analytical(t) for t in ts])
-    ax.plot(ts, [analytical(t) for t in ts])
+    ts = np.linspace(0, 1, num=1000)
+    ax1.plot(ts, [analyticalRTypeExpansion(t) for t in ts], label="Analytical")
+    ax1.legend()
 
 
 def createSlicePlots() -> None:

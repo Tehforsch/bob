@@ -2,6 +2,7 @@ from typing import List, Any
 
 from bob.simulationSet import SimulationSet
 import matplotlib.pyplot as plt
+from bob.postprocessingFunctions import addPlot
 
 
 def getScalingSimSets(sims: SimulationSet) -> List[Any]:
@@ -11,6 +12,7 @@ def getScalingSimSets(sims: SimulationSet) -> List[Any]:
     return quotient
 
 
+@addPlot(None)
 def speedup(ax: plt.axes, sims: SimulationSet) -> None:
     for (params, simSet) in getScalingSimSets(sims):
         numCores = [sim.params["numCores"] for sim in simSet]
@@ -26,6 +28,7 @@ def speedup(ax: plt.axes, sims: SimulationSet) -> None:
     ax.legend()
 
 
+@addPlot(None)
 def runTime(ax: plt.axes, sims: SimulationSet) -> None:
     for (params, simSet) in getScalingSimSets(sims):
         numCores = [sim.params["numCores"] for sim in simSet]
