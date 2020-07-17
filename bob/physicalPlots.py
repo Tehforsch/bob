@@ -73,8 +73,8 @@ def expansion(ax: plt.axes, sims: SimulationSet) -> None:
     ax1.set_ylabel("$R / R_s$")
     ax2.set_ylabel("relative error")
 
-    plotBorders = False
-    colors = ["b", "r"]
+    plotBorders = True
+    colors = ["b", "orange"]
     for (color, sim) in zip(colors, sims):
         initialSnap = sim.snapshots[0]
         nH = np.mean(BasicField("Density").getData(initialSnap) * initialSnap.dens_prev * initialSnap.dens_to_ndens) * 1.22
