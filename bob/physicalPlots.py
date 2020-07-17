@@ -64,15 +64,18 @@ def analyticalRTypeExpansion(t: np.ndarray) -> np.ndarray:
 
 @addPlot(None)
 def expansion(ax: plt.axes, sims: SimulationSet) -> None:
-    _, (ax1, ax2) = ax.subplots(2, sharex=True, sharey=False)
-    ax1.set_xlim(0, 0.4)
-    ax1.set_ylim(0, 1)
+    gridspec_kw = {"height_ratios": [2, 1]}
+    _, (ax1, ax2) = ax.subplots(2, sharex=True, sharey=False, gridspec_kw=gridspec_kw)
+    ax1.set_xlim(0, 0.1)
+    ax1.set_ylim(0, 0.6)
     ax2.set_ylim(0, 0.2)
     ax2.set_xlabel("$t / t_{\\mathrm{rec}}$")
-    ax2.set_ylabel("$R / R_s$")
-    ax1.set_ylabel("relative error")
+    ax1.set_ylabel("$R / R_s$")
+    ax2.set_ylabel("relative error")
 
-    for sim in sims:
+    plotBorders = False
+    colors = ["b", "r"]
+    for (color, sim) in zip(colors, sims):
         initialSnap = sim.snapshots[0]
         nH = np.mean(BasicField("Density").getData(initialSnap) * initialSnap.dens_prev * initialSnap.dens_to_ndens) * 1.22
         recombinationTime = 1 / (alphaB * nH)
@@ -89,11 +92,18 @@ def expansion(ax: plt.axes, sims: SimulationSet) -> None:
             np.abs(radius - analyticalRTypeExpansion(time)) / (1e-10 + analyticalRTypeExpansion(time)) if time > 0 else 0
             for (time, radius) in zip(times, radii)
         ]
-        ax1.plot(times, radii, label=sims.getNiceSimName(sim))
+        if not plotBorders:
+            ax1.plot(times, radii, label=sims.getNiceSimName(sim), color=color)
+        else:
+            radiiUpper = [(getIonizationRadius(snapshot, np.array([0.5, 0.5, 0.5]), 0.9) / stroemgrenRadius).simplified for snapshot in sim.snapshots]
+            radiiLower = [(getIonizationRadius(snapshot, np.array([0.5, 0.5, 0.5]), 0.1) / stroemgrenRadius).simplified for snapshot in sim.snapshots]
+            ax1.plot(times, radii, label=sims.getNiceSimName(sim) + " 0.5", color=color)
+            ax1.plot(times, radiiUpper, label=sims.getNiceSimName(sim) + " 0.9", color=color, linestyle="--")
+            ax1.plot(times, radiiLower, label=sims.getNiceSimName(sim) + " 0.1", color=color, linestyle="--")
         ax2.plot(times, error, label="Relative error")
 
     ts = np.linspace(0, 1, num=1000)
-    ax1.plot(ts, [analyticalRTypeExpansion(t) for t in ts], label="Analytical")
+    ax1.plot(ts, [analyticalRTypeExpansion(t) for t in ts], label="Analytical", color="g")
     ax1.legend()
 
 
