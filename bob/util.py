@@ -52,3 +52,9 @@ def getNiceTimeUnitName(value: float) -> str:
         return "Myr"
 
     assert False, f"Found no nice name for time unit with value {value}"
+
+
+def getNiceParamName(k: str, v: Any) -> str:
+    if k == "SX_SWEEP":
+        return "Sweep" if v else "SPRAI"
+    return "{}: {}".format(k, v)

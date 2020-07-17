@@ -13,6 +13,7 @@ from bob.paramFile import ConfigFile, InputFile, JobFile
 from bob.util import memoize
 from bob.params import Params
 from bob.snapshot import Snapshot
+from bob.sources import Sources
 
 
 class Simulation:
@@ -122,3 +123,9 @@ class Simulation:
         snapshotFiles = list(self.outputDir.glob(snapshotGlob))
         snapshotFiles.sort()
         return [Snapshot(s) for s in snapshotFiles]
+
+    @property  # type: ignore
+    @memoize
+    def sources(self) -> Sources:
+        assert self.params["SX_SOURCES"] == 10, "This is not implemented yet for actual sink/star particles"
+        return Sources(Path(self.folder, self.params["TestSrcFile"]))

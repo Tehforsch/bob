@@ -6,6 +6,7 @@ import argparse
 import yaml
 from bob import config
 from bob.simulation import Simulation
+from bob.util import getNiceParamName
 
 
 class SimulationSet(list):
@@ -29,6 +30,11 @@ class SimulationSet(list):
             (dict(configuration), SimulationSet(self.folder, [sim for sim in self if getConfiguration(sim) == configuration]))
             for configuration in configurations
         ]
+
+    def getNiceSimName(self, sim: Simulation) -> str:
+        assert sim in self
+        result = ",".join(getNiceParamName(k, sim.params[k]) for k in self.variedParams)
+        return result
 
 
 def readSubstitutionsFile(inputFolder: Path) -> Dict[str, Any]:
