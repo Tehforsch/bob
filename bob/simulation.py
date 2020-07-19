@@ -121,7 +121,15 @@ class Simulation:
         snapshotFileBase = self.params["SnapshotFileBase"]
         snapshotGlob = "{}_*.hdf5".format(snapshotFileBase)
         snapshotFiles = list(self.outputDir.glob(snapshotGlob))
-        snapshotFiles.sort()
+
+        def getNumber(name: Path) -> int:
+            nameRep = str(name).replace("{}_".format(snapshotFileBase), "")
+            nameRep = nameRep.replace(".hdf5", "")
+            nameRep = nameRep.replace(str(self.outputDir), "")
+            nameRep = nameRep.replace("/", "")
+            return int(nameRep)
+
+        snapshotFiles.sort(key=getNumber)
         return [Snapshot(s) for s in snapshotFiles]
 
     @property  # type: ignore

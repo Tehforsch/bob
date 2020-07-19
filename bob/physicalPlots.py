@@ -50,7 +50,7 @@ def getIonization(coordinates: np.ndarray, data: np.ndarray, center: np.ndarray,
     return np.mean(1 - data[insideShell])
 
 
-def getIonizationRadius(snapshot: Snapshot, center: np.ndarray, val=0.5) -> float:
+def getIonizationRadius(snapshot: Snapshot, center: np.ndarray, val: float = 0.5) -> float:
     coordinates = snapshot.coordinates
     field = BasicField("ChemicalAbundances", 1)
     data = field.getData(snapshot)
@@ -63,17 +63,25 @@ def analyticalRTypeExpansion(t: np.ndarray) -> np.ndarray:
 
 
 @addPlot(None)
+def expansionInnerOuter(ax: plt.axes, sims: SimulationSet) -> None:
+    expansionGeneral(ax, sims, innerOuter=True)
+
+
+@addPlot(None)
 def expansion(ax: plt.axes, sims: SimulationSet) -> None:
+    expansionGeneral(ax, sims, innerOuter=False)
+
+
+def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False) -> None:
     gridspec_kw = {"height_ratios": [2, 1]}
     _, (ax1, ax2) = ax.subplots(2, sharex=True, sharey=False, gridspec_kw=gridspec_kw)
-    ax1.set_xlim(0, 0.1)
-    ax1.set_ylim(0, 0.6)
+    ax1.set_xlim(0, 1.0)
+    ax1.set_ylim(0, 1.0)
     ax2.set_ylim(0, 0.2)
     ax2.set_xlabel("$t / t_{\\mathrm{rec}}$")
     ax1.set_ylabel("$R / R_s$")
     ax2.set_ylabel("relative error")
 
-    plotBorders = True
     colors = ["b", "orange"]
     for (color, sim) in zip(colors, sims):
         initialSnap = sim.snapshots[0]
@@ -92,7 +100,7 @@ def expansion(ax: plt.axes, sims: SimulationSet) -> None:
             np.abs(radius - analyticalRTypeExpansion(time)) / (1e-10 + analyticalRTypeExpansion(time)) if time > 0 else 0
             for (time, radius) in zip(times, radii)
         ]
-        if not plotBorders:
+        if not innerOuter:
             ax1.plot(times, radii, label=sims.getNiceSimName(sim), color=color)
         else:
             radiiUpper = [(getIonizationRadius(snapshot, np.array([0.5, 0.5, 0.5]), 0.9) / stroemgrenRadius).simplified for snapshot in sim.snapshots]

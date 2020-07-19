@@ -13,8 +13,8 @@ class SimulationSet(list):
     def __init__(self, folder: Path, sims: Iterable[Simulation]) -> None:
         super().__init__(sims)
         self.folder = folder
-        for sim in self[1:]:
-            assert sim.params.keys() == self[0].params.keys()
+        # for sim in self[1:]:
+        # assert sim.params.keys() == self[0].params.keys(), "Not matching: {}".format(set(sim.params.keys()).difference(set(self[0].params.keys())))
         self.derivedParams = set.union(*(f.params.getDerivedParams() for f in self))
         self.variedParams = set(k for k in self[0].params if self.doesVary(k) and not k in self.derivedParams)
         self.commonParams = self[0].params.keys() - self.variedParams

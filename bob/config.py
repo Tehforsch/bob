@@ -28,7 +28,7 @@ picFolder = "pics"
 specialFolders = [picFolder]
 
 # Plot settings
-dpi = 300
+dpi = 600
 fontSize = 9
 picFileEnding = ".png"
 
