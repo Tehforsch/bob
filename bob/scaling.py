@@ -25,7 +25,7 @@ def speedup(ax: plt.axes, sims: SimulationSet) -> None:
         print(speedup)
         ax.xlabel("N")
         ax.ylabel("Speedup")
-        ax.plot(numCores, speedup, label=",".join(getNiceParamName(k, v) for (k, v) in params.items()))
+        ax.plot(numCores, speedup, label=",".join(getNiceParamName(k, v) for (k, v) in params.items()), marker="o")
 
     ax.plot(numCores, numCores, label="Ideal")
     ax.legend()
@@ -38,7 +38,7 @@ def runTime(ax: plt.axes, sims: SimulationSet) -> None:
         runTimes = [sim.runTime for sim in simSet]
         ax.xlabel("N")
         ax.ylabel("run time [s]")
-        ax.plot(numCores, runTimes, label=",".join(getNiceParamName(k, v) for (k, v) in params.items()))
+        ax.plot(numCores, runTimes, label=",".join(getNiceParamName(k, v) for (k, v) in params.items()), marker="o")
 
     # plt.plot(numCores, numCores, label="Ideal")
     ax.legend()
