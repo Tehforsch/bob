@@ -65,7 +65,7 @@ class InputFile(LineParamFile):
         if matches is None:
             return ("", "")
         groups = matches.groups()
-        return (groups[0], groups[1])
+        return (groups[0], convertValue(groups[1]))
 
     def writeLine(self, param: Tuple[str, Any]) -> str:
         k, v = param
@@ -141,3 +141,17 @@ class JobFile(ParamFile):
     def setRunCommand(self) -> None:
         runParams = self["runParams"]
         self["runCommand"] = f"./{config.binaryName} {config.inputFilename} {runParams}"
+
+
+class IcsParamFile(LineParamFile):
+    def __init__(self, filename: Path):
+        self.commentString = "#"
+        super().__init__(filename)
+
+    def readLine(self, line: str) -> Tuple[str, Any]:
+        k, v = [x.strip() for x in line.split("=")]
+        return k, convertValue(v)
+
+    def writeLine(self, param: Tuple[str, Any]) -> str:
+        k, v = param
+        return f"{k}={v}"

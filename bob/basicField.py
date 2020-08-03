@@ -23,7 +23,14 @@ class BasicField(Field):
 
     @property
     def niceName(self) -> str:
-        fieldName: Dict[str, str] = {"ChemicalAbundances": "Abundance", "PhotonFlux": "Flux", "Density": "Density", "PhotonRates": "PhotonRate"}
+        fieldName: Dict[str, str] = {
+            "ChemicalAbundances": "Abundance",
+            "PhotonFlux": "Flux",
+            "Density": "Density",
+            "PhotonRates": "PhotonRate",
+            "Masses": "Mass",
+            "Coordinates": "Coordinates",
+        }
         return fieldName[self.name] + str(self.index)
 
     def getData(self, snapshot: "Snapshot") -> np.ndarray:

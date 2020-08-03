@@ -14,6 +14,7 @@ class Snapshot:
         self.filename = filename
         self.coordinates_ = None
         self.name = self.getName()
+        self.number = int(self.name)
         self.hdf5File = h5py.File(self.filename, "r")
         self.initConversionFactors()
 

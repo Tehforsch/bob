@@ -38,6 +38,8 @@ def main(args: argparse.Namespace, sims: SimulationSet) -> None:
     setFontSizes()
     picFolder = Path(args.simFolder, config.picFolder)
     picFolder.mkdir(exist_ok=True)
+    # if args.snapshot is not None:
+    # postprocessingFunctions = [f for f in postprocessingFunctions if isinstance(f, SingleSnapshotPlotFunction)]
     for function in getSpecifiedFunctions(args, postprocessingFunctions):
         if isinstance(function, PlotFunction):
             bob.plot.runPlot(function, sims, args)

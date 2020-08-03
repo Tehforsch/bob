@@ -22,6 +22,9 @@ runTimePattern = "Code run for ([0-9.]*) seconds!"
 
 # Bob names
 substitutionFileName = "sims"
+icsParamFileName = "ics"
+icsFileName = "ics.hdf5"
+meshRelaxedIcsFileName = "icsMR.hdf5"
 jobFilename = "job"
 sourceOutputFolderName = "arepo"
 picFolder = "pics"
@@ -37,7 +40,10 @@ gprofPartFilePattern = "gmon.out.*"
 gprofSumFile = "gmon.sum"
 gprofOutFile = "gprof.log"
 
+numMeshRelaxSteps = 1
+
 configParams = [
+    "MESHRELAX",
     "NTYPES",
     "PERIODIC",
     "IMPOSE_PINNING",

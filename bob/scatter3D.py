@@ -9,12 +9,20 @@ class Scatter3D:
         self.vmin = 0
         self.vmax = 1
         self.vFilterTreshold = treshold
-        self.array = field.getData(snapshot)
+        if self.field.name != "Coordinates":
+            self.array = field.getData(snapshot)
 
     def plot(self, ax, **plotSettings):
-        where = np.where(self.array >= self.vFilterTreshold)
-        coords = [self.snapshot.coordinates[where, i] for i in range(3)]
-        ax.scatter(*coords, c=self.array[where], **plotSettings)
+        ax = get3DAx()
+        if self.field.name == "Coordinates":
+            coords = [self.snapshot.coordinates[::20, i] for i in range(3)]
+            print(coords)
+            ax.scatter(*coords, **plotSettings)
+        else:
+            print(self.array.shape, self.snapshot.coordinates.shape)
+            where = np.where(self.array >= self.vFilterTreshold)
+            coords = [self.snapshot.coordinates[where, i] for i in range(3)]
+            ax.scatter(*coords, c=self.array[where], **plotSettings)
 
 
 def get3DAx():

@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 import itertools
 from typing import List, Dict, Any, Iterable, Tuple, Set
@@ -68,10 +69,28 @@ def getAllSubstitutions(args: argparse.Namespace) -> Dict[str, Any]:
         return readSubstitutionsFile(Path(args.simFolder, simNames[0]))
 
 
+def deleteFiles(folder: Path) -> None:
+    if folder.is_dir():
+        shutil.rmtree(folder)
+
+
+def copyFiles(sourceFolder: Path, targetFolder: Path) -> None:
+    shutil.copytree(sourceFolder, targetFolder)
+
+
+def createSimulation(args: argparse.Namespace, name: str, d: Dict[str, Any]) -> Simulation:
+    folder = Path(args.simFolder, name)
+    if args.delete:
+        deleteFiles(folder)
+    if args.create:
+        copyFiles(args.inputFolder, folder)
+    return Simulation(folder, d)
+
+
 def createSimsFromFolder(args: argparse.Namespace) -> SimulationSet:
     allSubstitutions = getAllSubstitutions(args)
     if allSubstitutions == {}:
-        return SimulationSet(args.simFolder, [Simulation(args, "sim", {})])
+        return SimulationSet(args.simFolder, [createSimulation(args, "sim", {})])
     if allSubstitutions.get(config.cartesianIdentifier, False):
         del allSubstitutions[config.cartesianIdentifier]
         dicts = getProductSubstitutions(allSubstitutions)
@@ -81,4 +100,12 @@ def createSimsFromFolder(args: argparse.Namespace) -> SimulationSet:
             assert len(v) == numSims
         dicts = [dict((k, v[i]) for (k, v) in allSubstitutions.items()) for i in range(numSims)]
     names = getSimNames(dicts)
-    return SimulationSet(args.simFolder, (Simulation(args, name, d) for (name, d) in zip(names, dicts) if args.select is None or name in args.select))
+    return SimulationSet(args.simFolder, (createSimulation(args, name, d) for (name, d) in zip(names, dicts) if args.select is None or name in args.select))
+
+
+def getSimsFromFolder(args: argparse.Namespace) -> SimulationSet:
+    sims = createSimsFromFolder(args)
+    for sim in sims:
+        if args.create:
+            sim.params.writeFiles()
+    return sims

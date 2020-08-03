@@ -17,6 +17,7 @@ class Slice:
 
     def plot(self, ax: plt.axes, **plotSettings: Dict[str, Any]) -> None:
         field = self.field.getData(self.snapshot)
+        print(np.mean(field), np.max(field))
         coordinates = self.snapshot.coordinates
         coord1, coord2, values = getSlice(field, coordinates, self.start, self.axis, self.thickness)
         ax.scatter(coord1, coord2, c=values, alpha=1.0, **plotSettings, vmin=self.vmin, vmax=self.vmax)

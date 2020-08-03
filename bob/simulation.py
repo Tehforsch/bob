@@ -9,7 +9,7 @@ import re
 
 from bob import localConfig, config, util
 from bob.exceptions import CompilationError
-from bob.paramFile import ConfigFile, InputFile, JobFile
+from bob.paramFile import ConfigFile, InputFile, JobFile, IcsParamFile
 from bob.util import memoize
 from bob.params import Params
 from bob.snapshot import Snapshot
@@ -17,38 +17,23 @@ from bob.sources import Sources
 
 
 class Simulation:
-    def __init__(self, args: argparse.Namespace, name: str, substitutions: Dict[str, Any]) -> None:
-        self.name = name
-        if args.create:
-            logging.info(f"Creating sim {name}")
-        else:
-            logging.info(f"Loading sim {name}")
-        self.folder = Path(args.simFolder, self.name)
-        if args.delete:
-            self.deleteFiles()
-        if args.create:
-            self.copyFiles(args.inputFolder)
-        if args.gdb:
-            localConfig.jobParams["gdb"] = localConfig.defaultGdbCommand
+    def __init__(self, folder: Path, substitutions: Dict[str, Any]) -> None:
+        self.folder = folder
         self.params = self.readFiles()
         self.params.updateParams(substitutions)
         self.params.setDerivedParams()
-        if args.create:
-            self.params.writeFiles()
         self.binaryFile = Path(self.folder, config.binaryName)
-
-    def deleteFiles(self) -> None:
-        if self.folder.is_dir():
-            shutil.rmtree(self.folder)
-
-    def copyFiles(self, inputFolder: Path) -> None:
-        shutil.copytree(inputFolder, self.folder)
 
     def readFiles(self) -> Params:
         self.configFile = ConfigFile(Path(self.folder, config.configFilename))
         self.inputFile = InputFile(Path(self.folder, config.inputFilename))
         self.jobFile = JobFile(Path(self.folder, config.jobFilename), localConfig.jobParams)
-        return Params([self.configFile, self.inputFile, self.jobFile])
+        paramFileList = [self.configFile, self.inputFile, self.jobFile]
+        icsFilePath = Path(self.folder, config.icsParamFileName)
+        if icsFilePath.is_file():
+            self.icsFile = IcsParamFile(icsFilePath)
+            paramFileList.append(self.icsFile)
+        return Params(paramFileList)
 
     def compileArepo(self, quiet: bool = False) -> None:
         self.copyConfigFile()
@@ -90,9 +75,14 @@ class Simulation:
         target = Path(localConfig.arepoDir, config.arepoConfigSrcFile)
         shutil.copy(source, target)
 
-    def run(self, args: argparse.Namespace) -> None:
+    def run(self, verbose: bool) -> None:
         assert self.binaryFile.is_file(), "Binary does not exist. Not starting job. Did you forget to specify -m (tell bob to compile arepo)?"
-        util.runCommand([localConfig.runJobCommand, str(self.jobFile.filename.name)], path=self.jobFile.filename.parent, shell=False, printOutput=args.verbose)
+        util.runCommand([localConfig.runJobCommand, str(self.jobFile.filename.name)], path=self.jobFile.filename.parent, shell=False, printOutput=verbose)
+
+    @property  # type: ignore
+    @memoize
+    def name(self) -> str:
+        return self.folder.name
 
     @property  # type: ignore
     @memoize

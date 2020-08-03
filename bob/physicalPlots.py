@@ -5,9 +5,11 @@ import numpy as np
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
 from bob.slicePlot import Slice
+from bob.scatter3D import Scatter3D
 from bob.basicField import BasicField
 from bob.postprocessingFunctions import addPlot, addSingleSnapshotPlot
 from bob.constants import alphaB
+from bob.constants import protonMass
 
 basicFields = [
     BasicField("ChemicalAbundances", 0),
@@ -17,6 +19,8 @@ basicFields = [
     BasicField("ChemicalAbundances", 4),
     BasicField("ChemicalAbundances", 5),
     BasicField("Density", None),
+    BasicField("Masses", None),
+    BasicField("Coordinates", None),
     BasicField("PhotonFlux", 0),
     BasicField("PhotonFlux", 1),
     BasicField("PhotonFlux", 2),
@@ -89,6 +93,7 @@ def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False
         recombinationTime = 1 / (alphaB * nH)
         recombinationTime.units = "Myr"
         nE = nH  # We can probably assume this
+        print("Density: ", nH * protonMass)
         assert len(sim.sources) == 1
         photonRate = sim.sources.sed[0, 2] / pq.s
         stroemgrenRadius = (3 * photonRate / (4 * np.pi * alphaB * nE ** 2)) ** (1 / 3.0)
@@ -129,4 +134,17 @@ def createSlicePlots() -> None:
             addSingleSnapshotPlot(name)(thisSlicePlot)
 
 
+def createScatterPlots() -> None:
+    for basicField in basicFields:
+
+        def thisSlicePlot(ax: plt.axes, snap: Snapshot, basicField: BasicField = basicField) -> None:
+            # center = sim.boxSize * 0.5
+            Scatter3D(snap, basicField, 0).plot(ax)
+
+        name = f"scatter3D{basicField.niceName}"
+        # Register plot in list
+        addSingleSnapshotPlot(name)(thisSlicePlot)
+
+
 createSlicePlots()
+createScatterPlots()
