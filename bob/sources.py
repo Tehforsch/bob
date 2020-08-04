@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Any, Union, List, Optional
 import numpy as np
+import sys
 
 
 class Sources:
@@ -67,14 +68,37 @@ class Sources:
             self.time.astype("f8").tofile(f)
 
     def __repr__(self) -> str:
+        s = ""
         if self.sigma is not None:
-            print("Cross sections:  ", self.sigma)
+            s += "Cross sections:  " + self.sigma + "\n"
         if self.energy is not None:
-            print("Excess energies: ", self.energy)
-        ids = slice(limit) if limit else slice(self.nSources)
-        print("x", self.coord[ids, 0])
-        print("y", self.coord[ids, 1])
-        print("z", self.coord[ids, 2])
-        print("t", self.time)
+            s += "Excess energies: " + self.energy + "\n"
+        s += "x " + str(self.coord[:, 0]) + "\n"
+        s += "y " + str(self.coord[:, 1]) + "\n"
+        s += "z " + str(self.coord[:, 2]) + "\n"
+        s += "t " + str(self.time) + "\n"
         for f in range(self.nFreq):
-            print("sed %d" % f, self.sed[ids, f])
+            s += f"sed {str(self.sed[:, f])}" + "\n"
+        return s
+
+
+if __name__ == "__main__":
+    if len(sys.argv) == 1:
+        print(
+            "Need either 1 argument ( a source file to print ) or 1 for the output file and many times 3 + 5 (the coordinates and ionization rates of the sources"
+        )
+    if len(sys.argv) == 2:
+        inFile = sys.argv[1]
+        print(Sources(Path(inFile)))
+    else:
+        assert (len(sys.argv) - 2) % 8 == 0
+        out = Path(sys.argv[1])
+        s = Sources()
+        for i in range((len(sys.argv) - 2) // 8):
+            inp = iter(sys.argv[2:])
+            x, y, z, s1, s2, s3, s4, s5 = [float(next(inp)) for _ in range(8)]
+            coord = [x, y, z]
+            sed = [s1, s2, s3, s4, s5]
+            s.addSource(coord, sed, [0])
+            print(s)
+        s.write(out)
