@@ -79,15 +79,26 @@ def expansion(ax: plt.axes, sims: SimulationSet) -> None:
 def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False) -> None:
     gridspec_kw = {"height_ratios": [2, 1]}
     _, (ax1, ax2) = ax.subplots(2, sharex=True, sharey=False, gridspec_kw=gridspec_kw)
-    ax1.set_xlim(0, 1.0)
-    ax1.set_ylim(0, 1.0)
-    ax2.set_ylim(0, 0.2)
+    # ax1.set_xlim(0, 1.0)
+    # ax1.set_ylim(0, 1.0)
+    # ax2.set_ylim(0, 0.2)
     ax2.set_xlabel("$t / t_{\\mathrm{rec}}$")
     ax1.set_ylabel("$R / R_s$")
     ax2.set_ylabel("relative error")
 
-    colors = ["b", "orange"]
-    for (color, sim) in zip(colors, sims):
+    print(sims)
+    for sim in sims:
+        color = "blue" if sim.params["SX_SWEEP"] else "red"
+        # resolution = int(sim.params["InitCondFile"].replace("ics_"))
+        linestyle = "solid"
+        # linestyle = {
+        #         12: "solid",
+        #         16: "loosely dotted",
+        #         24: "dotted",
+        #         32: "dashed",
+        #         36: "loosely dashed"
+        # }[resolution]
+
         initialSnap = sim.snapshots[0]
         nH = np.mean(BasicField("Density").getData(initialSnap) * initialSnap.dens_prev * initialSnap.dens_to_ndens) * 1.22
         recombinationTime = 1 / (alphaB * nH)
@@ -99,21 +110,23 @@ def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False
         stroemgrenRadius = (3 * photonRate / (4 * np.pi * alphaB * nE ** 2)) ** (1 / 3.0)
         stroemgrenRadius.units = "kpc"
         print("Recombination time: {}, Stroemgren radius: {}".format(recombinationTime, stroemgrenRadius))
-        times = [(snapshot.time / recombinationTime).simplified for snapshot in sim.snapshots]
-        radii = [(getIonizationRadius(snapshot, np.array([0.5, 0.5, 0.5]), 0.5) / stroemgrenRadius).simplified for snapshot in sim.snapshots]
+        times = [(snapshot.time / recombinationTime).simplified for snapshot in sim.snapshots[::50]]
+        radii = [(getIonizationRadius(snapshot, np.array([0.5, 0.5, 0.5]), 0.5) / stroemgrenRadius).simplified for snapshot in sim.snapshots[::50]]
+        # print(times)
+        # print(radii)
         error = [
             np.abs(radius - analyticalRTypeExpansion(time)) / (1e-10 + analyticalRTypeExpansion(time)) if time > 0 else 0
             for (time, radius) in zip(times, radii)
         ]
         if not innerOuter:
-            ax1.plot(times, radii, label=sims.getNiceSimName(sim), color=color)
+            ax1.plot(times, radii, label=sims.getNiceSimName(sim), color=color, linestyle=linestyle)
         else:
             radiiUpper = [(getIonizationRadius(snapshot, np.array([0.5, 0.5, 0.5]), 0.9) / stroemgrenRadius).simplified for snapshot in sim.snapshots]
             radiiLower = [(getIonizationRadius(snapshot, np.array([0.5, 0.5, 0.5]), 0.1) / stroemgrenRadius).simplified for snapshot in sim.snapshots]
             ax1.plot(times, radii, label=sims.getNiceSimName(sim) + " 0.5", color=color)
             ax1.plot(times, radiiUpper, label=sims.getNiceSimName(sim) + " 0.9", color=color, linestyle="--")
             ax1.plot(times, radiiLower, label=sims.getNiceSimName(sim) + " 0.1", color=color, linestyle="--")
-        ax2.plot(times, error, label="Relative error")
+        ax2.plot(times, error, label="Relative error", color=color, linestyle=linestyle)
 
     ts = np.linspace(0, 1, num=1000)
     ax1.plot(ts, [analyticalRTypeExpansion(t) for t in ts], label="Analytical", color="g")

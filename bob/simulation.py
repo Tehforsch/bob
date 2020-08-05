@@ -80,7 +80,6 @@ class Simulation:
         util.runCommand([localConfig.runJobCommand, str(self.jobFile.filename.name)], path=self.jobFile.filename.parent, shell=False, printOutput=verbose)
 
     @property  # type: ignore
-    @memoize
     def name(self) -> str:
         return self.folder.name
 
