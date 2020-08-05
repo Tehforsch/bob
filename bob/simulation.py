@@ -132,7 +132,6 @@ class Simulation:
         return Sources(Path(self.folder, self.params["TestSrcFile"]))
 
     def __hash__(self) -> int:
-        print(str(self.folder), str(self.folder).__hash__())
         return str(self.folder).__hash__()
 
     def __eq__(self, sim2: "Simulation") -> bool:
