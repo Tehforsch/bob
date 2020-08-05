@@ -4,7 +4,7 @@ from bob.snapshot import Snapshot
 from bob.slicePlot import Slice
 from bob.scatter3D import Scatter3D
 from bob.basicField import BasicField
-from bob.plots.expansion import *
+from bob.plots.expansion import expansionInnerOuter, expansion, expansionErrorOverResolution
 
 basicFields = [
     BasicField("ChemicalAbundances", 0),

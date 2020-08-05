@@ -1,4 +1,4 @@
-from typing import Callable, List, Tuple
+from typing import List, Tuple
 import numpy as np
 import matplotlib.pyplot as plt
 import quantities as pq
@@ -6,24 +6,12 @@ from bob.basicField import BasicField
 
 from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
-from bob.field import Field
 from bob.postprocessingFunctions import addPlot
 from bob.constants import alphaB
 from bob.constants import protonMass
 from bob.util import unitNpArray, fileMemoize
 from bob.snapshot import Snapshot
-
-
-def bisect(valueFunction: Callable[[float], float], targetValue: float, start: float, end: float, precision: float = 0.01) -> float:
-    """Find the x at which the monotonously growing function valueFunction fulfills valueFunction(x) = targetValue to a precision (in x) of precision. start and end denote the maximum and minimum possible x value"""
-    position = (end + start) / 2
-    if (end - start) < precision:
-        return position
-    value = valueFunction(position)
-    if value < targetValue:
-        return bisect(valueFunction, targetValue, position, end, precision=precision)
-    else:
-        return bisect(valueFunction, targetValue, start, position, precision=precision)
+from bob.helpers import getMeanValue, getTimes, bisect
 
 
 def getIonization(coordinates: np.ndarray, data: np.ndarray, center: np.ndarray, radius: float) -> float:
@@ -46,6 +34,11 @@ def analyticalRTypeExpansion(t: np.ndarray) -> np.ndarray:
     return (1 - np.exp(-t)) ** (1.0 / 3)
 
 
+@fileMemoize
+def getRadii(sim: Simulation, treshold: float = 0.5, sourcePos: np.ndarray = np.array([0.5, 0.5, 0.5])) -> List[float]:
+    return unitNpArray([(getIonizationRadius(snapshot, sourcePos, treshold)) for snapshot in sim.snapshots])
+
+
 @addPlot(None)
 def expansionInnerOuter(ax: plt.axes, sims: SimulationSet) -> None:
     expansionGeneral(ax, sims, innerOuter=True)
@@ -54,21 +47,6 @@ def expansionInnerOuter(ax: plt.axes, sims: SimulationSet) -> None:
 @addPlot(None)
 def expansion(ax: plt.axes, sims: SimulationSet) -> None:
     expansionGeneral(ax, sims, innerOuter=False)
-
-
-@fileMemoize
-def getRadii(sim: Simulation, treshold: float = 0.5, sourcePos: np.ndarray = np.array([0.5, 0.5, 0.5])) -> List[float]:
-    return unitNpArray([(getIonizationRadius(snapshot, sourcePos, treshold)) for snapshot in sim.snapshots])
-
-
-@fileMemoize
-def getTimes(sim: Simulation) -> List[float]:
-    return unitNpArray([snapshot.time for snapshot in sim.snapshots])
-
-
-@fileMemoize
-def getMeanValue(snap: Snapshot, field: Field) -> float:
-    return np.mean(field.getData(snap))
 
 
 @addPlot(None)
@@ -80,11 +58,11 @@ def expansionErrorOverResolution(ax: plt.axes, sims: SimulationSet) -> None:
         averageError = [np.mean(getExpansionData(sim)[2]) for sim in simSet]
         plt.xlabel("Resolution")
         plt.ylabel("Error")
-        plt.plot(resolutions, averageError, label=sims.getNiceSubsetName(params, simSet))
+        plt.plot(resolutions, averageError, label=sims.getNiceSubsetName(params, simSet), marker="o")
         plt.legend()
 
 
-def getExpansionData(sim) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def getExpansionData(sim: Simulation) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     initialSnap = sim.snapshots[0]
     meanDens = getMeanValue(initialSnap, BasicField("Density"))
     nH = meanDens * initialSnap.dens_prev * initialSnap.dens_to_ndens * 1.22
