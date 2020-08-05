@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, Any, List, Iterator, Set
 from collections.abc import MutableMapping
 
@@ -21,7 +22,8 @@ class Params(MutableMapping):
 
     def getParamFileWithParameter(self, k: str) -> ParamFile:
         paramFilesWithThisParameter = [paramFile for paramFile in self.files if k in paramFile or k in paramFile.unusedParams]
-        assert len(paramFilesWithThisParameter) != 0, f"No file contains this parameter: {k}"
+        if len(paramFilesWithThisParameter) == 0:
+            logging.error(f"No file contains this parameter: {k}")
         assert len(paramFilesWithThisParameter) == 1, f"Multiple files contain this parameter: {k}: {paramFilesWithThisParameter}"
         return paramFilesWithThisParameter[0]
 

@@ -2,9 +2,40 @@ import logging
 import sys
 from subprocess import Popen, PIPE, check_output
 from typing import Callable, Any, List, Dict, Union
-from pathlib import Path
-from bob.field import Field
 from math import isclose
+
+import numpy as np
+from pathlib import Path
+import quantities as pq
+import pickle
+
+from bob import config
+
+
+def fileMemoize(func: Callable[..., Any]) -> Callable[..., Any]:
+    def wrapper(*args: List[Any], **kwargs: Dict[Any, Any]) -> Any:
+        callName = func.__name__ + str((args, tuple(kwargs.items())).__hash__())
+        if not config.memoizeDir.is_dir():
+            config.memoizeDir.mkdir()
+
+        resultFile = Path(config.memoizeDir, callName)
+        if resultFile.is_file():
+            result = pickle.load(resultFile.open("rb"))
+            logging.info(f"REUSING MEMOIZED RESULT FOR {func.__name__}")
+            return result
+        else:
+            result = func(*args, **kwargs)
+            pickle.dump(result, resultFile.open("wb"))
+            return result
+
+    return wrapper
+
+
+def unitNpArray(values: List[pq.quantity.Quantity]) -> np.ndarray:
+    assert len(values) > 0, "What unit am I supposed to turn this empty array into?"
+    units = values[0].units
+    assert all(units == v.units for v in values[1:]), "Inconsistent unit in list"
+    return units * np.array([float(x) for x in values])
 
 
 def runCommand(command: Union[str, List[str]], path: Union[str, Path], printOutput: bool = False, shell: bool = False) -> Popen:
@@ -57,4 +88,8 @@ def getNiceTimeUnitName(value: float) -> str:
 def getNiceParamName(k: str, v: Any) -> str:
     if k == "SX_SWEEP":
         return "Sweep" if v else "SPRAI"
+    if k == "ReferenceGasPartMass":
+        return ""
+    if k == "InitCondFile":
+        return "Resolution: {}".format(v.replace("ics_", ""))
     return "{}: {}".format(k, v)

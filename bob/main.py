@@ -1,9 +1,10 @@
 from pathlib import Path
+import shutil
 import logging
 import argparse
 
 
-from bob import postprocess, ics
+from bob import postprocess, ics, config
 from bob import postprocessingFunctions
 from bob.simulationSet import SimulationSet, getSimsFromFolder
 from bob.units import setupUnits
@@ -26,6 +27,7 @@ def setupArgs() -> argparse.Namespace:
     parser.add_argument("--showFigures", action="store_true", help="Show figures instead of saving them")
     parser.add_argument("-s", "--select", nargs="*", help="Select only some of the sims for postprocessing/running/compiling")
     parser.add_argument("-i", "--ics", action="store_true", help="Create initial conditions")
+    parser.add_argument("--recalc", action="store_true", help="Recalculate memoized results")
 
     args = parser.parse_args()
     if args.create is not None:
@@ -57,6 +59,8 @@ def main() -> None:
     setupUnits()
     setupLogging(args)
     sims = getSimsFromFolder(args)
+    if args.recalc:
+        shutil.rmtree(config.memoizeDir)
     if args.ics:
         ics.main(args, sims)
     if args.make:

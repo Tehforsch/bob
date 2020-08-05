@@ -29,6 +29,7 @@ jobFilename = "job"
 sourceOutputFolderName = "arepo"
 picFolder = "pics"
 specialFolders = [picFolder]
+memoizeDir = Path(Path.home(), ".bobMemoize") # For in-file memoization to speed up plot work
 
 # Plot settings
 dpi = 600

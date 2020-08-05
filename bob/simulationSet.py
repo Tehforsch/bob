@@ -34,7 +34,12 @@ class SimulationSet(list):
 
     def getNiceSimName(self, sim: Simulation) -> str:
         assert sim in self
-        result = ",".join(getNiceParamName(k, sim.params[k]) for k in self.variedParams)
+        result = ",".join(getNiceParamName(k, sim.params[k]) for k in self.variedParams if getNiceParamName(k, sim.params[k]) != "")
+        return result
+
+    def getNiceSubsetName(self, params: List[str], simSet: "SimulationSet") -> str:
+        assert all(sim in self for sim in simSet)
+        result = ",".join(getNiceParamName(k, simSet[0].params[k]) for k in params if getNiceParamName(k, simSet[0].params[k]) != "")
         return result
 
 
