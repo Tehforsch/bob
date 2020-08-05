@@ -1,6 +1,6 @@
 import logging
 import shutil
-from typing import Dict, Any, Callable
+from typing import Dict, Any, Callable, Tuple
 import numpy as np
 import h5py as hp
 from pathlib import Path
@@ -94,7 +94,6 @@ class ICS:
             self.mass[c] = self.volume[c] * densityFunction(coord)
         self.ids = np.array(f["PartType0/ParticleIDs"][:])
         self.velocities = np.zeros(self.coords.shape)
-        print(self.coords.shape, self.volume.shape, self.velocities.shape)
 
     def save(self, fileName: Path) -> None:
         with hp.File(fileName, "w") as f:
@@ -138,7 +137,7 @@ def getMeshRelaxTime(meshRelaxSim: Simulation) -> float:
     return max(5 * meshRelaxSim.params["MaxSizeTimestep"], meshRelaxSim.params["TimeBetSnapshot"] * 5)
 
 
-def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path) -> Path:
+def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path) -> Tuple[Path, Simulation]:
     """Run a mesh relaxation for the simulation sim, starting from the ics in inputFile. Run the simulation in 
     folder."""
     shutil.copytree(sim.folder, folder, ignore=shutil.ignore_patterns("meshRelax*"))
@@ -154,7 +153,7 @@ def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path) -> Path:
     lastSnapshot = meshRelaxSim.snapshots[-1].filename
     resultFile = Path(folder, config.meshRelaxedIcsFileName)
     convertIcs(lastSnapshot, resultFile, resolution=sim.params["resolution"])
-    return resultFile
+    return resultFile, meshRelaxSim
 
 
 def main(args: argparse.Namespace, sims: SimulationSet) -> None:
@@ -167,4 +166,5 @@ def main(args: argparse.Namespace, sims: SimulationSet) -> None:
             logging.info("Running mesh relaxation step {}".format(i))
             sim.params["ReferenceGasPartMass"] = targetGasMass
             sim.inputFile.write()  # Update reference gas mass
-            currentIcsFile = runMeshRelax(sim, currentIcsFile, Path(sim.folder, "meshRelax{}".format(i)))
+            currentIcsFile, mrSim = runMeshRelax(sim, currentIcsFile, Path(sim.folder, "meshRelax{}".format(i)))
+        shutil.copyfile(mrSim.snapshots[-1].filename, Path(sims.folder, "ics_{}.hdf5".format(sim.params["resolution"])))
