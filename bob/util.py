@@ -1,7 +1,7 @@
+from typing import Callable, Any, List, Dict, Union, Iterable
 import logging
 import sys
 from subprocess import Popen, PIPE, check_output
-from typing import Callable, Any, List, Dict, Union
 from math import isclose
 
 import numpy as np
@@ -60,6 +60,14 @@ def printArgs(func: Callable[..., Any]) -> Callable[..., Any]:
         result = func(*args, **kwargs)
         print(f"{result}")
         return result
+
+    return wrapper
+
+
+def toList(func: Callable[..., Iterable[Any]]) -> Callable[..., List[Any]]:
+    def wrapper(*args: List[Any], **kwargs: Dict[str, Any]) -> Any:
+        result = func(*args, **kwargs)
+        return list(result)
 
     return wrapper
 

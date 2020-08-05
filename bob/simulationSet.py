@@ -1,13 +1,13 @@
 import shutil
 from pathlib import Path
 import itertools
-from typing import List, Dict, Any, Iterable, Tuple, Set
+from typing import List, Dict, Any, Iterable, Tuple, Set, Union
 import math
 import argparse
 import yaml
 from bob import config
 from bob.simulation import Simulation
-from bob.util import getNiceParamName
+from bob.util import getNiceParamName, toList
 
 
 class SimulationSet(list):
@@ -49,10 +49,28 @@ def readSubstitutionsFile(inputFolder: Path) -> Dict[str, Any]:
         return yaml.load(f, yaml.SafeLoader)
 
 
-def getProductSubstitutions(subst: Dict[str, Any]) -> List[Dict[str, Any]]:
+@toList
+def getProductSubstitutions(subst: Dict[Any, Any], cartesianOptions: Union[bool, List[List[str]]]) -> Iterable[Dict[str, Any]]:
+    params = list(subst.keys())
+    if isinstance(cartesianOptions, List):
+        for combinedParams in cartesianOptions:
+            values = [subst[param] for param in combinedParams]
+            assert (len(v) == len(values[0]) for v in values), "Unequal parameter list lengths for params: {}".format(cartesianOptions)
+            for param in combinedParams:
+                del subst[param]
+            subst[tuple(combinedParams)] = list(zip(*values))
     params = list(subst.keys())
     configurations = itertools.product(*[subst[param] for param in params])
-    return [dict((param, configuration[i]) for (i, param) in enumerate(params)) for configuration in configurations]
+    for configuration in configurations:
+        d = {}
+        for (i, param) in enumerate(params):
+            if type(param) == tuple:  # grouped params = varied at once
+                assert type(configuration[i]) == tuple
+                for (k, v) in zip(param, configuration[i]):
+                    d[k] = v
+            else:
+                d[param] = configuration[i]
+        yield d
 
 
 def getSimNames(dicts: List[Dict[str, Any]]) -> List[str]:
@@ -96,16 +114,18 @@ def createSimsFromFolder(args: argparse.Namespace) -> SimulationSet:
     allSubstitutions = getAllSubstitutions(args)
     if allSubstitutions == {}:
         return SimulationSet(args.simFolder, [createSimulation(args, "sim", {})])
-    if allSubstitutions.get(config.cartesianIdentifier, False):
+    cartesianOptions = allSubstitutions.get(config.cartesianIdentifier, False)
+    if cartesianOptions:
         del allSubstitutions[config.cartesianIdentifier]
-        dicts = getProductSubstitutions(allSubstitutions)
+        dicts = getProductSubstitutions(allSubstitutions, cartesianOptions)
     else:
         numSims = len(next(iter(allSubstitutions.values())))
         for v in allSubstitutions.values():
             assert len(v) == numSims
         dicts = [dict((k, v[i]) for (k, v) in allSubstitutions.items()) for i in range(numSims)]
     names = getSimNames(dicts)
-    return SimulationSet(args.simFolder, (createSimulation(args, name, d) for (name, d) in zip(names, dicts) if args.select is None or name in args.select))
+    sims = SimulationSet(args.simFolder, (createSimulation(args, name, d) for (name, d) in zip(names, dicts) if args.select is None or name in args.select))
+    return sims
 
 
 def getSimsFromFolder(args: argparse.Namespace) -> SimulationSet:
