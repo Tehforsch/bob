@@ -32,7 +32,7 @@ basicFields = [
 def createSlicePlots() -> None:
     for basicField in basicFields:
         for (axis, axisName) in zip([[1, 0, 0], [0, 1, 0], [0, 0, 1]], ["X", "Y", "Z"]):
-            center = [0.5, 0.5, 0.5]
+            center = [0.51, 0.5, 0.5]
 
             def thisSlicePlot(ax: plt.axes, snap: Snapshot, basicField: BasicField = basicField) -> None:
                 # center = sim.boxSize * 0.5

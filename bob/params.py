@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any, List, Iterator, Set
+from typing import Dict, Any, List, Iterator, Set, Optional
 from collections.abc import MutableMapping
 
 from bob.paramFile import ParamFile
@@ -20,18 +20,23 @@ class Params(MutableMapping):
         for paramFile in self.files:
             paramFile.write()
 
-    def getParamFileWithParameter(self, k: str) -> ParamFile:
+    def getParamFileWithParameter(self, k: str) -> Optional[ParamFile]:
         paramFilesWithThisParameter = [paramFile for paramFile in self.files if k in paramFile or k in paramFile.unusedParams]
         if len(paramFilesWithThisParameter) == 0:
             logging.error(f"No file contains this parameter: {k}")
-        assert len(paramFilesWithThisParameter) == 1, f"Multiple files contain this parameter: {k}: {paramFilesWithThisParameter}"
+            return None
+        assert len(paramFilesWithThisParameter) <= 1, f"Multiple files contain this parameter: {k}: {paramFilesWithThisParameter}"
         return paramFilesWithThisParameter[0]
 
     def __getitem__(self, k: str) -> Any:
         return self.getParamFileWithParameter(k)[k]
 
     def __setitem__(self, k: str, v: Any) -> None:
-        self.getParamFileWithParameter(k)[k] = v
+        f = self.getParamFileWithParameter(k)
+        if f is None:
+            logging.error("Invalid parameter: {} (might be fine though)".format(k))
+        else:
+            f[k] = v
 
     def __iter__(self) -> Iterator[Any]:
         return iter([k for f in self.files for k in f.keys()])
