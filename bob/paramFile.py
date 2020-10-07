@@ -126,14 +126,18 @@ class JobFile(ParamFile):
         self.setNumCores()
 
     def setNumCores(self) -> None:
+        if not "numCores" in self:
+            self["numCores"] = 32
         if "numNodes" in self and "coresPerNode" in self:
             numCores = self["numCores"]
             if numCores < self["maxCoresPerNode"]:
                 self["coresPerNode"] = numCores
                 self["numNodes"] = 1
+                self["partition"] = "single"
             else:
                 self["coresPerNode"] = self["maxCoresPerNode"]
                 self["numNodes"] = math.ceil(numCores / self["coresPerNode"])
+                self["partition"] = "multi"
                 realNumCores = self["coresPerNode"] * self["numNodes"]
                 if realNumCores != numCores:
                     logging.info(f"Cannot run with {numCores} cores (not divisible by max num of cores per node). Running on {realNumCores} instead.")

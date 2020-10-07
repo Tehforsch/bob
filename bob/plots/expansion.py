@@ -98,7 +98,7 @@ def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False
         times, radii, error = getExpansionData(sim)
         if not innerOuter:
             (line1,) = ax1.plot(times, radii, label=sims.getNiceSimName(sim), color=color)
-            line1.set_dashes(linestyle)  # 2pt line, 2pt break, 10pt line, 2pt break
+            # line1.set_dashes(linestyle)  # 2pt line, 2pt break, 10pt line, 2pt break
         else:
             radiiUpper = [(getIonizationRadius(snapshot, np.array([0.5, 0.5, 0.5]), 0.9) / stroemgrenRadius).simplified for snapshot in sim.snapshots]
             radiiLower = [(getIonizationRadius(snapshot, np.array([0.5, 0.5, 0.5]), 0.1) / stroemgrenRadius).simplified for snapshot in sim.snapshots]
@@ -106,7 +106,7 @@ def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False
             ax1.plot(times, radiiUpper, label=sims.getNiceSimName(sim) + " 0.9", color=color, linestyle="--")
             ax1.plot(times, radiiLower, label=sims.getNiceSimName(sim) + " 0.1", color=color, linestyle="--")
         (line2,) = ax2.plot(times, error, label="Relative error", color=color)
-        line2.set_dashes(linestyle)
+        # line2.set_dashes(linestyle)
 
     ts = np.linspace(0, np.max(times), num=1000)
     ax1.plot(ts, [analyticalRTypeExpansion(t) for t in ts], label="Analytical", color="g")
@@ -115,9 +115,11 @@ def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False
 
 def getStyle(sim: Simulation) -> Tuple[Tuple[float, float, float], List[float]]:
     resolution = int(sim.params["InitCondFile"].replace("ics_", ""))
-    resolutionIndex = [36, 32, 24, 16, 12].index(resolution)
+    resolutionIndex = [256, 128, 64, 32].index(resolution)
+    print(resolution, resolutionIndex)
     cmaps = [plt.get_cmap("Reds"), plt.get_cmap("Blues")]
     cmap = cmaps[int(sim.params["SX_SWEEP"])]
     color = cmap(1.0 - resolutionIndex * 0.05)
     linestyle = [4, resolutionIndex]
+    return color, [1]
     return color, linestyle
