@@ -13,7 +13,7 @@ class Slice:
         self.axis = axis / np.linalg.norm(axis)
         self.vmin = 0
         self.vmax = 1
-        self.thickness = 0.02
+        self.thickness = 0.05
 
     def plot(self, ax: plt.axes, **plotSettings: Dict[str, Any]) -> None:
         field = self.field.getData(self.snapshot)
