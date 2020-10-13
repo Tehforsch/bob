@@ -113,7 +113,7 @@ class JobFile(ParamFile):
         self.unusedParams = set(
             ["numCores", "runParams", "maxCoresPerNode"]
         )  # Parameters that we might not use (numCores might be specified but coresPerNode and numNodes will be used)
-        self.derivedParams = set(["numNodes", "coresPerNode", "runCommand"])  # Parameters that are not interesting for postprocessing (we care about numCores)
+        self.derivedParams = set(["numNodes", "coresPerNode", "runCommand", "partition", "runParams"])  # Parameters that are not interesting for postprocessing (we care about numCores)
 
     def write(self) -> None:
         for param in self:
@@ -130,7 +130,7 @@ class JobFile(ParamFile):
             self["numCores"] = 32
         if "numNodes" in self and "coresPerNode" in self:
             numCores = self["numCores"]
-            if numCores < self["maxCoresPerNode"]:
+            if numCores <= self["maxCoresPerNode"]:
                 self["coresPerNode"] = numCores
                 self["numNodes"] = 1
                 self["partition"] = "single"
