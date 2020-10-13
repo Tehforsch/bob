@@ -27,6 +27,7 @@ class SimulationSet(list):
         remainingVariedParams = self.variedParams - set(parameters)
         getConfiguration = lambda sim: tuple((k, sim.params[k]) for k in remainingVariedParams)
         configurations = set(getConfiguration(sim) for sim in self)
+        print(configurations)
         return [
             (dict(configuration), SimulationSet(self.folder, [sim for sim in self if getConfiguration(sim) == configuration]))
             for configuration in configurations
