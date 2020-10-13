@@ -89,7 +89,8 @@ class ICS:
         masses = np.array(f["PartType0/Masses"][:])
         self.coords = np.array(f["PartType0/Coordinates"][:])
         self.volume = masses / density
-        self.mass = np.zeros(self.numParticles)  # g
+        self.mass = np.zeros(self.coords.shape)  # g
+        print(self.coords.shape, self.mass.shape, self.volume.shape)
         for c, coord in enumerate(self.coords):
             self.mass[c] = self.volume[c] * densityFunction(coord)
         self.ids = np.array(f["PartType0/ParticleIDs"][:])
@@ -111,13 +112,21 @@ class ICS:
             f[pt].create_dataset("ParticleIDs", data=self.ids)
 
 
-def densityFunction(coord: np.ndarray) -> float:
+def homogeneous(coord: np.ndarray) -> float:
     # dist = np.linalg.norm(coord - np.array([0.5, 0.5, 0.5]))
     # return 5.21e-21 / (dist ** 4 + 0.01)  # g/cm^-3
     return 1.672622012311334e-27
 
 
-def convertIcs(inputFile: Path, outputFile: Path, resolution: int) -> None:
+def nonHomogeneous(coord: np.ndarray) -> float:
+    # dist = np.linalg.norm(coord - np.array([0.5, 0.5, 0.5]))
+    # return 5.21e-21 / (dist ** 4 + 0.01)  # g/cm^-3
+    center = np.array([0.5, 0.5, 0.8])
+    alpha = 20
+    return 1.672622012311334e-27 * (1 + 30 * np.exp(-alpha * np.linalg.norm(coord - center) ** 2))
+
+
+def convertIcs(inputFile: Path, outputFile: Path, densityFunction: Callable[[np.ndarray], float], resolution: int) -> None:
     print("Converting {} to {}".format(inputFile, outputFile))
     f = ICS()
     f.create(resolution=resolution, units={"length": pc * 14000, "mass": M_sol, "time": 1e6 * yr,})  # 14 kpc  # 1 M_sol  # Myr
@@ -125,7 +134,7 @@ def convertIcs(inputFile: Path, outputFile: Path, resolution: int) -> None:
     f.save(outputFile)
 
 
-def createIcs(outputFile: Path, resolution: int) -> float:
+def createIcs(outputFile: Path, densityFunction: Callable[[np.ndarray], float], resolution: int) -> float:
     f = ICS()
     f.create(resolution=resolution, units={"length": pc * 14000, "mass": M_sol, "time": 1e6 * yr,})  # 14 kpc  # 1 M_sol  # Myr
     targetGasMass = f.densFromGrid(densityFunction)
@@ -137,7 +146,7 @@ def getMeshRelaxTime(meshRelaxSim: Simulation) -> float:
     return max(5 * meshRelaxSim.params["MaxSizeTimestep"], meshRelaxSim.params["TimeBetSnapshot"] * 5)
 
 
-def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path) -> Tuple[Path, Simulation]:
+def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path, densityFunction: Callable[[np.ndarray], float]) -> Tuple[Path, Simulation]:
     """Run a mesh relaxation for the simulation sim, starting from the ics in inputFile. Run the simulation in 
     folder."""
     shutil.copytree(sim.folder, folder, ignore=shutil.ignore_patterns("meshRelax*"))
@@ -152,19 +161,27 @@ def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path) -> Tuple[Path, 
     meshRelaxSim.run(verbose=False)
     lastSnapshot = meshRelaxSim.snapshots[-1].filename
     resultFile = Path(folder, config.meshRelaxedIcsFileName)
-    convertIcs(lastSnapshot, resultFile, resolution=sim.params["resolution"])
+    convertIcs(lastSnapshot, resultFile, densityFunction, resolution=sim.params["resolution"])
     return resultFile, meshRelaxSim
+
+
+def getDensityFunction(name: str) -> Callable[[np.ndarray], float]:
+    if name == "homogeneous":
+        return homogeneous
+    assert name == "nonHomogeneous"
+    return nonHomogeneous
 
 
 def main(args: argparse.Namespace, sims: SimulationSet) -> None:
     for sim in sims:
         sim.icsFile = IcsParamFile(Path(sim.folder, config.icsParamFileName))
         initialIcsFile = Path(sim.folder, config.icsFileName)
-        targetGasMass = createIcs(initialIcsFile, sim.params["resolution"])
+        densityFunction = getDensityFunction(sim.params["densityFunction"])
+        targetGasMass = createIcs(initialIcsFile, densityFunction, sim.params["resolution"])
         currentIcsFile = initialIcsFile
         for i in range(config.numMeshRelaxSteps):
             logging.info("Running mesh relaxation step {}".format(i))
             sim.params["ReferenceGasPartMass"] = targetGasMass
             sim.inputFile.write()  # Update reference gas mass
-            currentIcsFile, mrSim = runMeshRelax(sim, currentIcsFile, Path(sim.folder, "meshRelax{}".format(i)))
+            currentIcsFile, mrSim = runMeshRelax(sim, currentIcsFile, Path(sim.folder, "meshRelax{}".format(i)), densityFunction)
         shutil.copyfile(mrSim.snapshots[-1].filename, Path(sims.folder, "ics_{}.hdf5".format(sim.params["resolution"])))
