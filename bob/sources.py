@@ -70,9 +70,9 @@ class Sources:
     def __repr__(self) -> str:
         s = ""
         if self.sigma is not None:
-            s += "Cross sections:  " + self.sigma + "\n"
+            s += "Cross sections:  " + str(self.sigma) + "\n"
         if self.energy is not None:
-            s += "Excess energies: " + self.energy + "\n"
+            s += "Excess energies: " + str(self.energy) + "\n"
         s += "x " + str(self.coord[:, 0]) + "\n"
         s += "y " + str(self.coord[:, 1]) + "\n"
         s += "z " + str(self.coord[:, 2]) + "\n"

@@ -38,7 +38,7 @@ def createSlicePlots() -> None:
                 # center = sim.boxSize * 0.5
                 Slice(snap, basicField, center, axis).plot(ax)
 
-            name = f"centerSlice{axisName}{basicField.niceName}"
+            name = f"slice{axisName}{basicField.niceName}"
             # Register plot in list
             addSingleSnapshotPlot(name)(thisSlicePlot)
 
@@ -50,7 +50,7 @@ def createScatterPlots() -> None:
             # center = sim.boxSize * 0.5
             Scatter3D(snap, basicField, 0).plot(ax)
 
-        name = f"scatter3D{basicField.niceName}"
+        name = f"3D{basicField.niceName}"
         # Register plot in list
         addSingleSnapshotPlot(name)(thisSlicePlot)
 

@@ -31,6 +31,8 @@ class BasicField(Field):
             "Masses": "Mass",
             "Coordinates": "Coordinates",
         }
+        if self.index is None:
+            return fieldName[self.name]
         return fieldName[self.name] + str(self.index)
 
     def getData(self, snapshot: "Snapshot") -> np.ndarray:

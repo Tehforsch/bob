@@ -1,4 +1,5 @@
 import argparse
+import sys
 from typing import Sequence
 from pathlib import Path
 from bob.simulationSet import SimulationSet
@@ -7,6 +8,7 @@ import bob.scaling
 import bob.gprof
 import matplotlib.pyplot as plt
 import bob.plot
+from bob.snapshot import Snapshot
 import bob.physicalPlots
 import bob.compareSimulations
 from bob.postprocessingFunctions import (

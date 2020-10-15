@@ -46,6 +46,8 @@ class SimulationSet(list):
 
 def readSubstitutionsFile(inputFolder: Path) -> Dict[str, Any]:
     substitutionFile = Path(inputFolder, config.substitutionFileName)
+    if not substitutionFile.is_file():
+        return {}
     with open(substitutionFile, "r") as f:
         return yaml.load(f, yaml.SafeLoader)
 
@@ -88,7 +90,7 @@ def getAllSubstitutions(args: argparse.Namespace) -> Dict[str, Any]:
     if args.create:
         return readSubstitutionsFile(args.inputFolder)
     else:
-        simNames = list(f for f in args.simFolder.glob("*") if not f.name in config.specialFolders)
+        simNames = list(f for f in args.simFolder.glob("*") if (not f.name in config.specialFolders) and f.is_dir())
         assert len(simNames) > 0, "No simulation in output folder."
         return readSubstitutionsFile(Path(args.simFolder, simNames[0]))
 
@@ -114,7 +116,7 @@ def createSimulation(args: argparse.Namespace, name: str, d: Dict[str, Any]) -> 
 def createSimsFromFolder(args: argparse.Namespace) -> SimulationSet:
     allSubstitutions = getAllSubstitutions(args)
     if allSubstitutions == {}:
-        return SimulationSet(args.simFolder, [createSimulation(args, "sim", {})])
+        return SimulationSet(args.simFolder, [createSimulation(args, "0", {})])
     cartesianOptions = allSubstitutions.get(config.cartesianIdentifier, False)
     if cartesianOptions:
         del allSubstitutions[config.cartesianIdentifier]

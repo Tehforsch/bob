@@ -11,16 +11,14 @@ class Slice:
         self.field = field
         self.start = start
         self.axis = axis / np.linalg.norm(axis)
-        self.vmin = 0
-        self.vmax = 1
-        self.thickness = 0.05
+        self.thickness = 0.15
 
     def plot(self, ax: plt.axes, **plotSettings: Dict[str, Any]) -> None:
         field = self.field.getData(self.snapshot)
         print(np.mean(field), np.max(field))
         coordinates = self.snapshot.coordinates
         coord1, coord2, values = getSlice(field, coordinates, self.start, self.axis, self.thickness)
-        ax.scatter(coord1, coord2, c=values, alpha=1.0, **plotSettings, vmin=self.vmin, vmax=self.vmax)
+        ax.scatter(coord1, coord2, c=values, alpha=1.0, **plotSettings)
 
 
 def getSlice(array: np.ndarray, coordinates: np.ndarray, start: np.ndarray, axis: np.ndarray, thickness: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
