@@ -18,7 +18,18 @@ class Slice:
         print(np.mean(field), np.max(field))
         coordinates = self.snapshot.coordinates
         coord1, coord2, values = getSlice(field, coordinates, self.start, self.axis, self.thickness)
+        ax.xlabel(getAxisName(findOrthogonalAxes(self.axis)[0]))
+        ax.ylabel(getAxisName(findOrthogonalAxes(self.axis)[1]))
         ax.scatter(coord1, coord2, c=values, alpha=1.0, **plotSettings)
+
+
+def getAxisName(axis: np.ndarray) -> str:
+    xAxis = np.array([1.0, 0.0, 0.0])
+    yAxis = np.array([0.0, 1.0, 0.0])
+    zAxis = np.array([0.0, 0.0, 1.0])
+    dotProducts = [np.abs(np.dot(axis, a)) for a in [xAxis, yAxis, zAxis]]
+    mostParallel = np.argmax(dotProducts)
+    return ["x", "y", "z"][mostParallel]
 
 
 def getSlice(array: np.ndarray, coordinates: np.ndarray, start: np.ndarray, axis: np.ndarray, thickness: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:

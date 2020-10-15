@@ -1,3 +1,4 @@
+import numpy as np
 from bob.postprocessingFunctions import addSingleSnapshotPlot
 import matplotlib.pyplot as plt
 from bob.snapshot import Snapshot
@@ -34,7 +35,7 @@ def createSlicePlots() -> None:
         for (axis, axisName) in zip([[1, 0, 0], [0, 1, 0], [0, 0, 1]], ["X", "Y", "Z"]):
             center = [0.51, 0.5, 0.5]
 
-            def thisSlicePlot(ax: plt.axes, snap: Snapshot, basicField: BasicField = basicField) -> None:
+            def thisSlicePlot(ax: plt.axes, snap: Snapshot, basicField: BasicField = basicField, axis: np.ndarray = axis) -> None:
                 # center = sim.boxSize * 0.5
                 Slice(snap, basicField, center, axis).plot(ax)
 
