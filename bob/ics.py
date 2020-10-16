@@ -120,9 +120,9 @@ def homogeneous(coord: np.ndarray) -> float:
 def nonHomogeneous(coord: np.ndarray) -> float:
     # dist = np.linalg.norm(coord - np.array([0.5, 0.5, 0.5]))
     # return 5.21e-21 / (dist ** 4 + 0.01)  # g/cm^-3
-    center = np.array([0.5, 0.5, 0.8])
+    center = np.array([0.5, 0.5, 0.7])
     # alpha = 20
-    factor = 1000 if np.linalg.norm(coord - center) < 0.3 else 1
+    factor = 1000 if np.linalg.norm(coord - center) < 0.15 else 1
     return 1.672622012311334e-27 * factor
 
 
@@ -149,7 +149,7 @@ def getMeshRelaxTime(meshRelaxSim: Simulation) -> float:
 def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path, densityFunction: Callable[[np.ndarray], float]) -> Tuple[Path, Simulation]:
     """Run a mesh relaxation for the simulation sim, starting from the ics in inputFile. Run the simulation in 
     folder."""
-    shutil.copytree(sim.folder, folder, ignore=shutil.ignore_patterns("meshRelax*", "sims"))
+    shutil.copytree(sim.folder, folder, ignore=shutil.ignore_patterns("meshRelax*"))
     targetFile = Path(folder, config.icsFileName)
     shutil.copyfile(inputFile, targetFile)
     meshRelaxSim = Simulation(folder, {"runParams": sim.params["runParams"]})
