@@ -91,6 +91,7 @@ configParams = [
     "SX_DISPLAY_LOAD",
     "SX_NDIR",
     "SX_SWEEP",
+    "SX_SWEEP_EQUAL_DISTRIBUTION",
     "MAX_VARIATION_TOLERANCE",
 ]
 
