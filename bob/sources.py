@@ -87,6 +87,7 @@ if __name__ == "__main__":
         print(
             "Need either 1 argument ( a source file to print ) or 1 for the output file and many times 3 + 5 (the coordinates and ionization rates of the sources"
         )
+        print("For example: python sources.py newSource.bin 0.5 0.5 0.5 1e48 0 0 0 0")
     if len(sys.argv) == 2:
         inFile = sys.argv[1]
         print(Sources(Path(inFile)))
