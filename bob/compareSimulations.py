@@ -11,14 +11,14 @@ from bob.snapshot import Snapshot
 from bob.simulation import Simulation
 from bob.util import getNiceTimeUnitName
 from bob.postprocessingFunctions import addCompareSimSingleSnapshotPlot
-from bob.slicePlot import Slice
+from bob.slicePlot import voronoiSlice
 
 
 @addCompareSimSingleSnapshotPlot(None)
 def fieldDifference(ax: plt.axes, sim1: Simulation, sim2: Simulation, snap1: Snapshot, snap2: Snapshot) -> None:
     field = BasicField("ChemicalAbundances", 1)
     diff = RelativeDifference(field, snap1)
-    Slice(snap2, diff, (0.5, 0.5, 0.5), (1.0, 0.0, 0.0)).plot(ax)
+    voronoiSlice(ax, snap2, diff, (0.5, 0.5, 0.5), (1.0, 0.0, 0.0))
     # maxDiff = np.max(diff)
     # minDiff = np.min(diff)
     # averageDiff = np.mean(diff)

@@ -2,7 +2,7 @@ import numpy as np
 from bob.postprocessingFunctions import addSingleSnapshotPlot
 import matplotlib.pyplot as plt
 from bob.snapshot import Snapshot
-from bob.slicePlot import Slice
+from bob.slicePlot import voronoiSlice
 from bob.scatter3D import Scatter3D
 from bob.basicField import BasicField
 from bob.plots.expansion import expansionInnerOuter, expansion, expansionErrorOverResolution
@@ -30,14 +30,14 @@ basicFields = [
 ]
 
 
-def createSlicePlots() -> None:
+def createVoronoiSlicePlots() -> None:
     for basicField in basicFields:
         for (axis, axisName) in zip([[1, 0, 0], [0, 1, 0], [0, 0, 1]], ["X", "Y", "Z"]):
-            center = [0.50, 0.5, 0.5]
+            center = np.array([0.5, 0.5, 0.5])
 
             def thisSlicePlot(ax: plt.axes, snap: Snapshot, basicField: BasicField = basicField, axis: np.ndarray = axis) -> None:
                 # center = sim.boxSize * 0.5
-                Slice(snap, basicField, center, axis).plot(ax)
+                voronoiSlice(ax, snap, basicField, center, axis)
 
             name = f"slice{axisName}{basicField.niceName}"
             # Register plot in list
@@ -56,5 +56,5 @@ def createScatterPlots() -> None:
         addSingleSnapshotPlot(name)(thisSlicePlot)
 
 
-createSlicePlots()
+createVoronoiSlicePlots()
 createScatterPlots()

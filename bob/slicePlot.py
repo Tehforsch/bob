@@ -1,26 +1,34 @@
-from typing import Dict, Any, Tuple
-import numpy as np
+from typing import Any, Dict, Tuple
 import matplotlib.pyplot as plt
+from scipy.spatial import cKDTree
+import numpy as np
+
 from bob.snapshot import Snapshot
 from bob.field import Field
+from bob import config
 
 
-class Slice:
-    def __init__(self, snapshot: Snapshot, field: Field, start: np.array, axis: np.array):
-        self.snapshot = snapshot
-        self.field = field
-        self.start = start
-        self.axis = axis / np.linalg.norm(axis)
-        self.thickness = 0.03
-
-    def plot(self, ax: plt.axes, **plotSettings: Dict[str, Any]) -> None:
-        field = self.field.getData(self.snapshot)
-        print(np.mean(field), np.max(field))
-        coordinates = self.snapshot.coordinates
-        coord1, coord2, values = getSlice(field, coordinates, self.start, self.axis, self.thickness)
-        ax.xlabel(getAxisName(findOrthogonalAxes(self.axis)[0]))
-        ax.ylabel(getAxisName(findOrthogonalAxes(self.axis)[1]))
-        ax.scatter(coord1, coord2, c=values, alpha=1.0, **plotSettings)
+def voronoiSlice(ax: plt.axes, snap: Snapshot, field: Field, center: np.ndarray, axis: np.ndarray, **plotSettings: Dict[str, Any]) -> None:
+    axis = np.array(axis)
+    center = np.array(center)
+    min1 = 0.0
+    max1 = 1.0
+    min2 = 0.0
+    max2 = 1.0
+    ortho1, ortho2 = findOrthogonalAxes(axis)
+    n1 = config.dpi * 3
+    n2 = config.dpi * 3
+    p1, p2 = np.meshgrid(np.linspace(min1, max1, n1), np.linspace(min2, max2, n2))
+    coordinates = axis * (center * axis) + np.outer(p1, ortho1) + np.outer(p2, ortho2)
+    tree = cKDTree(snap.coordinates)
+    cellIndices = tree.query(coordinates)[1]
+    cellIndices = cellIndices.reshape((n1, n2))
+    data = field.getData(snap)
+    print(np.mean(data), np.max(data))
+    ax.xlabel(getAxisName(ortho1))
+    ax.ylabel(getAxisName(ortho2))
+    extent = (0, 1, 0, 1)
+    ax.imshow(data[cellIndices], extent=extent, origin="lower", cmap="Reds", **plotSettings)
 
 
 def getAxisName(axis: np.ndarray) -> str:
