@@ -11,7 +11,7 @@ class Slice:
         self.field = field
         self.start = start
         self.axis = axis / np.linalg.norm(axis)
-        self.thickness = 0.15
+        self.thickness = 0.03
 
     def plot(self, ax: plt.axes, **plotSettings: Dict[str, Any]) -> None:
         field = self.field.getData(self.snapshot)
@@ -51,4 +51,8 @@ def findOrthogonalAxes(axis: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     axis1 = axis1 / np.linalg.norm(axis)
     axis2 = np.cross(axis1, axis)
     axis2 = axis2 / np.linalg.norm(axis)
+    if np.sum(axis1) < 0:
+        axis1 = -axis1
+    if np.sum(axis2) < 0:
+        axis2 = -axis2
     return axis1, axis2
