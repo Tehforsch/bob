@@ -49,3 +49,4 @@ def saveAndShow(filename: Path, show: bool) -> None:
     plt.savefig(str(filename) + ".png", dpi=config.dpi)
     if show:
         plt.show()
+    plt.clf()
