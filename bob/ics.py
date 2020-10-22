@@ -117,12 +117,15 @@ def homogeneous(coord: np.ndarray) -> float:
     return 1.672622012311334e-27
 
 
-def nonHomogeneous(coord: np.ndarray) -> float:
-    # dist = np.linalg.norm(coord - np.array([0.5, 0.5, 0.5]))
-    # return 5.21e-21 / (dist ** 4 + 0.01)  # g/cm^-3
+def shadowing1(coord: np.ndarray) -> float:
     center = np.array([0.5, 0.5, 0.7])
-    # alpha = 20
     factor = 1000 if np.linalg.norm(coord - center) < 0.15 else 1
+    return 1.672622012311334e-27 * factor
+
+
+def shadowing2(coord: np.ndarray) -> float:
+    center = np.array([0.5, 0.5, 0.7])
+    factor = 1000 if np.linalg.norm(coord - center) < 0.05 else 1
     return 1.672622012311334e-27 * factor
 
 
@@ -166,14 +169,18 @@ def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path, densityFunction
 
 
 def getDensityFunction(name: str) -> Callable[[np.ndarray], float]:
-    if name == "homogeneous":
-        return homogeneous
-    assert name == "nonHomogeneous"
-    return nonHomogeneous
+    if name == "shadowing1":
+        return shadowing1
+    if name == "shadowing2":
+        return shadowing2
+    assert name == "homogeneous"
+    return homogeneous
 
 
 def main(args: argparse.Namespace, sims: SimulationSet) -> None:
     for sim in sims:
+        paramIdentifier = "_".join("{}_{}".format(k, sim.params[k]) for k in sims.variedParams)
+        name = "ics_{}.hdf5".format(paramIdentifier)
         sim.icsFile = IcsParamFile(Path(sim.folder, config.icsParamFileName))
         initialIcsFile = Path(sim.folder, config.icsFileName)
         densityFunction = getDensityFunction(sim.params["densityFunction"])
@@ -184,4 +191,4 @@ def main(args: argparse.Namespace, sims: SimulationSet) -> None:
             sim.params["ReferenceGasPartMass"] = targetGasMass
             sim.inputFile.write()  # Update reference gas mass
             currentIcsFile, mrSim = runMeshRelax(sim, currentIcsFile, Path(sim.folder, "{}".format(i)), densityFunction)
-        shutil.copyfile(mrSim.snapshots[-1].filename, Path(sims.folder, "ics_{}.hdf5".format(sim.params["resolution"])))
+        shutil.copyfile(mrSim.snapshots[-1].filename, Path(sims.folder, name))
