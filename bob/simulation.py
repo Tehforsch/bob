@@ -9,7 +9,7 @@ import re
 
 from bob import localConfig, config, util
 from bob.exceptions import CompilationError
-from bob.paramFile import ConfigFile, InputFile, JobFile, IcsParamFile
+from bob.paramFile import ConfigFile, InputFile, JobFile, IcsParamFile, MiscFile
 from bob.util import memoize
 from bob.params import Params
 from bob.snapshot import Snapshot

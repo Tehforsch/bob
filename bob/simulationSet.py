@@ -8,14 +8,14 @@ import yaml
 from bob import config
 from bob.simulation import Simulation
 from bob.util import getNiceParamName, toList
+from bob.config import outputFolderIdentifier, initialSnapIdentifier, snapshotFileBaseIdentifier
 
 
 class SimulationSet(list):
     def __init__(self, folder: Path, sims: Iterable[Simulation]) -> None:
         super().__init__(sims)
         self.folder = folder
-        # for sim in self[1:]:
-        # assert sim.params.keys() == self[0].params.keys(), "Not matching: {}".format(set(sim.params.keys()).difference(set(self[0].params.keys())))
+        assert len(self) > 0, "Error: No sim found!"
         self.derivedParams = set.union(*(f.params.getDerivedParams() for f in self))
         self.variedParams = set(k for k in self[0].params if self.doesVary(k) and not k in self.derivedParams)
         self.commonParams = self[0].params.keys() - self.variedParams
@@ -57,6 +57,9 @@ def getProductSubstitutions(subst: Dict[Any, Any], cartesianOptions: Union[bool,
     params = list(subst.keys())
     if isinstance(cartesianOptions, List):
         for combinedParams in cartesianOptions:
+            assert all(
+                param in params for param in combinedParams
+            ), "Error in sims file: Parameter listed in cartesian product that is not given actual values."
             values = [subst[param] for param in combinedParams]
             assert (len(v) == len(values[0]) for v in values), "Unequal parameter list lengths for params: {}".format(cartesianOptions)
             for param in combinedParams:
@@ -104,13 +107,26 @@ def copyFiles(sourceFolder: Path, targetFolder: Path) -> None:
     shutil.copytree(sourceFolder, targetFolder)
 
 
+def copyInitialSnapshot(folder: Path, sim: Simulation) -> None:
+    outputFolderName = sim.params[outputFolderIdentifier]
+    initialSnapshot = sim.params[initialSnapIdentifier]
+    snapFileBase = sim.params[snapshotFileBaseIdentifier]
+    outputFolder = Path(folder, outputFolderName)
+    outputFolder.mkdir(exist_ok=True)
+    nameFirstSnapshot = f"{snapFileBase}_000.hdf5"
+    shutil.copyfile(Path(folder, initialSnapshot), Path(outputFolder, nameFirstSnapshot))
+
+
 def createSimulation(args: argparse.Namespace, name: str, d: Dict[str, Any]) -> Simulation:
     folder = Path(args.simFolder, name)
     if args.delete:
         deleteFiles(folder)
     if args.create:
         copyFiles(args.inputFolder, folder)
-    return Simulation(folder, d)
+    sim = Simulation(folder, d)
+    if initialSnapIdentifier in sim.params:
+        copyInitialSnapshot(folder, sim)
+    return sim
 
 
 def createSimsFromFolder(args: argparse.Namespace) -> SimulationSet:

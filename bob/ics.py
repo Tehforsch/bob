@@ -9,6 +9,7 @@ from bob.simulationSet import SimulationSet
 from bob import config
 from bob.paramFile import IcsParamFile
 from bob.simulation import Simulation
+from bob.icsDefaults import shadowing1, shadowing2, homogeneous
 
 M_sol = 1.989e33  # solar mass [g]
 m_p = 1.67262178e-24  # proton mass [g]
@@ -109,24 +110,6 @@ class ICS:
             velocities = self.velocities / self.header["UnitVelocity_in_cm_per_s"]
             f[pt].create_dataset("Velocities", data=velocities)
             f[pt].create_dataset("ParticleIDs", data=self.ids)
-
-
-def homogeneous(coord: np.ndarray) -> float:
-    # dist = np.linalg.norm(coord - np.array([0.5, 0.5, 0.5]))
-    # return 5.21e-21 / (dist ** 4 + 0.01)  # g/cm^-3
-    return 1.672622012311334e-27
-
-
-def shadowing1(coord: np.ndarray) -> float:
-    center = np.array([0.5, 0.5, 0.7])
-    factor = 1000 if np.linalg.norm(coord - center) < 0.15 else 1
-    return 1.672622012311334e-27 * factor
-
-
-def shadowing2(coord: np.ndarray) -> float:
-    center = np.array([0.5, 0.5, 0.7])
-    factor = 1000 if np.linalg.norm(coord - center) < 0.05 else 1
-    return 1.672622012311334e-27 * factor
 
 
 def convertIcs(inputFile: Path, outputFile: Path, densityFunction: Callable[[np.ndarray], float], resolution: int) -> None:

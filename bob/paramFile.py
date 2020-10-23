@@ -161,3 +161,10 @@ class IcsParamFile(LineParamFile):
     def writeLine(self, param: Tuple[str, Any]) -> str:
         k, v = param
         return f"{k}={v}"
+
+
+class MiscFile(LineParamFile):
+    def __init__(self, filename: Path):
+        self.commentString = "#"
+        super().__init__(filename)
+        self["initialSnap"] = None
