@@ -1,3 +1,4 @@
+import numpy as np
 from pathlib import Path
 
 from bob import localConfig
@@ -35,6 +36,10 @@ memoizeDir = Path(Path.home(), ".bobMemoize") # For in-file memoization to speed
 dpi = 600
 fontSize = 9
 picFileEnding = ".png"
+# for prettier code
+npRed = np.array([1.0, 0.0, 0.0])
+npGreen = np.array([0.0, 1.0, 0.0])
+npBlue = np.array([0.0, 0.0, 1.0])
 
 # Gprof settings
 gprofPartFilePattern = "gmon.out.*"

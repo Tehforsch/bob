@@ -6,6 +6,7 @@ from bob.slicePlot import voronoiSlice
 from bob.scatter3D import Scatter3D
 from bob.basicField import BasicField
 from bob.plots.expansion import expansionInnerOuter, expansion, expansionErrorOverResolution
+from bob.plots.shadowing import shadowing
 
 basicFields = [
     BasicField("ChemicalAbundances", 0),
