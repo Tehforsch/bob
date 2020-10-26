@@ -22,7 +22,8 @@ def speedup(ax: plt.axes, sims: SimulationSet) -> None:
         # ax.xscale("log")
         baseTime = runTimes[0]
         speedup = [0 if runTime is None else baseTime / runTime for runTime in runTimes]
-        print(speedup)
+        ax.xscale("log")
+        ax.yscale("log")
         ax.xlabel("N")
         ax.ylabel("Speedup")
         ax.plot(numCores, speedup, label=",".join(getNiceParamName(k, v) for (k, v) in params.items()), marker="o")
@@ -37,6 +38,8 @@ def runTime(ax: plt.axes, sims: SimulationSet) -> None:
         numCores = [sim.params["numCores"] for sim in simSet]
         runTimes = [sim.runTime for sim in simSet]
         ax.xlabel("N")
+        ax.xscale("log")
+        ax.yscale("log")
         ax.ylabel("run time [s]")
         ax.plot(numCores, runTimes, label=",".join(getNiceParamName(k, v) for (k, v) in params.items()), marker="o")
     # plt.plot(numCores, numCores, label="Ideal")
@@ -50,6 +53,7 @@ def runTimeWeak(ax: plt.axes, sims: SimulationSet) -> None:
         runTimes = [sim.runTime for sim in simSet]
         ax.xlabel("N")
         ax.xscale("log")
+        ax.yscale("log")
         ax.ylabel("run time [s]")
         ax.plot(numCores, runTimes, label=",".join(getNiceParamName(k, v) for (k, v) in params.items()), marker="o")
     # plt.plot(numCores, numCores, label="Ideal")
