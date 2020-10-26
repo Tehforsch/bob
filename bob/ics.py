@@ -1,5 +1,6 @@
 import logging
 import shutil
+import time
 from typing import Dict, Any, Callable, Tuple
 import numpy as np
 import h5py as hp
@@ -138,17 +139,23 @@ def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path, densityFunction
     shutil.copytree(sim.folder, folder, ignore=shutil.ignore_patterns("meshRelax*"))
     targetFile = Path(folder, config.icsFileName)
     shutil.copyfile(inputFile, targetFile)
-    meshRelaxSim = Simulation(folder, {"runParams": sim.params["runParams"]})
+    meshRelaxSim = Simulation(folder, {"runParams": sim.params["runParams"], "numCores": sim.params["numCores"]})
     meshRelaxSim.params["TimeMax"] = getMeshRelaxTime(meshRelaxSim)
     meshRelaxSim.params["InitCondFile"] = targetFile.stem
     meshRelaxSim.params["MESHRELAX"] = True
     meshRelaxSim.params.writeFiles()
     meshRelaxSim.compileArepo()
     meshRelaxSim.run(verbose=False)
+    waitForMeshRelaxSim(meshRelaxSim)
     lastSnapshot = meshRelaxSim.snapshots[-1].filename
     resultFile = Path(folder, config.meshRelaxedIcsFileName)
     convertIcs(lastSnapshot, resultFile, densityFunction, resolution=sim.params["resolution"])
     return resultFile, meshRelaxSim
+
+def waitForMeshRelaxSim(sim: Simulation):
+    logging.info("Waiting for sim to finish (waiting until at least 3 snapshots are written)")
+    while len(sim.snapshots) < 3:
+        time.sleep(5)
 
 
 def getDensityFunction(name: str) -> Callable[[np.ndarray], float]:
