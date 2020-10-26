@@ -31,6 +31,9 @@ class Params(MutableMapping):
     def __getitem__(self, k: str) -> Any:
         return self.getParamFileWithParameter(k)[k]
 
+    def __contains__(self, k: str) -> Any:
+        return self.getParamFileWithParameter(k) != None
+
     def __setitem__(self, k: str, v: Any) -> None:
         f = self.getParamFileWithParameter(k)
         if f is None:
