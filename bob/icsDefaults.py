@@ -10,9 +10,9 @@ def homogeneous(coord: np.ndarray) -> float:
     return 1.672622012311334e-27
 
 
-def shadowing(coord: np.ndarray, center: np.ndarray,) -> float:
-    factor = 1000 if np.linalg.norm(coord - center) < 0.15 else 1
-    return 1.672622012311334e-27 * factor
+def shadowing(coord: np.ndarray, center: np.ndarray, factor: float, size: float, baseDensity: float) -> float:
+    localFactor = factor if np.linalg.norm(coord - center) < size else 1
+    return baseDensity * localFactor
 
 
 def shadowing1(coord: np.ndarray) -> float:
