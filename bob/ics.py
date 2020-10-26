@@ -162,7 +162,7 @@ def getDensityFunction(name: str) -> Callable[[np.ndarray], float]:
 
 def main(args: argparse.Namespace, sims: SimulationSet) -> None:
     for sim in sims:
-        paramIdentifier = "_".join("{}_{}".format(k, sim.params[k]) for k in sims.variedParams)
+        paramIdentifier = "_".join("{}_{}".format(k, sim.params[k]) for k in sorted(list(sims.variedParams)))
         name = "ics_{}.hdf5".format(paramIdentifier)
         sim.icsFile = IcsParamFile(Path(sim.folder, config.icsParamFileName))
         initialIcsFile = Path(sim.folder, config.icsFileName)
