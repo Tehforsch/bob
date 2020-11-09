@@ -95,11 +95,11 @@ if __name__ == "__main__":
         assert (len(sys.argv) - 2) % 8 == 0
         out = Path(sys.argv[1])
         s = Sources()
+        inp = iter(sys.argv[2:])
         for i in range((len(sys.argv) - 2) // 8):
-            inp = iter(sys.argv[2:])
             x, y, z, s1, s2, s3, s4, s5 = [float(next(inp)) for _ in range(8)]
             coord = [x, y, z]
             sed = [s1, s2, s3, s4, s5]
             s.addSource(coord, sed, [0])
-            print(s)
+        print(s)
         s.write(out)
