@@ -146,7 +146,7 @@ def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path, densityFunction
     meshRelaxSim.params.writeFiles()
     meshRelaxSim.compileArepo()
     meshRelaxSim.run(verbose=False)
-    waitForMeshRelaxSim(meshRelaxSim)
+    # waitForMeshRelaxSim(meshRelaxSim)
     lastSnapshot = meshRelaxSim.snapshots[-1].filename
     resultFile = Path(folder, config.meshRelaxedIcsFileName)
     convertIcs(lastSnapshot, resultFile, densityFunction, resolution=sim.params["resolution"])

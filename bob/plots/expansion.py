@@ -77,8 +77,8 @@ def getExpansionData(sim: Simulation) -> Tuple[np.ndarray, np.ndarray, np.ndarra
     photonRate = sim.sources.sed[0, 2] / pq.s
     stroemgrenRadius = (3 * photonRate / (4 * np.pi * alphaB * nE ** 2)) ** (1 / 3.0)
     stroemgrenRadius.units = "kpc"
-    print("Density: ", nH * protonMass)
-    print("Recombination time: {}, Stroemgren radius: {}".format(recombinationTime, stroemgrenRadius))
+    print(f"Mass density: {nH*protonMass}, Number density: {nH}")
+    print(f"Recombination time: {recombinationTime}, Stroemgren radius: {stroemgrenRadius}")
     times = (getTimes(sim) / recombinationTime).simplified
     radii = (getRadii(sim) / stroemgrenRadius).simplified
     error = [
@@ -122,7 +122,6 @@ def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False
 def getStyle(sim: Simulation) -> Tuple[Tuple[float, float, float], List[float]]:
     resolution = int(sim.params["InitCondFile"].replace("ics_", ""))
     resolutionIndex = [256, 128, 64, 32].index(resolution)
-    print(resolution, resolutionIndex)
     cmaps = [plt.get_cmap("Reds"), plt.get_cmap("Blues")]
     cmap = cmaps[int(sim.params["SX_SWEEP"])]
     color = cmap(1.0 - resolutionIndex * 0.05)

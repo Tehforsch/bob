@@ -18,6 +18,7 @@ from bob.postprocessingFunctions import (
     SingleSimPlotFunction,
     SingleSnapshotPlotFunction,
     CompareSimSingleSnapshotPlotFunction,
+    SingleSnapPostprocessingFunction,
 )
 
 
@@ -51,5 +52,7 @@ def main(args: argparse.Namespace, sims: SimulationSet) -> None:
             bob.plot.runSingleSnapshotPlot(function, sims, args)
         elif isinstance(function, CompareSimSingleSnapshotPlotFunction):
             bob.plot.runCompareSimSingleSnapPlot(function, sims, args)
+        elif isinstance(function, SingleSnapPostprocessingFunction):
+            bob.plot.runSingleSnapshotPostprocessingFunction(function, sims, args)
         elif type(function) == PostprocessingFunction:
             function(sims)

@@ -7,6 +7,8 @@ from bob.scatter3D import Scatter3D
 from bob.basicField import BasicField
 from bob.plots.expansion import expansionInnerOuter, expansion, expansionErrorOverResolution
 from bob.plots.shadowing import shadowing
+from bob.plots.snapOverview import overview
+from bob.simulation import Simulation
 
 basicFields = [
     BasicField("ChemicalAbundances", 0),
@@ -36,7 +38,7 @@ def createVoronoiSlicePlots() -> None:
         for (axis, axisName) in zip([[1, 0, 0], [0, 1, 0], [0, 0, 1]], ["X", "Y", "Z"]):
             center = np.array([0.5, 0.5, 0.5])
 
-            def thisSlicePlot(ax: plt.axes, snap: Snapshot, basicField: BasicField = basicField, axis: np.ndarray = axis) -> None:
+            def thisSlicePlot(ax: plt.axes, sim: Simulation, snap: Snapshot, basicField: BasicField = basicField, axis: np.ndarray = axis) -> None:
                 # center = sim.boxSize * 0.5
                 voronoiSlice(ax, snap, basicField, center, axis)
 
@@ -48,7 +50,7 @@ def createVoronoiSlicePlots() -> None:
 def createScatterPlots() -> None:
     for basicField in basicFields:
 
-        def thisSlicePlot(ax: plt.axes, snap: Snapshot, basicField: BasicField = basicField) -> None:
+        def thisSlicePlot(ax: plt.axes, sim: Simulation, snap: Snapshot, basicField: BasicField = basicField) -> None:
             # center = sim.boxSize * 0.5
             Scatter3D(snap, basicField, 0).plot(ax)
 

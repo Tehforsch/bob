@@ -31,6 +31,7 @@ def runSingleSnapshotPlot(function: SingleSnapshotPlotFunction, sims: Simulation
         for snap in sim.snapshots:
             if args.snapshots is None or snap.number in args.snapshots:
                 logging.info("For snap {}".format(snap.name))
+                function(plt, sim, snap)
                 simPicFolder = Path(sims.folder, config.picFolder, sim.name)
                 saveAndShow(Path(simPicFolder, "{}_{}".format(function.name, snap.name)), args.showFigures)
 
@@ -41,6 +42,16 @@ def runCompareSimSingleSnapPlot(function: CompareSimSingleSnapshotPlotFunction, 
             assert snap1.time == snap2.time, f"Non-matching snapshots between sims {sim1.name} and {sim2.name}"
             function(plt, sim1, sim2, snap1, snap2)
             saveAndShow(Path(sims.folder, config.picFolder, function.name), args.showFigures)
+
+
+def runSingleSnapshotPostprocessingFunction(function: SingleSnapshotPlotFunction, sims: SimulationSet, args: argparse.Namespace) -> None:
+    logging.info("Running {}".format(function.name))
+    for sim in sims:
+        logging.info("For sim {}".format(sim.name))
+        for snap in sim.snapshots:
+            if args.snapshots is None or snap.number in args.snapshots:
+                logging.info("For snap {}".format(snap.name))
+                function(sim, snap)
 
 
 def saveAndShow(filename: Path, show: bool) -> None:

@@ -24,7 +24,7 @@ def voronoiSlice(ax: plt.axes, snap: Snapshot, field: Field, center: np.ndarray,
     cellIndices = tree.query(coordinates)[1]
     cellIndices = cellIndices.reshape((n1, n2))
     data = field.getData(snap)
-    print(np.mean(data), np.max(data))
+    print(f"Field: {field.niceName}: min: {np.min(data):.2e}, mean: {np.mean(data):.2e}, max: {np.max(data):.2e}")
     ax.xlabel(getAxisName(ortho1))
     ax.ylabel(getAxisName(ortho2))
     extent = (0, 1, 0, 1)
