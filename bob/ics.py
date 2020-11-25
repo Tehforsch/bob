@@ -152,6 +152,7 @@ def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path, densityFunction
     convertIcs(lastSnapshot, resultFile, densityFunction, resolution=sim.params["resolution"])
     return resultFile, meshRelaxSim
 
+
 def waitForMeshRelaxSim(sim: Simulation):
     logging.info("Waiting for sim to finish (waiting until at least 3 snapshots are written)")
     while len(sim.snapshots) < 3:
@@ -179,6 +180,7 @@ def main(args: argparse.Namespace, sims: SimulationSet) -> None:
         for i in range(config.numMeshRelaxSteps):
             logging.info("Running mesh relaxation step {}".format(i))
             sim.params["ReferenceGasPartMass"] = targetGasMass
+            print(f"Set ReferenceGasPartMass = {targetGasMass}")
             sim.inputFile.write()  # Update reference gas mass
             currentIcsFile, mrSim = runMeshRelax(sim, currentIcsFile, Path(sim.folder, "{}".format(i)), densityFunction)
         shutil.copyfile(mrSim.snapshots[-1].filename, Path(sims.folder, name))
