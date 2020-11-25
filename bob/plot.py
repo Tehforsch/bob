@@ -31,7 +31,6 @@ def runSingleSnapshotPlot(function: SingleSnapshotPlotFunction, sims: Simulation
         for snap in sim.snapshots:
             if args.snapshots is None or snap.number in args.snapshots:
                 logging.info("For snap {}".format(snap.name))
-                function(plt, snap)
                 simPicFolder = Path(sims.folder, config.picFolder, sim.name)
                 saveAndShow(Path(simPicFolder, "{}_{}".format(function.name, snap.name)), args.showFigures)
 

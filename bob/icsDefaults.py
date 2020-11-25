@@ -2,6 +2,7 @@ import numpy as np
 
 shadowing1Params = {"center": np.array([0.5, 0.5, 0.7]), "factor": 1000, "size": 0.15, "baseDensity": 1.672622012311334e-27}
 shadowing2Params = {"center": np.array([0.5, 0.5, 0.7]), "factor": 1000, "size": 0.05, "baseDensity": 1.672622012311334e-27}
+shadowingCenterParams = {"center": np.array([0.5, 0.5, 0.5]), "factor": 1000, "size": 0.125, "baseDensity": 1.672622012311334e-24}
 
 
 def homogeneous(coord: np.ndarray) -> float:
@@ -21,3 +22,7 @@ def shadowing1(coord: np.ndarray) -> float:
 
 def shadowing2(coord: np.ndarray) -> float:
     return shadowing(coord, **shadowing2Params)
+
+
+def shadowingCenter(coord: np.ndarray) -> float:
+    return shadowing(coord, **shadowingCenterParams)
