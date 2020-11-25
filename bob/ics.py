@@ -10,7 +10,7 @@ from bob.simulationSet import SimulationSet
 from bob import config
 from bob.paramFile import IcsParamFile
 from bob.simulation import Simulation
-from bob.icsDefaults import shadowing1, shadowing2, homogeneous
+from bob.icsDefaults import shadowing1, shadowing2, shadowingCenter, homogeneous
 
 M_sol = 1.989e33  # solar mass [g]
 m_p = 1.67262178e-24  # proton mass [g]
@@ -163,6 +163,8 @@ def getDensityFunction(name: str) -> Callable[[np.ndarray], float]:
         return shadowing1
     if name == "shadowing2":
         return shadowing2
+    if name == "shadowingCenter":
+        return shadowingCenter
     assert name == "homogeneous"
     return homogeneous
 
