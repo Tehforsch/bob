@@ -3,18 +3,19 @@ import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
 import numpy as np
 
+from bob.simulation import Simulation
 from bob.snapshot import Snapshot
 from bob.field import Field
 from bob import config
 
 
-def voronoiSlice(ax: plt.axes, snap: Snapshot, field: Field, center: np.ndarray, axis: np.ndarray, **plotSettings: Dict[str, Any]) -> None:
+def voronoiSlice(ax: plt.axes, sim: Simulation, snap: Snapshot, field: Field, center: np.ndarray, axis: np.ndarray, **plotSettings: Dict[str, Any]) -> None:
     axis = np.array(axis)
     center = np.array(center)
     min1 = 0.0
-    max1 = 1.0
+    max1 = sim.params["BoxSize"]
     min2 = 0.0
-    max2 = 1.0
+    max2 = sim.params["BoxSize"]
     ortho1, ortho2 = findOrthogonalAxes(axis)
     n1 = config.dpi * 3
     n2 = config.dpi * 3
@@ -23,11 +24,12 @@ def voronoiSlice(ax: plt.axes, snap: Snapshot, field: Field, center: np.ndarray,
     tree = cKDTree(snap.coordinates)
     cellIndices = tree.query(coordinates)[1]
     cellIndices = cellIndices.reshape((n1, n2))
+    # data = np.log(field.getData(snap))
     data = field.getData(snap)
     print(f"Field: {field.niceName}: min: {np.min(data):.2e}, mean: {np.mean(data):.2e}, max: {np.max(data):.2e}")
     ax.xlabel(getAxisName(ortho1))
     ax.ylabel(getAxisName(ortho2))
-    extent = (0, 1, 0, 1)
+    extent = (0, sim.params["BoxSize"], 0, sim.params["BoxSize"])
     ax.imshow(data[cellIndices], extent=extent, origin="lower", cmap="Reds", **plotSettings)
 
 

@@ -36,11 +36,10 @@ basicFields = [
 def createVoronoiSlicePlots() -> None:
     for basicField in basicFields:
         for (axis, axisName) in zip([[1, 0, 0], [0, 1, 0], [0, 0, 1]], ["X", "Y", "Z"]):
-            center = np.array([0.5, 0.5, 0.5])
 
             def thisSlicePlot(ax: plt.axes, sim: Simulation, snap: Snapshot, basicField: BasicField = basicField, axis: np.ndarray = axis) -> None:
-                # center = sim.boxSize * 0.5
-                voronoiSlice(ax, snap, basicField, center, axis)
+                center = np.array([0.5, 0.5, 0.5]) * sim.params["BoxSize"]
+                voronoiSlice(ax, sim, snap, basicField, center, axis)
 
             name = f"slice{axisName}{basicField.niceName}"
             # Register plot in list
