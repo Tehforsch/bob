@@ -116,7 +116,8 @@ class Simulation:
             nameRep = nameRep.replace(".hdf5", "")
             nameRep = nameRep.replace(str(self.outputDir), "")
             nameRep = nameRep.replace("/", "")
-            return int(nameRep)
+            # return int(nameRep)
+            return nameRep
 
         snapshotFiles.sort(key=getNumber)
         return [Snapshot(s) for s in snapshotFiles]

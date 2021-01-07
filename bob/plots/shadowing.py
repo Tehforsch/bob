@@ -7,7 +7,7 @@ from bob.combinedField import CombinedField
 from bob.tresholdField import TresholdField
 from bob.basicField import BasicField
 from bob.slicePlot import voronoiSlice
-from bob.postprocessingFunctions import addSingleSimPlot
+from bob.postprocessingFunctions import addSingleSimPlot, addSingleSnapshotPlot
 from bob.icsDefaults import shadowing1Params, shadowing2Params
 from bob.snapshot import Snapshot
 
@@ -43,17 +43,16 @@ def shadowing(ax: plt.axes, sim: Simulation) -> int:
     ax.plot((x, x + delX * f), (y, y - delY * f), color="green")
     # ax.plot((center[1], center[2]), (obstacleCenter[2], obstacleCenter[1] + obstacleSize))
 
-@addSingleSimPlot(None)
-def shadowingDouble(ax: plt.axes, sim: Simulation) -> int:
+@addSingleSnapshotPlot(None)
+def shadowingDouble(ax: plt.axes, sim: Simulation, snap: Snapshot) -> int:
     center = np.array([0.5, 0.5, 0.5])
-    axis = np.array([1.0, 0.0, 0.0])
+    axis = np.array([0.0, 0.0, 1.0])
     abundance = BasicField("ChemicalAbundances", 1)
     density = BasicField("Density", None)
     criticalDensity = 1e9
     obstacle = TresholdField(density, criticalDensity, 0, 1)
     field = CombinedField([abundance, obstacle], [npRed, npBlue])
 
-    snap = sim.snapshots[-1]
     voronoiSlice(ax, snap, field, center, axis)
 
 # def findSnapshotsAtTimes(snapshots: List[Snapshot], times: List[float]) -> Iterator[Snapshot]:

@@ -31,6 +31,7 @@ def voronoiSlice(ax: plt.axes, sim: Simulation, snap: Snapshot, field: Field, ce
     ax.ylabel(getAxisName(ortho2))
     extent = (0, sim.params["BoxSize"], 0, sim.params["BoxSize"])
     ax.imshow(data[cellIndices], extent=extent, origin="lower", cmap="Reds", **plotSettings)
+    plt.colorbar()
 
 
 def getAxisName(axis: np.ndarray) -> str:

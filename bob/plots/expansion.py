@@ -114,7 +114,8 @@ def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False
 
     ts = np.linspace(0, np.max(times), num=1000)
     # ax1.plot(ts, [analyticalRTypeExpansion(t) for t in ts], label="Analytical", color="g")
-    ci = 2.172 * pq.km / pq.s
+    # ci = 2.172 * pq.km / pq.s
+    ci = 4.172 * pq.km / pq.s
     ax1.plot(ts, [analyticalDTypeExpansion(t, ci, stroemgrenRadius, recombinationTime) for t in ts], label="Analytical", color="g")
     ax1.legend()
 

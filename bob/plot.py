@@ -6,7 +6,25 @@ import logging
 
 from bob.postprocessingFunctions import PlotFunction, SingleSimPlotFunction, SingleSnapshotPlotFunction, CompareSimSingleSnapshotPlotFunction
 from bob.simulationSet import SimulationSet
+from bob.snapshot import Snapshot
 from bob import config
+
+
+def isInSnapshotArgs(snap: Snapshot, args: argparse.Namespace) -> bool:
+    return args.snapshots is None or any(isSameSnapshot(arg_snap, snap) for arg_snap in args.snapshots)
+
+def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
+    try:
+        arg_num = int(arg_snap)
+        if type(snap.number) == int:
+            return snap.number == arg_num
+    except:
+        try:
+            arg_num = tuple(int(x) for x in arg_snap.split(","))
+            if type(snap.number) == tuple:
+                return snap.number == arg_num
+        except:
+            raise ("WRONG type of snapshot argument. Either pass an int or int,int for subbox snapshots")
 
 
 def runPlot(function: PlotFunction, sims: SimulationSet, args: argparse.Namespace) -> None:
@@ -29,7 +47,7 @@ def runSingleSnapshotPlot(function: SingleSnapshotPlotFunction, sims: Simulation
     for sim in sims:
         logging.info("For sim {}".format(sim.name))
         for snap in sim.snapshots:
-            if args.snapshots is None or snap.number in args.snapshots:
+            if isInSnapshotArgs(snap, args):
                 logging.info("For snap {}".format(snap.name))
                 function(plt, sim, snap)
                 simPicFolder = Path(sims.folder, config.picFolder, sim.name)
@@ -49,7 +67,7 @@ def runSingleSnapshotPostprocessingFunction(function: SingleSnapshotPlotFunction
     for sim in sims:
         logging.info("For sim {}".format(sim.name))
         for snap in sim.snapshots:
-            if args.snapshots is None or snap.number in args.snapshots:
+            if isInSnapshotArgs(snap, args):
                 logging.info("For snap {}".format(snap.name))
                 function(sim, snap)
 

@@ -12,7 +12,6 @@ jobTemplate = """#!/bin/bash
 #SBATCH --nodes={numNodes}
 #SBATCH --ntasks-per-node={coresPerNode}
 #SBATCH --time={wallTime}
-#SBATCH --mem=50gb
 #SBATCH --output={logFile}
 #SBATCH --export=HDF5_DISABLE_VERSION_CHECK=2
 {jobLines}

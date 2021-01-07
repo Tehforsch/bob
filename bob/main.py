@@ -19,7 +19,7 @@ def setupArgs() -> argparse.Namespace:
     parser.add_argument("-m", "--make", action="store_true", help="Compile arepo if config file changed and copy executable")
     parser.add_argument("-r", "--run", action="store_true", help="Run and compile the simulations after writing them")
     parser.add_argument("-p", "--postprocess", action="store_true", help="Run postprocessing scripts on an already run simulation")
-    parser.add_argument("--snapshots", nargs="+", type=int, help="Run postprocessing scripts for selected snapshots")
+    parser.add_argument("--snapshots", nargs="+", type=str, help="Run postprocessing scripts for selected snapshots")
     parser.add_argument("-d", "--delete", action="store_true", help="Delete old simulations if they exist")
     parser.add_argument("--functions", choices=functionNames, nargs="+", help="Which postprocessing functions to run")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
