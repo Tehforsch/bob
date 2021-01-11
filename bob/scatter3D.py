@@ -15,11 +15,10 @@ class Scatter3D:
     def plot(self, ax, **plotSettings):
         ax = get3DAx()
         if self.field.name == "Coordinates":
-            coords = [self.snapshot.coordinates[::20, i] for i in range(3)]
+            coords = [self.snapshot.coordinates[:, i] for i in range(3)]
             print(coords)
             ax.scatter(*coords, **plotSettings)
         else:
-            print(self.array.shape, self.snapshot.coordinates.shape)
             where = np.where(self.array >= self.vFilterTreshold)
             coords = [self.snapshot.coordinates[where, i] for i in range(3)]
             ax.scatter(*coords, c=self.array[where], **plotSettings)

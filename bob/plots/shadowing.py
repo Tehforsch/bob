@@ -25,7 +25,7 @@ def shadowing(ax: plt.axes, sim: Simulation) -> int:
     field = CombinedField([abundance, obstacle], [npRed, npBlue])
 
     snap = sim.snapshots[-1]
-    voronoiSlice(ax, snap, field, center, axis)
+    voronoiSlice(ax, snap, field, axis)
     assert sim.params["densityFunction"] in ["shadowing1", "shadowing2"]
     if sim.params["densityFunction"] == "shadowing1":
         params = shadowing1Params
@@ -43,6 +43,7 @@ def shadowing(ax: plt.axes, sim: Simulation) -> int:
     ax.plot((x, x + delX * f), (y, y - delY * f), color="green")
     # ax.plot((center[1], center[2]), (obstacleCenter[2], obstacleCenter[1] + obstacleSize))
 
+
 @addSingleSnapshotPlot(None)
 def shadowingDouble(ax: plt.axes, sim: Simulation, snap: Snapshot) -> int:
     center = np.array([0.5, 0.5, 0.5])
@@ -53,7 +54,8 @@ def shadowingDouble(ax: plt.axes, sim: Simulation, snap: Snapshot) -> int:
     obstacle = TresholdField(density, criticalDensity, 0, 1)
     field = CombinedField([abundance, obstacle], [npRed, npBlue])
 
-    voronoiSlice(ax, snap, field, center, axis)
+    voronoiSlice(ax, snap, field, axis)
+
 
 # def findSnapshotsAtTimes(snapshots: List[Snapshot], times: List[float]) -> Iterator[Snapshot]:
 #     unit = 1000 * pq.year

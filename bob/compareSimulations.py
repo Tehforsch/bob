@@ -18,7 +18,7 @@ from bob.slicePlot import voronoiSlice
 def fieldDifference(ax: plt.axes, sim1: Simulation, sim2: Simulation, snap1: Snapshot, snap2: Snapshot) -> None:
     field = BasicField("ChemicalAbundances", 1)
     diff = RelativeDifference(field, snap1)
-    voronoiSlice(ax, snap2, diff, (0.5, 0.5, 0.5), (1.0, 0.0, 0.0))
+    voronoiSlice(ax, snap2, diff, (1.0, 0.0, 0.0))
     # maxDiff = np.max(diff)
     # minDiff = np.min(diff)
     # averageDiff = np.mean(diff)
