@@ -13,6 +13,11 @@ def getScalingSimSets(sims: SimulationSet, additionalParameters: List[str] = [])
     quotient.sort(key=lambda sims: (sims[0]["SX_SWEEP"]))
     return quotient
 
+def getMultipleDomainsSimSet(sims: SimulationSet, additionalParameters: List[str] = []) -> List[Any]:
+    sims.sort(key=lambda sim: sim.params["MultipleDomains"])
+    quotient = sims.quotient(["MultipleDomains"] + additionalParameters)
+    return quotient
+
 
 @addPlot(None)
 def speedup(ax: plt.axes, sims: SimulationSet) -> None:
@@ -45,6 +50,15 @@ def runTime(ax: plt.axes, sims: SimulationSet) -> None:
     # plt.plot(numCores, numCores, label="Ideal")
     ax.legend()
 
+
+@addPlot(None)
+def runTimeMultipleDomains(ax: plt.axes, sims: SimulationSet) -> None:
+    for (params, simSet) in getMultipleDomainsSimSet(sims):
+        numDomains = [sim.params["MultipleDomains"] for sim in simSet]
+        runTimes = [sim.runTime for sim in simSet]
+        ax.xlabel("Num Domains / Core")
+        ax.ylabel("Run time [s]")
+        ax.plot(numDomains, runTimes, marker="o")
 
 @addPlot(None)
 def runTimeWeak(ax: plt.axes, sims: SimulationSet) -> None:
