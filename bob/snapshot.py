@@ -10,15 +10,20 @@ from bob.constants import kB, protonMass, MSun
 
 
 class Snapshot:
-    def __init__(self, filename: Path) -> None:
+    def __init__(self, sim: "Simulation", filename: Path) -> None:
         self.filename = filename
         self.coordinates_ = None
         self.name = self.getName()
         if "subbox" in self.name:
             numbers = self.name.replace("subbox", "").split("_")
             self.number = int(numbers[0]), int(numbers[1])
+            self.minExtent, self.maxExtent = sim.subboxCoords()
+            self.center = (self.maxExtent + self.minExtent) * 0.5
         else:
             self.number = int(self.name)
+            self.minExtent = np.array([0.0, 0.0, 0.0])
+            self.maxExtent = np.array([1.0, 1.0, 1.0]) * sim.params["BoxSize"]
+            self.center = (self.maxExtent + self.minExtent) * 0.5
         self.hdf5File = h5py.File(self.filename, "r")
         self.initConversionFactors()
 

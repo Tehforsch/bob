@@ -9,14 +9,14 @@ from bob.field import Field
 from bob import config
 
 
-def voronoiSlice(ax: plt.axes, sim: Simulation, snap: Snapshot, field: Field, center: np.ndarray, axis: np.ndarray, **plotSettings: Dict[str, Any]) -> None:
+def voronoiSlice(ax: plt.axes, sim: Simulation, snap: Snapshot, field: Field, axis: np.ndarray, **plotSettings: Dict[str, Any]) -> None:
     axis = np.array(axis)
-    center = np.array(center)
-    min1 = 0.0
-    max1 = sim.params["BoxSize"]
-    min2 = 0.0
-    max2 = sim.params["BoxSize"]
+    center = snap.center
     ortho1, ortho2 = findOrthogonalAxes(axis)
+    min1 = np.dot(ortho1, snap.minExtent)
+    min2 = np.dot(ortho2, snap.minExtent)
+    max1 = np.dot(ortho1, snap.maxExtent)
+    max2 = np.dot(ortho2, snap.maxExtent)
     n1 = config.dpi * 3
     n2 = config.dpi * 3
     p1, p2 = np.meshgrid(np.linspace(min1, max1, n1), np.linspace(min2, max2, n2))
@@ -24,12 +24,12 @@ def voronoiSlice(ax: plt.axes, sim: Simulation, snap: Snapshot, field: Field, ce
     tree = cKDTree(snap.coordinates)
     cellIndices = tree.query(coordinates)[1]
     cellIndices = cellIndices.reshape((n1, n2))
-    # data = np.log(field.getData(snap))
+    data = np.log(field.getData(snap))
     data = field.getData(snap)
     print(f"Field: {field.niceName}: min: {np.min(data):.2e}, mean: {np.mean(data):.2e}, max: {np.max(data):.2e}")
     ax.xlabel(getAxisName(ortho1))
     ax.ylabel(getAxisName(ortho2))
-    extent = (0, sim.params["BoxSize"], 0, sim.params["BoxSize"])
+    extent = (min1, max1, min2, max2)
     ax.imshow(data[cellIndices], extent=extent, origin="lower", cmap="Reds", **plotSettings)
     plt.colorbar()
 

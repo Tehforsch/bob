@@ -1,3 +1,4 @@
+import numpy as np
 from typing import Dict, Any, List
 import shutil
 import os
@@ -120,7 +121,14 @@ class Simulation:
             return nameRep
 
         snapshotFiles.sort(key=getNumber)
-        return [Snapshot(s) for s in snapshotFiles]
+        return [Snapshot(self, s) for s in snapshotFiles]
+
+    def subboxCoords(self) -> (np.ndarray, np.ndarray):
+        with open(Path(self.folder, self.params["SubboxCoordinatesPath"])) as f:
+            lines = f.readlines()
+            assert len(lines) == 1
+            minX, maxX, minY, maxY, minZ, maxZ = [float(x) for x in lines[0].split(" ")]
+            return [np.array([minX, minY, minZ]), np.array([maxX, maxY, maxZ])]
 
     @property
     def resolution(self) -> int:

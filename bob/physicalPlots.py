@@ -9,6 +9,8 @@ from bob.plots.expansion import expansionInnerOuter, expansion, expansionErrorOv
 from bob.plots.shadowing import shadowing
 from bob.plots.snapOverview import overview
 from bob.simulation import Simulation
+from bob.combinedField import CombinedAbundances
+
 
 basicFields = [
     BasicField("ChemicalAbundances", 0),
@@ -30,6 +32,7 @@ basicFields = [
     BasicField("PhotonRates", 2),
     BasicField("PhotonRates", 3),
     BasicField("PhotonRates", 4),
+    # CombinedAbundances(),
 ]
 
 
@@ -39,7 +42,7 @@ def createVoronoiSlicePlots() -> None:
 
             def thisSlicePlot(ax: plt.axes, sim: Simulation, snap: Snapshot, basicField: BasicField = basicField, axis: np.ndarray = axis) -> None:
                 center = np.array([0.5, 0.5, 0.5]) * sim.params["BoxSize"]
-                voronoiSlice(ax, sim, snap, basicField, center, axis)
+                voronoiSlice(ax, sim, snap, basicField, axis)
 
             name = f"slice{axisName}{basicField.niceName}"
             # Register plot in list
