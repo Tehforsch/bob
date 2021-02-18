@@ -56,20 +56,22 @@ class Snapshot:
         if self.OmegaLambda != 0:
             self.Omega0 = self.hdf5File["Header"].attrs["Omega0"]
             # redsh_str = "z" + str(int(round(10 * redsh)))
-        self.l_unit = self.hdf5File["Header"].attrs["UnitLength_in_cm"] * pq.cm
-        self.m_unit = self.hdf5File["Header"].attrs["UnitMass_in_g"] * pq.g
-        self.v_unit = self.hdf5File["Header"].attrs["UnitVelocity_in_cm_per_s"] * pq.cm / pq.s
-        self.t_unit = self.l_unit / self.v_unit
-        self.time = self.hdf5File["Header"].attrs["Time"] * self.t_unit
+        self.lengthUnit = self.hdf5File["Header"].attrs["UnitLength_in_cm"] * pq.cm
+        self.massUnit = self.hdf5File["Header"].attrs["UnitMass_in_g"] * pq.g
+        self.velocityUnit = self.hdf5File["Header"].attrs["UnitVelocity_in_cm_per_s"] * pq.cm / pq.s
+        self.timeUnit = self.lengthUnit / self.velocityUnit
+        self.energyUnit = self.lengthUnit ** 2 / (self.timeUnit ** 2) * self.massUnit
+        self.volumeUnit = self.lengthUnit ** 3
+        self.time = self.hdf5File["Header"].attrs["Time"] * self.timeUnit
         self.z = redsh
         # prefactors derived from that:
-        self.dens_prev = (self.m_unit / self.l_unit ** 3) * ((redsh + 1.0) ** 3 * self.h ** 2)
+        self.dens_prev = (self.massUnit / self.lengthUnit ** 3) * ((redsh + 1.0) ** 3 * self.h ** 2)
         self.dens_to_ndens = 1.0 / (protonMass * mu)
-        self.temp_prev = ((gamma - 1.0) * mu * protonMass / kB) * self.v_unit ** 2
-        self.mass_prev = self.m_unit / MSun / self.h
+        self.temp_prev = ((gamma - 1.0) * mu * protonMass / kB) * self.velocityUnit ** 2
+        self.mass_prev = self.massUnit / MSun / self.h
         self.len_to_phys = 1.0 / self.h / (1.0 + redsh)
-        self.l_Mpc = self.l_unit / (1.0e6 * pq.pc)
-        self.vel_to_phys = self.v_unit / np.sqrt(1.0 + redsh)  # in physical cm/s
+        self.l_Mpc = self.lengthUnit / (1.0e6 * pq.pc)
+        self.vel_to_phys = self.velocityUnit / np.sqrt(1.0 + redsh)  # in physical cm/s
         self.vel_phys_kms = self.vel_to_phys * 1.0e-5  # in physical km/s
 
         if self.OmegaLambda != 0:

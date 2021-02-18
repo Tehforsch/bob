@@ -124,7 +124,7 @@ def createSimulation(args: argparse.Namespace, name: str, d: Dict[str, Any]) -> 
     if args.create:
         copyFiles(args.inputFolder, folder)
     sim = Simulation(folder, d)
-    if initialSnapIdentifier in sim.params:
+    if args.create and initialSnapIdentifier in sim.params:
         copyInitialSnapshot(folder, sim)
     return sim
 
