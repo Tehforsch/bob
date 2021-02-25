@@ -91,14 +91,15 @@ def getExpansionData(sim: Simulation) -> Tuple[np.ndarray, np.ndarray, np.ndarra
 
 
 def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False) -> None:
-    gridspec_kw = {"height_ratios": [2, 1]}
-    _, (ax1, ax2) = ax.subplots(2, sharex=True, sharey=False, gridspec_kw=gridspec_kw)
+    # gridspec_kw = {"height_ratios": [2, 1]}
+    # _, (ax1, ax2) = ax.subplots(2, sharex=True, sharey=False, gridspec_kw=gridspec_kw)
+    _, (ax1) = ax.subplots(1, sharex=True, sharey=False)
     # ax1.set_xlim(0, 1.0)
     # ax1.set_ylim(0, 1.0)
-    ax2.set_ylim(0, 0.2)
-    ax2.set_xlabel("$t / t_{\\mathrm{rec}}$")
+    # ax2.set_ylim(0, 0.2)
+    # ax2.set_xlabel("$t / t_{\\mathrm{rec}}$")
     ax1.set_ylabel("$R / R_s$")
-    ax2.set_ylabel("relative error")
+    # ax2.set_ylabel("relative error")
 
     for sim in sims:
         color, linestyle = getStyle(sim)
@@ -116,13 +117,11 @@ def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False
             ax1.plot(times, radii, label=sims.getNiceSimName(sim) + " 0.5", color=color)
             ax1.plot(times, radiiUpper, label=sims.getNiceSimName(sim) + " 0.9", color=color, linestyle="--")
             ax1.plot(times, radiiLower, label=sims.getNiceSimName(sim) + " 0.1", color=color, linestyle="--")
-        (line2,) = ax2.plot(times, error, label="Relative error", color=color)
+        # (line2,) = ax2.plot(times, error, label="Relative error", color=color)
         # line2.set_dashes(linestyle)
 
     ts = np.linspace(0, np.max(times), num=1000)
     # ax1.plot(ts, [analyticalRTypeExpansion(t) for t in ts], label="Analytical", color="g")
-    # ci = 2.172 * pq.km / pq.s
-    # ci = 4.172 * pq.km / pq.s
     ci = soundSpeed[0]
     ax1.plot(ts, [analyticalDTypeExpansion(t * recombinationTime, ci, stroemgrenRadius) / stroemgrenRadius for t in ts], label="Analytical", color="g")
     ax1.legend()
