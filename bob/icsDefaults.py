@@ -6,8 +6,6 @@ shadowingCenterParams = {"center": np.array([0.5, 0.5, 0.5]), "factor": 1000, "s
 
 
 def homogeneous(coord: np.ndarray) -> float:
-    # dist = np.linalg.norm(coord - np.array([0.5, 0.5, 0.5]))
-    # return 5.21e-21 / (dist ** 4 + 0.01)  # g/cm^-3
     return 1.672622012311334e-27
 
 
