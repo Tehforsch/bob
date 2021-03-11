@@ -164,7 +164,7 @@ def getMeshRelaxTime(meshRelaxSim: Simulation) -> float:
 def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path, densityFunction: Callable[[np.ndarray], float]) -> Tuple[Path, Simulation]:
     """Run a mesh relaxation for the simulation sim, starting from the ics in inputFile. Run the simulation in
     folder."""
-    shutil.copytree(sim.folder, folder, ignore=shutil.ignore_patterns("meshRelax*"))
+    shutil.copytree(sim.folder, folder, ignore=shutil.ignore_patterns("meshRelax*","[0-9]"))
     targetFile = Path(folder, config.icsFileName)
     shutil.copyfile(inputFile, targetFile)
     meshRelaxSim = Simulation(folder, {"runParams": sim.params["runParams"], "numCores": sim.params["numCores"]})
