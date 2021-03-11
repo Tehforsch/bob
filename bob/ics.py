@@ -85,17 +85,31 @@ class ICS:
             self.mass[c] = self.volume * densityFunction(coord)
         return np.mean(self.mass / self.header["UnitMass_in_g"])
 
-    def densFromSnap(self, fileName: Path, densityFunction: Callable[[np.ndarray], float]) -> None:
-        f = hp.File(fileName, "r")
-        density = np.array(f["PartType0/Density"][:])
-        masses = np.array(f["PartType0/Masses"][:])
-        self.coords = np.array(f["PartType0/Coordinates"][:])
-        self.volume = masses / density
-        self.mass = np.zeros(self.coords.shape)  # g
-        for c, coord in enumerate(self.coords):
-            self.mass[c] = self.volume[c] * densityFunction(coord)
-        self.ids = np.array(f["PartType0/ParticleIDs"][:])
-        self.velocities = np.zeros(self.coords.shape)
+    # def densFromSnap(self, fileName: Path, densityFunction: Callable[[np.ndarray], float]) -> None:
+    #     f = hp.File(fileName, "r")
+    #     density = np.array(f["PartType0/Density"][:])
+    #     masses = np.array(f["PartType0/Masses"][:])
+    #     self.coords = np.array(f["PartType0/Coordinates"][:])
+    #     self.volume = masses / density
+    #     self.mass = np.zeros(self.coords.shape)  # g
+    #     for c, coord in enumerate(self.coords):
+    #         self.mass[c] = self.volume[c] * densityFunction(coord)
+    #     self.ids = np.array(f["PartType0/ParticleIDs"][:])
+    #     self.velocities = np.zeros(self.coords.shape)
+
+    def convertSnapWithDensityAdjusted(self, inputFile: Path, outputFile: Path, densityFunction: Callable[[np.ndarray], float]) -> None:
+        shutil.copy(inputFile, outputFile)
+        with hp.File(outputFile, "r") as f:
+            coords = np.array(f["PartType0/Coordinates"][:])
+            volume = np.array(f["PartType0/Masses"][:]) / np.array(f["PartType0/Density"][:])
+            newMass = np.zeros(coords.shape[0])  # g
+            for c, coord in enumerate(coords):
+                newMass[c] = volume[c] * densityFunction(coord) / self.header["UnitMass_in_g"]
+        with hp.File(outputFile, "r+") as f:
+            dens = np.ones(coords.shape[0]) * densityFunction(coord) * self.header["UnitLength_in_cm"] ** 3 / self.header["UnitMass_in_g"]
+            f["PartType0/Density"][:] = dens
+            f["PartType0/Velocities"][:] = np.zeros(coords.shape)
+            f["PartType0/Masses"][:] = newMass
 
     def save(self, fileName: Path) -> None:
         with hp.File(fileName, "w") as f:
@@ -116,14 +130,28 @@ class ICS:
 def convertIcs(inputFile: Path, outputFile: Path, densityFunction: Callable[[np.ndarray], float], resolution: int) -> None:
     print("Converting {} to {}".format(inputFile, outputFile))
     f = ICS()
-    f.create(resolution=resolution, units={"length": pc * 14000, "mass": M_sol, "time": 1e6 * yr,})  # 14 kpc  # 1 M_sol  # Myr
-    f.densFromSnap(inputFile, densityFunction)  # ,header={'BoxSize':30})
-    f.save(outputFile)
+    f.create(
+        resolution=resolution,
+        units={
+            "length": pc * 14000,
+            "mass": M_sol,
+            "time": 1e6 * yr,
+        },
+    )  # 14 kpc  # 1 M_sol  # Myr
+    f.convertSnapWithDensityAdjusted(inputFile, outputFile, densityFunction)  # ,header={'BoxSize':30})
+    # f.save(outputFile)
 
 
 def createIcs(outputFile: Path, densityFunction: Callable[[np.ndarray], float], resolution: int) -> float:
     f = ICS()
-    f.create(resolution=resolution, units={"length": pc * 14000, "mass": M_sol, "time": 1e6 * yr,})  # 14 kpc  # 1 M_sol  # Myr
+    f.create(
+        resolution=resolution,
+        units={
+            "length": pc * 14000,
+            "mass": M_sol,
+            "time": 1e6 * yr,
+        },
+    )  # 14 kpc  # 1 M_sol  # Myr
     targetGasMass = f.densFromGrid(densityFunction)
     f.save(outputFile)
     return targetGasMass
@@ -134,7 +162,7 @@ def getMeshRelaxTime(meshRelaxSim: Simulation) -> float:
 
 
 def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path, densityFunction: Callable[[np.ndarray], float]) -> Tuple[Path, Simulation]:
-    """Run a mesh relaxation for the simulation sim, starting from the ics in inputFile. Run the simulation in 
+    """Run a mesh relaxation for the simulation sim, starting from the ics in inputFile. Run the simulation in
     folder."""
     shutil.copytree(sim.folder, folder, ignore=shutil.ignore_patterns("meshRelax*"))
     targetFile = Path(folder, config.icsFileName)

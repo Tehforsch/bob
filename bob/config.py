@@ -52,7 +52,7 @@ gprofPartFilePattern = "gmon.out.*"
 gprofSumFile = "gmon.sum"
 gprofOutFile = "gprof.log"
 
-numMeshRelaxSteps = 1
+numMeshRelaxSteps = 10
 
 configParams = [
     "MESHRELAX",
