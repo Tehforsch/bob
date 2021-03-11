@@ -104,7 +104,7 @@ class ICS:
             volume = np.array(f["PartType0/Masses"][:]) / np.array(f["PartType0/Density"][:])
             newMass = np.zeros(coords.shape[0])  # g
             for c, coord in enumerate(coords):
-                newMass[c] = volume[c] * densityFunction(coord) / self.header["UnitMass_in_g"]
+                newMass[c] = volume[c] * densityFunction(coord) / self.header["UnitMass_in_g"] * self.header["UnitLength_in_cm"] ** 3
         with hp.File(outputFile, "r+") as f:
             dens = np.ones(coords.shape[0]) * densityFunction(coord) * self.header["UnitLength_in_cm"] ** 3 / self.header["UnitMass_in_g"]
             f["PartType0/Density"][:] = dens
