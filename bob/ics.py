@@ -85,26 +85,17 @@ class ICS:
             self.mass[c] = self.volume * densityFunction(coord)
         return np.mean(self.mass / self.header["UnitMass_in_g"])
 
-    # def densFromSnap(self, fileName: Path, densityFunction: Callable[[np.ndarray], float]) -> None:
-    #     f = hp.File(fileName, "r")
-    #     density = np.array(f["PartType0/Density"][:])
-    #     masses = np.array(f["PartType0/Masses"][:])
-    #     self.coords = np.array(f["PartType0/Coordinates"][:])
-    #     self.volume = masses / density
-    #     self.mass = np.zeros(self.coords.shape)  # g
-    #     for c, coord in enumerate(self.coords):
-    #         self.mass[c] = self.volume[c] * densityFunction(coord)
-    #     self.ids = np.array(f["PartType0/ParticleIDs"][:])
-    #     self.velocities = np.zeros(self.coords.shape)
-
     def convertSnapWithDensityAdjusted(self, inputFile: Path, outputFile: Path, densityFunction: Callable[[np.ndarray], float]) -> None:
         shutil.copy(inputFile, outputFile)
         with hp.File(outputFile, "r") as f:
+            oldMasses = f["PartType0/Masses"][:]
             coords = np.array(f["PartType0/Coordinates"][:])
             volume = np.array(f["PartType0/Masses"][:]) / np.array(f["PartType0/Density"][:])
             newMass = np.zeros(coords.shape[0])  # g
             for c, coord in enumerate(coords):
                 newMass[c] = volume[c] * densityFunction(coord) / self.header["UnitMass_in_g"] * self.header["UnitLength_in_cm"] ** 3
+            relDifference = np.absolute(oldMasses - newMass) / np.absolute(oldMasses)
+            print(f"Mean relative difference in target mass: {np.mean(relDifference)}")
         with hp.File(outputFile, "r+") as f:
             dens = np.ones(coords.shape[0]) * densityFunction(coord) * self.header["UnitLength_in_cm"] ** 3 / self.header["UnitMass_in_g"]
             f["PartType0/Density"][:] = dens
