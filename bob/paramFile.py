@@ -145,8 +145,9 @@ class JobFile(ParamFile):
                     logging.info(f"Cannot run with {numCores} cores (not divisible by max num of cores per node). Running on {realNumCores} instead.")
 
     def setRunCommand(self) -> None:
-        runParams = self["runParams"]
-        self["runCommand"] = f"./{config.binaryName} {config.inputFilename} {runParams}"
+        if "runParams" in self:
+            runParams = self["runParams"]
+            self["runCommand"] = f"./{config.binaryName} {config.inputFilename} {runParams}"
 
 
 class IcsParamFile(LineParamFile):
