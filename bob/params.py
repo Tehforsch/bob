@@ -23,7 +23,8 @@ class Params(MutableMapping):
     def getParamFileWithParameter(self, k: str) -> Optional[ParamFile]:
         paramFilesWithThisParameter = [paramFile for paramFile in self.files if k in paramFile or k in paramFile.unusedParams]
         if len(paramFilesWithThisParameter) == 0:
-            logging.error(f"No file contains this parameter: {k}")
+            if k != "initialSnap":
+                logging.error(f"No file contains this parameter: {k}")
             return None
         assert len(paramFilesWithThisParameter) <= 1, f"Multiple files contain this parameter: {k}: {paramFilesWithThisParameter}"
         return paramFilesWithThisParameter[0]
@@ -37,7 +38,8 @@ class Params(MutableMapping):
     def __setitem__(self, k: str, v: Any) -> None:
         f = self.getParamFileWithParameter(k)
         if f is None:
-            logging.error("Invalid parameter: {} (might be fine though)".format(k))
+            if k != "initialSnap":
+                logging.error("Invalid parameter: {}".format(k))
         else:
             f[k] = v
 
