@@ -10,7 +10,7 @@ from bob.simulationSet import SimulationSet
 from bob import config
 from bob.paramFile import IcsParamFile
 from bob.simulation import Simulation
-from bob.icsDefaults import shadowing1, shadowing2, shadowingCenter, homogeneous
+from bob.icsDefaults import shadowing1, shadowing2, shadowingCenter, rType, dType
 
 M_sol = 1.989e33  # solar mass [g]
 m_p = 1.67262178e-24  # proton mass [g]
@@ -165,7 +165,7 @@ def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path, densityFunction
     meshRelaxSim.params.writeFiles()
     meshRelaxSim.compileArepo()
     meshRelaxSim.run(verbose=False)
-    # waitForMeshRelaxSim(meshRelaxSim)
+    waitForMeshRelaxSim(meshRelaxSim)
     lastSnapshot = meshRelaxSim.snapshots[-1].filename
     resultFile = Path(folder, config.meshRelaxedIcsFileName)
     convertIcs(lastSnapshot, resultFile, densityFunction, resolution=sim.params["resolution"])
@@ -175,18 +175,15 @@ def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path, densityFunction
 def waitForMeshRelaxSim(sim: Simulation):
     logging.info("Waiting for sim to finish (waiting until at least 3 snapshots are written)")
     while len(sim.snapshots) < 3:
+        print(".",)
         time.sleep(5)
 
 
 def getDensityFunction(name: str) -> Callable[[np.ndarray], float]:
-    if name == "shadowing1":
-        return shadowing1
-    if name == "shadowing2":
-        return shadowing2
-    if name == "shadowingCenter":
-        return shadowingCenter
-    assert name == "homogeneous"
-    return homogeneous
+    densityFunctions = [shadowing1, shadowing2, shadowingCenter, rType, dType]
+    potentialFunctions =  [f for f in densityFunctions if f.__name__ == name]
+    assert len(potentialFunctions) == 1, "Invalid function name?"
+    return potentialFunctions[0]
 
 
 def main(args: argparse.Namespace, sims: SimulationSet) -> None:
@@ -201,7 +198,9 @@ def main(args: argparse.Namespace, sims: SimulationSet) -> None:
         for i in range(config.numMeshRelaxSteps):
             logging.info("Running mesh relaxation step {}".format(i))
             sim.params["ReferenceGasPartMass"] = targetGasMass
-            print(f"Set ReferenceGasPartMass = {targetGasMass}")
             sim.inputFile.write()  # Update reference gas mass
+            print("Running mesh relax")
             currentIcsFile, mrSim = runMeshRelax(sim, currentIcsFile, Path(sim.folder, "{}".format(i)), densityFunction)
-        shutil.copyfile(mrSim.snapshots[-1].filename, Path(sims.folder, name))
+        filename = mrSim.snapshots[-1].filename, 
+        shutil.copyfile(filename, Path(sims.folder, name))
+        print(f"ReferenceGasPartMass = {targetGasMass} for {filename}")
