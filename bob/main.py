@@ -63,9 +63,10 @@ def main() -> None:
         shutil.rmtree(config.memoizeDir)
     if args.ics:
         ics.main(args, sims)
-    if args.make:
-        makeSimulations(args, sims)
-    if args.run:
-        runSimulations(args, sims)
-    if args.postprocess:
-        postprocess.main(args, sims)
+    else:
+        if args.make:
+            makeSimulations(args, sims)
+        if args.run:
+            runSimulations(args, sims)
+        if args.postprocess:
+            postprocess.main(args, sims)

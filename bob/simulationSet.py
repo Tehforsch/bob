@@ -107,9 +107,9 @@ def copyFiles(sourceFolder: Path, targetFolder: Path) -> None:
     shutil.copytree(sourceFolder, targetFolder)
 
 
-def copyInitialSnapshot(folder: Path, sim: Simulation) -> None:
+def copyInitialSnapshot(folder: Path, sim: Simulation, initialSnap: Path) -> None:
     outputFolderName = sim.params[outputFolderIdentifier]
-    initialSnapshot = sim.params[initialSnapIdentifier]
+    initialSnapshot = initialSnap
     snapFileBase = sim.params[snapshotFileBaseIdentifier]
     outputFolder = Path(folder, outputFolderName)
     outputFolder.mkdir(exist_ok=True)
@@ -124,8 +124,8 @@ def createSimulation(args: argparse.Namespace, name: str, d: Dict[str, Any]) -> 
     if args.create:
         copyFiles(args.inputFolder, folder)
     sim = Simulation(folder, d)
-    if args.create and initialSnapIdentifier in sim.params:
-        copyInitialSnapshot(folder, sim)
+    if args.create and initialSnapIdentifier in d:
+        copyInitialSnapshot(folder, sim, d[initialSnapIdentifier])
     return sim
 
 

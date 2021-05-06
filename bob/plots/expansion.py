@@ -120,7 +120,7 @@ def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False
         # line2.set_dashes(linestyle)
 
     ts = np.linspace(0, np.max(times), num=1000)
-    ci = 5.5 * pq.pc / pq.Myr
+    ci = 5.5 * pq.pc / (1e6 * pq.yr)
     # ax1.plot(ts, [analyticalDTypeExpansion(t * recombinationTime, ci, stroemgrenRadius) / stroemgrenRadius for t in ts], label="Analytical", color="g")
     ax1.plot(ts, [analyticalRTypeExpansion(t) for t in ts], label="Analytical", color="g")
     ax1.legend()

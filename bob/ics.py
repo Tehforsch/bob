@@ -45,12 +45,11 @@ class ICS:
             "Time": 0,
         }
 
-    def create(self, resolution: int = 64, units: Dict[str, float] = {}) -> None:
+    def create(self, sim: Simulation, resolution: int) -> None:
         # set the header information
-        if units:  # update units
-            self.header["UnitLength_in_cm"] = units["length"]
-            self.header["UnitMass_in_g"] = units["mass"]
-            self.header["UnitVelocity_in_cm_per_s"] = units["length"] / units["time"]
+        self.header["UnitLength_in_cm"] = float(sim.params["UnitLength_in_cm"])
+        self.header["UnitMass_in_g"] = float(sim.params["UnitMass_in_g"])
+        self.header["UnitVelocity_in_cm_per_s"] = float(sim.params["UnitVelocity_in_cm_per_s"])
 
         self.resolution = resolution
         self.numParticles = resolution ** 3
@@ -95,6 +94,7 @@ class ICS:
             for c, coord in enumerate(coords):
                 newMass[c] = volume[c] * densityFunction(coord) / self.header["UnitMass_in_g"] * self.header["UnitLength_in_cm"] ** 3
             relDifference = np.absolute(oldMasses - newMass) / np.absolute(oldMasses)
+            print("Mean density:", np.mean(newMass / volume))
             print(f"Mean relative difference in target mass: {np.mean(relDifference)}")
         with hp.File(outputFile, "r+") as f:
             dens = np.ones(coords.shape[0]) * densityFunction(coord) * self.header["UnitLength_in_cm"] ** 3 / self.header["UnitMass_in_g"]
@@ -118,30 +118,22 @@ class ICS:
             f[pt].create_dataset("ParticleIDs", data=self.ids)
 
 
-def convertIcs(inputFile: Path, outputFile: Path, densityFunction: Callable[[np.ndarray], float], resolution: int) -> None:
+def convertIcs(sim: Simulation, inputFile: Path, outputFile: Path, densityFunction: Callable[[np.ndarray], float], resolution: int) -> None:
     print("Converting {} to {}".format(inputFile, outputFile))
     f = ICS()
     f.create(
+        sim,
         resolution=resolution,
-        units={
-            "length": pc * 14000,
-            "mass": M_sol,
-            "time": 1e6 * yr,
-        },
     )  # 14 kpc  # 1 M_sol  # Myr
     f.convertSnapWithDensityAdjusted(inputFile, outputFile, densityFunction)  # ,header={'BoxSize':30})
     # f.save(outputFile)
 
 
-def createIcs(outputFile: Path, densityFunction: Callable[[np.ndarray], float], resolution: int) -> float:
+def createIcs(sim: Simulation, outputFile: Path, densityFunction: Callable[[np.ndarray], float], resolution: int) -> float:
     f = ICS()
     f.create(
+        sim,
         resolution=resolution,
-        units={
-            "length": pc * 14000,
-            "mass": M_sol,
-            "time": 1e6 * yr,
-        },
     )  # 14 kpc  # 1 M_sol  # Myr
     targetGasMass = f.densFromGrid(densityFunction)
     f.save(outputFile)
@@ -168,20 +160,22 @@ def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path, densityFunction
     waitForMeshRelaxSim(meshRelaxSim)
     lastSnapshot = meshRelaxSim.snapshots[-1].filename
     resultFile = Path(folder, config.meshRelaxedIcsFileName)
-    convertIcs(lastSnapshot, resultFile, densityFunction, resolution=sim.params["resolution"])
+    convertIcs(sim, lastSnapshot, resultFile, densityFunction, resolution=sim.params["resolution"])
     return resultFile, meshRelaxSim
 
 
 def waitForMeshRelaxSim(sim: Simulation):
     logging.info("Waiting for sim to finish (waiting until at least 3 snapshots are written)")
     while len(sim.snapshots) < 3:
-        print(".",)
+        print(
+            ".",
+        )
         time.sleep(5)
 
 
 def getDensityFunction(name: str) -> Callable[[np.ndarray], float]:
     densityFunctions = [shadowing1, shadowing2, shadowingCenter, rType, dType]
-    potentialFunctions =  [f for f in densityFunctions if f.__name__ == name]
+    potentialFunctions = [f for f in densityFunctions if f.__name__ == name]
     assert len(potentialFunctions) == 1, "Invalid function name?"
     return potentialFunctions[0]
 
@@ -193,7 +187,7 @@ def main(args: argparse.Namespace, sims: SimulationSet) -> None:
         sim.icsFile = IcsParamFile(Path(sim.folder, config.icsParamFileName))
         initialIcsFile = Path(sim.folder, config.icsFileName)
         densityFunction = getDensityFunction(sim.params["densityFunction"])
-        targetGasMass = createIcs(initialIcsFile, densityFunction, sim.params["resolution"])
+        targetGasMass = createIcs(sim, initialIcsFile, densityFunction, sim.params["resolution"])
         currentIcsFile = initialIcsFile
         for i in range(config.numMeshRelaxSteps):
             logging.info("Running mesh relaxation step {}".format(i))
@@ -201,6 +195,6 @@ def main(args: argparse.Namespace, sims: SimulationSet) -> None:
             sim.inputFile.write()  # Update reference gas mass
             print("Running mesh relax")
             currentIcsFile, mrSim = runMeshRelax(sim, currentIcsFile, Path(sim.folder, "{}".format(i)), densityFunction)
-        filename = mrSim.snapshots[-1].filename, 
-        shutil.copyfile(filename, Path(sims.folder, name))
+        filename = Path(sims.folder, name)
         print(f"ReferenceGasPartMass = {targetGasMass} for {filename}")
+        shutil.copyfile(mrSim.snapshots[-1].filename, filename)
