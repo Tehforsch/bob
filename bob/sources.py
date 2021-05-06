@@ -82,6 +82,24 @@ class Sources:
         return s
 
 
+def getSourcesFromParamFile(sim):
+    s = Sources()
+    s.coord = np.array([[sim.params["TestSourcePosX"], sim.params["TestSourcePosY"], sim.params["TestSourcePosZ"]]])
+    s.sed = np.array(
+        [
+            [
+                sim.params["TestSourceRate056"],
+                sim.params["TestSourceRate112"],
+                sim.params["TestSourceRate136"],
+                sim.params["TestSourceRate152"],
+                sim.params["TestSourceRate246"],
+            ]
+        ]
+    )
+    s.nSources = 1
+    return s
+
+
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         print(

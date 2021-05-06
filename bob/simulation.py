@@ -14,7 +14,7 @@ from bob.paramFile import ConfigFile, InputFile, JobFile, IcsParamFile, MiscFile
 from bob.util import memoize
 from bob.params import Params
 from bob.snapshot import Snapshot
-from bob.sources import Sources
+from bob.sources import Sources, getSourcesFromParamFile
 
 
 class Simulation:
@@ -135,10 +135,13 @@ class Simulation:
         return int(self.params["InitCondFile"].replace("ics_", ""))
 
     @property  # type: ignore
-    @memoize
     def sources(self) -> Sources:
-        assert self.params["SX_SOURCES"] == 10, "This is not implemented yet for actual sink/star particles"
-        return Sources(Path(self.folder, self.params["TestSrcFile"]))
+        if self.params["SX_SOURCES"] == 10:
+            return Sources(Path(self.folder, self.params["TestSrcFile"]))
+        elif self.params["SX_SOURCES"] == 9:
+            return getSourcesFromParamFile(self)
+        else:
+            raise ValueError("This is not implemented yet for actual sink/star particles")
 
     def __hash__(self) -> int:
         return str(self.folder).__hash__()
