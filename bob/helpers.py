@@ -6,12 +6,10 @@ from bob.util import unitNpArray, fileMemoize
 from bob.field import Field
 
 
-@fileMemoize
 def getMeanValue(snap: Snapshot, field: Field) -> float:
     return np.mean(field.getData(snap))
 
 
-@fileMemoize
 def getTimes(sim: Simulation) -> List[float]:
     return unitNpArray([snapshot.time for snapshot in sim.snapshots])
 

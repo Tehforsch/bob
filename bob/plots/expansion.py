@@ -8,7 +8,7 @@ from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
 from bob.postprocessingFunctions import addPlot
 from bob.constants import alphaB, protonMass, kB, gamma
-from bob.util import unitNpArray, fileMemoize
+from bob.util import unitNpArray
 from bob.snapshot import Snapshot
 from bob.helpers import getMeanValue, getTimes, bisect
 from bob.temperature import Temperature
@@ -41,7 +41,6 @@ def analyticalDTypeExpansion(t: np.ndarray, ci: float, stroemgrenRadius: float) 
     return stroemgrenRadius * ((1 + 7 / 4 * ci * t / stroemgrenRadius) ** (4.0 / 7.0)).simplified
 
 
-@fileMemoize
 def getRadii(sim: Simulation, treshold: float = 0.5, sourcePos: np.ndarray = np.array([0.5, 0.5, 0.5])) -> List[float]:
     return unitNpArray([(getIonizationRadius(snapshot, sourcePos, treshold)) for snapshot in sim.snapshots])
 
