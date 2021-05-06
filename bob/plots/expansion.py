@@ -72,7 +72,7 @@ def expansionErrorOverResolution(ax: plt.axes, sims: SimulationSet) -> None:
 def getExpansionData(sim: Simulation) -> Tuple[np.ndarray, np.ndarray, np.ndarray, float, float]:
     initialSnap = sim.snapshots[0]
     meanDens = getMeanValue(initialSnap, BasicField("Density"))
-    nH = meanDens * initialSnap.dens_prev * initialSnap.dens_to_ndens * 1.22
+    nH = meanDens * initialSnap.dens_prev * initialSnap.dens_to_ndens
     recombinationTime = 1 / (alphaB * nH)
     recombinationTime.units = "Myr"
     nE = nH  # We can probably assume this
@@ -104,9 +104,8 @@ def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False
     for sim in sims:
         color, linestyle = getStyle(sim)
         times, radii, error, recombinationTime, stroemgrenRadius = getExpansionData(sim)
-        temperatures = [(getAverageTemperature(snap, radius)) for (radius, snap) in zip(radii, sim.snapshots)]
-        soundSpeed = [getSoundSpeed(temperature) for temperature in temperatures]
-        print("Temperature: {}, Sound speed: {}", temperatures[0], soundSpeed[0])
+        # temperatures = [(getAverageTemperature(snap, radius)) for (radius, snap) in zip(radii, sim.snapshots)]
+        # soundSpeed = [getSoundSpeed(temperature) for temperature in temperatures]
         if not innerOuter:
             (line1,) = ax1.plot(times, radii, label=sims.getNiceSimName(sim), color=color)
             # line1.set_dashes(linestyle)  # 2pt line, 2pt break, 10pt line, 2pt break
@@ -121,9 +120,9 @@ def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False
         # line2.set_dashes(linestyle)
 
     ts = np.linspace(0, np.max(times), num=1000)
-    # ax1.plot(ts, [analyticalRTypeExpansion(t) for t in ts], label="Analytical", color="g")
-    ci = soundSpeed[0]
-    ax1.plot(ts, [analyticalDTypeExpansion(t * recombinationTime, ci, stroemgrenRadius) / stroemgrenRadius for t in ts], label="Analytical", color="g")
+    ci = 5.5 * pq.pc / pq.Myr
+    # ax1.plot(ts, [analyticalDTypeExpansion(t * recombinationTime, ci, stroemgrenRadius) / stroemgrenRadius for t in ts], label="Analytical", color="g")
+    ax1.plot(ts, [analyticalRTypeExpansion(t) for t in ts], label="Analytical", color="g")
     ax1.legend()
 
 

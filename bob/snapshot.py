@@ -43,7 +43,6 @@ class Snapshot:
         return str(self.filename)
 
     def initConversionFactors(self) -> None:
-        mu = 1.22
         gamma = 5.0 / 3.0
         self.h = self.hdf5File["Header"].attrs["HubbleParam"]
         try:
@@ -66,8 +65,8 @@ class Snapshot:
         self.z = redsh
         # prefactors derived from that:
         self.dens_prev = (self.massUnit / self.lengthUnit ** 3) * ((redsh + 1.0) ** 3 * self.h ** 2)
-        self.dens_to_ndens = 1.0 / (protonMass * mu)
-        self.temp_prev = ((gamma - 1.0) * mu * protonMass / kB) * self.velocityUnit ** 2
+        self.dens_to_ndens = 1.0 / (protonMass)
+        self.temp_prev = ((gamma - 1.0) * protonMass / kB) * self.velocityUnit ** 2
         self.mass_prev = self.massUnit / MSun / self.h
         self.len_to_phys = 1.0 / self.h / (1.0 + redsh)
         self.l_Mpc = self.lengthUnit / (1.0e6 * pq.pc)
