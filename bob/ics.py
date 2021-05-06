@@ -10,7 +10,7 @@ from bob.simulationSet import SimulationSet
 from bob import config
 from bob.paramFile import IcsParamFile
 from bob.simulation import Simulation
-from bob.icsDefaults import shadowing1, shadowing2, shadowingCenter, homogeneous
+from bob.icsDefaults import shadowing1, shadowing2, shadowingCenter, rType, dType
 
 M_sol = 1.989e33  # solar mass [g]
 m_p = 1.67262178e-24  # proton mass [g]
@@ -85,26 +85,17 @@ class ICS:
             self.mass[c] = self.volume * densityFunction(coord)
         return np.mean(self.mass / self.header["UnitMass_in_g"])
 
-    # def densFromSnap(self, fileName: Path, densityFunction: Callable[[np.ndarray], float]) -> None:
-    #     f = hp.File(fileName, "r")
-    #     density = np.array(f["PartType0/Density"][:])
-    #     masses = np.array(f["PartType0/Masses"][:])
-    #     self.coords = np.array(f["PartType0/Coordinates"][:])
-    #     self.volume = masses / density
-    #     self.mass = np.zeros(self.coords.shape)  # g
-    #     for c, coord in enumerate(self.coords):
-    #         self.mass[c] = self.volume[c] * densityFunction(coord)
-    #     self.ids = np.array(f["PartType0/ParticleIDs"][:])
-    #     self.velocities = np.zeros(self.coords.shape)
-
     def convertSnapWithDensityAdjusted(self, inputFile: Path, outputFile: Path, densityFunction: Callable[[np.ndarray], float]) -> None:
         shutil.copy(inputFile, outputFile)
         with hp.File(outputFile, "r") as f:
+            oldMasses = f["PartType0/Masses"][:]
             coords = np.array(f["PartType0/Coordinates"][:])
             volume = np.array(f["PartType0/Masses"][:]) / np.array(f["PartType0/Density"][:])
             newMass = np.zeros(coords.shape[0])  # g
             for c, coord in enumerate(coords):
                 newMass[c] = volume[c] * densityFunction(coord) / self.header["UnitMass_in_g"] * self.header["UnitLength_in_cm"] ** 3
+            relDifference = np.absolute(oldMasses - newMass) / np.absolute(oldMasses)
+            print(f"Mean relative difference in target mass: {np.mean(relDifference)}")
         with hp.File(outputFile, "r+") as f:
             dens = np.ones(coords.shape[0]) * densityFunction(coord) * self.header["UnitLength_in_cm"] ** 3 / self.header["UnitMass_in_g"]
             f["PartType0/Density"][:] = dens
@@ -174,7 +165,7 @@ def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path, densityFunction
     meshRelaxSim.params.writeFiles()
     meshRelaxSim.compileArepo()
     meshRelaxSim.run(verbose=False)
-    # waitForMeshRelaxSim(meshRelaxSim)
+    waitForMeshRelaxSim(meshRelaxSim)
     lastSnapshot = meshRelaxSim.snapshots[-1].filename
     resultFile = Path(folder, config.meshRelaxedIcsFileName)
     convertIcs(lastSnapshot, resultFile, densityFunction, resolution=sim.params["resolution"])
@@ -184,18 +175,15 @@ def runMeshRelax(sim: Simulation, inputFile: Path, folder: Path, densityFunction
 def waitForMeshRelaxSim(sim: Simulation):
     logging.info("Waiting for sim to finish (waiting until at least 3 snapshots are written)")
     while len(sim.snapshots) < 3:
+        print(".",)
         time.sleep(5)
 
 
 def getDensityFunction(name: str) -> Callable[[np.ndarray], float]:
-    if name == "shadowing1":
-        return shadowing1
-    if name == "shadowing2":
-        return shadowing2
-    if name == "shadowingCenter":
-        return shadowingCenter
-    assert name == "homogeneous"
-    return homogeneous
+    densityFunctions = [shadowing1, shadowing2, shadowingCenter, rType, dType]
+    potentialFunctions =  [f for f in densityFunctions if f.__name__ == name]
+    assert len(potentialFunctions) == 1, "Invalid function name?"
+    return potentialFunctions[0]
 
 
 def main(args: argparse.Namespace, sims: SimulationSet) -> None:
@@ -210,7 +198,9 @@ def main(args: argparse.Namespace, sims: SimulationSet) -> None:
         for i in range(config.numMeshRelaxSteps):
             logging.info("Running mesh relaxation step {}".format(i))
             sim.params["ReferenceGasPartMass"] = targetGasMass
-            print(f"Set ReferenceGasPartMass = {targetGasMass}")
             sim.inputFile.write()  # Update reference gas mass
+            print("Running mesh relax")
             currentIcsFile, mrSim = runMeshRelax(sim, currentIcsFile, Path(sim.folder, "{}".format(i)), densityFunction)
-        shutil.copyfile(mrSim.snapshots[-1].filename, Path(sims.folder, name))
+        filename = mrSim.snapshots[-1].filename, 
+        shutil.copyfile(filename, Path(sims.folder, name))
+        print(f"ReferenceGasPartMass = {targetGasMass} for {filename}")
