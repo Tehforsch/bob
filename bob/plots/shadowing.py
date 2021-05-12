@@ -44,17 +44,39 @@ def shadowing(ax: plt.axes, sim: Simulation) -> int:
     # ax.plot((center[1], center[2]), (obstacleCenter[2], obstacleCenter[1] + obstacleSize))
 
 
-@addSingleSnapshotPlot(None)
-def shadowingDouble(ax: plt.axes, sim: Simulation, snap: Snapshot) -> int:
-    center = np.array([0.5, 0.5, 0.5])
-    axis = np.array([0.0, 0.0, 1.0])
-    abundance = BasicField("ChemicalAbundances", 1)
-    density = BasicField("Density", None)
-    criticalDensity = 1e9
-    obstacle = TresholdField(density, criticalDensity, 0, 1)
-    field = CombinedField([abundance, obstacle], [npRed, npBlue])
+def bisectSnapTime(snaps: List[Snapshot], desiredTime: float):
+    return snaps[bisectSnapTimeIndex(snaps, desiredTime, 0, len(snaps))]
 
-    voronoiSlice(ax, sim, snap, field, axis)
+
+def bisectSnapTimeIndex(snaps: List[Snapshot], desiredTime: float, minIndex: int, maxIndex: int):
+    middle = int((minIndex + maxIndex) / 2)
+    print(minIndex, maxIndex, middle)
+    if minIndex == middle or maxIndex == middle:
+        return middle
+    else:
+        time = snaps[middle].time
+        print(f"Checking {time} @ {middle}")
+        if time < desiredTime:
+            return bisectSnapTimeIndex(snaps, desiredTime, middle, maxIndex)
+        else:
+            return bisectSnapTimeIndex(snaps, desiredTime, minIndex, middle)
+
+
+@addSingleSimPlot(None)
+def shadowingDouble(ax: plt.axes, sim: Simulation) -> int:
+    desiredTimes = [3200 * pq.year, 6500 * pq.year, 32000 * pq.year, 64000 * pq.year]
+    snaps = [bisectSnapTime(sim.snapshots, desiredTime) for desiredTime in desiredTimes]
+    print(snaps)
+    for snap in snaps:
+        center = np.array([0.5, 0.5, 0.5])
+        axis = np.array([0.0, 0.0, 1.0])
+        abundance = BasicField("ChemicalAbundances", 1)
+        density = BasicField("Density", None)
+        criticalDensity = 1e5
+        obstacle = TresholdField(density, criticalDensity, 0, 1)
+        field = CombinedField([abundance, obstacle], [npRed, npBlue])
+
+        voronoiSlice(ax, sim, snap, field, axis)
 
 
 # def findSnapshotsAtTimes(snapshots: List[Snapshot], times: List[float]) -> Iterator[Snapshot]:
