@@ -94,7 +94,7 @@ def getNiceTimeUnitName(value: float) -> str:
 
 
 def getNiceParamName(k: str, v: Any) -> str:
-    if k == "SX_SWEEP":
+    if k == "SWEEP":
         return "Sweep" if v else "SPRAI"
     if k == "ReferenceGasPartMass":
         return ""

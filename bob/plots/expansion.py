@@ -58,7 +58,7 @@ def expansion(ax: plt.axes, sims: SimulationSet) -> None:
 @addPlot(None)
 def expansionErrorOverResolution(ax: plt.axes, sims: SimulationSet) -> None:
     quotient = sims.quotient(["ReferenceGasPartMass", "InitCondFile"])
-    quotient.sort(key=lambda sims: (sims[0]["SX_SWEEP"]))
+    quotient.sort(key=lambda sims: (sims[0]["SWEEP"]))
     for (params, simSet) in quotient:
         resolutions = [sim.resolution for sim in simSet]
         averageError = [np.mean(getExpansionData(sim)[2]) for sim in simSet]
@@ -141,7 +141,7 @@ def getStyle(sim: Simulation) -> Tuple[Tuple[float, float, float], List[float]]:
     except ValueError:
         resolutionIndex = 0
     cmaps = [plt.get_cmap("Reds"), plt.get_cmap("Blues")]
-    cmap = cmaps[int(sim.params["SX_SWEEP"])]
+    cmap = cmaps[int(sim.params["SWEEP"])]
     color = cmap(1.0 - resolutionIndex * 0.05)
     linestyle = [4, resolutionIndex]
     return color, [1]
