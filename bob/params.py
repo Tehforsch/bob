@@ -21,12 +21,18 @@ class Params(MutableMapping):
             paramFile.write()
 
     def getParamFileWithParameter(self, k: str) -> Optional[ParamFile]:
-        paramFilesWithThisParameter = [paramFile for paramFile in self.files if k in paramFile or k in paramFile.unusedParams]
+        paramFilesWithThisParameter = [
+            paramFile
+            for paramFile in self.files
+            if k in paramFile or k in paramFile.unusedParams
+        ]
         if len(paramFilesWithThisParameter) == 0:
             if k != "initialSnap":
                 logging.error(f"No file contains this parameter: {k}")
             return None
-        assert len(paramFilesWithThisParameter) <= 1, f"Multiple files contain this parameter: {k}: {paramFilesWithThisParameter}"
+        assert (
+            len(paramFilesWithThisParameter) <= 1
+        ), f"Multiple files contain this parameter: {k}: {paramFilesWithThisParameter}"
         return paramFilesWithThisParameter[0]
 
     def __getitem__(self, k: str) -> Any:

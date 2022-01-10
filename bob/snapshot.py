@@ -49,7 +49,10 @@ class Snapshot:
             redsh = self.hdf5File["Header"].attrs["Redshift"]
         except:
             redsh = 0.0
-            print("WARNING: No cosmological units, I am not sure " + "how much of this library will work")
+            print(
+                "WARNING: No cosmological units, I am not sure "
+                + "how much of this library will work"
+            )
 
         self.OmegaLambda = self.hdf5File["Header"].attrs["OmegaLambda"]
         if self.OmegaLambda != 0:
@@ -57,14 +60,18 @@ class Snapshot:
             # redsh_str = "z" + str(int(round(10 * redsh)))
         self.lengthUnit = self.hdf5File["Header"].attrs["UnitLength_in_cm"] * pq.cm
         self.massUnit = self.hdf5File["Header"].attrs["UnitMass_in_g"] * pq.g
-        self.velocityUnit = self.hdf5File["Header"].attrs["UnitVelocity_in_cm_per_s"] * pq.cm / pq.s
+        self.velocityUnit = (
+            self.hdf5File["Header"].attrs["UnitVelocity_in_cm_per_s"] * pq.cm / pq.s
+        )
         self.timeUnit = self.lengthUnit / self.velocityUnit
         self.energyUnit = self.lengthUnit ** 2 / (self.timeUnit ** 2) * self.massUnit
         self.volumeUnit = self.lengthUnit ** 3
         self.time = self.hdf5File["Header"].attrs["Time"] * self.timeUnit
         self.z = redsh
         # prefactors derived from that:
-        self.dens_prev = (self.massUnit / self.lengthUnit ** 3) * ((redsh + 1.0) ** 3 * self.h ** 2)
+        self.dens_prev = (self.massUnit / self.lengthUnit ** 3) * (
+            (redsh + 1.0) ** 3 * self.h ** 2
+        )
         self.dens_to_ndens = 1.0 / (protonMass)
         self.temp_prev = ((gamma - 1.0) * protonMass / kB) * self.velocityUnit ** 2
         self.mass_prev = self.massUnit / MSun / self.h
@@ -79,8 +86,12 @@ class Snapshot:
             # time difference to z=14 (Myr)
             self.t14 = self.cosmic_time(1 / (1.0 + redsh), 1.0 / 15.0)
 
-        self.box_vol = (self.hdf5File["Header"].attrs["BoxSize"] * (self.l_Mpc)) ** 3  # Mpc^3
-        self.dm_mass = self.mass_prev * self.hdf5File["Header"].attrs["MassTable"][1]  # in MSun
+        self.box_vol = (
+            self.hdf5File["Header"].attrs["BoxSize"] * (self.l_Mpc)
+        ) ** 3  # Mpc^3
+        self.dm_mass = (
+            self.mass_prev * self.hdf5File["Header"].attrs["MassTable"][1]
+        )  # in MSun
 
     def cosmic_time(self, a1: float, a0: float) -> float:
         factor1 = 2.0 / (3.0 * np.sqrt(self.OmegaLambda))

@@ -17,7 +17,12 @@ class Temperature(Field):
         dens = BasicField("Density").getData(snapshot)
         x0He = 0.1  # REALLY not sure about this one, taken from sgchem def given that CHEMISTRYNETWORK != 1
         yn = dens * snapshot.dens_prev / ((1.0 + 4.0 * x0He) * protonMass)
-        en = BasicField("InternalEnergy").getData(snapshot) * dens * snapshot.energyUnit / snapshot.volumeUnit
+        en = (
+            BasicField("InternalEnergy").getData(snapshot)
+            * dens
+            * snapshot.energyUnit
+            / snapshot.volumeUnit
+        )
         xH2 = BasicField("ChemicalAbundances", 0).getData(snapshot)
         xHP = BasicField("ChemicalAbundances", 1).getData(snapshot)
         xHEP = BasicField("ChemicalAbundances", 4).getData(snapshot)

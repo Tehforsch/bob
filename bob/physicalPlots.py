@@ -5,11 +5,7 @@ from bob.snapshot import Snapshot
 from bob.slicePlot import voronoiSlice
 from bob.scatter3D import Scatter3D
 from bob.basicField import BasicField
-from bob.plots.expansion import expansionInnerOuter, expansion, expansionErrorOverResolution
-from bob.plots.shadowing import shadowing
-from bob.plots.snapOverview import overview
 from bob.simulation import Simulation
-from bob.combinedField import CombinedAbundances
 
 
 basicFields = [
@@ -40,8 +36,13 @@ def createVoronoiSlicePlots() -> None:
     for basicField in basicFields:
         for (axis, axisName) in zip([[1, 0, 0], [0, 1, 0], [0, 0, 1]], ["X", "Y", "Z"]):
 
-            def thisSlicePlot(ax: plt.axes, sim: Simulation, snap: Snapshot, basicField: BasicField = basicField, axis: np.ndarray = axis) -> None:
-                center = np.array([0.5, 0.5, 0.5]) * sim.params["BoxSize"]
+            def thisSlicePlot(
+                ax: plt.axes,
+                sim: Simulation,
+                snap: Snapshot,
+                basicField: BasicField = basicField,
+                axis: np.ndarray = axis,
+            ) -> None:
                 voronoiSlice(ax, sim, snap, basicField, axis)
 
             name = f"slice{axisName}{basicField.niceName}"
@@ -52,7 +53,12 @@ def createVoronoiSlicePlots() -> None:
 def createScatterPlots() -> None:
     for basicField in basicFields:
 
-        def thisSlicePlot(ax: plt.axes, sim: Simulation, snap: Snapshot, basicField: BasicField = basicField) -> None:
+        def thisSlicePlot(
+            ax: plt.axes,
+            sim: Simulation,
+            snap: Snapshot,
+            basicField: BasicField = basicField,
+        ) -> None:
             # center = sim.boxSize * 0.5
             Scatter3D(snap, basicField, 0).plot(ax)
 

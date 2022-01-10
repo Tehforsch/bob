@@ -1,4 +1,4 @@
-from typing import Any, Tuple, Union, List, Optional, Dict, Set
+from typing import Any, Tuple, Union, Optional, Dict, Set
 import re
 from pathlib import Path
 from string import Formatter
@@ -10,7 +10,9 @@ from bob import localConfig, config
 
 
 class ParamFile(ABC, dict):
-    def __init__(self, filename: Path, defaults: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(
+        self, filename: Path, defaults: Optional[Dict[str, Any]] = None
+    ) -> None:
         super().__init__([])
         self.filename = filename
         if defaults is not None:
@@ -32,7 +34,9 @@ class LineParamFile(ParamFile):
         self.commentString = "#"
         with filename.open("r") as f:
             self.lines = f.readlines()
-            self.update(self.readLine(self.getLineWithoutComment(line)) for line in self.lines)
+            self.update(
+                self.readLine(self.getLineWithoutComment(line)) for line in self.lines
+            )
             if "" in self:
                 del self[""]
 
@@ -76,7 +80,9 @@ class ConfigFile(LineParamFile):
     def __init__(self, filename: Path):
         self.commentString = "#"
         for param in config.configParams:
-            self[param] = False  # Ensure all possible config parameters exist in the dictionary, even if they are commented out in the file
+            self[
+                param
+            ] = False  # Ensure all possible config parameters exist in the dictionary, even if they are commented out in the file
         super().__init__(filename)
 
     def readLine(self, line: str) -> Tuple[str, Any]:
@@ -142,12 +148,16 @@ class JobFile(ParamFile):
                 self["partition"] = "multi"
                 realNumCores = self["coresPerNode"] * self["numNodes"]
                 if realNumCores != numCores:
-                    logging.info(f"Cannot run with {numCores} cores (not divisible by max num of cores per node). Running on {realNumCores} instead.")
+                    logging.info(
+                        f"Cannot run with {numCores} cores (not divisible by max num of cores per node). Running on {realNumCores} instead."
+                    )
 
     def setRunCommand(self) -> None:
         if "runParams" in self:
             runParams = self["runParams"]
-            self["runCommand"] = f"./{config.binaryName} {config.inputFilename} {runParams}"
+            self[
+                "runCommand"
+            ] = f"./{config.binaryName} {config.inputFilename} {runParams}"
 
 
 class IcsParamFile(LineParamFile):

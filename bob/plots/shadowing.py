@@ -1,4 +1,4 @@
-from typing import Iterator, List
+from typing import List
 import numpy as np
 import matplotlib.pyplot as plt
 import quantities as pq
@@ -7,7 +7,7 @@ from bob.combinedField import CombinedField
 from bob.tresholdField import TresholdField
 from bob.basicField import BasicField
 from bob.slicePlot import voronoiSlice
-from bob.postprocessingFunctions import addSingleSimPlot, addSingleSnapshotPlot
+from bob.postprocessingFunctions import addSingleSimPlot
 from bob.icsDefaults import shadowing1Params, shadowing2Params
 from bob.snapshot import Snapshot
 
@@ -48,7 +48,9 @@ def bisectSnapTime(snaps: List[Snapshot], desiredTime: float):
     return snaps[bisectSnapTimeIndex(snaps, desiredTime, 0, len(snaps))]
 
 
-def bisectSnapTimeIndex(snaps: List[Snapshot], desiredTime: float, minIndex: int, maxIndex: int):
+def bisectSnapTimeIndex(
+    snaps: List[Snapshot], desiredTime: float, minIndex: int, maxIndex: int
+):
     middle = int((minIndex + maxIndex) / 2)
     print(minIndex, maxIndex, middle)
     if minIndex == middle or maxIndex == middle:
@@ -68,7 +70,6 @@ def shadowingDouble(ax: plt.axes, sim: Simulation) -> int:
     snaps = [bisectSnapTime(sim.snapshots, desiredTime) for desiredTime in desiredTimes]
     print(snaps)
     for snap in snaps:
-        center = np.array([0.5, 0.5, 0.5])
         axis = np.array([0.0, 0.0, 1.0])
         abundance = BasicField("ChemicalAbundances", 1)
         density = BasicField("Density", None)

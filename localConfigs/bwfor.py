@@ -3,7 +3,13 @@ from bob import config
 
 arepoDir = "/beegfs/home/hd/hd_hd/hd_hp240/projects/arepo"
 
-jobParams = {"wallTime": "3:00:00", "jobName": "arepoTest", "logFile": "stdout.log", "maxCoresPerNode": 16, "jobLines": ""}
+jobParams = {
+    "wallTime": "3:00:00",
+    "jobName": "arepoTest",
+    "logFile": "stdout.log",
+    "maxCoresPerNode": 16,
+    "jobLines": "",
+}
 
 runJobCommand = "sbatch"
 

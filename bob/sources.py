@@ -10,9 +10,9 @@ class Sources:
         self.nFreq = 0
         self.nSigma = 0
         self.nEnergy = 0
-        self.coord: np.ndarray = []
-        self.sed: np.ndarray = []
-        self.time: np.ndarray = []
+        self.coord: np.ndarray = np.array([])
+        self.sed: np.ndarray = np.array([])
+        self.time: np.ndarray = np.array([])
         self.sigma = None
         self.energy = None
 
@@ -28,7 +28,9 @@ class Sources:
     def __exit__(self, type: Any, value: Any, tb: Any) -> None:
         return
 
-    def addSource(self, coord: np.ndarray, sed: np.ndarray, time: Union[List[float], float] = None) -> None:
+    def addSource(
+        self, coord: np.ndarray, sed: np.ndarray, time: Union[List[float], float] = None
+    ) -> None:
         if np.ndim(coord) == 1:
             coord, sed = [coord], [sed]
         time = np.zeros(len(coord)) if time is None else time
@@ -50,15 +52,25 @@ class Sources:
             self.nFreq = nFreq
             self.nSigma = nSigma
             self.nEnergy = nEnergy
-            self.sigma = np.fromfile(f, dtype="f8", count=nSigma) if nSigma > 0 else None
-            self.energy = np.fromfile(f, dtype="f8", count=nEnergy) if nEnergy > 0 else None
-            self.coord = np.fromfile(f, dtype="f8", count=nSources * 3).reshape((nSources, 3))
-            self.sed = np.fromfile(f, dtype="f8", count=nSources * nFreq).reshape((nSources, nFreq))
+            self.sigma = (
+                np.fromfile(f, dtype="f8", count=nSigma) if nSigma > 0 else None
+            )
+            self.energy = (
+                np.fromfile(f, dtype="f8", count=nEnergy) if nEnergy > 0 else None
+            )
+            self.coord = np.fromfile(f, dtype="f8", count=nSources * 3).reshape(
+                (nSources, 3)
+            )
+            self.sed = np.fromfile(f, dtype="f8", count=nSources * nFreq).reshape(
+                (nSources, nFreq)
+            )
             self.time = np.fromfile(f, dtype="f8", count=nSources)
 
     def write(self, fileName: Path) -> None:
         with open(fileName, "wb") as f:
-            np.array([self.nSigma, self.nEnergy, self.nSources, self.nFreq]).astype("u4").tofile(f)
+            np.array([self.nSigma, self.nEnergy, self.nSources, self.nFreq]).astype(
+                "u4"
+            ).tofile(f)
             if self.sigma is not None:
                 self.sigma.astype("f8").tofile(f)
             if self.energy is not None:
@@ -84,7 +96,15 @@ class Sources:
 
 def getSourcesFromParamFile(sim):
     s = Sources()
-    s.coord = np.array([[float(sim.params["TestSourcePosX"]), float(sim.params["TestSourcePosY"]), float(sim.params["TestSourcePosZ"])]])
+    s.coord = np.array(
+        [
+            [
+                float(sim.params["TestSourcePosX"]),
+                float(sim.params["TestSourcePosY"]),
+                float(sim.params["TestSourcePosZ"]),
+            ]
+        ]
+    )
     s.sed = np.array(
         [
             [

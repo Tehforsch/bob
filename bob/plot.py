@@ -4,14 +4,22 @@ import argparse
 import matplotlib.pyplot as plt
 import logging
 
-from bob.postprocessingFunctions import PlotFunction, SingleSimPlotFunction, SingleSnapshotPlotFunction, CompareSimSingleSnapshotPlotFunction
+from bob.postprocessingFunctions import (
+    PlotFunction,
+    SingleSimPlotFunction,
+    SingleSnapshotPlotFunction,
+    CompareSimSingleSnapshotPlotFunction,
+)
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
 from bob import config
 
 
 def isInSnapshotArgs(snap: Snapshot, args: argparse.Namespace) -> bool:
-    return args.snapshots is None or any(isSameSnapshot(arg_snap, snap) for arg_snap in args.snapshots)
+    return args.snapshots is None or any(
+        isSameSnapshot(arg_snap, snap) for arg_snap in args.snapshots
+    )
+
 
 def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
     try:
@@ -24,16 +32,22 @@ def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
             if type(snap.number) == tuple:
                 return snap.number == arg_num
         except:
-            raise ("WRONG type of snapshot argument. Either pass an int or int,int for subbox snapshots")
+            raise (
+                "WRONG type of snapshot argument. Either pass an int or int,int for subbox snapshots"
+            )
 
 
-def runPlot(function: PlotFunction, sims: SimulationSet, args: argparse.Namespace) -> None:
+def runPlot(
+    function: PlotFunction, sims: SimulationSet, args: argparse.Namespace
+) -> None:
     logging.info("Running {}".format(function.name))
     function(plt, sims)
     saveAndShow(Path(sims.folder, config.picFolder, function.name), args.showFigures)
 
 
-def runSingleSimPlot(function: SingleSimPlotFunction, sims: SimulationSet, args: argparse.Namespace) -> None:
+def runSingleSimPlot(
+    function: SingleSimPlotFunction, sims: SimulationSet, args: argparse.Namespace
+) -> None:
     logging.info("Running {}".format(function.name))
     for sim in sims:
         logging.info("For sim {}".format(sim.name))
@@ -42,7 +56,9 @@ def runSingleSimPlot(function: SingleSimPlotFunction, sims: SimulationSet, args:
         saveAndShow(Path(simPicFolder, function.name), args.showFigures)
 
 
-def runSingleSnapshotPlot(function: SingleSnapshotPlotFunction, sims: SimulationSet, args: argparse.Namespace) -> None:
+def runSingleSnapshotPlot(
+    function: SingleSnapshotPlotFunction, sims: SimulationSet, args: argparse.Namespace
+) -> None:
     logging.info("Running {}".format(function.name))
     for sim in sims:
         logging.info("For sim {}".format(sim.name))
@@ -51,18 +67,31 @@ def runSingleSnapshotPlot(function: SingleSnapshotPlotFunction, sims: Simulation
                 logging.info("For snap {}".format(snap.name))
                 function(plt, sim, snap)
                 simPicFolder = Path(sims.folder, config.picFolder, sim.name)
-                saveAndShow(Path(simPicFolder, "{}_{}".format(function.name, snap.name)), args.showFigures)
+                saveAndShow(
+                    Path(simPicFolder, "{}_{}".format(function.name, snap.name)),
+                    args.showFigures,
+                )
 
 
-def runCompareSimSingleSnapPlot(function: CompareSimSingleSnapshotPlotFunction, sims: SimulationSet, args: argparse.Namespace) -> None:
+def runCompareSimSingleSnapPlot(
+    function: CompareSimSingleSnapshotPlotFunction,
+    sims: SimulationSet,
+    args: argparse.Namespace,
+) -> None:
     for (sim1, sim2) in itertools.combinations(sims, r=2):
         for (snap1, snap2) in zip(sim1.snapshots, sim2.snapshots):
-            assert snap1.time == snap2.time, f"Non-matching snapshots between sims {sim1.name} and {sim2.name}"
+            assert (
+                snap1.time == snap2.time
+            ), f"Non-matching snapshots between sims {sim1.name} and {sim2.name}"
             function(plt, sim1, sim2, snap1, snap2)
-            saveAndShow(Path(sims.folder, config.picFolder, function.name), args.showFigures)
+            saveAndShow(
+                Path(sims.folder, config.picFolder, function.name), args.showFigures
+            )
 
 
-def runSingleSnapshotPostprocessingFunction(function: SingleSnapshotPlotFunction, sims: SimulationSet, args: argparse.Namespace) -> None:
+def runSingleSnapshotPostprocessingFunction(
+    function: SingleSnapshotPlotFunction, sims: SimulationSet, args: argparse.Namespace
+) -> None:
     logging.info("Running {}".format(function.name))
     for sim in sims:
         logging.info("For sim {}".format(sim.name))

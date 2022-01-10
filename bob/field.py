@@ -28,7 +28,9 @@ class RelativeDifference(Field):
         data2 = self.field.getData(self.reference)
         # data2 = reorder(data2, snapshot.coordinates, self.reference.coordinates)
         assert (snapshot.coordinates == self.reference.coordinates).all()
-        for (x1, x2, y1, y2) in zip(snapshot.coordinates, self.reference.coordinates, data1, data2):
+        for (x1, x2, y1, y2) in zip(
+            snapshot.coordinates, self.reference.coordinates, data1, data2
+        ):
             assert (x1 == x2).all()
             if np.abs(y1 - y2) > 0.01:
                 print(x1, x2, y1, y2)

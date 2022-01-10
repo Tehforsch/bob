@@ -7,13 +7,18 @@ from bob.postprocessingFunctions import addPlot
 from bob.util import getNiceParamName
 
 
-def getScalingSimSets(sims: SimulationSet, additionalParameters: List[str] = []) -> List[Any]:
+def getScalingSimSets(
+    sims: SimulationSet, additionalParameters: List[str] = []
+) -> List[Any]:
     sims.sort(key=lambda sim: sim.params["numCores"])
     quotient = sims.quotient(["numCores"] + additionalParameters)
     quotient.sort(key=lambda sims: (sims[0]["SWEEP"]))
     return quotient
 
-def getMultipleDomainsSimSet(sims: SimulationSet, additionalParameters: List[str] = []) -> List[Any]:
+
+def getMultipleDomainsSimSet(
+    sims: SimulationSet, additionalParameters: List[str] = []
+) -> List[Any]:
     sims.sort(key=lambda sim: sim.params["MultipleDomains"])
     quotient = sims.quotient(["MultipleDomains"] + additionalParameters)
     return quotient
@@ -31,7 +36,12 @@ def speedup(ax: plt.axes, sims: SimulationSet) -> None:
         ax.yscale("log")
         ax.xlabel("N")
         ax.ylabel("Speedup")
-        ax.plot(numCores, speedup, label=",".join(getNiceParamName(k, v) for (k, v) in params.items()), marker="o")
+        ax.plot(
+            numCores,
+            speedup,
+            label=",".join(getNiceParamName(k, v) for (k, v) in params.items()),
+            marker="o",
+        )
 
     ax.plot(numCores, numCores, label="Ideal")
     ax.legend()
@@ -46,7 +56,12 @@ def runTime(ax: plt.axes, sims: SimulationSet) -> None:
         ax.xscale("log")
         ax.yscale("log")
         ax.ylabel("run time [s]")
-        ax.plot(numCores, runTimes, label=",".join(getNiceParamName(k, v) for (k, v) in params.items()), marker="o")
+        ax.plot(
+            numCores,
+            runTimes,
+            label=",".join(getNiceParamName(k, v) for (k, v) in params.items()),
+            marker="o",
+        )
     # plt.plot(numCores, numCores, label="Ideal")
     ax.legend()
 
@@ -60,6 +75,7 @@ def runTimeMultipleDomains(ax: plt.axes, sims: SimulationSet) -> None:
         ax.ylabel("Run time [s]")
         ax.plot(numDomains, runTimes, marker="o")
 
+
 @addPlot(None)
 def runTimeWeak(ax: plt.axes, sims: SimulationSet) -> None:
     for (params, simSet) in getScalingSimSets(sims, ["ReferenceGasPartMass"]):
@@ -69,7 +85,12 @@ def runTimeWeak(ax: plt.axes, sims: SimulationSet) -> None:
         ax.xscale("log")
         ax.yscale("log")
         ax.ylabel("run time [s]")
-        ax.plot(numCores, runTimes, label=",".join(getNiceParamName(k, v) for (k, v) in params.items()), marker="o")
+        ax.plot(
+            numCores,
+            runTimes,
+            label=",".join(getNiceParamName(k, v) for (k, v) in params.items()),
+            marker="o",
+        )
     # plt.plot(numCores, numCores, label="Ideal")
     ax.legend()
 
@@ -84,7 +105,12 @@ def speedupWeak(ax: plt.axes, sims: SimulationSet) -> None:
         speedup = [0 if runTime is None else baseTime / runTime for runTime in runTimes]
         ax.xlabel("N")
         ax.ylabel("Speedup")
-        ax.plot(numCores, speedup, label=",".join(getNiceParamName(k, v) for (k, v) in params.items()), marker="o")
+        ax.plot(
+            numCores,
+            speedup,
+            label=",".join(getNiceParamName(k, v) for (k, v) in params.items()),
+            marker="o",
+        )
 
     ax.plot(numCores, [1 for core in numCores], label="Ideal")
     ax.legend()

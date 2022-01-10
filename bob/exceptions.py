@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class BobException(Exception):
     pass
 
@@ -8,5 +11,5 @@ class CompilationError(BobException):
 
 
 class PostprocessingError(BobException):
-    def __init__(self, s) -> None:
+    def __init__(self, s: Any) -> None:
         super().__init__(s)

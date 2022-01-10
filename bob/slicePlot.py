@@ -9,7 +9,14 @@ from bob.field import Field
 from bob import config
 
 
-def voronoiSlice(ax: plt.axes, sim: Simulation, snap: Snapshot, field: Field, axis: np.ndarray, **plotSettings: Dict[str, Any]) -> None:
+def voronoiSlice(
+    ax: plt.axes,
+    sim: Simulation,
+    snap: Snapshot,
+    field: Field,
+    axis: np.ndarray,
+    **plotSettings: Dict[str, Any],
+) -> None:
     axis = np.array(axis)
     center = snap.center
     ortho1, ortho2 = findOrthogonalAxes(axis)
@@ -26,11 +33,15 @@ def voronoiSlice(ax: plt.axes, sim: Simulation, snap: Snapshot, field: Field, ax
     cellIndices = cellIndices.reshape((n1, n2))
     data = np.log(field.getData(snap))
     data = field.getData(snap)
-    print(f"Field: {field.niceName}: min: {np.min(data):.2e}, mean: {np.mean(data):.2e}, max: {np.max(data):.2e}")
+    print(
+        f"Field: {field.niceName}: min: {np.min(data):.2e}, mean: {np.mean(data):.2e}, max: {np.max(data):.2e}"
+    )
     ax.xlabel(getAxisName(ortho1))
     ax.ylabel(getAxisName(ortho2))
     extent = (min1, max1, min2, max2)
-    ax.imshow(data[cellIndices], extent=extent, origin="lower", cmap="Reds", **plotSettings)
+    ax.imshow(
+        data[cellIndices], extent=extent, origin="lower", cmap="Reds", **plotSettings
+    )
     plt.colorbar()
 
 
@@ -43,10 +54,20 @@ def getAxisName(axis: np.ndarray) -> str:
     return ["x", "y", "z"][mostParallel]
 
 
-def getSlice(array: np.ndarray, coordinates: np.ndarray, start: np.ndarray, axis: np.ndarray, thickness: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def getSlice(
+    array: np.ndarray,
+    coordinates: np.ndarray,
+    start: np.ndarray,
+    axis: np.ndarray,
+    thickness: float,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     indices = np.where(np.abs(np.dot(coordinates - start, axis)) < thickness)
     axis1, axis2 = findOrthogonalAxes(axis)
-    return np.dot(coordinates[indices], axis1), np.dot(coordinates[indices], axis2), array[indices]
+    return (
+        np.dot(coordinates[indices], axis1),
+        np.dot(coordinates[indices], axis2),
+        array[indices],
+    )
 
 
 def findOrthogonalAxes(axis: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:

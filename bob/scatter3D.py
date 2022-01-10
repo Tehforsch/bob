@@ -21,6 +21,7 @@ class Scatter3D:
         else:
             where = np.where(self.array >= self.vFilterTreshold)
             coords = [self.snapshot.coordinates[where, i] for i in range(3)]
+
             ax.scatter(*coords, c=self.array[where], **plotSettings)
 
 
@@ -28,3 +29,11 @@ def get3DAx():
     from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 
     return plt.figure().add_subplot(111, projection="3d")
+
+
+def f1(k: int):
+    return k
+
+
+def f2(x: str):
+    f1(x)

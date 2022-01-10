@@ -43,11 +43,15 @@ def addToList(name: Optional[str], cls: Any) -> Callable[[Callable[..., Any]], A
     return wrapper
 
 
-def addPostprocessing(name: Optional[str]) -> Callable[[Callable[..., Any]], PostprocessingFunction]:
+def addPostprocessing(
+    name: Optional[str],
+) -> Callable[[Callable[..., Any]], PostprocessingFunction]:
     return addToList(name, PostprocessingFunction)
 
 
-def addSingleSnapshotPostprocessing(name: Optional[str]) -> Callable[[Callable[..., Any]], SingleSnapPostprocessingFunction]:
+def addSingleSnapshotPostprocessing(
+    name: Optional[str],
+) -> Callable[[Callable[..., Any]], SingleSnapPostprocessingFunction]:
     return addToList(name, SingleSnapPostprocessingFunction)
 
 
@@ -55,21 +59,29 @@ def addPlot(name: Optional[str]) -> Callable[[Callable[..., Any]], PlotFunction]
     return addToList(name, PlotFunction)
 
 
-def addSingleSimPlot(name: Optional[str]) -> Callable[[Callable[..., Any]], SingleSimPlotFunction]:
+def addSingleSimPlot(
+    name: Optional[str],
+) -> Callable[[Callable[..., Any]], SingleSimPlotFunction]:
     return addToList(name, SingleSimPlotFunction)
 
 
-def addSingleSnapshotPlot(name: Optional[str]) -> Callable[[Callable[..., Any]], SingleSnapshotPlotFunction]:
+def addSingleSnapshotPlot(
+    name: Optional[str],
+) -> Callable[[Callable[..., Any]], SingleSnapshotPlotFunction]:
     return addToList(name, SingleSnapshotPlotFunction)
 
 
-def addCompareSimSingleSnapshotPlot(name: Optional[str]) -> Callable[[Callable[..., Any]], CompareSimSingleSnapshotPlotFunction]:
+def addCompareSimSingleSnapshotPlot(
+    name: Optional[str],
+) -> Callable[[Callable[..., Any]], CompareSimSingleSnapshotPlotFunction]:
     return addToList(name, CompareSimSingleSnapshotPlotFunction)
 
 
 def checkNoDoubledNames() -> None:
     functionNames: List[str] = [f.name for f in postprocessingFunctions]
-    assert len(set(functionNames)) == len(functionNames), "Two functions with the same name in postprocessing functions!"
+    assert len(set(functionNames)) == len(
+        functionNames
+    ), "Two functions with the same name in postprocessing functions!"
 
 
 postprocessingFunctions: List[PostprocessingFunction] = []

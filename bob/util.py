@@ -38,17 +38,29 @@ def unitNpArray(values: List[pq.quantity.Quantity]) -> np.ndarray:
     return units * np.array([float(x) for x in values])
 
 
-def runCommand(command: Union[str, List[str]], path: Union[str, Path], printOutput: bool = False, shell: bool = False) -> Popen:
+def runCommand(
+    command: Union[str, List[str]],
+    path: Union[str, Path],
+    printOutput: bool = False,
+    shell: bool = False,
+) -> Popen:
     logging.debug("Running {}".format(command))
     if printOutput:
-        process = Popen(command, cwd=path, shell=shell, stdout=sys.stdout, stderr=sys.stderr)
+        process = Popen(
+            command, cwd=path, shell=shell, stdout=sys.stdout, stderr=sys.stderr
+        )
     else:
         process = Popen(command, cwd=path, shell=shell, stdout=PIPE, stderr=PIPE)
     process.communicate()
     return process
 
 
-def checkOutput(command: Union[str, List[str]], path: Union[str, Path], printOutput: bool = False, shell: bool = False) -> bytes:
+def checkOutput(
+    command: Union[str, List[str]],
+    path: Union[str, Path],
+    printOutput: bool = False,
+    shell: bool = False,
+) -> bytes:
     return check_output(command, cwd=path, shell=shell)
 
 

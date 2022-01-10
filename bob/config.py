@@ -15,7 +15,14 @@ inputFilename = "param.txt"
 configFilename = "Config.sh"
 miscFilename = "misc.txt"
 arepoCompilationCommand = "make build -j 6"
-srcFiles = ["src", "Makefile", "Makefile.systype", "prepare-config.py", "git_version.sh", "Config.sh"]
+srcFiles = [
+    "src",
+    "Makefile",
+    "Makefile.systype",
+    "prepare-config.py",
+    "git_version.sh",
+    "Config.sh",
+]
 arepoConfigBuildFile = "build/arepoconfig.h"
 arepoConfigSrcFile = "src/arepoconfig.h"
 
@@ -31,10 +38,10 @@ jobFilename = "job"
 sourceOutputFolderName = "arepo"
 picFolder = "pics"
 specialFolders = [picFolder]
-memoizeDir = Path(Path.home(), ".bobMemoize")  # For in-file memoization to speed up plot work
-initialSnapIdentifier = (
-    "initialSnap"  # The name of the variable specifying the name of the file which we should copy to the output directory to run postprocessing on
-)
+memoizeDir = Path(
+    Path.home(), ".bobMemoize"
+)  # For in-file memoization to speed up plot work
+initialSnapIdentifier = "initialSnap"  # The name of the variable specifying the name of the file which we should copy to the output directory to run postprocessing on
 outputFolderIdentifier = "OutputDir"
 snapshotFileBaseIdentifier = "SnapshotFileBase"
 
