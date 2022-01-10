@@ -6,9 +6,7 @@ from bob.basicField import BasicField
 
 
 class CombinedField(Field):
-    def __init__(
-        self, fields: List[Field], colors: Optional[List[np.ndarray]] = None
-    ) -> None:
+    def __init__(self, fields: List[Field], colors: Optional[List[np.ndarray]] = None) -> None:
         if colors is None:
             colors = [
                 np.array([1.0, 0.0, 0.0]),
@@ -20,9 +18,7 @@ class CombinedField(Field):
 
     def getData(self, snapshot: Snapshot) -> np.ndarray:
         data = [field.getData(snapshot) for field in self.fields]
-        return sum(
-            np.outer(d / np.max(d), color) for (d, color) in zip(data, self.colors)
-        )
+        return sum(np.outer(d / np.max(d), color) for (d, color) in zip(data, self.colors))
 
     @property
     def niceName(self) -> str:

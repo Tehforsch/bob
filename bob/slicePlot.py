@@ -33,15 +33,11 @@ def voronoiSlice(
     cellIndices = cellIndices.reshape((n1, n2))
     data = np.log(field.getData(snap))
     data = field.getData(snap)
-    print(
-        f"Field: {field.niceName}: min: {np.min(data):.2e}, mean: {np.mean(data):.2e}, max: {np.max(data):.2e}"
-    )
+    print(f"Field: {field.niceName}: min: {np.min(data):.2e}, mean: {np.mean(data):.2e}, max: {np.max(data):.2e}")
     ax.xlabel(getAxisName(ortho1))
     ax.ylabel(getAxisName(ortho2))
     extent = (min1, max1, min2, max2)
-    ax.imshow(
-        data[cellIndices], extent=extent, origin="lower", cmap="Reds", **plotSettings
-    )
+    ax.imshow(data[cellIndices], extent=extent, origin="lower", cmap="Reds", **plotSettings)
     plt.colorbar()
 
 

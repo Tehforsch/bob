@@ -28,9 +28,7 @@ class Simulation:
     def readFiles(self) -> Params:
         self.configFile = ConfigFile(Path(self.folder, config.configFilename))
         self.inputFile = InputFile(Path(self.folder, config.inputFilename))
-        self.jobFile = JobFile(
-            Path(self.folder, config.jobFilename), localConfig.jobParams
-        )
+        self.jobFile = JobFile(Path(self.folder, config.jobFilename), localConfig.jobParams)
         paramFileList = [self.configFile, self.inputFile, self.jobFile]
         icsFilePath = Path(self.folder, config.icsParamFileName)
         if icsFilePath.is_file():
@@ -59,9 +57,7 @@ class Simulation:
         targetConfigFile = Path(localConfig.arepoDir, config.configFilename)
         if targetConfigFile.is_file():
             if filecmp.cmp(str(self.configFile.filename), str(targetConfigFile)):
-                logging.info(
-                    "Config file identical, not copying again to preserve compilation state."
-                )
+                logging.info("Config file identical, not copying again to preserve compilation state.")
                 return
         shutil.copyfile(self.configFile.filename, targetConfigFile)
 
@@ -86,9 +82,7 @@ class Simulation:
         shutil.copy(source, target)
 
     def run(self, verbose: bool) -> None:
-        assert (
-            self.binaryFile.is_file()
-        ), "Binary does not exist. Not starting job. Did you forget to specify -m (tell bob to compile arepo)?"
+        assert self.binaryFile.is_file(), "Binary does not exist. Not starting job. Did you forget to specify -m (tell bob to compile arepo)?"
         util.runCommand(
             [localConfig.runJobCommand, str(self.jobFile.filename.name)],
             path=self.jobFile.filename.parent,
@@ -157,9 +151,7 @@ class Simulation:
         elif self.params["SX_SOURCES"] == 9:
             return getSourcesFromParamFile(self)
         else:
-            raise ValueError(
-                "This is not implemented yet for actual sink/star particles"
-            )
+            raise ValueError("This is not implemented yet for actual sink/star particles")
 
     def __hash__(self) -> int:
         return str(self.folder).__hash__()

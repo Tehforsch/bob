@@ -18,9 +18,7 @@ from bob.postprocessingFunctions import (
 )
 
 
-def getSpecifiedFunctions(
-    args: argparse.Namespace, functions: Sequence[PostprocessingFunction]
-) -> Sequence[PostprocessingFunction]:
+def getSpecifiedFunctions(args: argparse.Namespace, functions: Sequence[PostprocessingFunction]) -> Sequence[PostprocessingFunction]:
     if args.functions is None:
         return functions
     else:

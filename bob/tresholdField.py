@@ -4,9 +4,7 @@ from bob.snapshot import Snapshot
 
 
 class TresholdField(Field):
-    def __init__(
-        self, field: Field, treshold: float, lowerValue: float, upperValue: float
-    ) -> None:
+    def __init__(self, field: Field, treshold: float, lowerValue: float, upperValue: float) -> None:
         self.field = field
         self.treshold = treshold
         self.lowerValue = lowerValue

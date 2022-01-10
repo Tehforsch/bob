@@ -7,18 +7,14 @@ from bob.postprocessingFunctions import addPlot
 from bob.util import getNiceParamName
 
 
-def getScalingSimSets(
-    sims: SimulationSet, additionalParameters: List[str] = []
-) -> List[Any]:
+def getScalingSimSets(sims: SimulationSet, additionalParameters: List[str] = []) -> List[Any]:
     sims.sort(key=lambda sim: sim.params["numCores"])
     quotient = sims.quotient(["numCores"] + additionalParameters)
     quotient.sort(key=lambda sims: (sims[0]["SWEEP"]))
     return quotient
 
 
-def getMultipleDomainsSimSet(
-    sims: SimulationSet, additionalParameters: List[str] = []
-) -> List[Any]:
+def getMultipleDomainsSimSet(sims: SimulationSet, additionalParameters: List[str] = []) -> List[Any]:
     sims.sort(key=lambda sim: sim.params["MultipleDomains"])
     quotient = sims.quotient(["MultipleDomains"] + additionalParameters)
     return quotient

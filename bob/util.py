@@ -46,9 +46,7 @@ def runCommand(
 ) -> Popen:
     logging.debug("Running {}".format(command))
     if printOutput:
-        process = Popen(
-            command, cwd=path, shell=shell, stdout=sys.stdout, stderr=sys.stderr
-        )
+        process = Popen(command, cwd=path, shell=shell, stdout=sys.stdout, stderr=sys.stderr)
     else:
         process = Popen(command, cwd=path, shell=shell, stdout=PIPE, stderr=PIPE)
     process.communicate()

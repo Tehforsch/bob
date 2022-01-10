@@ -48,9 +48,7 @@ def bisectSnapTime(snaps: List[Snapshot], desiredTime: float):
     return snaps[bisectSnapTimeIndex(snaps, desiredTime, 0, len(snaps))]
 
 
-def bisectSnapTimeIndex(
-    snaps: List[Snapshot], desiredTime: float, minIndex: int, maxIndex: int
-):
+def bisectSnapTimeIndex(snaps: List[Snapshot], desiredTime: float, minIndex: int, maxIndex: int):
     middle = int((minIndex + maxIndex) / 2)
     print(minIndex, maxIndex, middle)
     if minIndex == middle or maxIndex == middle:

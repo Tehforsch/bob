@@ -33,12 +33,8 @@ def setupArgs() -> argparse.Namespace:
         help="Which postprocessing functions to run",
     )
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
-    parser.add_argument(
-        "--show", action="store_true", help="Show figures instead of saving them"
-    )
-    parser.add_argument(
-        "--recalc", action="store_true", help="Recalculate memoized results"
-    )
+    parser.add_argument("--show", action="store_true", help="Show figures instead of saving them")
+    parser.add_argument("--recalc", action="store_true", help="Recalculate memoized results")
 
     args = parser.parse_args()
     args.simFolder = args.simFolder.expanduser()

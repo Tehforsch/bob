@@ -79,9 +79,7 @@ def addCompareSimSingleSnapshotPlot(
 
 def checkNoDoubledNames() -> None:
     functionNames: List[str] = [f.name for f in postprocessingFunctions]
-    assert len(set(functionNames)) == len(
-        functionNames
-    ), "Two functions with the same name in postprocessing functions!"
+    assert len(set(functionNames)) == len(functionNames), "Two functions with the same name in postprocessing functions!"
 
 
 postprocessingFunctions: List[PostprocessingFunction] = []

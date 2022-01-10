@@ -10,9 +10,7 @@ from bob import localConfig, config
 
 
 class ParamFile(ABC, dict):
-    def __init__(
-        self, filename: Path, defaults: Optional[Dict[str, Any]] = None
-    ) -> None:
+    def __init__(self, filename: Path, defaults: Optional[Dict[str, Any]] = None) -> None:
         super().__init__([])
         self.filename = filename
         if defaults is not None:
@@ -34,9 +32,7 @@ class LineParamFile(ParamFile):
         self.commentString = "#"
         with filename.open("r") as f:
             self.lines = f.readlines()
-            self.update(
-                self.readLine(self.getLineWithoutComment(line)) for line in self.lines
-            )
+            self.update(self.readLine(self.getLineWithoutComment(line)) for line in self.lines)
             if "" in self:
                 del self[""]
 
@@ -80,9 +76,7 @@ class ConfigFile(LineParamFile):
     def __init__(self, filename: Path):
         self.commentString = "#"
         for param in config.configParams:
-            self[
-                param
-            ] = False  # Ensure all possible config parameters exist in the dictionary, even if they are commented out in the file
+            self[param] = False  # Ensure all possible config parameters exist in the dictionary, even if they are commented out in the file
         super().__init__(filename)
 
     def readLine(self, line: str) -> Tuple[str, Any]:
@@ -114,7 +108,7 @@ class JobFile(ParamFile):
         super().__init__(filename, defaults)
         for _, fieldname, _, _ in Formatter().parse(localConfig.jobTemplate):
             if fieldname:
-                if not fieldname in self:
+                if fieldname not in self:
                     self[fieldname] = None
         self.unusedParams = set(
             ["numCores", "runParams", "maxCoresPerNode"]
@@ -134,7 +128,7 @@ class JobFile(ParamFile):
         self.setNumCores()
 
     def setNumCores(self) -> None:
-        if not "numCores" in self:
+        if "numCores" not in self:
             self["numCores"] = 4
         if "numNodes" in self and "coresPerNode" in self:
             numCores = self["numCores"]
@@ -148,16 +142,12 @@ class JobFile(ParamFile):
                 self["partition"] = "multi"
                 realNumCores = self["coresPerNode"] * self["numNodes"]
                 if realNumCores != numCores:
-                    logging.info(
-                        f"Cannot run with {numCores} cores (not divisible by max num of cores per node). Running on {realNumCores} instead."
-                    )
+                    logging.info(f"Cannot run with {numCores} cores (not divisible by max num of cores per node). Running on {realNumCores} instead.")
 
     def setRunCommand(self) -> None:
         if "runParams" in self:
             runParams = self["runParams"]
-            self[
-                "runCommand"
-            ] = f"./{config.binaryName} {config.inputFilename} {runParams}"
+            self["runCommand"] = f"./{config.binaryName} {config.inputFilename} {runParams}"
 
 
 class IcsParamFile(LineParamFile):
