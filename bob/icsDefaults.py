@@ -42,12 +42,12 @@ def shadowing(
 
 
 def shadowing1(coord: np.ndarray) -> float:
-    return shadowing(coord, **shadowing1Params)
+    return shadowing(coord, **shadowing1Params)  # type: ignore
 
 
 def shadowing2(coord: np.ndarray) -> float:
-    return shadowing(coord, **shadowing2Params)
+    return shadowing(coord, **shadowing2Params)  # type: ignore
 
 
 def shadowingCenter(coord: np.ndarray) -> float:
-    return shadowing(coord, **shadowingCenterParams)
+    return shadowing(coord, **shadowingCenterParams)  # type: ignore

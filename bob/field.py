@@ -26,7 +26,6 @@ class RelativeDifference(Field):
         epsilon = 1e-10
         data1 = self.field.getData(snapshot)
         data2 = self.field.getData(self.reference)
-        # data2 = reorder(data2, snapshot.coordinates, self.reference.coordinates)
         assert (snapshot.coordinates == self.reference.coordinates).all()
         for (x1, x2, y1, y2) in zip(snapshot.coordinates, self.reference.coordinates, data1, data2):
             assert (x1 == x2).all()
@@ -40,10 +39,3 @@ class RelativeDifference(Field):
     def niceName(self) -> str:
         name = self.field.niceName
         return f"Rel. Difference {name}"
-
-
-def reorder(values: np.ndarray, l1: np.ndarray, l2: np.ndarray) -> np.ndarray:
-    """Shuffle the order of values and l1 in the same way, such that l1 == l2 and then return the shuffled values"""
-    indices = [l2.index(x) for x in l1]
-    print(indices)
-    return values[indices]

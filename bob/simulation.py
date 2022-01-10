@@ -1,5 +1,5 @@
 import numpy as np
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 import shutil
 import os
 import argparse
@@ -101,12 +101,13 @@ class Simulation:
 
     @property
     def runTime(self) -> float:
-        for line in self.log[::-1]:
-            match = re.match(config.runTimePattern, line)
-            if match is not None:
-                return float(match.groups()[0])
-        # assert False, f"Could not read runtime from log. Did the simulation finish? ({str(self)})"
-        return None
+        return NotImplemented
+        # for line in self.log[::-1]:
+        #     match = re.match(config.runTimePattern, line)
+        #     if match is not None:
+        #         return float(match.groups()[0])
+        # # assert False, f"Could not read runtime from log. Did the simulation finish? ({str(self)})"
+        # return None
 
     def __repr__(self) -> str:
         return f"Sim{self.name}"
@@ -126,18 +127,17 @@ class Simulation:
             nameRep = nameRep.replace(".hdf5", "")
             nameRep = nameRep.replace(str(self.outputDir), "")
             nameRep = nameRep.replace("/", "")
-            # return int(nameRep)
-            return nameRep
+            return int(nameRep)
 
         snapshotFiles.sort(key=getNumber)
         return [Snapshot(self, s) for s in snapshotFiles]
 
-    def subboxCoords(self) -> (np.ndarray, np.ndarray):
+    def subboxCoords(self) -> Tuple[np.ndarray, np.ndarray]:
         with open(Path(self.folder, self.params["SubboxCoordinatesPath"])) as f:
             lines = f.readlines()
             assert len(lines) == 1
             minX, maxX, minY, maxY, minZ, maxZ = [float(x) for x in lines[0].split(" ")]
-            return [np.array([minX, minY, minZ]), np.array([maxX, maxY, maxZ])]
+            return (np.array([minX, minY, minZ]), np.array([maxX, maxY, maxZ]))
 
     @property
     def resolution(self) -> int:
@@ -155,5 +155,7 @@ class Simulation:
     def __hash__(self) -> int:
         return str(self.folder).__hash__()
 
-    def __eq__(self, sim2: "Simulation") -> bool:
+    def __eq__(self, sim2: object) -> bool:
+        if not isinstance(sim2, Simulation):
+            return NotImplemented
         return self.folder == sim2.folder

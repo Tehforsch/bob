@@ -30,9 +30,15 @@ class Params(MutableMapping):
         return paramFilesWithThisParameter[0]
 
     def __getitem__(self, k: str) -> Any:
-        return self.getParamFileWithParameter(k)[k]
+        f = self.getParamFileWithParameter(k)
+        if f is None:
+            return NotImplemented
+        else:
+            return f[k]
 
-    def __contains__(self, k: str) -> Any:
+    def __contains__(self, k: object) -> bool:
+        if not isinstance(k, str):
+            return NotImplemented
         return self.getParamFileWithParameter(k) is not None
 
     def __setitem__(self, k: str, v: Any) -> None:
@@ -46,8 +52,12 @@ class Params(MutableMapping):
     def __iter__(self) -> Iterator[Any]:
         return iter([k for f in self.files for k in f.keys()])
 
-    def __delitem__(self, k: Any) -> None:
-        del self.getParamFileWithParameter(k)[k]
+    def __delitem__(self, k: str) -> None:
+        f = self.getParamFileWithParameter(k)
+        if f is not None:
+            del f[k]
+        else:
+            raise ValueError(f"{k} is not a valid parameter")
 
     def __len__(self) -> int:
         return sum(len(f) for f in self.files)

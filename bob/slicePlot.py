@@ -73,7 +73,7 @@ def findOrthogonalAxes(axis: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     dotProducts = [np.abs(np.dot(axis, a)) for a in [xAxis, yAxis, zAxis]]
     mostParallel = np.argmax(dotProducts)
     mostOrthogonal = [0, 1, 2]
-    mostOrthogonal.remove(mostParallel)
+    mostOrthogonal.remove(int(mostParallel))
     basicAxis1 = [xAxis, yAxis, zAxis][mostOrthogonal[0]]
     axis1 = np.cross(basicAxis1, axis)
     axis1 = axis1 / np.linalg.norm(axis)

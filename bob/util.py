@@ -64,7 +64,7 @@ def checkOutput(
 
 def printArgs(func: Callable[..., Any]) -> Callable[..., Any]:
     def wrapper(*args: List[Any], **kwargs: Dict[str, Any]) -> Any:
-        prettyDict = ", ".join(f"{k} = {v}" for (k, v) in kwargs)
+        prettyDict = ", ".join(f"{k} = {v}" for (k, v) in kwargs.items())
         print(f"{func.__name__}({args}, {prettyDict}) = ", end="", flush=True)
 
         result = func(*args, **kwargs)

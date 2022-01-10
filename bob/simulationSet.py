@@ -1,4 +1,4 @@
-from typing import Iterable, List, Any
+from typing import Iterable, List, Any, Tuple
 import os
 from pathlib import Path
 import argparse
@@ -21,8 +21,8 @@ class SimulationSet(list):
     def quotient(self, parameters: List[str]) -> List[Any]:
         remainingVariedParams = self.variedParams - set(parameters)
 
-        def getConfiguration(sim: Simulation):
-            return tuple((k, sim.params[k]) for k in remainingVariedParams)
+        def getConfiguration(sim: Simulation) -> Iterable[Tuple[str, Any]]:
+            return ((k, sim.params[k]) for k in remainingVariedParams)
 
         configurations = set(getConfiguration(sim) for sim in self)
         return [

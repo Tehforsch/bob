@@ -1,3 +1,4 @@
+from typing import Union, Tuple, TYPE_CHECKING
 from pathlib import Path
 import numpy as np
 import h5py
@@ -8,6 +9,14 @@ from bob.util import memoize
 from bob.exceptions import BobException
 from bob.constants import kB, protonMass, MSun
 
+if TYPE_CHECKING:
+    from bob.simulation import Simulation
+
+
+class SnapNumber:
+    def __init__(self, value: Union[int, Tuple[int, int]]):
+        self.value = value
+
 
 class Snapshot:
     def __init__(self, sim: "Simulation", filename: Path) -> None:
@@ -16,15 +25,15 @@ class Snapshot:
         self.name = self.getName()
         if "subbox" in self.name:
             numbers = self.name.replace("subbox", "").split("_")
-            self.number = int(numbers[0]), int(numbers[1])
+            self.number: SnapNumber = SnapNumber((int(numbers[0]), int(numbers[1])))
             self.minExtent, self.maxExtent = sim.subboxCoords()
             self.center = (self.maxExtent + self.minExtent) * 0.5
         else:
-            self.number = int(self.name)
+            self.number = SnapNumber(int(self.name))
             self.minExtent = np.array([0.0, 0.0, 0.0])
             self.maxExtent = np.array([1.0, 1.0, 1.0]) * sim.params["BoxSize"]
             self.center = (self.maxExtent + self.minExtent) * 0.5
-        self.hdf5File = h5py.File(self.filename, "r")
+        self.hdf5File: h5py.File = h5py.File(self.filename, "r")
         self.initConversionFactors()
 
     def getName(self) -> str:
@@ -36,7 +45,7 @@ class Snapshot:
 
     @property  # type: ignore
     @memoize
-    def coordinates(self) -> None:
+    def coordinates(self) -> np.ndarray:
         return BasicField("Coordinates").getData(self)
 
     def __repr__(self) -> str:

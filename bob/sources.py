@@ -3,6 +3,8 @@ from typing import Any, Union, List, Optional
 import numpy as np
 import sys
 
+from bob.simulation import Simulation
+
 
 class Sources:
     def __init__(self, fileName: Optional[Path] = None) -> None:
@@ -29,18 +31,16 @@ class Sources:
         return
 
     def addSource(self, coord: np.ndarray, sed: np.ndarray, time: Union[List[float], float] = None) -> None:
-        if np.ndim(coord) == 1:
-            coord, sed = [coord], [sed]
-        time = np.zeros(len(coord)) if time is None else time
+        timeArray = np.zeros(len(coord)) if time is None else time
         if self.nSources == 0:
             self.coord = np.array(coord)
             self.sed = np.array(sed)
-            self.time = np.array(time)
+            self.time = np.array(timeArray)
             self.nFreq = self.sed.shape[1]
         else:
             self.coord = np.append(self.coord, coord, axis=0)
             self.sed = np.append(self.sed, sed, axis=0)
-            self.time = np.append(self.time, time)
+            self.time = np.append(self.time, timeArray)
         self.nSources = self.sed.shape[0]
 
     def read(self, fileName: Path) -> None:
@@ -82,7 +82,7 @@ class Sources:
         return s
 
 
-def getSourcesFromParamFile(sim):
+def getSourcesFromParamFile(sim: Simulation) -> Sources:
     s = Sources()
     s.coord = np.array(
         [
@@ -124,8 +124,8 @@ if __name__ == "__main__":
         inp = iter(sys.argv[2:])
         for i in range((len(sys.argv) - 2) // 8):
             x, y, z, s1, s2, s3, s4, s5 = [float(next(inp)) for _ in range(8)]
-            coord = [x, y, z]
-            sed = [s1, s2, s3, s4, s5]
-            s.addSource(coord, sed, [0])
+            coord = np.array([x, y, z])
+            sed = np.array([s1, s2, s3, s4, s5])
+            s.addSource(coord, sed, [0.0])
         print(s)
         s.write(out)

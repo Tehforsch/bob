@@ -1,9 +1,14 @@
+from typing import Dict, Any
+
 import matplotlib.pyplot as plt
 import numpy as np
 
+from bob.snapshot import Snapshot
+from bob.basicField import BasicField
+
 
 class Scatter3D:
-    def __init__(self, snapshot, field, treshold):
+    def __init__(self, snapshot: Snapshot, field: BasicField, treshold: float) -> None:
         self.snapshot = snapshot
         self.field = field
         self.vmin = 0
@@ -12,8 +17,10 @@ class Scatter3D:
         if self.field.name != "Coordinates":
             self.array = field.getData(snapshot)
 
-    def plot(self, ax, **plotSettings):
-        ax = get3DAx()
+    def plot(self, ax: plt.axes, **plotSettings: Dict[str, Any]) -> None:
+        from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
+
+        ax = plt.figure().add_subplot(111, projection="3d")
         if self.field.name == "Coordinates":
             coords = [self.snapshot.coordinates[:, i] for i in range(3)]
             print(coords)
@@ -23,17 +30,3 @@ class Scatter3D:
             coords = [self.snapshot.coordinates[where, i] for i in range(3)]
 
             ax.scatter(*coords, c=self.array[where], **plotSettings)
-
-
-def get3DAx():
-    from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
-
-    return plt.figure().add_subplot(111, projection="3d")
-
-
-def f1(k: int):
-    return k
-
-
-def f2(x: str):
-    f1(x)
