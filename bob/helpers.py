@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Callable
 import numpy as np
 from bob.snapshot import Snapshot
 from bob.simulation import Simulation
@@ -10,7 +10,7 @@ def getMeanValue(snap: Snapshot, field: Field) -> float:
     return np.mean(field.getData(snap))
 
 
-def getTimes(sim: Simulation) -> List[float]:
+def getTimes(sim: Simulation) -> np.ndarray:
     return unitNpArray([snapshot.time for snapshot in sim.snapshots])
 
 

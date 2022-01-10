@@ -8,6 +8,7 @@ from bob.postprocessingFunctions import (
     PlotFunction,
     SingleSimPlotFunction,
     SingleSnapshotPlotFunction,
+    SingleSnapshotPostprocessingFunction,
     CompareSimSingleSnapshotPlotFunction,
 )
 from bob.simulationSet import SimulationSet
@@ -21,16 +22,15 @@ def isInSnapshotArgs(snap: Snapshot, args: argparse.Namespace) -> bool:
 
 def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
     try:
-        arg_num = int(arg_snap)
         if type(snap.number) == int:
+            arg_num = int(arg_snap)
             return snap.number == arg_num
+        else:
+            assert type(snap.number) == tuple
+            arg_tuple = tuple(int(x) for x in arg_snap.split(","))
+            return snap.number == arg_tuple
     except ValueError:
-        try:
-            arg_num = tuple(int(x) for x in arg_snap.split(","))
-            if type(snap.number) == tuple:
-                return snap.number == arg_num
-        except ValueError:
-            raise ("WRONG type of snapshot argument. Either pass an int or int,int for subbox snapshots")
+        raise ValueError("WRONG type of snapshot argument. Either pass an int or int,int for subbox snapshots")
 
 
 def runPlot(function: PlotFunction, sims: SimulationSet, args: argparse.Namespace) -> None:
@@ -75,7 +75,7 @@ def runCompareSimSingleSnapPlot(
             saveAndShow(Path(sims.folder, config.picFolder, function.name), args.show)
 
 
-def runSingleSnapshotPostprocessingFunction(function: SingleSnapshotPlotFunction, sims: SimulationSet, args: argparse.Namespace) -> None:
+def runSingleSnapshotPostprocessingFunction(function: SingleSnapshotPostprocessingFunction, sims: SimulationSet, args: argparse.Namespace) -> None:
     logging.info("Running {}".format(function.name))
     for sim in sims:
         logging.info("For sim {}".format(sim.name))

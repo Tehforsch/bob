@@ -14,7 +14,7 @@ from bob.postprocessingFunctions import (
     PlotFunction,
     SingleSimPlotFunction,
     SingleSnapshotPlotFunction,
-    SingleSnapPostprocessingFunction,
+    SingleSnapshotPostprocessingFunction,
 )
 
 
@@ -44,7 +44,7 @@ def main(args: argparse.Namespace, sims: SimulationSet) -> None:
             bob.plot.runSingleSimPlot(function, sims, args)
         elif isinstance(function, SingleSnapshotPlotFunction):
             bob.plot.runSingleSnapshotPlot(function, sims, args)
-        elif isinstance(function, SingleSnapPostprocessingFunction):
+        elif isinstance(function, SingleSnapshotPostprocessingFunction):
             bob.plot.runSingleSnapshotPostprocessingFunction(function, sims, args)
         elif type(function) == PostprocessingFunction:
             function(sims)

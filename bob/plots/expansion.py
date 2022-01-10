@@ -1,9 +1,9 @@
-from typing import List, Tuple
+from typing import List, Tuple, Any
 import numpy as np
 import matplotlib.pyplot as plt
-import quantities as pq
-from bob.basicField import BasicField
+import astropy.units as u
 
+from bob.basicField import BasicField
 from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
 from bob.postprocessingFunctions import addPlot
@@ -25,12 +25,12 @@ def getDistanceToCenter(coordinates: np.ndarray, center: np.ndarray) -> np.ndarr
     return np.linalg.norm(coordinates - center, axis=1)
 
 
-def getIonizationRadius(snapshot: Snapshot, center: np.ndarray, val: float = 0.5) -> float:
+def getIonizationRadius(snapshot: Snapshot, center: np.ndarray, val: float = 0.5) -> u.Quantity:
     coordinates = snapshot.coordinates
     field = BasicField("ChemicalAbundances", 1)
     data = field.getData(snapshot)
 
-    def valueFunction(radius):
+    def valueFunction(radius: u.Quantity) -> u.Quantity:
         getIonization(coordinates, data, center, radius)
 
     return bisect(valueFunction, val, 0, 1, precision=0.00001) * snapshot.lengthUnit
@@ -40,7 +40,7 @@ def analyticalRTypeExpansion(t: np.ndarray) -> np.ndarray:
     return (1 - np.exp(-t)) ** (1.0 / 3)
 
 
-def analyticalDTypeExpansion(t: np.ndarray, ci: float, stroemgrenRadius: float) -> np.ndarray:
+def analyticalDTypeExpansion(t: np.ndarray, ci: u.Quantity, stroemgrenRadius: u.Quantity) -> u.Quantity:
     return stroemgrenRadius * ((1 + 7 / 4 * ci * t / stroemgrenRadius) ** (4.0 / 7.0)).simplified
 
 
@@ -48,7 +48,7 @@ def getRadii(
     sim: Simulation,
     treshold: float = 0.5,
     sourcePos: np.ndarray = np.array([0.5, 0.5, 0.5]),
-) -> List[float]:
+) -> np.ndarray:
     return unitNpArray([(getIonizationRadius(snapshot, sourcePos, treshold)) for snapshot in sim.snapshots])
 
 
@@ -90,17 +90,19 @@ def getExpansionData(
     recombinationTime.units = "Myr"
     nE = nH  # We can probably assume this
     assert len(sim.sources) == 1
-    photonRate = sim.sources.sed[0, 2] / pq.s
+    photonRate = sim.sources.sed[0, 2] / u.s
     stroemgrenRadius = (3 * photonRate / (4 * np.pi * alphaB * nE ** 2)) ** (1 / 3.0)
     stroemgrenRadius.units = "kpc"
     print(f"Mass density: {nH*protonMass}, Number density: {nH}")
     print(f"Recombination time: {recombinationTime}, Stroemgren radius: {stroemgrenRadius}")
     times = (getTimes(sim) / recombinationTime).simplified
     radii = (getRadii(sim) / stroemgrenRadius).simplified
-    error = [
-        np.abs(radius - analyticalRTypeExpansion(time)) / (1e-10 + analyticalRTypeExpansion(time)) if time > 0 else 0
-        for (time, radius) in zip(times, radii)
-    ]
+    error = np.array(
+        [
+            np.abs(radius - analyticalRTypeExpansion(time)) / (1e-10 + analyticalRTypeExpansion(time)) if time > 0 else 0
+            for (time, radius) in zip(times, radii)
+        ]
+    )
     return times, radii, error, recombinationTime, stroemgrenRadius
 
 

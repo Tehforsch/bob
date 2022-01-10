@@ -10,7 +10,7 @@ class PostprocessingFunction:
         return self.f(*args, **kwargs)
 
 
-class SingleSnapPostprocessingFunction(PostprocessingFunction):
+class SingleSnapshotPostprocessingFunction(PostprocessingFunction):
     pass
 
 
@@ -51,8 +51,8 @@ def addPostprocessing(
 
 def addSingleSnapshotPostprocessing(
     name: Optional[str],
-) -> Callable[[Callable[..., Any]], SingleSnapPostprocessingFunction]:
-    return addToList(name, SingleSnapPostprocessingFunction)
+) -> Callable[[Callable[..., Any]], SingleSnapshotPostprocessingFunction]:
+    return addToList(name, SingleSnapshotPostprocessingFunction)
 
 
 def addPlot(name: Optional[str]) -> Callable[[Callable[..., Any]], PlotFunction]:

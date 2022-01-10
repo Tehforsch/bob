@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Dict, Any
 import numpy as np
 import matplotlib.pyplot as plt
-import quantities as pq
+import astropy.units as u
 from bob.simulation import Simulation
 from bob.combinedField import CombinedField
 from bob.tresholdField import TresholdField
@@ -15,7 +15,7 @@ from bob.config import npRed, npBlue
 
 
 @addSingleSimPlot(None)
-def shadowing(ax: plt.axes, sim: Simulation) -> int:
+def shadowing(ax: plt.axes, sim: Simulation) -> None:
     center = np.array([0.5, 0.5, 0.5])
     axis = np.array([1.0, 0.0, 0.0])
     abundance = BasicField("ChemicalAbundances", 1)
@@ -27,12 +27,9 @@ def shadowing(ax: plt.axes, sim: Simulation) -> int:
     snap = sim.snapshots[-1]
     voronoiSlice(ax, sim, snap, field, axis)
     assert sim.params["densityFunction"] in ["shadowing1", "shadowing2"]
-    if sim.params["densityFunction"] == "shadowing1":
-        params = shadowing1Params
-    else:
-        params = shadowing2Params
-    obstacleSize = params["size"]
-    obstacleCenter = params["center"]
+    params: Dict[str, Any] = shadowing1Params if sim.params["densityFunction"] == "shadowing1" else shadowing2Params
+    obstacleSize: float = params["size"]
+    obstacleCenter: np.ndarray = params["center"]
     # ax.plot((center[2], center[1]), (obstacleCenter[2], obstacleCenter[1] - obstacleSize))
     x, y = center[2], center[1]
     ox, oy = obstacleCenter[2], obstacleCenter[1]
@@ -44,11 +41,11 @@ def shadowing(ax: plt.axes, sim: Simulation) -> int:
     # ax.plot((center[1], center[2]), (obstacleCenter[2], obstacleCenter[1] + obstacleSize))
 
 
-def bisectSnapTime(snaps: List[Snapshot], desiredTime: float):
+def bisectSnapTime(snaps: List[Snapshot], desiredTime: float) -> Snapshot:
     return snaps[bisectSnapTimeIndex(snaps, desiredTime, 0, len(snaps))]
 
 
-def bisectSnapTimeIndex(snaps: List[Snapshot], desiredTime: float, minIndex: int, maxIndex: int):
+def bisectSnapTimeIndex(snaps: List[Snapshot], desiredTime: float, minIndex: int, maxIndex: int) -> int:
     middle = int((minIndex + maxIndex) / 2)
     print(minIndex, maxIndex, middle)
     if minIndex == middle or maxIndex == middle:
@@ -63,8 +60,8 @@ def bisectSnapTimeIndex(snaps: List[Snapshot], desiredTime: float, minIndex: int
 
 
 @addSingleSimPlot(None)
-def shadowingDouble(ax: plt.axes, sim: Simulation) -> int:
-    desiredTimes = [3200 * pq.year, 6500 * pq.year, 32000 * pq.year, 64000 * pq.year]
+def shadowingDouble(ax: plt.axes, sim: Simulation) -> None:
+    desiredTimes = [3200 * u.year, 6500 * u.year, 32000 * u.year, 64000 * u.year]
     snaps = [bisectSnapTime(sim.snapshots, desiredTime) for desiredTime in desiredTimes]
     print(snaps)
     for snap in snaps:
@@ -76,15 +73,3 @@ def shadowingDouble(ax: plt.axes, sim: Simulation) -> int:
         field = CombinedField([abundance, obstacle], [npRed, npBlue])
 
         voronoiSlice(ax, sim, snap, field, axis)
-
-
-# def findSnapshotsAtTimes(snapshots: List[Snapshot], times: List[float]) -> Iterator[Snapshot]:
-#     unit = 1000 * pq.year
-#     for time in times:
-#         bestSnap = min(snapshots, key=lambda snap: abs(snap.time.rescale(unit) - time.rescale(unit)))
-#         relativeError = (bestSnap.time - time) / time
-#         if relativeError > 0.01:
-#             print(f"ERR: Wanted snap at time {time} but the closest one is at {bestSnap.time}")
-#         else:
-#             print(f"Wanted snap at time {time}, found {bestSnap.time}")
-#         yield bestSnap

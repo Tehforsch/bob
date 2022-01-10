@@ -1,4 +1,6 @@
+from typing import List
 import numpy as np
+
 from bob.postprocessingFunctions import addSingleSnapshotPlot
 import matplotlib.pyplot as plt
 from bob.snapshot import Snapshot
@@ -34,7 +36,7 @@ basicFields = [
 
 def createVoronoiSlicePlots() -> None:
     for basicField in basicFields:
-        for (axis, axisName) in zip([[1, 0, 0], [0, 1, 0], [0, 0, 1]], ["X", "Y", "Z"]):
+        for (axis, axisName) in zip([np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([0, 0, 1])], ["X", "Y", "Z"]):
 
             def thisSlicePlot(
                 ax: plt.axes,
