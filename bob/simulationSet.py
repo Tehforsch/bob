@@ -25,7 +25,6 @@ class SimulationSet(list):
             return tuple((k, sim.params[k]) for k in remainingVariedParams)
 
         configurations = set(getConfiguration(sim) for sim in self)
-        print(configurations)
         return [
             (
                 dict(configuration),
@@ -49,5 +48,16 @@ class SimulationSet(list):
 
 
 def getSimsFromFolder(args: argparse.Namespace) -> SimulationSet:
-    for folder in os.walk(args.simFolder):
-        print(folder)
+    folders = [folder for folder in os.listdir(args.simFolder) if stringIsInt(folder) and Path(folder)]
+    folders.sort(key=lambda x: int(x))
+    folders = [Path(folder) for folder in folders]
+    return SimulationSet(args.simFolder, (Simulation(folder) for folder in folders))
+
+
+def stringIsInt(s: str) -> bool:
+    print(s)
+    try:
+        _ = int(s)
+        return True
+    except ValueError:
+        return False

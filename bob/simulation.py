@@ -18,10 +18,9 @@ from bob.sources import Sources, getSourcesFromParamFile
 
 
 class Simulation:
-    def __init__(self, folder: Path, substitutions: Dict[str, Any]) -> None:
+    def __init__(self, folder: Path) -> None:
         self.folder = folder
         self.params = self.readFiles()
-        self.params.updateParams(substitutions)
         self.params.setDerivedParams()
         self.binaryFile = Path(self.folder, config.binaryName)
 
