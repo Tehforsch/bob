@@ -55,7 +55,6 @@ def getSimsFromFolder(args: argparse.Namespace) -> SimulationSet:
 
 
 def stringIsInt(s: str) -> bool:
-    print(s)
     try:
         _ = int(s)
         return True

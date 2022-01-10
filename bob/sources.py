@@ -1,9 +1,12 @@
+from typing import TYPE_CHECKING
+
 from pathlib import Path
 from typing import Any, Union, List, Optional
 import numpy as np
 import sys
 
-from bob.simulation import Simulation
+if TYPE_CHECKING:
+    from bob.simulation import Simulation
 
 
 class Sources:
@@ -82,7 +85,7 @@ class Sources:
         return s
 
 
-def getSourcesFromParamFile(sim: Simulation) -> Sources:
+def getSourcesFromParamFile(sim: "Simulation") -> Sources:
     s = Sources()
     s.coord = np.array(
         [
