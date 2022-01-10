@@ -3,7 +3,6 @@ import shutil
 import logging
 import argparse
 
-
 from bob import postprocess, config
 from bob import postprocessingFunctions
 from bob.simulationSet import getSimsFromFolder

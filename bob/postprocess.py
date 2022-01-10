@@ -1,3 +1,4 @@
+import os
 import argparse
 from typing import Sequence
 from pathlib import Path
@@ -26,15 +27,13 @@ def getSpecifiedFunctions(args: argparse.Namespace, functions: Sequence[Postproc
 
 
 def setFontSizes() -> None:
-    plt.rcParams["axes.labelsize"] = config.fontSize
-    plt.rcParams["axes.titlesize"] = config.fontSize
-    plt.rcParams["legend.fontsize"] = config.fontSize
-    plt.rcParams["xtick.labelsize"] = config.fontSize
-    plt.rcParams["ytick.labelsize"] = config.fontSize
+    file_path = Path(os.path.realpath(__file__))
+    plt.style.use(Path(file_path).parent / "../styles/plot.mlpstyle")
 
 
 def main(args: argparse.Namespace, sims: SimulationSet) -> None:
     setFontSizes()
+
     picFolder = Path(args.simFolder, config.picFolder)
     picFolder.mkdir(exist_ok=True)
     for function in getSpecifiedFunctions(args, postprocessingFunctions):

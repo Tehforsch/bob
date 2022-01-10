@@ -109,5 +109,5 @@ def getNiceParamName(k: str, v: Any) -> str:
     if k == "ReferenceGasPartMass":
         return ""
     if k == "InitCondFile":
-        return "Resolution: {}".format(v.replace("ics_", ""))
+        return "${}^3$".format(v.replace("ics_", ""))
     return "{}: {}".format(k, v)

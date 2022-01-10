@@ -1,4 +1,4 @@
-from typing import Iterable, List, Any, Tuple
+from typing import Iterable, List, Any, Tuple, Dict
 import os
 from pathlib import Path
 import argparse
@@ -17,11 +17,11 @@ class SimulationSet(list):
     def doesVary(self, k: str) -> bool:
         return len(set(sim.params[k] for sim in self)) > 1
 
-    def quotient(self, parameters: List[str]) -> List[Any]:
+    def quotient(self, parameters: List[str]) -> List[Tuple[Dict[str, Any], "SimulationSet"]]:
         remainingVariedParams = self.variedParams - set(parameters)
 
         def getConfiguration(sim: Simulation) -> Tuple[Tuple[Any, Any], ...]:
-            return tuple((k, sim.params[k]) for k in remainingVariedParams)
+            return tuple((k, sim.params[k]) for k in parameters)
 
         configurations = set(getConfiguration(sim) for sim in self)
         return [
@@ -40,7 +40,7 @@ class SimulationSet(list):
         result = ",".join(getNiceParamName(k, sim.params[k]) for k in self.variedParams if getNiceParamName(k, sim.params[k]) != "")
         return result
 
-    def getNiceSubsetName(self, params: List[str], simSet: "SimulationSet") -> str:
+    def getNiceSubsetName(self, params: Dict[str, Any], simSet: "SimulationSet") -> str:
         assert all(sim in self for sim in simSet)
         result = ",".join(getNiceParamName(k, simSet[0].params[k]) for k in params if getNiceParamName(k, simSet[0].params[k]) != "")
         return result
