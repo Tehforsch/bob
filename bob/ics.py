@@ -95,6 +95,7 @@ class ICS:
                 newMass[c] = volume[c] * densityFunction(coord) / self.header["UnitMass_in_g"] * self.header["UnitLength_in_cm"] ** 3
             relDifference = np.absolute(oldMasses - newMass) / np.absolute(oldMasses)
             print("Mean density:", np.mean(newMass / volume))
+            print("Variance density:", np.var(newMass / volume))
             print(f"Mean relative difference in target mass: {np.mean(relDifference)}")
         with hp.File(outputFile, "r+") as f:
             dens = np.ones(coords.shape[0]) * densityFunction(coord) * self.header["UnitLength_in_cm"] ** 3 / self.header["UnitMass_in_g"]
