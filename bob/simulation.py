@@ -1,93 +1,53 @@
 import numpy as np
-from typing import Dict, Any, List, Tuple
-import shutil
-import os
-import argparse
+from typing import Dict, Any, List, Tuple, Union, Optional
 from pathlib import Path
-import filecmp
-import logging
 import re
+import yaml
 
-from bob import localConfig, config, util
-from bob.exceptions import CompilationError
-from bob.paramFile import ConfigFile, InputFile, JobFile, IcsParamFile, MiscFile
+import bob.config as config
 from bob.util import memoize
-from bob.params import Params
 from bob.snapshot import Snapshot
 from bob.sources import Sources, getSourcesFromParamFile
+
+
+def getParams(folder: Path) -> Dict[str, Any]:
+    bobParamsFile = folder / "bobParams.yaml"
+    contents = yaml.load(bobParamsFile.open("r"), Loader=yaml.SafeLoader)
+    result = {}
+    for (k, v) in contents.items():
+        readValue = getParamValue(*list(v.items())[0])
+        result[k] = readValue
+    return result
+
+
+def getParamValue(type_: str, value: Any) -> Union[str, bool, int, float, List[int], List[bool], List[float], List[str]]:
+    if type_ == "Bool":
+        return bool(value)
+    if type_ == "Str":
+        return str(value)
+    if type_ == "Int":
+        return int(value)
+    if type_ == "Float":
+        return float(value[0])
+    else:
+        print(type_)
+        return NotImplemented
 
 
 class Simulation:
     def __init__(self, folder: Path) -> None:
         self.folder = folder
-        self.params = self.readFiles()
-        self.params.setDerivedParams()
-        self.binaryFile = Path(self.folder, config.binaryName)
+        self.params = getParams(folder)
+        self.replaceNumCoresInParams()
 
-    def readFiles(self) -> Params:
-        self.configFile = ConfigFile(Path(self.folder, config.configFilename))
-        self.inputFile = InputFile(Path(self.folder, config.inputFilename))
-        self.jobFile = JobFile(Path(self.folder, config.jobFilename), localConfig.jobParams)
-        paramFileList = [self.configFile, self.inputFile, self.jobFile]
-        icsFilePath = Path(self.folder, config.icsParamFileName)
-        if icsFilePath.is_file():
-            self.icsFile = IcsParamFile(icsFilePath)
-            paramFileList.append(self.icsFile)
-        return Params(paramFileList)
-
-    def compileArepo(self, quiet: bool = False) -> None:
-        self.copyConfigFile()
-        logging.info("Compiling arepo.")
-        if config.srcArepoConfigFile.is_file():
-            os.remove(config.srcArepoConfigFile)
-        process = util.runCommand(
-            config.arepoCompilationCommand,
-            path=localConfig.arepoDir,
-            printOutput=not quiet,
-            shell=True,
-        )
-        if process.returncode != 0:
-            raise CompilationError()
-        self.copyBinary()
-        self.copySource()
-        self.copyArepoconfig()
-
-    def copyConfigFile(self) -> None:
-        targetConfigFile = Path(localConfig.arepoDir, config.configFilename)
-        if targetConfigFile.is_file():
-            if filecmp.cmp(str(self.configFile.filename), str(targetConfigFile)):
-                logging.info("Config file identical, not copying again to preserve compilation state.")
+    def replaceNumCoresInParams(self) -> None:
+        for line in self.log:
+            match = re.match("Running with ([0-9]+) MPI tasks", line)
+            if match is not None:
+                self.params["numCores"] = int(match.groups()[0])
                 return
-        shutil.copyfile(self.configFile.filename, targetConfigFile)
 
-    def copyBinary(self) -> None:
-        sourceFile = Path(localConfig.arepoDir, config.binaryName)
-        shutil.copy(sourceFile, self.binaryFile)
-
-    def copySource(self) -> None:
-        for srcFile in config.srcFiles:
-            source = Path(localConfig.arepoDir, srcFile)
-            target = Path(self.folder, config.sourceOutputFolderName, srcFile)
-            if source.is_file():
-                shutil.copy(source, target)
-            else:
-                shutil.copytree(source, target)
-
-    def copyArepoconfig(self) -> None:
-        """Copy the arepoconfig.h file. This file is generated from the Config.sh when arepo compiles
-        and is necessary in the src folder if clangd is supposed to understand the code at all."""
-        source = Path(localConfig.arepoDir, config.arepoConfigBuildFile)
-        target = Path(localConfig.arepoDir, config.arepoConfigSrcFile)
-        shutil.copy(source, target)
-
-    def run(self, verbose: bool) -> None:
-        assert self.binaryFile.is_file(), "Binary does not exist. Not starting job. Did you forget to specify -m (tell bob to compile arepo)?"
-        util.runCommand(
-            [localConfig.runJobCommand, str(self.jobFile.filename.name)],
-            path=self.jobFile.filename.parent,
-            shell=False,
-            printOutput=verbose,
-        )
+        print("Failed to read number of cores from log file, using {} instead".format(self.params["numCores"]))
 
     @property  # type: ignore
     def name(self) -> str:
@@ -96,18 +56,22 @@ class Simulation:
     @property  # type: ignore
     @memoize
     def log(self) -> List[str]:
-        with Path(self.folder, self.jobFile["logFile"]).open("r") as f:
+        with (self.folder / config.arepoLogFile).open("r") as f:
             return f.readlines()
 
     @property
-    def runTime(self) -> float:
-        return NotImplemented
-        # for line in self.log[::-1]:
-        #     match = re.match(config.runTimePattern, line)
-        #     if match is not None:
-        #         return float(match.groups()[0])
-        # # assert False, f"Could not read runtime from log. Did the simulation finish? ({str(self)})"
-        # return None
+    def runTime(self) -> Optional[float]:
+        total = 0.0
+        for line in self.log[::-1]:
+            if self.params["SWEEP"]:
+                match = re.match(config.runTimePatternSweep, line)
+            else:
+                match = re.match(config.runTimePatternSprai, line)
+            if match is not None:
+                total += float(match.groups()[0])
+        if total == 0.0:
+            return None
+        return total
 
     def __repr__(self) -> str:
         return f"Sim{self.name}"

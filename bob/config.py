@@ -27,7 +27,10 @@ arepoConfigBuildFile = "build/arepoconfig.h"
 arepoConfigSrcFile = "src/arepoconfig.h"
 
 # Various arepo things
-runTimePattern = "Code run for ([0-9.]*) seconds!"
+runTimePatternSweep = "Finished [0-9+]+ sweeps in ([0-9.+]+)s"
+runTimePatternSprai = "SX: RUN [0-9]+ took ([0-9.+-e]+) s"
+
+arepoLogFile = "stdout.log"
 
 # Bob names
 substitutionFileName = "sims"

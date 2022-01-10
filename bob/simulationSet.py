@@ -11,8 +11,7 @@ class SimulationSet(list):
         super().__init__(sims)
         self.folder = folder
         assert len(self) > 0, "Error: No sim found!"
-        self.derivedParams = set.union(*(f.params.getDerivedParams() for f in self))
-        self.variedParams = set(k for k in self[0].params if self.doesVary(k) and k not in self.derivedParams)
+        self.variedParams = set(k for k in self[0].params if self.doesVary(k))
         self.commonParams = self[0].params.keys() - self.variedParams
 
     def doesVary(self, k: str) -> bool:
@@ -21,8 +20,8 @@ class SimulationSet(list):
     def quotient(self, parameters: List[str]) -> List[Any]:
         remainingVariedParams = self.variedParams - set(parameters)
 
-        def getConfiguration(sim: Simulation) -> Iterable[Tuple[str, Any]]:
-            return ((k, sim.params[k]) for k in remainingVariedParams)
+        def getConfiguration(sim: Simulation) -> Tuple[Tuple[Any, Any], ...]:
+            return tuple((k, sim.params[k]) for k in remainingVariedParams)
 
         configurations = set(getConfiguration(sim) for sim in self)
         return [

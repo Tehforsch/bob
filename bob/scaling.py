@@ -25,6 +25,7 @@ def speedup(ax: plt.axes, sims: SimulationSet) -> None:
     for (params, simSet) in getScalingSimSets(sims):
         numCores = [sim.params["numCores"] for sim in simSet]
         runTimes = [sim.runTime for sim in simSet]
+        print(numCores, runTimes)
         # ax.xscale("log")
         baseTime = runTimes[0]
         speedup = [0 if runTime is None else baseTime / runTime for runTime in runTimes]
