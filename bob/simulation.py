@@ -3,6 +3,7 @@ from typing import Dict, Any, List, Tuple, Union, Optional
 from pathlib import Path
 import re
 import yaml
+from astropy.cosmology import FlatLambdaCDM
 
 import bob.config as config
 from bob.util import memoize
@@ -102,6 +103,12 @@ class Simulation:
             assert len(lines) == 1
             minX, maxX, minY, maxY, minZ, maxZ = [float(x) for x in lines[0].split(" ")]
             return (np.array([minX, minY, minZ]), np.array([maxX, maxY, maxZ]))
+
+    def getCosmology(self) -> FlatLambdaCDM:
+        Ob0 = self.params["OmegaBaryon"]
+        Om0 = self.params["Omega0"]
+        H0 = self.params["HubbleParam"] * 100.0
+        return FlatLambdaCDM(H0=H0, Om0=Om0, Ob0=Ob0)
 
     @property
     def resolution(self) -> int:

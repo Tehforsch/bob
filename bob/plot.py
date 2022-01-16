@@ -14,6 +14,7 @@ from bob.postprocessingFunctions import (
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
 from bob import config
+import bob.plots.ionization
 
 
 def isInSnapshotArgs(snap: Snapshot, args: argparse.Namespace) -> bool:
@@ -87,7 +88,7 @@ def runSingleSnapshotPostprocessingFunction(function: SingleSnapshotPostprocessi
 
 def saveAndShow(filename: Path, show: bool) -> None:
     filename.parent.mkdir(exist_ok=True)
-    plt.savefig(str(filename) + ".png", dpi=config.dpi)
+    plt.savefig(str(filename) + ".pdf", dpi=config.dpi)
     if show:
         plt.show()
     plt.clf()
