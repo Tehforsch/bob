@@ -1,4 +1,5 @@
 import re
+import itertools
 from typing import List, Tuple, Any
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,7 +11,7 @@ import astropy.units as u
 
 from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
-from bob.postprocessingFunctions import addPlot
+from bob.postprocessingFunctions import addMultiPlot
 
 
 class IonizationData:
@@ -34,32 +35,34 @@ class IonizationData:
         self.redshift = z_at_value(cosmology.scale_factor, self.scale_factor)
 
 
-@addPlot(None)
-def ionization(ax1: plt.axes, sims: SimulationSet) -> None:
+@addMultiPlot(None)
+def ionization(ax1: plt.axes, simSets: List[SimulationSet]) -> None:
     _, (ax1) = ax1.subplots()
-    data = IonizationData([sim for sim in sims])
-    # ax1.set_yscale("log")
-    # ax1.set_xlim(10, 6.5)
-    # ax1.set_xlabel("z")
-    # ax1.set_ylabel("$x_{\\mathrm{H}+}$")
-    # ax1.plot(data.redshift, data.massAv, label="Mass av.", marker=".")
-    # ax1.plot(data.redshift, data.volumeAv, label="Volume av.", marker="o")
-    # ax1.plot(data.redshift, 1.0 - data.massAv, label="Mass av.", marker=".")
-    # ax1.plot(data.redshift, 1.0 - data.volumeAv, label="Volume av.", marker="o")
-    # ax1.legend()
+    data = [IonizationData([sim for sim in sims]) for sims in simSets]
     plt.style.use("classic")
-    plot_xhi([data.neutralVolumeAv, data.neutralMassAv], [data.redshift, data.redshift], ["L35N270TNG volume av.", "L35N270TNG mass av."])
+    plot_xhi(
+        [(d.neutralVolumeAv, d.neutralMassAv) for d in data],
+        [d.redshift for d in data],
+        ["L35N270TNG", "L35N270TNG more pbc iterations", "L35N270TNG lower timestep"],
+    )
     plt.legend(loc="center right")
 
 
 def plot_xhi(
-    sim_xhis_list: List[np.ndarray], sim_zeds_list: List[np.ndarray], sim_label_list: List[str], xhi_min: float = 1e-5, output_path: str = "."
+    sim_xhis_list: List[Tuple[np.ndarray, np.ndarray]],
+    sim_zeds_list: List[np.ndarray],
+    sim_label_list: List[str],
+    xhi_min: float = 1e-5,
+    output_path: str = ".",
 ) -> List[plt.axes]:
     """
     This should be OK, but be aware I threw this together without testing the function
     I'm hoping that you can call the function from wherever so that you never have to see this very ugly code
     If you want several simulation curves, you'll want to handle the sim_xhis, sim_zeds, and sim_labels differently. In principle you'd only need to code some kind of loop around the .plot(...) statements in the function
     """
+    assert len(sim_xhis_list) == len(sim_zeds_list) == len(sim_label_list), "{} {} {}".format(
+        len(sim_xhis_list), len(sim_zeds_list), len(sim_label_list)
+    )
     # FIGURE SETUP
     label_font_size = 17
     tics_label_size = 15
@@ -212,8 +215,9 @@ def plot_xhi(
 
     # lin_xHI_ax.set_title('Average neutral fraction')
 
-    for (sim_xhis, sim_zeds, sim_label) in zip(sim_xhis_list, sim_zeds_list, sim_label_list):
-        lin_xHI_ax.plot(sim_zeds, sim_xhis, label=sim_label, linewidth=3)
+    for ((sim_xhis_volume, sim_xhis_mass), sim_zeds, sim_label) in zip(sim_xhis_list, sim_zeds_list, sim_label_list):
+        lin_xHI_ax.plot(sim_zeds, sim_xhis_volume, label="{} {}".format(sim_label, "Volume av."), linewidth=3)
+        lin_xHI_ax.plot(sim_zeds, sim_xhis_mass, label="{} {}".format(sim_label, "Mass av."), linewidth=3)
 
     lin_xHI_ax.set_xlim(4.2, 12)
 
@@ -254,8 +258,9 @@ def plot_xhi(
 
     log_xHI_ax.set_xlabel("z", fontsize=label_font_size)
 
-    for (sim_xhis, sim_zeds, sim_label) in zip(sim_xhis_list, sim_zeds_list, sim_label_list):
-        log_xHI_ax.plot(sim_zeds, sim_xhis, linewidth=3)
+    for ((sim_xhis_volume, sim_xhis_mass), sim_zeds, sim_label) in zip(sim_xhis_list, sim_zeds_list, sim_label_list):
+        log_xHI_ax.plot(sim_zeds, sim_xhis_volume, linewidth=3)
+        log_xHI_ax.plot(sim_zeds, sim_xhis_mass, linewidth=3)
 
     log_xHI_ax.set_yscale("log")
 

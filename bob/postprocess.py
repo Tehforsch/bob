@@ -13,6 +13,7 @@ from bob.postprocessingFunctions import (
     postprocessingFunctions,
     PostprocessingFunction,
     PlotFunction,
+    MultiPlotFunction,
     SingleSimPlotFunction,
     SingleSnapshotPlotFunction,
     SingleSnapshotPostprocessingFunction,
@@ -31,19 +32,22 @@ def setFontSizes() -> None:
     plt.style.use(Path(file_path).parent / "../styles/plot.mlpstyle")
 
 
-def main(args: argparse.Namespace, sims: SimulationSet) -> None:
+def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> None:
     setFontSizes()
 
-    picFolder = Path(args.simFolder, config.picFolder)
+    picFolder = Path(parent_folder, config.picFolder)
     picFolder.mkdir(exist_ok=True)
+    plotter = bob.plot.Plotter(parent_folder, sims, args.snapshots, args.show, args.quotient)
     for function in getSpecifiedFunctions(args, postprocessingFunctions):
         if isinstance(function, PlotFunction):
-            bob.plot.runPlot(function, sims, args)
+            plotter.runPlot(function)
+        elif isinstance(function, MultiPlotFunction):
+            plotter.runMultiPlot(function)
         elif isinstance(function, SingleSimPlotFunction):
-            bob.plot.runSingleSimPlot(function, sims, args)
+            plotter.runSingleSimPlot(function)
         elif isinstance(function, SingleSnapshotPlotFunction):
-            bob.plot.runSingleSnapshotPlot(function, sims, args)
+            plotter.runSingleSnapshotPlot(function)
         elif isinstance(function, SingleSnapshotPostprocessingFunction):
-            bob.plot.runSingleSnapshotPostprocessingFunction(function, sims, args)
-        elif type(function) == PostprocessingFunction:
-            function(sims)
+            plotter.runSingleSnapshotPostprocessingFunction(function)
+        else:
+            raise NotImplementedError

@@ -1,4 +1,5 @@
 from typing import Callable, Any, List, Dict, Union, Iterable
+import itertools
 import logging
 import sys
 from subprocess import Popen, PIPE, check_output
@@ -111,3 +112,10 @@ def getNiceParamName(k: str, v: Any) -> str:
     if k == "InitCondFile":
         return "${}^3$".format(v.replace("ics_", ""))
     return "{}: {}".format(k, v)
+
+
+def getCommonParentFolder(folders: List[Path]) -> Path:
+    parts = (folder.parts for folder in folders)
+    zippedParts = zip(*parts)
+    commonParts = (parts[0] for parts in itertools.takewhile(lambda parts: all(part == parts[0] for part in parts), zippedParts))
+    return Path(*commonParts)

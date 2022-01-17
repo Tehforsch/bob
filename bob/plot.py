@@ -1,3 +1,4 @@
+from typing import Iterator, List, Optional
 import itertools
 from pathlib import Path
 import argparse
@@ -6,6 +7,7 @@ import logging
 
 from bob.postprocessingFunctions import (
     PlotFunction,
+    MultiPlotFunction,
     SingleSimPlotFunction,
     SingleSnapshotPlotFunction,
     SingleSnapshotPostprocessingFunction,
@@ -15,10 +17,7 @@ from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
 from bob import config
 import bob.plots.ionization
-
-
-def isInSnapshotArgs(snap: Snapshot, args: argparse.Namespace) -> bool:
-    return args.snapshots is None or any(isSameSnapshot(arg_snap, snap) for arg_snap in args.snapshots)
+from bob.simulation import Simulation
 
 
 def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
@@ -34,61 +33,76 @@ def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
         raise ValueError("WRONG type of snapshot argument. Either pass an int or int,int for subbox snapshots")
 
 
-def runPlot(function: PlotFunction, sims: SimulationSet, args: argparse.Namespace) -> None:
-    logging.info("Running {}".format(function.name))
-    function(plt, sims)
-    saveAndShow(Path(sims.folder, config.picFolder, function.name), args.show)
+class Plotter:
+    def __init__(self, parent_folder: Path, sims: SimulationSet, snapshotFilter: List[str], show: bool, quotient_params: Optional[List[str]]) -> None:
+        self.pic_folder = parent_folder / config.picFolder
+        self.sims = sims
+        self.snapshotFilter = snapshotFilter
+        self.show = show
+        self.quotient_params = quotient_params
 
+    def runPlot(self, function: PlotFunction) -> None:
+        logging.info("Running {}".format(function.name))
+        function(plt, self.sims)
+        self.saveAndShow(function.name)
 
-def runSingleSimPlot(function: SingleSimPlotFunction, sims: SimulationSet, args: argparse.Namespace) -> None:
-    logging.info("Running {}".format(function.name))
-    for sim in sims:
-        logging.info("For sim {}".format(sim.name))
-        function(plt, sim)
-        simPicFolder = Path(sims.folder, config.picFolder, sim.name)
-        saveAndShow(Path(simPicFolder, function.name), args.show)
+    def runMultiPlot(self, function: MultiPlotFunction) -> None:
+        logging.info("Running {}".format(function.name))
+        quotient_params = self.quotient_params
+        if quotient_params is None:
+            quotient_params = function.default_quotient_params
+        quotient = [sims for (config, sims) in self.sims.quotient(quotient_params)]
+        function(plt, quotient)
+        self.saveAndShow(function.name)
 
+    def runSingleSimPlot(self, function: SingleSimPlotFunction) -> None:
+        logging.info("Running {}".format(function.name))
+        for sim in self.sims:
+            logging.info("For sim {}".format(sim.name))
+            function(plt, sim)
+            self.saveAndShow("{}_{}".format(sim.name, function.name))
 
-def runSingleSnapshotPlot(function: SingleSnapshotPlotFunction, sims: SimulationSet, args: argparse.Namespace) -> None:
-    logging.info("Running {}".format(function.name))
-    for sim in sims:
-        logging.info("For sim {}".format(sim.name))
-        for snap in sim.snapshots:
-            if isInSnapshotArgs(snap, args):
+    def runSingleSnapshotPlot(self, function: SingleSnapshotPlotFunction) -> None:
+        logging.info("Running {}".format(function.name))
+        for sim in self.sims:
+            logging.info("For sim {}".format(sim.name))
+            for snap in self.get_snapshots(sim):
                 logging.info("For snap {}".format(snap.name))
                 function(plt, sim, snap)
-                simPicFolder = Path(sims.folder, config.picFolder, sim.name)
-                saveAndShow(
-                    Path(simPicFolder, "{}_{}".format(function.name, snap.name)),
-                    args.show,
+                self.saveAndShow(
+                    "{}_{}_{}".format(sim.name, function.name, snap.name),
                 )
 
+    def runCompareSimSingleSnapPlot(
+        self,
+        function: CompareSimSingleSnapshotPlotFunction,
+    ) -> None:
+        for (sim1, sim2) in itertools.combinations(self.sims, r=2):
+            for (snap1, snap2) in zip(sim1.snapshots, sim2.snapshots):
+                assert snap1.time == snap2.time, f"Non-matching snapshots between sims {sim1.name} and {sim2.name}"
+                function(plt, sim1, sim2, snap1, snap2)
+                self.saveAndShow(function.name)
 
-def runCompareSimSingleSnapPlot(
-    function: CompareSimSingleSnapshotPlotFunction,
-    sims: SimulationSet,
-    args: argparse.Namespace,
-) -> None:
-    for (sim1, sim2) in itertools.combinations(sims, r=2):
-        for (snap1, snap2) in zip(sim1.snapshots, sim2.snapshots):
-            assert snap1.time == snap2.time, f"Non-matching snapshots between sims {sim1.name} and {sim2.name}"
-            function(plt, sim1, sim2, snap1, snap2)
-            saveAndShow(Path(sims.folder, config.picFolder, function.name), args.show)
-
-
-def runSingleSnapshotPostprocessingFunction(function: SingleSnapshotPostprocessingFunction, sims: SimulationSet, args: argparse.Namespace) -> None:
-    logging.info("Running {}".format(function.name))
-    for sim in sims:
-        logging.info("For sim {}".format(sim.name))
-        for snap in sim.snapshots:
-            if isInSnapshotArgs(snap, args):
+    def runSingleSnapshotPostprocessingFunction(self, function: SingleSnapshotPostprocessingFunction) -> None:
+        logging.info("Running {}".format(function.name))
+        for sim in self.sims:
+            logging.info("For sim {}".format(sim.name))
+            for snap in self.get_snapshots(sim):
                 logging.info("For snap {}".format(snap.name))
                 function(sim, snap)
 
+    def isInSnapshotArgs(self, snap: Snapshot) -> bool:
+        return self.snapshotFilter is None or any(isSameSnapshot(arg_snap, snap) for arg_snap in self.snapshotFilter)
 
-def saveAndShow(filename: Path, show: bool) -> None:
-    filename.parent.mkdir(exist_ok=True)
-    plt.savefig(str(filename) + ".pdf", dpi=config.dpi)
-    if show:
-        plt.show()
-    plt.clf()
+    def get_snapshots(self, sim: Simulation) -> Iterator[Snapshot]:
+        for snap in sim.snapshots:
+            if self.isInSnapshotArgs(snap):
+                yield snap
+
+    def saveAndShow(self, filename: str) -> None:
+        filepath = self.pic_folder / filename
+        filepath.parent.mkdir(exist_ok=True)
+        plt.savefig(str(filepath) + ".pdf", dpi=config.dpi)
+        if self.show:
+            plt.show()
+        plt.clf()

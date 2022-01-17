@@ -1,4 +1,5 @@
 from typing import Iterable, List, Any, Tuple, Dict
+import itertools
 import os
 from pathlib import Path
 import argparse
@@ -7,9 +8,8 @@ from bob.util import getNiceParamName
 
 
 class SimulationSet(list):
-    def __init__(self, folder: Path, sims: Iterable[Simulation]) -> None:
+    def __init__(self, sims: Iterable[Simulation]) -> None:
         super().__init__(sims)
-        self.folder = folder
         assert len(self) > 0, "Error: No sim found!"
         self.variedParams = set(k for k in self[0].params if self.doesVary(k))
         self.commonParams = self[0].params.keys() - self.variedParams
@@ -18,8 +18,6 @@ class SimulationSet(list):
         return len(set(sim.params[k] for sim in self)) > 1
 
     def quotient(self, parameters: List[str]) -> List[Tuple[Dict[str, Any], "SimulationSet"]]:
-        remainingVariedParams = self.variedParams - set(parameters)
-
         def getConfiguration(sim: Simulation) -> Tuple[Tuple[Any, Any], ...]:
             return tuple((k, sim.params[k]) for k in parameters)
 
@@ -28,7 +26,6 @@ class SimulationSet(list):
             (
                 dict(configuration),
                 SimulationSet(
-                    self.folder,
                     [sim for sim in self if getConfiguration(sim) == configuration],
                 ),
             )
@@ -46,11 +43,25 @@ class SimulationSet(list):
         return result
 
 
-def getSimsFromFolder(args: argparse.Namespace) -> SimulationSet:
-    folders = [folder for folder in os.listdir(args.simFolder) if stringIsInt(folder) and Path(folder)]
-    folders.sort(key=lambda x: int(x))
-    folders = [Path(folder) for folder in folders]
-    return SimulationSet(args.simFolder, (Simulation(folder) for folder in folders))
+def isSimulationDirectory(folder: str) -> bool:
+    # This is a bit ugly and needs to change to allow different simulation names. The check probably
+    # needs to be removed and replaced by strictly adhering to a directory structure
+    return stringIsInt(folder) and Path(folder).is_dir()
+
+
+def getSimsFromFolder(sim_set_folder: Path) -> SimulationSet:
+    folders = [sim_set_folder / Path(folder) for folder in os.listdir(sim_set_folder) if stringIsInt(folder)]
+    folders.sort(key=lambda x: int(str(x.stem)))
+    return SimulationSet((Simulation(folder) for folder in folders))
+
+
+def joined(simSets: List[SimulationSet]) -> SimulationSet:
+    return SimulationSet(itertools.chain(*simSets.__iter__()))
+
+
+def getSimsFromFolders(args: argparse.Namespace) -> SimulationSet:
+    sims = [getSimsFromFolder(folder) for folder in args.simFolders]
+    return joined(sims)
 
 
 def stringIsInt(s: str) -> bool:

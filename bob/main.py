@@ -5,14 +5,15 @@ import argparse
 
 from bob import postprocess, config
 from bob import postprocessingFunctions
-from bob.simulationSet import getSimsFromFolder
+from bob.simulationSet import getSimsFromFolders
 from bob.units import setupUnits
+from bob.util import getCommonParentFolder
 
 
 def setupArgs() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Postprocess arepo sims")
     functionNames = postprocessingFunctions.functionNames()
-    parser.add_argument("simFolder", type=Path, help="Sim folder")
+    parser.add_argument("simFolders", type=Path, nargs="*", help="Path to simulation directories")
     parser.add_argument(
         "--snapshots",
         nargs="+",
@@ -25,6 +26,7 @@ def setupArgs() -> argparse.Namespace:
         nargs="*",
         help="Select only some of the sims for postprocessing/running/compiling",
     )
+    parser.add_argument("-q", "--quotient", nargs="*", help="Parameters by which to divide the simulations into sets")
     parser.add_argument(
         "functions",
         choices=functionNames,
@@ -36,7 +38,6 @@ def setupArgs() -> argparse.Namespace:
     parser.add_argument("--recalc", action="store_true", help="Recalculate memoized results")
 
     args = parser.parse_args()
-    args.simFolder = args.simFolder.expanduser()
     return args
 
 
@@ -51,7 +52,8 @@ def main() -> None:
     args = setupArgs()
     setupUnits()
     setupLogging(args)
-    sims = getSimsFromFolder(args)
+    sims = getSimsFromFolders(args)
     if args.recalc:
         shutil.rmtree(config.memoizeDir)
-    postprocess.main(args, sims)
+    folder = getCommonParentFolder(args.simFolders)
+    postprocess.main(args, folder, sims)

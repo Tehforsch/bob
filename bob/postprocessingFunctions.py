@@ -1,4 +1,9 @@
-from typing import Callable, Any, Dict, List, Optional
+import matplotlib.pyplot as plt
+from abc import abstractmethod
+from typing import Callable, Any, List, Optional
+from bob.simulation import Simulation
+from bob.simulationSet import SimulationSet
+from bob.snapshot import Snapshot
 
 
 class PostprocessingFunction:
@@ -6,47 +11,54 @@ class PostprocessingFunction:
         self.f = f
         self.name = name
 
-    def __call__(self, *args: List[Any], **kwargs: Dict[str, Any]) -> None:
-        return self.f(*args, **kwargs)
-
 
 class SingleSnapshotPostprocessingFunction(PostprocessingFunction):
-    pass
+    def __call__(self, sim: Simulation, snap: Snapshot) -> None:
+        return self.f(sim, snap)
 
 
 class PlotFunction(PostprocessingFunction):
-    pass
+    def __call__(self, axes: plt.axes, sims: SimulationSet) -> None:
+        return self.f(axes, sims)
+
+
+class MultiPlotFunction(PostprocessingFunction):
+    def __init__(self, f: Callable[..., Any], name: str) -> None:
+        super().__init__(f, name)
+        self.default_quotient_params: List[str] = []
+
+    def __call__(self, axes: plt.axes, sims: List[SimulationSet]) -> None:
+        return self.f(axes, sims)
 
 
 class SingleSimPlotFunction(PostprocessingFunction):
-    pass
+    def __call__(self, sim: Simulation, snap: Snapshot) -> None:
+        return self.f(sim, snap)
 
 
 class SingleSnapshotPlotFunction(PostprocessingFunction):
-    pass
+    def __call__(self, axes: plt.axes, sim: Simulation, snap: Snapshot) -> None:
+        return self.f(axes, sim, snap)
 
 
 class CompareSimSingleSnapshotPlotFunction(PostprocessingFunction):
-    pass
+    def __call__(self, axes: plt.axes, sim1: Simulation, sim2: Simulation, snap1: Snapshot, snap2: Snapshot) -> None:
+        return self.f(axes, sim1, sim2, snap1, snap2)
 
 
 # Giving up on mypy hints on this one
-def addToList(name: Optional[str], cls: Any) -> Callable[[Callable[..., Any]], Any]:
+def addToList(name: Optional[str], cls: Any, modify: Optional[Callable[..., Any]] = None) -> Callable[[Callable[..., Any]], Any]:
     def wrapper(f: Callable[..., Any]) -> Any:
         if name is None:
             newF = cls(f, f.__name__)
         else:
             newF = cls(f, name)
+        if modify is not None:
+            modify(newF)
         postprocessingFunctions.append(newF)
         return newF
 
     return wrapper
-
-
-def addPostprocessing(
-    name: Optional[str],
-) -> Callable[[Callable[..., Any]], PostprocessingFunction]:
-    return addToList(name, PostprocessingFunction)
 
 
 def addSingleSnapshotPostprocessing(
@@ -57,6 +69,13 @@ def addSingleSnapshotPostprocessing(
 
 def addPlot(name: Optional[str]) -> Callable[[Callable[..., Any]], PlotFunction]:
     return addToList(name, PlotFunction)
+
+
+def addMultiPlot(name: Optional[str], default_quotient_params: List[str] = []) -> Callable[[Callable[..., Any]], MultiPlotFunction]:
+    def modify(f: MultiPlotFunction) -> None:
+        f.default_quotient_params = default_quotient_params
+
+    return addToList(name, MultiPlotFunction, modify)
 
 
 def addSingleSimPlot(
