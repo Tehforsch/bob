@@ -15,7 +15,7 @@ class SimulationSet(list):
         self.commonParams = self[0].params.keys() - self.variedParams
 
     def doesVary(self, k: str) -> bool:
-        return len(set(sim.params[k] for sim in self)) > 1
+        return len(set(sim.params.get(k) for sim in self)) > 1
 
     def quotient(self, parameters: List[str]) -> List[Tuple[Dict[str, Any], "SimulationSet"]]:
         def getConfiguration(sim: Simulation) -> Tuple[Tuple[Any, Any], ...]:

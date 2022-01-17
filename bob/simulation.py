@@ -6,7 +6,6 @@ import yaml
 from astropy.cosmology import FlatLambdaCDM
 
 import bob.config as config
-from bob.util import memoize
 from bob.snapshot import Snapshot
 from bob.sources import Sources, getSourcesFromParamFile
 
@@ -55,7 +54,6 @@ class Simulation:
         return self.folder.name
 
     @property  # type: ignore
-    @memoize
     def log(self) -> List[str]:
         with (self.folder / config.arepoLogFile).open("r") as f:
             return f.readlines()
