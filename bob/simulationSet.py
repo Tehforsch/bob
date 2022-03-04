@@ -21,7 +21,8 @@ class SimulationSet(list):
         def getConfiguration(sim: Simulation) -> Tuple[Tuple[Any, Any], ...]:
             return tuple((k, sim.params[k]) for k in parameters)
 
-        configurations = set(getConfiguration(sim) for sim in self)
+        configurations = list(set(getConfiguration(sim) for sim in self))
+        configurations.sort()
         return [
             (
                 dict(configuration),

@@ -22,10 +22,13 @@ class IonizationData:
             cosmology = sim.getCosmology()
             # "Time" is just the scale factor here. To make sure that this is true, check that ComovingIntegrationOn is 1
             regex = re.compile("Time ([0-9.+]+): Volume Av. H ionization: ([0-9.+]+), Mass Av. H ionization: ([0-9.+]+)")
-            for line in sim.log:
-                match = regex.match(line)
-                if match is not None:
-                    data.append([float(x) for x in match.groups()])
+            try:
+                for line in sim.log:
+                    match = regex.match(line)
+                    if match is not None:
+                        data.append([float(x) for x in match.groups()])
+            except:
+                pass
 
         self.scale_factor = np.array([d[0] for d in data])
         self.volumeAv = np.array([d[1] for d in data])
@@ -40,8 +43,9 @@ def ionization(ax1: plt.axes, simSets: List[SimulationSet]) -> None:
     _, (ax1) = ax1.subplots()
     plt.style.use("classic")
 
-    labels = ["L35n540TNG", "L35n270TNG", "L35n270TNG (smaller $\Delta t$)"]
-    colors = ["b", "r", "g"]
+    # labels = [ "L35n270TNG", "L35n270TNG (smaller $\Delta t$)","L35n540TNG"]
+    labels = ["5%", "10%", "15%", "20%", "25%"]
+    colors = ["b", "r", "g", "b", "r"]
     assert len(labels) == len(simSets) == len(colors)
     linAx, logAx = setupIonizationPlot()
 

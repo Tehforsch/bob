@@ -51,6 +51,7 @@ class Plotter:
         quotient_params = self.quotient_params
         if quotient_params is None:
             quotient_params = function.default_quotient_params
+        print(self.sims.quotient(quotient_params))
         quotient = [sims for (config, sims) in self.sims.quotient(quotient_params)]
         function(plt, quotient)
         self.saveAndShow(function.name)

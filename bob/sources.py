@@ -18,8 +18,8 @@ class Sources:
         self.coord: np.ndarray = np.array([])
         self.sed: np.ndarray = np.array([])
         self.time: np.ndarray = np.array([])
-        self.sigma = None
-        self.energy = None
+        self.sigma: Optional[np.ndarray] = None
+        self.energy: Optional[np.ndarray] = None
 
         if fileName is not None:
             self.read(fileName)

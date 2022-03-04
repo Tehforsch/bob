@@ -91,7 +91,7 @@ def getExpansionData(
     nE = nH  # We can probably assume this
     assert len(sim.sources) == 1
     photonRate = sim.sources.sed[0, 2] / u.s
-    stroemgrenRadius = (3 * photonRate / (4 * np.pi * alphaB * nE ** 2)) ** (1 / 3.0)
+    stroemgrenRadius = (3 * photonRate / (4 * np.pi * alphaB * nE**2)) ** (1 / 3.0)
     stroemgrenRadius.units = "kpc"
     print(f"Mass density: {nH*protonMass}, Number density: {nH}")
     print(f"Recombination time: {recombinationTime}, Stroemgren radius: {stroemgrenRadius}")

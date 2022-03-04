@@ -41,13 +41,14 @@ class Simulation:
         self.replaceNumCoresInParams()
 
     def replaceNumCoresInParams(self) -> None:
-        for line in self.log:
-            match = re.match("Running with ([0-9]+) MPI tasks", line)
-            if match is not None:
-                self.params["numCores"] = int(match.groups()[0])
-                return
-
-        print("Failed to read number of cores from log file, using {} instead".format(self.params["numCores"]))
+        try:
+            for line in self.log:
+                match = re.match("Running with ([0-9]+) MPI tasks", line)
+                if match is not None:
+                    self.params["numCores"] = int(match.groups()[0])
+                    return
+        except (FileNotFoundError, ValueError):
+            print("Failed to read number of cores from log file, using {} instead".format(self.params["numCores"]))
 
     @property  # type: ignore
     def name(self) -> str:
