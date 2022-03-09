@@ -8,6 +8,7 @@ import bob.scaling
 import matplotlib.pyplot as plt
 import bob.plot
 import bob.physicalPlots
+import bob.image
 
 from bob.postprocessingFunctions import (
     postprocessingFunctions,
@@ -17,6 +18,7 @@ from bob.postprocessingFunctions import (
     SingleSimPlotFunction,
     SingleSnapshotPlotFunction,
     SingleSnapshotPostprocessingFunction,
+    SlicePlotFunction,
 )
 
 
@@ -49,5 +51,7 @@ def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> 
             plotter.runSingleSnapshotPlot(function)
         elif isinstance(function, SingleSnapshotPostprocessingFunction):
             plotter.runSingleSnapshotPostprocessingFunction(function)
+        elif isinstance(function, SlicePlotFunction):
+            plotter.runSlicePlotFunction(function)
         else:
             raise NotImplementedError
