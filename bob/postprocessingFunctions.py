@@ -1,3 +1,4 @@
+from pathlib import Path
 import matplotlib.pyplot as plt
 from abc import abstractmethod
 from typing import Callable, Any, List, Optional
@@ -46,6 +47,11 @@ class CompareSimSingleSnapshotPlotFunction(PostprocessingFunction):
         return self.f(axes, sim1, sim2, snap1, snap2)
 
 
+class SlicePlotFunction(PostprocessingFunction):
+    def __call__(self, axes: plt.axes, sim: Simulation, slice_: "Slice") -> None:
+        return self.f(axes, sim, slice_)
+
+
 # Giving up on mypy hints on this one
 def addToList(name: Optional[str], cls: Any, modify: Optional[Callable[..., Any]] = None) -> Callable[[Callable[..., Any]], Any]:
     def wrapper(f: Callable[..., Any]) -> Any:
@@ -88,6 +94,12 @@ def addSingleSnapshotPlot(
     name: Optional[str],
 ) -> Callable[[Callable[..., Any]], SingleSnapshotPlotFunction]:
     return addToList(name, SingleSnapshotPlotFunction)
+
+
+def addSlicePlot(
+    name: Optional[str],
+) -> Callable[[Callable[..., Any]], SlicePlotFunction]:
+    return addToList(name, SlicePlotFunction)
 
 
 def addCompareSimSingleSnapshotPlot(

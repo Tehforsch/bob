@@ -1,6 +1,8 @@
+import os
+from pathlib import Path
+
 import numpy as np
 from typing import Dict, Any, List, Tuple, Union, Optional
-from pathlib import Path
 import re
 import yaml
 from astropy.cosmology import FlatLambdaCDM
@@ -95,6 +97,13 @@ class Simulation:
 
         snapshotFiles.sort(key=getNumber)
         return [Snapshot(self, s) for s in snapshotFiles]
+
+    def getSlices(self) -> List["Slice"]:
+        from bob.image import Slice
+
+        sliceFiles = [Slice(self.outputDir / f) for f in os.listdir(self.outputDir) if "slice" in f]
+        sliceFiles.sort(key=lambda s: s.path)
+        return sliceFiles
 
     def subboxCoords(self) -> Tuple[np.ndarray, np.ndarray]:
         with open(Path(self.folder, self.params["SubboxCoordinatesPath"])) as f:

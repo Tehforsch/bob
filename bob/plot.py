@@ -12,6 +12,7 @@ from bob.postprocessingFunctions import (
     SingleSnapshotPlotFunction,
     SingleSnapshotPostprocessingFunction,
     CompareSimSingleSnapshotPlotFunction,
+    SlicePlotFunction,
 )
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
@@ -72,6 +73,17 @@ class Plotter:
                 function(plt, sim, snap)
                 self.saveAndShow(
                     "{}_{}_{}".format(sim.name, function.name, snap.name),
+                )
+
+    def runSlicePlotFunction(self, function: SlicePlotFunction) -> None:
+        logging.info("Running {}".format(function.name))
+        for sim in self.sims:
+            logging.info("For sim {}".format(sim.name))
+            for slice_ in sim.getSlices():
+                logging.info("For slice {}".format(slice_.name))
+                function(plt, sim, slice_)
+                self.saveAndShow(
+                    "{}_{}_{}".format(sim.name, function.name, slice_.name),
                 )
 
     def runCompareSimSingleSnapPlot(
