@@ -39,12 +39,12 @@ class Sources:
             self.coord = np.array(coord)
             self.sed = np.array(sed)
             self.time = np.array(timeArray)
-            self.nFreq = self.sed.shape[1]
+            self.nFreq = sed.shape[0]
         else:
             self.coord = np.append(self.coord, coord, axis=0)
             self.sed = np.append(self.sed, sed, axis=0)
             self.time = np.append(self.time, timeArray)
-        self.nSources = self.sed.shape[0]
+        self.nSources = self.sed.shape[0] / self.nFreq
 
     def read(self, fileName: Path) -> None:
         with open(fileName, "r") as f:
@@ -53,6 +53,7 @@ class Sources:
             self.nFreq = nFreq
             self.nSigma = nSigma
             self.nEnergy = nEnergy
+            print(self.nSources, self.nFreq)
             self.sigma = np.fromfile(f, dtype="f8", count=nSigma) if nSigma > 0 else None
             self.energy = np.fromfile(f, dtype="f8", count=nEnergy) if nEnergy > 0 else None
             self.coord = np.fromfile(f, dtype="f8", count=nSources * 3).reshape((nSources, 3))
