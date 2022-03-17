@@ -3,6 +3,7 @@ import numpy as np
 
 from bob.postprocessingFunctions import addSingleSnapshotPlot
 import matplotlib.pyplot as plt
+from bob.field import Field
 from bob.snapshot import Snapshot
 from bob.slicePlot import voronoiSlice
 from bob.scatter3D import Scatter3D
@@ -44,7 +45,7 @@ def createVoronoiSlicePlots() -> None:
                 ax: plt.axes,
                 sim: Simulation,
                 snap: Snapshot,
-                basicField: BasicField = basicField,
+                basicField: Field = basicField,
                 axis: np.ndarray = axis,
             ) -> None:
                 voronoiSlice(ax, sim, snap, basicField, axis)
@@ -61,7 +62,7 @@ def createScatterPlots() -> None:
             ax: plt.axes,
             sim: Simulation,
             snap: Snapshot,
-            basicField: BasicField = basicField,
+            basicField: Field = basicField,
         ) -> None:
             # center = sim.boxSize * 0.5
             Scatter3D(snap, basicField, 0).plot(ax)

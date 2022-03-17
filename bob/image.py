@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+from typing import Any
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -19,7 +20,7 @@ class Slice:
 
 
 # Taken from arepy
-def read_image(filename: Path):
+def read_image(filename: Path) -> Any:
     f = open(filename, mode="rb")
     npix_x = np.fromfile(f, np.uint32, 1)[0]
     npix_y = np.fromfile(f, np.uint32, 1)[0]
@@ -28,7 +29,7 @@ def read_image(filename: Path):
     return arepo_image
 
 
-def show_image(ax: plt.axes, sim: Simulation, slice_: Slice):
+def show_image(ax: plt.axes, sim: Simulation, slice_: Slice) -> None:
     data = read_image(slice_.path)
     plt.imshow(data)
 

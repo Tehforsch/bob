@@ -48,7 +48,7 @@ class CompareSimSingleSnapshotPlotFunction(PostprocessingFunction):
 
 
 class SlicePlotFunction(PostprocessingFunction):
-    def __call__(self, axes: plt.axes, sim: Simulation, slice_: "Slice") -> None:
+    def __call__(self, axes: plt.axes, sim: Simulation, slice_: Any) -> None:
         return self.f(axes, sim, slice_)
 
 

@@ -44,7 +44,7 @@ class Sources:
             self.coord = np.append(self.coord, coord, axis=0)
             self.sed = np.append(self.sed, sed, axis=0)
             self.time = np.append(self.time, timeArray)
-        self.nSources = self.sed.shape[0] / self.nFreq
+        self.nSources = self.sed.shape[0] // self.nFreq
 
     def read(self, fileName: Path) -> None:
         with open(fileName, "r") as f:
