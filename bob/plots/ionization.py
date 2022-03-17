@@ -44,9 +44,10 @@ def ionization(ax1: plt.axes, simSets: List[SimulationSet]) -> None:
     plt.style.use("classic")
 
     # labels = [ "L35n270TNG", "L35n270TNG (smaller $\Delta t$)","L35n540TNG"]
-    labels = ["5%", "10%", "15%", "20%", "25%"]
-    colors = ["b", "r", "g", "b", "r"]
-    assert len(labels) == len(simSets) == len(colors)
+    # labels = ["intermediate", "100%"]
+    labels = [simSet[0].folder.parent for simSet in simSets]
+    colors = ["b", "r"]
+    assert len(labels) == len(simSets)
     linAx, logAx = setupIonizationPlot()
 
     addConstraintsToAxis(linAx)

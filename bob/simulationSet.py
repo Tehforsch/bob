@@ -19,7 +19,11 @@ class SimulationSet(list):
 
     def quotient(self, parameters: List[str]) -> List[Tuple[Dict[str, Any], "SimulationSet"]]:
         def getConfiguration(sim: Simulation) -> Tuple[Tuple[Any, Any], ...]:
-            return tuple((k, sim.params[k]) for k in parameters)
+            def getValue(k: str) -> Any:
+                if k == "name": # For cases where sim sets are indistuingishable by actual sim parameters
+                    return sim.folder.parent
+                return sim.params[k]
+            return tuple((k, getValue(k)) for k in parameters)
 
         configurations = list(set(getConfiguration(sim) for sim in self))
         configurations.sort()
