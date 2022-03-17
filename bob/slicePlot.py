@@ -31,7 +31,6 @@ def voronoiSlice(
     tree = cKDTree(snap.coordinates)
     cellIndices = tree.query(coordinates)[1]
     cellIndices = cellIndices.reshape((n1, n2))
-    data = np.log(field.getData(snap))
     data = field.getData(snap)
     print(f"Field: {field.niceName}: min: {np.min(data):.2e}, mean: {np.mean(data):.2e}, max: {np.max(data):.2e}")
     ax.xlabel(getAxisName(ortho1))

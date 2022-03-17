@@ -5,7 +5,7 @@ import numpy as np
 from typing import Dict, Any, List, Tuple, Union, Optional
 import re
 import yaml
-from astropy.cosmology import FlatLambdaCDM
+from astropy.cosmology import FlatLambdaCDM, z_at_value
 
 import bob.config as config
 from bob.snapshot import Snapshot
@@ -98,7 +98,7 @@ class Simulation:
         snapshotFiles.sort(key=getNumber)
         return [Snapshot(self, s) for s in snapshotFiles]
 
-    def getSlices(self) -> List["Slice"]:
+    def getSlices(self) -> List[Any]:
         from bob.image import Slice
 
         sliceFiles = [Slice(self.outputDir / f) for f in os.listdir(self.outputDir) if "slice" in f]
@@ -117,6 +117,11 @@ class Simulation:
         Om0 = self.params["Omega0"]
         H0 = self.params["HubbleParam"] * 100.0
         return FlatLambdaCDM(H0=H0, Om0=Om0, Ob0=Ob0)
+
+    def getRedshift(self, scale_factor: float) -> float:
+        cosmology = self.getCosmology()
+        assert self.params["ComovingIntegrationOn"]
+        return z_at_value(cosmology.scale_factor, scale_factor)
 
     @property
     def resolution(self) -> int:

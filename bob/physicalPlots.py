@@ -8,7 +8,8 @@ from bob.slicePlot import voronoiSlice
 from bob.scatter3D import Scatter3D
 from bob.basicField import BasicField
 from bob.simulation import Simulation
-
+from bob.temperature import Temperature
+import bob.ionizationTime
 
 basicFields = [
     BasicField("ChemicalAbundances", 0),
@@ -30,6 +31,7 @@ basicFields = [
     BasicField("PhotonRates", 2),
     BasicField("PhotonRates", 3),
     BasicField("PhotonRates", 4),
+    Temperature(),
     # CombinedAbundances(),
 ]
 
