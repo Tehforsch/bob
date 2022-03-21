@@ -4,6 +4,7 @@ from typing import Any
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 from bob.simulation import Simulation
 
 from bob.postprocessingFunctions import addSlicePlot
@@ -31,7 +32,15 @@ def read_image(filename: Path) -> Any:
 
 def show_image(ax: plt.axes, sim: Simulation, slice_: Slice) -> None:
     data = read_image(slice_.path)
-    plt.imshow(data)
+    plt.xlabel("$x [h^{-1} \mathrm{kpc}]$")
+    plt.ylabel("$y [h^{-1} \mathrm{kpc}]$")
+    print(data.shape)
+    vmin = 1e-6
+    vmax = 1
+    plt.imshow(data, cmap="Reds", norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=(-17.5, 17.5, -17.5, 17.5))
+    plt.clim(vmin, vmax)
+    cbar = plt.colorbar()
+    cbar.set_label("$x_{\mathrm{H+}}$")
 
 
 @addSlicePlot("xHP", None)
