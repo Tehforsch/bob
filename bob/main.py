@@ -6,7 +6,6 @@ import argparse
 from bob import postprocess, config
 from bob import postprocessingFunctions
 from bob.simulationSet import getSimsFromFolders
-from bob.units import setupUnits
 from bob.util import getCommonParentFolder
 
 
@@ -50,7 +49,6 @@ def setupLogging(args: argparse.Namespace) -> None:
 
 def main() -> None:
     args = setupArgs()
-    setupUnits()
     setupLogging(args)
     sims = getSimsFromFolders(args)
     if args.recalc:

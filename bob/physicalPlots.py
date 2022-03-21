@@ -12,6 +12,7 @@ from bob.simulation import Simulation
 from bob.temperature import Temperature
 import bob.ionizationTime
 import bob.temperaturePlots
+import bob.thomsonScattering
 
 basicFields = [
     BasicField("ChemicalAbundances", 0),

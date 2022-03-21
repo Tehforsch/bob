@@ -3,7 +3,7 @@ from bob.constants import kB, protonMass, gamma
 from bob.field import Field
 from bob.basicField import BasicField
 from bob.snapshot import Snapshot
-import quantities as pq
+import astropy.units as pq
 
 
 class Temperature(Field):
@@ -20,7 +20,7 @@ class Temperature(Field):
         numberDensityUnit = 1 / (snapshot.lengthUnit**3)
         density = BasicField("Density").getData(snapshot)
         try:
-            x0He = 0.1  # REALLY not sure about this one, taken from sgchem def given that CHEMISTRYNETWORK != 1
+            x0He = 0.1
             yn = density * densityUnit / ((1.0 + 4.0 * x0He) * protonMass)
             en = BasicField("InternalEnergy").getData(snapshot) * density * numberDensityUnit * snapshot.energyUnit
             xH2 = BasicField("ChemicalAbundances", 0).getData(snapshot)
@@ -35,7 +35,7 @@ class Temperature(Field):
             xe = BasicField("ElectronAbundance").getData(snapshot)
             xH = 0.76
             mu = 4.0 / (1 + 3 * xH + 4 * xH * xe) * protonMass
-        temperature = ((gamma - 1.0) * en * mu / kB).simplified
+        temperature = ((gamma - 1.0) * en * mu / kB).decompose()
         return temperature
 
     @property

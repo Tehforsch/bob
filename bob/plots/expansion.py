@@ -41,7 +41,7 @@ def analyticalRTypeExpansion(t: np.ndarray) -> np.ndarray:
 
 
 def analyticalDTypeExpansion(t: np.ndarray, ci: u.Quantity, stroemgrenRadius: u.Quantity) -> u.Quantity:
-    return stroemgrenRadius * ((1 + 7 / 4 * ci * t / stroemgrenRadius) ** (4.0 / 7.0)).simplified
+    return stroemgrenRadius * ((1 + 7 / 4 * ci * t / stroemgrenRadius) ** (4.0 / 7.0)).decompose()
 
 
 def getRadii(
@@ -95,8 +95,8 @@ def getExpansionData(
     stroemgrenRadius.units = "kpc"
     print(f"Mass density: {nH*protonMass}, Number density: {nH}")
     print(f"Recombination time: {recombinationTime}, Stroemgren radius: {stroemgrenRadius}")
-    times = (getTimes(sim) / recombinationTime).simplified
-    radii = (getRadii(sim) / stroemgrenRadius).simplified
+    times = (getTimes(sim) / recombinationTime).decompose()
+    radii = (getRadii(sim) / stroemgrenRadius).decompose()
     error = np.array(
         [
             np.abs(radius - analyticalRTypeExpansion(time)) / (1e-10 + analyticalRTypeExpansion(time)) if time > 0 else 0
@@ -126,8 +126,12 @@ def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False
             (line1,) = ax1.plot(times, radii, label=sims.getNiceSimName(sim), color=color)
             # line1.set_dashes(linestyle)  # 2pt line, 2pt break, 10pt line, 2pt break
         else:
-            radiiUpper = [(getIonizationRadius(snapshot, np.array([0.5, 0.5, 0.5]), 0.9) / stroemgrenRadius).simplified for snapshot in sim.snapshots]
-            radiiLower = [(getIonizationRadius(snapshot, np.array([0.5, 0.5, 0.5]), 0.1) / stroemgrenRadius).simplified for snapshot in sim.snapshots]
+            radiiUpper = [
+                (getIonizationRadius(snapshot, np.array([0.5, 0.5, 0.5]), 0.9) / stroemgrenRadius).decompose() for snapshot in sim.snapshots
+            ]
+            radiiLower = [
+                (getIonizationRadius(snapshot, np.array([0.5, 0.5, 0.5]), 0.1) / stroemgrenRadius).decompose() for snapshot in sim.snapshots
+            ]
 
             ax1.plot(times, radii, label=sims.getNiceSimName(sim) + " 0.5", color=color)
             ax1.plot(
@@ -155,7 +159,7 @@ def expansionGeneral(ax: plt.axes, sims: SimulationSet, innerOuter: bool = False
 
 
 def getSoundSpeed(temperature: float) -> float:
-    return np.sqrt(gamma * kB * temperature / (protonMass)).simplified
+    return np.sqrt(gamma * kB * temperature / (protonMass)).decompose()
 
 
 def getAverageTemperature(snapshot: Snapshot, radius: float) -> np.ndarray:

@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import h5py
 import re
-import quantities as pq
+import astropy.units as pq
 from bob.basicField import BasicField
 from bob.util import memoize
 from bob.exceptions import BobException

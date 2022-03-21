@@ -115,6 +115,11 @@ class Simulation:
         assert self.params["ComovingIntegrationOn"]
         return z_at_value(cosmology.scale_factor, scale_factor)
 
+    def getLookbackTime(self, scale_factor: float) -> float:
+        cosmology = self.getCosmology()
+        assert self.params["ComovingIntegrationOn"]
+        return cosmology.lookback_time(self.getRedshift(scale_factor))
+
     @property
     def resolution(self) -> int:
         return int(self.params["InitCondFile"].replace("ics_", ""))

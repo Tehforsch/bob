@@ -7,7 +7,7 @@ from math import isclose
 
 import numpy as np
 from pathlib import Path
-import quantities as pq
+import astropy.units as pq
 import pickle
 
 from bob import config
