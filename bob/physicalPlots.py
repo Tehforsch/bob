@@ -11,6 +11,7 @@ from bob.basicField import BasicField
 from bob.simulation import Simulation
 from bob.temperature import Temperature
 import bob.ionizationTime
+import bob.temperaturePlots
 
 basicFields = [
     BasicField("ChemicalAbundances", 0),

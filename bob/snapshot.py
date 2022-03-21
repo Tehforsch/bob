@@ -67,9 +67,10 @@ class Snapshot:
         self.lengthUnit = self.hdf5File["Header"].attrs["UnitLength_in_cm"] * pq.cm
         self.massUnit = self.hdf5File["Header"].attrs["UnitMass_in_g"] * pq.g
         self.velocityUnit = self.hdf5File["Header"].attrs["UnitVelocity_in_cm_per_s"] * pq.cm / pq.s
-        self.timeUnit = 1 if self.hdf5File["Parameters"].attrs["ComovingIntegrationOn"] else self.lengthUnit / self.velocityUnit 
+        self.timeUnit = self.lengthUnit / self.velocityUnit
         self.energyUnit = self.lengthUnit**2 / (self.timeUnit**2) * self.massUnit
         self.volumeUnit = self.lengthUnit**3
+        self.scale_factor = self.hdf5File["Header"].attrs["Time"]
         self.time = self.hdf5File["Header"].attrs["Time"] * self.timeUnit
         self.z = redsh
         # prefactors derived from that:
