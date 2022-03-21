@@ -48,6 +48,10 @@ class CompareSimSingleSnapshotPlotFunction(PostprocessingFunction):
 
 
 class SlicePlotFunction(PostprocessingFunction):
+    def __init__(self, f: Callable[..., Any], name: str, slice_type: str):
+        self.slice_type = slice_type
+        super(SlicePlotFunction, self).__init__(f, name)
+
     def __call__(self, axes: plt.axes, sim: Simulation, slice_: Any) -> None:
         return self.f(axes, sim, slice_)
 
@@ -97,9 +101,10 @@ def addSingleSnapshotPlot(
 
 
 def addSlicePlot(
+    slice_type: str,
     name: Optional[str],
 ) -> Callable[[Callable[..., Any]], SlicePlotFunction]:
-    return addToList(name, SlicePlotFunction)
+    return addToList(name, lambda f, name: SlicePlotFunction(f, name, slice_type))
 
 
 def addCompareSimSingleSnapshotPlot(

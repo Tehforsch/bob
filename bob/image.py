@@ -34,6 +34,6 @@ def show_image(ax: plt.axes, sim: Simulation, slice_: Slice) -> None:
     plt.imshow(data)
 
 
-@addSlicePlot(None)
+@addSlicePlot("xHP", None)
 def hpImage(ax: plt.axes, sim: Simulation, slice_: Slice) -> None:
     show_image(ax, sim, slice_)

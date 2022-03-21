@@ -79,7 +79,7 @@ class Plotter:
         logging.info("Running {}".format(function.name))
         for sim in self.sims:
             logging.info("For sim {}".format(sim.name))
-            for slice_ in sim.getSlices():
+            for slice_ in sim.getSlices(function.slice_type):
                 logging.info("For slice {}".format(slice_.name))
                 function(plt, sim, slice_)
                 self.saveAndShow(
