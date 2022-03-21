@@ -13,7 +13,12 @@ from scipy.spatial import cKDTree
 
 @addPlot(None)
 def ionizationTime(plt: plt.axes, simSet: SimulationSet) -> None:
-    ((min1, min2, max1, max2), data) = getIonizationTimeData(simSet)
+    # ((min1, min2, max1, max2), data) = getIonizationTimeData(simSet)
+    min1 = -15
+    min2 = -15
+    max1 = 15
+    max2 = 15
+    data = np.load("out.npy")
     plt.xlabel("x")
     plt.ylabel("y")
     extent = (min1, max1, min2, max2)
@@ -43,5 +48,5 @@ def getIonizationTimeData(simSet: SimulationSet) -> Tuple[Tuple[float, float, fl
         cellIndices = tree.query(coordinates)[1]
         cellIndices = cellIndices.reshape((n1, n2))
         abundance = xHP[cellIndices]
-        data[np.where(abundance > 0.5)] = sim.getRedshift(snap.time)
+        data[np.where(abundance > 0.5)] = sim.getRedshift(snap.scale_factor)
     return (min1, min2, max1, max2), data
