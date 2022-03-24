@@ -19,11 +19,13 @@ def ionizationTime(plt: plt.axes, simSet: SimulationSet) -> None:
     max1 = 15
     max2 = 15
     data = np.load("out.npy")
-    plt.xlabel("x")
-    plt.ylabel("y")
-    extent = (min1, max1, min2, max2)
-    plt.imshow(data, extent=extent, origin="lower", cmap="Reds")
-    plt.colorbar()
+    plt.xlabel("$x [h^{-1} \mathrm{Mpc}]$")
+    plt.ylabel("$y [h^{-1} \mathrm{Mpc}]$")
+
+    extent = (-15, 15, -15, 15)
+    plt.imshow(data, extent=extent, cmap="Reds", vmin=6, vmax=10)
+    cbar = plt.colorbar()
+    cbar.set_label("$z$")
 
 
 def getIonizationTimeData(simSet: SimulationSet) -> Tuple[Tuple[float, float, float, float], np.ndarray]:
