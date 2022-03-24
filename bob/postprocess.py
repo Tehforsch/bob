@@ -39,7 +39,7 @@ def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> 
 
     picFolder = Path(parent_folder, config.picFolder)
     picFolder.mkdir(exist_ok=True)
-    plotter = bob.plot.Plotter(parent_folder, sims, args.snapshots, args.show, args.quotient)
+    plotter = bob.plot.Plotter(parent_folder, sims, args.snapshots, args.show, args.select, args.quotient)
     for function in getSpecifiedFunctions(args, postprocessingFunctions):
         if isinstance(function, PlotFunction):
             plotter.runPlot(function)

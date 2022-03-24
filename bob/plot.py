@@ -35,12 +35,26 @@ def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
 
 
 class Plotter:
-    def __init__(self, parent_folder: Path, sims: SimulationSet, snapshotFilter: List[str], show: bool, quotient_params: Optional[List[str]]) -> None:
+    def __init__(
+        self,
+        parent_folder: Path,
+        sims: SimulationSet,
+        snapshotFilter: List[str],
+        show: bool,
+        select: Optional[List[str]],
+        quotient_params: Optional[List[str]],
+    ) -> None:
         self.pic_folder = parent_folder / config.picFolder
-        self.sims = sims
+        self.sims = self.filterSims(sims, select)
         self.snapshotFilter = snapshotFilter
         self.show = show
         self.quotient_params = quotient_params
+
+    def filterSims(self, sims: SimulationSet, select: Optional[List[str]]) -> SimulationSet:
+        if select is None:
+            return sims
+        else:
+            return SimulationSet(sim for sim in sims if sim.name in select)
 
     def runPlot(self, function: PlotFunction) -> None:
         logging.info("Running {}".format(function.name))
