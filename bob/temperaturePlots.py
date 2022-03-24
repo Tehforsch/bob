@@ -16,9 +16,11 @@ from scipy.spatial import cKDTree
 def temperatureOverRedshift(plt: plt.axes, simSets: List[SimulationSet]) -> None:
     plt.xlabel("z")
     plt.ylabel("T [K]")
-    for (i, simSet) in enumerate(simSets):
+    labels = ["100%", "200%", "TNG"]
+    for ((i, simSet), label) in zip(enumerate(simSets), labels):
         result = np.load(f"temperature{i}.npy")
-        plt.plot(result[:, 0], result[:, 1])
+        plt.plot(result[:, 0], result[:, 1], label=label)
+    plt.legend()
 
 
 def getTemperatureOverTime(simSet: SimulationSet) -> Tuple[List[float], List[float]]:
