@@ -62,7 +62,7 @@ def ionization(ax1: plt.axes, simSets: List[SimulationSet]) -> None:
         linAx.plot([], [], color=color, label=label, linewidth=3)
     linAx.plot([], [], label="Volume av.", linestyle="-", linewidth=3, color="black")
     linAx.plot([], [], label="Mass av.", linestyle="--", linewidth=3, color="black")
-    plt.legend(loc="center right")
+    plt.legend(loc=(0, -0.2))
 
 
 def plotResultsToAxis(data: IonizationData, ax: plt.axes, color: str) -> None:
