@@ -13,11 +13,6 @@ class PostprocessingFunction:
         self.name = name
 
 
-class SingleSnapshotPostprocessingFunction(PostprocessingFunction):
-    def __call__(self, sim: Simulation, snap: Snapshot) -> None:
-        return self.f(sim, snap)
-
-
 class PlotFunction(PostprocessingFunction):
     def __call__(self, axes: plt.axes, sims: SimulationSet) -> None:
         return self.f(axes, sims)
@@ -42,11 +37,6 @@ class SingleSnapshotPlotFunction(PostprocessingFunction):
         return self.f(axes, sim, snap)
 
 
-class CompareSimSingleSnapshotPlotFunction(PostprocessingFunction):
-    def __call__(self, axes: plt.axes, sim1: Simulation, sim2: Simulation, snap1: Snapshot, snap2: Snapshot) -> None:
-        return self.f(axes, sim1, sim2, snap1, snap2)
-
-
 class SlicePlotFunction(PostprocessingFunction):
     def __init__(self, f: Callable[..., Any], name: str, slice_type: str):
         self.slice_type = slice_type
@@ -69,12 +59,6 @@ def addToList(name: Optional[str], cls: Any, modify: Optional[Callable[..., Any]
         return newF
 
     return wrapper
-
-
-def addSingleSnapshotPostprocessing(
-    name: Optional[str],
-) -> Callable[[Callable[..., Any]], SingleSnapshotPostprocessingFunction]:
-    return addToList(name, SingleSnapshotPostprocessingFunction)
 
 
 def addPlot(name: Optional[str]) -> Callable[[Callable[..., Any]], PlotFunction]:
@@ -105,12 +89,6 @@ def addSlicePlot(
     name: Optional[str],
 ) -> Callable[[Callable[..., Any]], SlicePlotFunction]:
     return addToList(name, lambda f, name: SlicePlotFunction(f, name, slice_type))
-
-
-def addCompareSimSingleSnapshotPlot(
-    name: Optional[str],
-) -> Callable[[Callable[..., Any]], CompareSimSingleSnapshotPlotFunction]:
-    return addToList(name, CompareSimSingleSnapshotPlotFunction)
 
 
 def checkNoDoubledNames() -> None:

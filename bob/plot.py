@@ -10,8 +10,6 @@ from bob.postprocessingFunctions import (
     MultiPlotFunction,
     SingleSimPlotFunction,
     SingleSnapshotPlotFunction,
-    SingleSnapshotPostprocessingFunction,
-    CompareSimSingleSnapshotPlotFunction,
     SlicePlotFunction,
 )
 from bob.simulationSet import SimulationSet
@@ -99,24 +97,6 @@ class Plotter:
                 self.saveAndShow(
                     "{}_{}_{}".format(sim.name, function.name, slice_.name),
                 )
-
-    def runCompareSimSingleSnapPlot(
-        self,
-        function: CompareSimSingleSnapshotPlotFunction,
-    ) -> None:
-        for (sim1, sim2) in itertools.combinations(self.sims, r=2):
-            for (snap1, snap2) in zip(sim1.snapshots, sim2.snapshots):
-                assert snap1.time == snap2.time, f"Non-matching snapshots between sims {sim1.name} and {sim2.name}"
-                function(plt, sim1, sim2, snap1, snap2)
-                self.saveAndShow(function.name)
-
-    def runSingleSnapshotPostprocessingFunction(self, function: SingleSnapshotPostprocessingFunction) -> None:
-        logging.info("Running {}".format(function.name))
-        for sim in self.sims:
-            logging.info("For sim {}".format(sim.name))
-            for snap in self.get_snapshots(sim):
-                logging.info("For snap {}".format(snap.name))
-                function(sim, snap)
 
     def isInSnapshotArgs(self, snap: Snapshot) -> bool:
         return self.snapshotFilter is None or any(isSameSnapshot(arg_snap, snap) for arg_snap in self.snapshotFilter)

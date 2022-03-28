@@ -22,7 +22,6 @@ from bob.postprocessingFunctions import (
     MultiPlotFunction,
     SingleSimPlotFunction,
     SingleSnapshotPlotFunction,
-    SingleSnapshotPostprocessingFunction,
     SlicePlotFunction,
 )
 
@@ -52,8 +51,6 @@ def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> 
             plotter.runSingleSimPlot(function)
         elif isinstance(function, SingleSnapshotPlotFunction):
             plotter.runSingleSnapshotPlot(function)
-        elif isinstance(function, SingleSnapshotPostprocessingFunction):
-            plotter.runSingleSnapshotPostprocessingFunction(function)
         elif isinstance(function, SlicePlotFunction):
             plotter.runSlicePlotFunction(function)
         else:
