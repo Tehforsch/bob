@@ -4,7 +4,6 @@ from typing import Sequence
 from pathlib import Path
 from bob.simulationSet import SimulationSet
 from bob import config
-import matplotlib.pyplot as plt
 import bob.plot
 import bob.plots.physicalPlots
 import bob.plots.image
@@ -29,6 +28,7 @@ def getSpecifiedFunctions(args: argparse.Namespace, functions: Sequence[Postproc
 
 
 def setMatplotlibStyle() -> None:
+    import matplotlib.pyplot as plt
     file_path = Path(os.path.realpath(__file__))
     plt.style.use(Path(file_path).parent / "../styles/plot.mlpstyle")
 
