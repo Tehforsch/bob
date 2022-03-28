@@ -28,13 +28,13 @@ def getSpecifiedFunctions(args: argparse.Namespace, functions: Sequence[Postproc
         return [function for function in functions if function.name in args.functions]
 
 
-def setFontSizes() -> None:
+def setMatplotlibStyle() -> None:
     file_path = Path(os.path.realpath(__file__))
     plt.style.use(Path(file_path).parent / "../styles/plot.mlpstyle")
 
 
 def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> None:
-    setFontSizes()
+    setMatplotlibStyle()
 
     picFolder = Path(parent_folder, config.picFolder)
     picFolder.mkdir(exist_ok=True)
