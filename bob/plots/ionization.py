@@ -63,10 +63,10 @@ class IonizationData:
 
 @addToList(None)
 class Ionization(MultiSetFn):
-    def post(simSets: List[SimulationSet]) -> Result:
+    def post(self, simSets: List[SimulationSet]) -> Result:
         return Result([IonizationData().fromSims(sims).toArray() for sims in simSets])
 
-    def plot(plt: plt.axes, result: Result) -> None:
+    def plot(self, plt: plt.axes, result: Result) -> None:
         ionizationDataList = [IonizationData().fromArray(arr) for arr in result]
         _, (ax1) = ax1.subplots()
         plt.style.use("classic")

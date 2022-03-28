@@ -1,4 +1,4 @@
-from typing import Iterator, List, Optional
+from typing import Iterator, List, Optional, Callable
 import itertools
 from pathlib import Path
 import argparse
@@ -16,6 +16,7 @@ from bob.snapshot import Snapshot
 from bob import config
 import bob.plots.ionization
 from bob.simulation import Simulation
+from bob.result import Result
 
 
 def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
@@ -53,20 +54,22 @@ class Plotter:
         else:
             return SimulationSet(sim for sim in sims if sim.name in select)
 
-    # def runPlot(self, function: PlotFunction) -> None:
-    #     logging.info("Running {}".format(function.name))
-    #     function(plt, self.sims)
-    #     self.saveAndShow(function.name)
+    def runPostAndPlot(self, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]) -> None:
+        logging.info("Running {}".format(name))
+        result = post()
+        plot(plt.axes, result)
+        self.saveAndShow(name)
 
-    # def runMultiPlot(self, function: MultiPlotFunction) -> None:
-    #     logging.info("Running {}".format(function.name))
-    #     quotient_params = self.quotient_params
-    #     if quotient_params is None:
-    #         quotient_params = function.default_quotient_params
-    #     print(self.sims.quotient(quotient_params))
-    #     quotient = [sims for (config, sims) in self.sims.quotient(quotient_params)]
-    #     function(plt, quotient)
-    #     self.saveAndShow(function.name)
+    def runMultiSetFn(self, function: MultiSetFn) -> None:
+        logging.info("Running {}".format(function.name))
+        quotient_params = self.quotient_params
+        if quotient_params is None:
+            quotient_params = []
+        print(self.sims.quotient(quotient_params))
+        quotient = [sims for (config, sims) in self.sims.quotient(quotient_params)]
+        def post():
+            function.post(quotient)
+        self.runPostAndPlot(function.name, post, function.plot)
 
     # def runSingleSimPlot(self, function: SingleSimPlotFunction) -> None:
     #     logging.info("Running {}".format(function.name))

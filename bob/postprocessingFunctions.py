@@ -10,7 +10,7 @@ from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
 
 
-class PostprocessingFunction:
+class PostprocessingFunction(ABC):
     pass
 
 

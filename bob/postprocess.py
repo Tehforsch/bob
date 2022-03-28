@@ -17,6 +17,10 @@ import bob.plots.physicalPlots
 from bob.postprocessingFunctions import (
     postprocessingFunctions,
     PostprocessingFunction,
+    SnapFn,
+    SetFn,
+    MultiSetFn,
+    SliceFn,
 )
 
 
@@ -36,16 +40,14 @@ def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> 
     picFolder = Path(parent_folder, config.picFolder)
     picFolder.mkdir(exist_ok=True)
     plotter = bob.plot.Plotter(parent_folder, sims, args.snapshots, args.show, args.select, args.quotient)
-    for function in getSpecifiedFunctions(args, postprocessingFunctions):
-        if isinstance(function, PlotFunction):
-            plotter.runPlot(function)
-        elif isinstance(function, MultiPlotFunction):
-            plotter.runMultiPlot(function)
-        elif isinstance(function, SingleSimPlotFunction):
-            plotter.runSingleSimPlot(function)
-        elif isinstance(function, SingleSnapshotPlotFunction):
-            plotter.runSingleSnapshotPlot(function)
-        elif isinstance(function, SlicePlotFunction):
-            plotter.runSlicePlotFunction(function)
-        else:
-            raise NotImplementedError
+    function = getSpecifiedFunction(args, postprocessingFunctions)()
+    if isinstance(function, SnapFn):
+        plotter.runSnapFn(function)
+    elif isinstance(function, SetFn):
+        plotter.runSetFn(function)
+    elif isinstance(function, MultiSetFn):
+        plotter.runMultiSetFn(function)
+    elif isinstance(function, SliceFn):
+        plotter.runSliceFn(function)
+    else:
+        raise NotImplementedError
