@@ -12,17 +12,11 @@ from bob.simulationSet import SimulationSet
 from bob import config
 import bob.plot
 import bob.plots.physicalPlots
-import bob.plots.image
 
 
 from bob.postprocessingFunctions import (
     postprocessingFunctions,
     PostprocessingFunction,
-    PlotFunction,
-    MultiPlotFunction,
-    SingleSimPlotFunction,
-    SingleSnapshotPlotFunction,
-    SlicePlotFunction,
 )
 
 

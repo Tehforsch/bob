@@ -5,7 +5,6 @@ import numpy as np
 from scipy.spatial import cKDTree
 
 from bob.snapshot import Snapshot
-from bob.postprocessingFunctions import addPlot
 from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
 from bob.basicField import BasicField

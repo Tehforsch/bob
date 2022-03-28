@@ -6,11 +6,10 @@ import matplotlib.pyplot as plt
 import logging
 
 from bob.postprocessingFunctions import (
-    PlotFunction,
-    MultiPlotFunction,
-    SingleSimPlotFunction,
-    SingleSnapshotPlotFunction,
-    SlicePlotFunction,
+    SetFn,
+    MultiSetFn,
+    SnapFn,
+    SliceFn,
 )
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
@@ -54,49 +53,49 @@ class Plotter:
         else:
             return SimulationSet(sim for sim in sims if sim.name in select)
 
-    def runPlot(self, function: PlotFunction) -> None:
-        logging.info("Running {}".format(function.name))
-        function(plt, self.sims)
-        self.saveAndShow(function.name)
+    # def runPlot(self, function: PlotFunction) -> None:
+    #     logging.info("Running {}".format(function.name))
+    #     function(plt, self.sims)
+    #     self.saveAndShow(function.name)
 
-    def runMultiPlot(self, function: MultiPlotFunction) -> None:
-        logging.info("Running {}".format(function.name))
-        quotient_params = self.quotient_params
-        if quotient_params is None:
-            quotient_params = function.default_quotient_params
-        print(self.sims.quotient(quotient_params))
-        quotient = [sims for (config, sims) in self.sims.quotient(quotient_params)]
-        function(plt, quotient)
-        self.saveAndShow(function.name)
+    # def runMultiPlot(self, function: MultiPlotFunction) -> None:
+    #     logging.info("Running {}".format(function.name))
+    #     quotient_params = self.quotient_params
+    #     if quotient_params is None:
+    #         quotient_params = function.default_quotient_params
+    #     print(self.sims.quotient(quotient_params))
+    #     quotient = [sims for (config, sims) in self.sims.quotient(quotient_params)]
+    #     function(plt, quotient)
+    #     self.saveAndShow(function.name)
 
-    def runSingleSimPlot(self, function: SingleSimPlotFunction) -> None:
-        logging.info("Running {}".format(function.name))
-        for sim in self.sims:
-            logging.info("For sim {}".format(sim.name))
-            function(plt, sim)
-            self.saveAndShow("{}_{}".format(sim.name, function.name))
+    # def runSingleSimPlot(self, function: SingleSimPlotFunction) -> None:
+    #     logging.info("Running {}".format(function.name))
+    #     for sim in self.sims:
+    #         logging.info("For sim {}".format(sim.name))
+    #         function(plt, sim)
+    #         self.saveAndShow("{}_{}".format(sim.name, function.name))
 
-    def runSingleSnapshotPlot(self, function: SingleSnapshotPlotFunction) -> None:
-        logging.info("Running {}".format(function.name))
-        for sim in self.sims:
-            logging.info("For sim {}".format(sim.name))
-            for snap in self.get_snapshots(sim):
-                logging.info("For snap {}".format(snap.name))
-                function(plt, sim, snap)
-                self.saveAndShow(
-                    "{}_{}_{}".format(sim.name, function.name, snap.name),
-                )
+    # def runSingleSnapshotPlot(self, function: SingleSnapshotPlotFunction) -> None:
+    #     logging.info("Running {}".format(function.name))
+    #     for sim in self.sims:
+    #         logging.info("For sim {}".format(sim.name))
+    #         for snap in self.get_snapshots(sim):
+    #             logging.info("For snap {}".format(snap.name))
+    #             function(plt, sim, snap)
+    #             self.saveAndShow(
+    #                 "{}_{}_{}".format(sim.name, function.name, snap.name),
+    #             )
 
-    def runSlicePlotFunction(self, function: SlicePlotFunction) -> None:
-        logging.info("Running {}".format(function.name))
-        for sim in self.sims:
-            logging.info("For sim {}".format(sim.name))
-            for slice_ in sim.getSlices(function.slice_type):
-                logging.info("For slice {}".format(slice_.name))
-                function(plt, sim, slice_)
-                self.saveAndShow(
-                    "{}_{}_{}".format(sim.name, function.name, slice_.name),
-                )
+    # def runSlicePlotFunction(self, function: SlicePlotFunction) -> None:
+    #     logging.info("Running {}".format(function.name))
+    #     for sim in self.sims:
+    #         logging.info("For sim {}".format(sim.name))
+    #         for slice_ in sim.getSlices(function.slice_type):
+    #             logging.info("For slice {}".format(slice_.name))
+    #             function(plt, sim, slice_)
+    #             self.saveAndShow(
+    #                 "{}_{}_{}".format(sim.name, function.name, slice_.name),
+    #             )
 
     def isInSnapshotArgs(self, snap: Snapshot) -> bool:
         return self.snapshotFilter is None or any(isSameSnapshot(arg_snap, snap) for arg_snap in self.snapshotFilter)

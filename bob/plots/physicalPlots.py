@@ -1,7 +1,6 @@
 from typing import List
 import numpy as np
 
-from bob.postprocessingFunctions import addSingleSnapshotPlot
 import matplotlib.pyplot as plt
 from bob.field import Field
 from bob.snapshot import Snapshot
@@ -10,10 +9,11 @@ from bob.simulation import Simulation
 from bob.temperature import Temperature
 
 from bob.plots.slicePlot import voronoiSlice
-from bob.plots.scatter3D import Scatter3D
-import bob.plots.ionizationTime
-import bob.plots.temperaturePlots
-import bob.plots.thomsonScattering
+
+# import bob.plots.ionizationTime
+# import bob.plots.temperaturePlots
+# import bob.plots.thomsonScattering
+# import bob.plots.image
 
 basicFields = [
     BasicField("ChemicalAbundances", 0),
@@ -40,40 +40,22 @@ basicFields = [
 ]
 
 
-def createVoronoiSlicePlots() -> None:
-    for basicField in basicFields:
-        for (axis, axisName) in zip([np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([0, 0, 1])], ["X", "Y", "Z"]):
+# def createVoronoiSlicePlots() -> None:
+#     for basicField in basicFields:
+#         for (axis, axisName) in zip([np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([0, 0, 1])], ["X", "Y", "Z"]):
 
-            def thisSlicePlot(
-                ax: plt.axes,
-                sim: Simulation,
-                snap: Snapshot,
-                basicField: Field = basicField,
-                axis: np.ndarray = axis,
-            ) -> None:
-                voronoiSlice(ax, sim, snap, basicField, axis)
+#             def thisSlicePlot(
+#                 ax: plt.axes,
+#                 sim: Simulation,
+#                 snap: Snapshot,
+#                 basicField: Field = basicField,
+#                 axis: np.ndarray = axis,
+#             ) -> None:
+#                 voronoiSlice(ax, sim, snap, basicField, axis)
 
-            name = f"slice{axisName}{basicField.niceName}"
-            # Register plot in list
-            addSingleSnapshotPlot(name)(thisSlicePlot)
-
-
-def createScatterPlots() -> None:
-    for basicField in basicFields:
-
-        def thisSlicePlot(
-            ax: plt.axes,
-            sim: Simulation,
-            snap: Snapshot,
-            basicField: Field = basicField,
-        ) -> None:
-            # center = sim.boxSize * 0.5
-            Scatter3D(snap, basicField, 0).plot(ax)
-
-        name = f"3D{basicField.niceName}"
-        # Register plot in list
-        addSingleSnapshotPlot(name)(thisSlicePlot)
+#             name = f"slice{axisName}{basicField.niceName}"
+#             # Register plot in list
+#             addSingleSnapshotPlot(name)(thisSlicePlot)
 
 
-createVoronoiSlicePlots()
-createScatterPlots()
+# createVoronoiSlicePlots()

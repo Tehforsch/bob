@@ -1,6 +1,9 @@
 from pathlib import Path
+
 import matplotlib.pyplot as plt
-from abc import abstractmethod
+import numpy as np
+
+from abc import ABC, abstractmethod
 from typing import Callable, Any, List, Optional
 from bob.simulation import Simulation
 from bob.simulationSet import SimulationSet
@@ -8,87 +11,64 @@ from bob.snapshot import Snapshot
 
 
 class PostprocessingFunction:
-    def __init__(self, f: Callable[..., Any], name: str) -> None:
-        self.f = f
-        self.name = name
+    pass
 
 
-class PlotFunction(PostprocessingFunction):
-    def __call__(self, axes: plt.axes, sims: SimulationSet) -> None:
-        return self.f(axes, sims)
+class SnapFn(PostprocessingFunction):
+    @abstractmethod
+    def post(self, sim: Simulation, snap: Snapshot) -> List[np.ndarray]:
+        pass
+
+    @abstractmethod
+    def plot(self, axes: plt.axes, result: List[np.ndarray]):
+        pass
 
 
-class MultiPlotFunction(PostprocessingFunction):
-    def __init__(self, f: Callable[..., Any], name: str) -> None:
-        super().__init__(f, name)
-        self.default_quotient_params: List[str] = []
+class SetFn(PostprocessingFunction):
+    @abstractmethod
+    def post(self, sims: SimulationSet) -> List[np.ndarray]:
+        pass
 
-    def __call__(self, axes: plt.axes, sims: List[SimulationSet]) -> None:
-        return self.f(axes, sims)
-
-
-class SingleSimPlotFunction(PostprocessingFunction):
-    def __call__(self, sim: Simulation, snap: Snapshot) -> None:
-        return self.f(sim, snap)
+    @abstractmethod
+    def plot(self, axes: plt.axes, result: List[np.ndarray]) -> None:
+        pass
 
 
-class SingleSnapshotPlotFunction(PostprocessingFunction):
-    def __call__(self, axes: plt.axes, sim: Simulation, snap: Snapshot) -> None:
-        return self.f(axes, sim, snap)
+class MultiSetFn(PostprocessingFunction):
+    @abstractmethod
+    def post(self, sims: List[SimulationSet]) -> List[np.ndarray]:
+        pass
+
+    @abstractmethod
+    def plot(self, axes: plt.axes, result: List[np.ndarray]) -> None:
+        pass
 
 
-class SlicePlotFunction(PostprocessingFunction):
-    def __init__(self, f: Callable[..., Any], name: str, slice_type: str):
+class SliceFn(PostprocessingFunction):
+    def __init__(self, slice_type: str):
         self.slice_type = slice_type
-        super(SlicePlotFunction, self).__init__(f, name)
 
-    def __call__(self, axes: plt.axes, sim: Simulation, slice_: Any) -> None:
-        return self.f(axes, sim, slice_)
+    @abstractmethod
+    def post(self, sim: Simulation, slice_: Any) -> List[np.ndarray]:
+        pass
+
+    @abstractmethod
+    def plot(self, axes: plt.axes, result: List[np.ndarray]) -> None:
+        pass
 
 
 # Giving up on mypy hints on this one
-def addToList(name: Optional[str], cls: Any, modify: Optional[Callable[..., Any]] = None) -> Callable[[Callable[..., Any]], Any]:
-    def wrapper(f: Callable[..., Any]) -> Any:
-        if name is None:
-            newF = cls(f, f.__name__)
+def addToList(name: Optional[str]) -> Any:
+    def wrapper(cls: Any) -> Any:
+        if name is not None:
+            cls.name = name
         else:
-            newF = cls(f, name)
-        if modify is not None:
-            modify(newF)
-        postprocessingFunctions.append(newF)
-        return newF
+            cls.name = cls.__name__
+            cls.name = cls.name[0].lower() + cls.name[1:]
+        postprocessingFunctions.append(cls)
+        return cls
 
     return wrapper
-
-
-def addPlot(name: Optional[str]) -> Callable[[Callable[..., Any]], PlotFunction]:
-    return addToList(name, PlotFunction)
-
-
-def addMultiPlot(name: Optional[str], default_quotient_params: List[str] = []) -> Callable[[Callable[..., Any]], MultiPlotFunction]:
-    def modify(f: MultiPlotFunction) -> None:
-        f.default_quotient_params = default_quotient_params
-
-    return addToList(name, MultiPlotFunction, modify)
-
-
-def addSingleSimPlot(
-    name: Optional[str],
-) -> Callable[[Callable[..., Any]], SingleSimPlotFunction]:
-    return addToList(name, SingleSimPlotFunction)
-
-
-def addSingleSnapshotPlot(
-    name: Optional[str],
-) -> Callable[[Callable[..., Any]], SingleSnapshotPlotFunction]:
-    return addToList(name, SingleSnapshotPlotFunction)
-
-
-def addSlicePlot(
-    slice_type: str,
-    name: Optional[str],
-) -> Callable[[Callable[..., Any]], SlicePlotFunction]:
-    return addToList(name, lambda f, name: SlicePlotFunction(f, name, slice_type))
 
 
 def checkNoDoubledNames() -> None:
