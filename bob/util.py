@@ -13,25 +13,6 @@ import pickle
 from bob import config
 
 
-def fileMemoize(func: Callable[..., Any]) -> Callable[..., Any]:
-    def wrapper(*args: List[Any], **kwargs: Dict[Any, Any]) -> Any:
-        callName = func.__name__ + str((args, tuple(kwargs.items())).__hash__())
-        if not config.memoizeDir.is_dir():
-            config.memoizeDir.mkdir()
-
-        resultFile = Path(config.memoizeDir, callName)
-        if resultFile.is_file():
-            result = pickle.load(resultFile.open("rb"))
-            logging.info(f"REUSING MEMOIZED RESULT FOR {func.__name__}")
-            return result
-        else:
-            result = func(*args, **kwargs)
-            pickle.dump(result, resultFile.open("wb"))
-            return result
-
-    return wrapper
-
-
 def unitNpArray(values: List[pq.quantity.Quantity]) -> np.ndarray:
     assert len(values) > 0, "What unit am I supposed to turn this empty array into?"
     units = values[0].units
@@ -79,20 +60,6 @@ def toList(func: Callable[..., Iterable[Any]]) -> Callable[..., List[Any]]:
     def wrapper(*args: List[Any], **kwargs: Dict[str, Any]) -> Any:
         result = func(*args, **kwargs)
         return list(result)
-
-    return wrapper
-
-
-def memoize(func: Callable[..., Any]) -> Callable[..., Any]:
-    cache: Dict[Any, Any] = {}
-
-    def wrapper(*args: List[Any], **kwargs: Dict[str, Any]) -> Any:
-        key = str(args) + str(kwargs)
-        if key in cache:
-            return cache[key]
-        result = func(*args, **kwargs)
-        cache[key] = result
-        return result
 
     return wrapper
 

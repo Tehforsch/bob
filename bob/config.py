@@ -41,7 +41,6 @@ jobFilename = "job"
 sourceOutputFolderName = "arepo"
 picFolder = "pics"
 specialFolders = [picFolder]
-memoizeDir = Path(Path.home(), ".bobMemoize")  # For in-file memoization to speed up plot work
 initialSnapIdentifier = (
     "initialSnap"  # The name of the variable specifying the name of the file which we should copy to the output directory to run postprocessing on
 )

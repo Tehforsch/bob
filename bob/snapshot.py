@@ -5,7 +5,6 @@ import h5py
 import re
 import astropy.units as pq
 from bob.basicField import BasicField
-from bob.util import memoize
 from bob.exceptions import BobException
 from bob.constants import kB, protonMass, MSun
 
@@ -44,7 +43,6 @@ class Snapshot:
             return match.groups()[0]
 
     @property  # type: ignore
-    @memoize
     def coordinates(self) -> np.ndarray:
         return BasicField("Coordinates").getData(self)
 
