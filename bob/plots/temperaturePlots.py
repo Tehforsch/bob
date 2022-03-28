@@ -1,15 +1,17 @@
 from typing import Tuple, List
+
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.spatial import cKDTree
+
 from bob.snapshot import Snapshot
 from bob.postprocessingFunctions import addMultiPlot
 from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
 from bob.basicField import BasicField
 from bob.temperature import Temperature
-from bob.slicePlot import findOrthogonalAxes
+from bob.plots.slicePlot import findOrthogonalAxes
 import bob.config as config
-from scipy.spatial import cKDTree
 
 
 @addMultiPlot(None)

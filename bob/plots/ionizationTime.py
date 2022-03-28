@@ -1,14 +1,16 @@
 from typing import Tuple
+
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.spatial import cKDTree
+
 from bob.snapshot import Snapshot
 from bob.postprocessingFunctions import addPlot
 from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
 from bob.basicField import BasicField
-from bob.slicePlot import findOrthogonalAxes
+from bob.plots.slicePlot import findOrthogonalAxes
 import bob.config as config
-from scipy.spatial import cKDTree
 
 
 @addPlot(None)

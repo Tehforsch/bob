@@ -4,11 +4,10 @@ from typing import Sequence
 from pathlib import Path
 from bob.simulationSet import SimulationSet
 from bob import config
-import bob.scaling
 import matplotlib.pyplot as plt
 import bob.plot
-import bob.physicalPlots
-import bob.image
+import bob.plots.physicalPlots
+import bob.plots.image
 
 from bob.postprocessingFunctions import (
     postprocessingFunctions,

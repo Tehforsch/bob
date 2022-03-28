@@ -5,14 +5,15 @@ from bob.postprocessingFunctions import addSingleSnapshotPlot
 import matplotlib.pyplot as plt
 from bob.field import Field
 from bob.snapshot import Snapshot
-from bob.slicePlot import voronoiSlice
-from bob.scatter3D import Scatter3D
 from bob.basicField import BasicField
 from bob.simulation import Simulation
 from bob.temperature import Temperature
-import bob.ionizationTime
-import bob.temperaturePlots
-import bob.thomsonScattering
+
+from bob.plots.slicePlot import voronoiSlice
+from bob.plots.scatter3D import Scatter3D
+import bob.plots.ionizationTime
+import bob.plots.temperaturePlots
+import bob.plots.thomsonScattering
 
 basicFields = [
     BasicField("ChemicalAbundances", 0),

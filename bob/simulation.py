@@ -88,7 +88,7 @@ class Simulation:
         return [Snapshot(self, s) for s in snapshotFiles]
 
     def getSlices(self, name: str) -> List[Any]:
-        from bob.image import Slice
+        from bob.plots.image import Slice
 
         def isCorrectSlice(filename: str) -> bool:
             return "slice" in filename and str(filename).split("_")[0] == name
