@@ -24,8 +24,8 @@ from bob.postprocessingFunctions import (
 )
 
 
-def getSpecifiedFunction(args: argparse.Namespace, functions: Sequence[PostprocessingFunction]) -> Sequence[PostprocessingFunction]:
-    return next(function for function in functions if function.name == args.function)
+def getFunctionByName(name: str, functions: Sequence[PostprocessingFunction]) -> Sequence[PostprocessingFunction]:
+    return next(function for function in functions if function.name == name)
 
 
 def setMatplotlibStyle() -> None:
@@ -40,7 +40,8 @@ def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> 
     picFolder = Path(parent_folder, config.picFolder)
     picFolder.mkdir(exist_ok=True)
     plotter = bob.plot.Plotter(parent_folder, sims, args.snapshots, args.show, args.select, args.quotient)
-    function = getSpecifiedFunction(args, postprocessingFunctions)()
+    function = getFunctionByName(args.function, postprocessingFunctions)
+    print(args)
     if isinstance(function, SnapFn):
         plotter.runSnapFn(function)
     elif isinstance(function, SetFn):

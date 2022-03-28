@@ -1,3 +1,5 @@
+import argparse
+
 from typing import Any, Dict, Tuple, List
 import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
@@ -7,37 +9,37 @@ from bob.simulation import Simulation
 from bob.snapshot import Snapshot
 from bob.field import Field
 from bob import config
+from bob.postprocessingFunctions import SnapFn
+from bob.result import Result
 
 
-def voronoiSlice(
-    ax: plt.axes,
-    sim: Simulation,
-    snap: Snapshot,
-    field: Field,
-    axis: np.ndarray,
-    **plotSettings: Dict[str, Any],
-) -> None:
-    axis = np.array(axis)
-    center = snap.center
-    ortho1, ortho2 = findOrthogonalAxes(axis)
-    min1 = np.dot(ortho1, snap.minExtent)
-    min2 = np.dot(ortho2, snap.minExtent)
-    max1 = np.dot(ortho1, snap.maxExtent)
-    max2 = np.dot(ortho2, snap.maxExtent)
-    n1 = config.dpi * 3
-    n2 = config.dpi * 3
-    p1, p2 = np.meshgrid(np.linspace(min1, max1, n1), np.linspace(min2, max2, n2))
-    coordinates = axis * (center * axis) + np.outer(p1, ortho1) + np.outer(p2, ortho2)
-    tree = cKDTree(snap.coordinates)
-    cellIndices = tree.query(coordinates)[1]
-    cellIndices = cellIndices.reshape((n1, n2))
-    data = field.getData(snap)
-    print(f"Field: {field.niceName}: min: {np.min(data):.2e}, mean: {np.mean(data):.2e}, max: {np.max(data):.2e}")
-    ax.xlabel(getAxisName(ortho1))
-    ax.ylabel(getAxisName(ortho2))
-    extent = (min1, max1, min2, max2)
-    ax.imshow(data[cellIndices], extent=extent, origin="lower", cmap="Reds", **plotSettings)
-    plt.colorbar()
+class VoronoiSlice(SnapFn):
+    def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
+        print(args)
+        axis = np.array(axis)
+        center = snap.center
+        ortho1, ortho2 = findOrthogonalAxes(axis)
+        min1 = np.dot(ortho1, snap.minExtent)
+        min2 = np.dot(ortho2, snap.minExtent)
+        max1 = np.dot(ortho1, snap.maxExtent)
+        max2 = np.dot(ortho2, snap.maxExtent)
+        n1 = config.dpi * 3
+        n2 = config.dpi * 3
+        p1, p2 = np.meshgrid(np.linspace(min1, max1, n1), np.linspace(min2, max2, n2))
+        coordinates = axis * (center * axis) + np.outer(p1, ortho1) + np.outer(p2, ortho2)
+        tree = cKDTree(snap.coordinates)
+        cellIndices = tree.query(coordinates)[1]
+        cellIndices = cellIndices.reshape((n1, n2))
+        data = field.getData(snap)
+        return data[cellIndicies]
+
+    def plot(self, plt: plt.axes, result: Result) -> None:
+        print(f"Field: {field.niceName}: min: {np.min(data):.2e}, mean: {np.mean(data):.2e}, max: {np.max(data):.2e}")
+        ax.xlabel(getAxisName(ortho1))
+        ax.ylabel(getAxisName(ortho2))
+        extent = (min1, max1, min2, max2)
+        ax.imshow(result.arrs[0], extent=extent, origin="lower", cmap="Reds", **plotSettings)
+        plt.colorbar()
 
 
 def getAxisName(axis: np.ndarray) -> str:

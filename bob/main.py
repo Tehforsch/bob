@@ -11,7 +11,6 @@ from bob.util import getCommonParentFolder
 
 def setupArgs() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Postprocess arepo sims")
-    functionNames = postprocessingFunctions.functionNames()
     parser.add_argument("simFolders", type=Path, nargs="*", help="Path to simulation directories")
     parser.add_argument(
         "--snapshots",
@@ -26,15 +25,14 @@ def setupArgs() -> argparse.Namespace:
         help="Select only some of the sims for postprocessing/running/compiling",
     )
     parser.add_argument("-q", "--quotient", nargs="*", help="Parameters by which to divide the simulations into sets")
-    parser.add_argument(
-        "function",
-        choices=functionNames,
-        help="Which postprocessing function to run",
-    )
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     parser.add_argument("--show", action="store_true", help="Show figures instead of saving them")
     parser.add_argument("--post", action="store_true", help="Only postprocess the data, do not run the corresponding plot scripts (for cluster)")
     parser.add_argument("--replot", action="store_true", help="Only run the plots, do not run the corresponding plot scripts (for cluster)")
+    subparsers = parser.add_subparsers(dest="function", required=True)
+    for function in postprocessingFunctions.postprocessingFunctions:
+        subparser = subparsers.add_parser(function.name)
+        function.setArgs(subparser)
 
     args = parser.parse_args()
     return args

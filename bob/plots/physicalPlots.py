@@ -7,8 +7,8 @@ from bob.snapshot import Snapshot
 from bob.basicField import BasicField
 from bob.simulation import Simulation
 from bob.temperature import Temperature
-
-from bob.plots.slicePlot import voronoiSlice
+from bob.plots.slicePlot import VoronoiSlice
+from bob.postprocessingFunctions import addToList
 
 # import bob.plots.ionizationTime
 # import bob.plots.temperaturePlots
@@ -36,26 +36,7 @@ basicFields = [
     BasicField("PhotonRates", 3),
     BasicField("PhotonRates", 4),
     Temperature(),
-    # CombinedAbundances(),
 ]
 
 
-# def createVoronoiSlicePlots() -> None:
-#     for basicField in basicFields:
-#         for (axis, axisName) in zip([np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([0, 0, 1])], ["X", "Y", "Z"]):
-
-#             def thisSlicePlot(
-#                 ax: plt.axes,
-#                 sim: Simulation,
-#                 snap: Snapshot,
-#                 basicField: Field = basicField,
-#                 axis: np.ndarray = axis,
-#             ) -> None:
-#                 voronoiSlice(ax, sim, snap, basicField, axis)
-
-#             name = f"slice{axisName}{basicField.niceName}"
-#             # Register plot in list
-#             addSingleSnapshotPlot(name)(thisSlicePlot)
-
-
-# createVoronoiSlicePlots()
+addToList("slice")(VoronoiSlice())

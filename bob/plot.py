@@ -54,22 +54,24 @@ class Plotter:
         else:
             return SimulationSet(sim for sim in sims if sim.name in select)
 
-    def runPostAndPlot(self, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]) -> None:
+    def runPostAndPlot(self, args: argparse.Namespace, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]) -> None:
         logging.info("Running {}".format(name))
         result = post()
         plot(plt.axes, result)
         self.saveAndShow(name)
 
-    def runMultiSetFn(self, function: MultiSetFn) -> None:
+    def runMultiSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
         logging.info("Running {}".format(function.name))
         quotient_params = self.quotient_params
         if quotient_params is None:
             quotient_params = []
         print(self.sims.quotient(quotient_params))
         quotient = [sims for (config, sims) in self.sims.quotient(quotient_params)]
+
         def post():
-            function.post(quotient)
-        self.runPostAndPlot(function.name, post, function.plot)
+            function.post(args, quotient)
+
+        self.runPostAndPlot(args, function.name, post, function.plot)
 
     # def runSingleSimPlot(self, function: SingleSimPlotFunction) -> None:
     #     logging.info("Running {}".format(function.name))
@@ -78,16 +80,14 @@ class Plotter:
     #         function(plt, sim)
     #         self.saveAndShow("{}_{}".format(sim.name, function.name))
 
-    # def runSingleSnapshotPlot(self, function: SingleSnapshotPlotFunction) -> None:
-    #     logging.info("Running {}".format(function.name))
-    #     for sim in self.sims:
-    #         logging.info("For sim {}".format(sim.name))
-    #         for snap in self.get_snapshots(sim):
-    #             logging.info("For snap {}".format(snap.name))
-    #             function(plt, sim, snap)
-    #             self.saveAndShow(
-    #                 "{}_{}_{}".format(sim.name, function.name, snap.name),
-    #             )
+    def runSnapFn(self, args: argparse.Namespace, function: SnapFn) -> None:
+        logging.info("Running {}".format(function.name))
+        for sim in self.sims:
+            logging.info("For sim {}".format(sim.name))
+            for snap in self.get_snapshots(sim):
+                logging.info("For snap {}".format(snap.name))
+                name = "{}_{}_{}".format(sim.name, function.name, snap.name)
+                self.runPostAndPlot(args, name, lambda: function.post(args, sim, snap), function.plot)
 
     # def runSlicePlotFunction(self, function: SlicePlotFunction) -> None:
     #     logging.info("Running {}".format(function.name))

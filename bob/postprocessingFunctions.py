@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -8,39 +9,41 @@ from typing import Callable, Any, List, Optional
 from bob.simulation import Simulation
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
+from bob.result import Result
 
 
 class PostprocessingFunction(ABC):
-    pass
+    def setArgs(self, subparser: argparse.ArgumentParser):
+        pass
 
 
 class SnapFn(PostprocessingFunction):
     @abstractmethod
-    def post(self, sim: Simulation, snap: Snapshot) -> List[np.ndarray]:
+    def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
         pass
 
     @abstractmethod
-    def plot(self, axes: plt.axes, result: List[np.ndarray]):
+    def plot(self, axes: plt.axes, result: Result):
         pass
 
 
 class SetFn(PostprocessingFunction):
     @abstractmethod
-    def post(self, sims: SimulationSet) -> List[np.ndarray]:
+    def post(self, args: argparse.Namespace, sims: SimulationSet) -> Result:
         pass
 
     @abstractmethod
-    def plot(self, axes: plt.axes, result: List[np.ndarray]) -> None:
+    def plot(self, axes: plt.axes, result: Result) -> None:
         pass
 
 
 class MultiSetFn(PostprocessingFunction):
     @abstractmethod
-    def post(self, sims: List[SimulationSet]) -> List[np.ndarray]:
+    def post(self, args: argparse.Namespace, sims: List[SimulationSet]) -> Result:
         pass
 
     @abstractmethod
-    def plot(self, axes: plt.axes, result: List[np.ndarray]) -> None:
+    def plot(self, axes: plt.axes, result: Result) -> None:
         pass
 
 
@@ -49,11 +52,11 @@ class SliceFn(PostprocessingFunction):
         self.slice_type = slice_type
 
     @abstractmethod
-    def post(self, sim: Simulation, slice_: Any) -> List[np.ndarray]:
+    def post(self, args: argparse.Namespace, sim: Simulation, slice_: Any) -> Result:
         pass
 
     @abstractmethod
-    def plot(self, axes: plt.axes, result: List[np.ndarray]) -> None:
+    def plot(self, axes: plt.axes, result: Result) -> None:
         pass
 
 
@@ -77,7 +80,3 @@ def checkNoDoubledNames() -> None:
 
 
 postprocessingFunctions: List[PostprocessingFunction] = []
-
-
-def functionNames() -> List[str]:
-    return [f.name for f in postprocessingFunctions]
