@@ -27,13 +27,14 @@ def setupArgs() -> argparse.Namespace:
     )
     parser.add_argument("-q", "--quotient", nargs="*", help="Parameters by which to divide the simulations into sets")
     parser.add_argument(
-        "functions",
+        "function",
         choices=functionNames,
-        nargs="+",
-        help="Which postprocessing functions to run",
+        help="Which postprocessing function to run",
     )
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     parser.add_argument("--show", action="store_true", help="Show figures instead of saving them")
+    parser.add_argument("--post", action="store_true", help="Only postprocess the data, do not run the corresponding plot scripts (for cluster)")
+    parser.add_argument("--replot", action="store_true", help="Only run the plots, do not run the corresponding plot scripts (for cluster)")
 
     args = parser.parse_args()
     return args

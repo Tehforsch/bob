@@ -2,11 +2,18 @@ import os
 import argparse
 from typing import Sequence
 from pathlib import Path
+
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    pass
+
 from bob.simulationSet import SimulationSet
 from bob import config
 import bob.plot
 import bob.plots.physicalPlots
 import bob.plots.image
+
 
 from bob.postprocessingFunctions import (
     postprocessingFunctions,
@@ -20,22 +27,18 @@ from bob.postprocessingFunctions import (
 )
 
 
-def getSpecifiedFunctions(args: argparse.Namespace, functions: Sequence[PostprocessingFunction]) -> Sequence[PostprocessingFunction]:
-    if args.functions is None:
-        return functions
-    else:
-        return [function for function in functions if function.name in args.functions]
+def getSpecifiedFunction(args: argparse.Namespace, functions: Sequence[PostprocessingFunction]) -> Sequence[PostprocessingFunction]:
+    return next(function for function in functions if function.name == args.function)
 
 
 def setMatplotlibStyle() -> None:
-    import matplotlib.pyplot as plt
-
     file_path = Path(os.path.realpath(__file__))
     plt.style.use(Path(file_path).parent / "../styles/plot.mlpstyle")
 
 
 def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> None:
-    setMatplotlibStyle()
+    if not args.post:
+        setMatplotlibStyle()
 
     picFolder = Path(parent_folder, config.picFolder)
     picFolder.mkdir(exist_ok=True)
