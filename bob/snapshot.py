@@ -66,15 +66,15 @@ class Snapshot:
         self.massUnit = self.hdf5File["Header"].attrs["UnitMass_in_g"] * pq.g
         self.velocityUnit = self.hdf5File["Header"].attrs["UnitVelocity_in_cm_per_s"] * pq.cm / pq.s
         self.timeUnit = self.lengthUnit / self.velocityUnit
-        self.energyUnit = self.lengthUnit**2 / (self.timeUnit**2) * self.massUnit
-        self.volumeUnit = self.lengthUnit**3
+        self.energyUnit = self.lengthUnit ** 2 / (self.timeUnit ** 2) * self.massUnit
+        self.volumeUnit = self.lengthUnit ** 3
         self.scale_factor = self.hdf5File["Header"].attrs["Time"]
         self.time = self.hdf5File["Header"].attrs["Time"] * self.timeUnit
         self.z = redsh
         # prefactors derived from that:
-        self.dens_prev = (self.massUnit / self.lengthUnit**3) * ((redsh + 1.0) ** 3 * self.h**2)
+        self.dens_prev = (self.massUnit / self.lengthUnit ** 3) * ((redsh + 1.0) ** 3 * self.h ** 2)
         self.dens_to_ndens = 1.0 / (protonMass)
-        self.temp_prev = ((gamma - 1.0) * protonMass / kB) * self.velocityUnit**2
+        self.temp_prev = ((gamma - 1.0) * protonMass / kB) * self.velocityUnit ** 2
         self.mass_prev = self.massUnit / MSun / self.h
         self.len_to_phys = 1.0 / self.h / (1.0 + redsh)
         self.l_Mpc = self.lengthUnit / (1.0e6 * pq.pc)
@@ -92,14 +92,14 @@ class Snapshot:
 
     def cosmic_time(self, a1: float, a0: float) -> float:
         factor1 = 2.0 / (3.0 * np.sqrt(self.OmegaLambda))
-        term1 = np.sqrt(self.OmegaLambda / self.Omega0) * a0**1.5
-        term2 = np.sqrt(1 + self.OmegaLambda / self.Omega0 * a0**3)
+        term1 = np.sqrt(self.OmegaLambda / self.Omega0) * a0 ** 1.5
+        term2 = np.sqrt(1 + self.OmegaLambda / self.Omega0 * a0 ** 3)
         factor2 = np.log(term1 + term2)
 
         t0 = factor1 * factor2
 
-        term1 = np.sqrt(self.OmegaLambda / self.Omega0) * a1**1.5
-        term2 = np.sqrt(1 + self.OmegaLambda / self.Omega0 * a1**3)
+        term1 = np.sqrt(self.OmegaLambda / self.Omega0) * a1 ** 1.5
+        term2 = np.sqrt(1 + self.OmegaLambda / self.Omega0 * a1 ** 3)
         factor2 = np.log(term1 + term2)
         t1 = factor1 * factor2
 

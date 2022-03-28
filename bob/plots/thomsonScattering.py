@@ -11,7 +11,7 @@ from bob.constants import speedOfLight, protonMass
 
 @addMultiPlot(None)
 def thomsonScattering(ax1: plt.axes, simSets: List[SimulationSet]) -> None:
-    sig = 6.65e-29 * pq.m**2  # Thomson scattering cross-section in m^2
+    sig = 6.65e-29 * pq.m ** 2  # Thomson scattering cross-section in m^2
 
     # ne, free electron density in number per m^3
 

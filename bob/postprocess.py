@@ -29,6 +29,7 @@ def getSpecifiedFunctions(args: argparse.Namespace, functions: Sequence[Postproc
 
 def setMatplotlibStyle() -> None:
     import matplotlib.pyplot as plt
+
     file_path = Path(os.path.realpath(__file__))
     plt.style.use(Path(file_path).parent / "../styles/plot.mlpstyle")
 
