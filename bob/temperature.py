@@ -41,3 +41,7 @@ class Temperature(Field):
     @property
     def niceName(self) -> str:
         return "Temperature"
+
+    @property
+    def symbol(self) -> str:
+        return "T"

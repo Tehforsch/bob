@@ -16,6 +16,11 @@ class Field(ABC):
     def niceName(self) -> str:
         pass
 
+    @property
+    @abstractmethod
+    def symbol(self) -> str:
+        pass
+
 
 class RelativeDifference(Field):
     def __init__(self, field: Field, reference: "Snapshot") -> None:

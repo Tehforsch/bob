@@ -35,6 +35,20 @@ class BasicField(Field):
             return fieldName[self.name]
         return fieldName[self.name] + str(self.index)
 
+    @property
+    def symbol(self) -> str:
+        fieldName: Dict[str, str] = {
+            "ChemicalAbundances": "Abundance",
+            "PhotonFlux": "Flux",
+            "Density": "$\rho$",
+            "PhotonRates": "PhotonRate",
+            "Masses": "$m$",
+            "Coordinates": "Coordinates",
+        }
+        if self.index is None:
+            return fieldName[self.name]
+        return fieldName[self.name] + str(self.index)
+
     def getData(self, snapshot: "Snapshot") -> np.ndarray:
         fieldData = readIntoNumpyArray(snapshot.hdf5File["PartType0"][self.name])
         if self.index is None:

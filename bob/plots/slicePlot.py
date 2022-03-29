@@ -5,38 +5,14 @@ import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
 import numpy as np
 
-from bob.basicField import BasicField
-from bob.temperature import Temperature
 from bob.simulation import Simulation
 from bob.snapshot import Snapshot
 from bob.field import Field
 from bob import config
 from bob.postprocessingFunctions import SnapFn
 from bob.result import Result
-
-
-basicFields = [
-    BasicField("ChemicalAbundances", 0),
-    BasicField("ChemicalAbundances", 1),
-    BasicField("ChemicalAbundances", 2),
-    BasicField("ChemicalAbundances", 3),
-    BasicField("ChemicalAbundances", 4),
-    BasicField("ChemicalAbundances", 5),
-    BasicField("Density", None),
-    BasicField("Masses", None),
-    BasicField("Coordinates", None),
-    BasicField("PhotonFlux", 0),
-    BasicField("PhotonFlux", 1),
-    BasicField("PhotonFlux", 2),
-    BasicField("PhotonFlux", 3),
-    BasicField("PhotonFlux", 4),
-    BasicField("PhotonRates", 0),
-    BasicField("PhotonRates", 1),
-    BasicField("PhotonRates", 2),
-    BasicField("PhotonRates", 3),
-    BasicField("PhotonRates", 4),
-    Temperature(),
-]
+from bob.basicField import BasicField
+from bob.allFields import allFields, getFieldByName
 
 
 class VoronoiSlice(SnapFn):
@@ -70,14 +46,10 @@ class VoronoiSlice(SnapFn):
 
     def setArgs(self, subparser: argparse.ArgumentParser):
         subparser.add_argument("--axis", required=True, choices=["x", "y", "z"])
-        subparser.add_argument("--field", required=True, choices=[f.niceName for f in basicFields])
+        subparser.add_argument("--field", required=True, choices=[f.niceName for f in allFields])
 
     def get_name(self, args: argparse.Namespace) -> str:
         return f"{self.name}_{args.axis}_{args.field}"
-
-
-def getFieldByName(name: str) -> np.ndarray:
-    return next(field for field in basicFields if field.niceName == name)
 
 
 def getAxisByName(name: str) -> np.ndarray:
