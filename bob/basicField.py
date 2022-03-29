@@ -1,4 +1,5 @@
 from typing import Optional, Dict
+import astropy.units as pq
 import h5py
 import numpy as np
 
@@ -48,6 +49,10 @@ class BasicField(Field):
         if self.index is None:
             return fieldName[self.name]
         return fieldName[self.name] + str(self.index)
+
+    @property
+    def unit(self) -> pq.Quantity:
+        return 1
 
     def getData(self, snapshot: "Snapshot") -> np.ndarray:
         fieldData = readIntoNumpyArray(snapshot.hdf5File["PartType0"][self.name])

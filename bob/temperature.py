@@ -45,3 +45,7 @@ class Temperature(Field):
     @property
     def symbol(self) -> str:
         return "T"
+
+    @property
+    def unit(self) -> pq.Quantity:
+        return pq.K
