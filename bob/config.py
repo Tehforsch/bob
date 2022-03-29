@@ -56,6 +56,8 @@ npRed = np.array([1.0, 0.0, 0.0])
 npGreen = np.array([0.0, 1.0, 0.0])
 npBlue = np.array([0.0, 0.0, 1.0])
 
+plotSerializationFileName = "plot.info"
+
 # Gprof settings
 gprofPartFilePattern = "gmon.out.*"
 gprofSumFile = "gmon.sum"

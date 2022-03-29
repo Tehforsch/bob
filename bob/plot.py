@@ -1,3 +1,5 @@
+import os
+import pickle
 from typing import Iterator, List, Optional, Callable
 import itertools
 from pathlib import Path
@@ -18,7 +20,7 @@ from bob import config
 import bob.plots.ionization
 from bob.simulation import Simulation
 from bob.result import Result
-
+from bob.postprocessingFunctions import PostprocessingFunction
 
 def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
     try:
@@ -56,17 +58,32 @@ class Plotter:
         else:
             return SimulationSet(sim for sim in sims if sim.name in select)
 
-    def runPostAndPlot(self, args: argparse.Namespace, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]) -> None:
+    def replot(self, args: argparse.Namespace) -> None:
+        for plot in os.listdir(self.data_folder):
+            plot_folder = self.data_folder / plot
+            plot = pickle.load(open(plot_folder / config.plotSerializationFileName, "rb"))
+            result = Result.fromFolder(plot_folder)
+            plot.plot(plt, result)
+            self.saveAndShow(plot_folder.name)
+            
+
+    def runPostAndPlot(self, args: argparse.Namespace, fn: PostprocessingFunction, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]) -> None:
         logging.info("Running {}".format(name))
         result = post()
+        self.savePlotInfo(fn, name)
         self.saveResult(name, result)
         plot(plt, result)
         self.saveAndShow(name)
 
-    def saveResult(self, plotName, result):
+    def savePlotInfo(self, fn: PostprocessingFunction, plotName: str) -> None:
+        filename = self.data_folder / plotName / config.plotSerializationFileName
+        pickle.dump(fn, open(filename, "wb"))
+ 
+    def saveResult(self, plotName: str, result: Result) -> None:
         plotDataFolder = self.data_folder / plotName
         plotDataFolder.mkdir(parents=True, exist_ok=True)
         result.save(plotDataFolder)
+
 
     def runMultiSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
         logging.info("Running {}".format(function.name))
@@ -96,7 +113,7 @@ class Plotter:
             for snap in self.get_snapshots(sim):
                 logging.info("For snap {}".format(snap.name))
                 name = "{}_{}_{}".format(sim.name, function.name, snap.name)
-                self.runPostAndPlot(args, name, lambda: function.post(args, sim, snap), function.plot)
+                self.runPostAndPlot(args, function, name, lambda: function.post(args, sim, snap), function.plot)
 
     # def runSlicePlotFunction(self, function: SlicePlotFunction) -> None:
     #     logging.info("Running {}".format(function.name))

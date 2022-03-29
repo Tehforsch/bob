@@ -33,6 +33,7 @@ def setupArgs() -> argparse.Namespace:
     for function in postprocessingFunctions.postprocessingFunctions:
         subparser = subparsers.add_parser(function.name)
         function.setArgs(subparser)
+    subparsers.add_parser("replot")
 
     args = parser.parse_args()
     return args

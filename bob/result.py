@@ -1,3 +1,4 @@
+import os
 import logging
 
 from pathlib import Path
@@ -18,3 +19,9 @@ class Result:
             else:
                 value = arr
             np.save(folder / str(i), value)
+
+    def fromFolder(folder: Path) -> "Result":
+        files = [folder / f for f in os.listdir(folder) if Path(f).suffix == ".npy"]
+        files.sort(key=lambda f: int(f.stem))
+        return Result([np.load(f) for f in files])
+        

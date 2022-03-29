@@ -40,14 +40,17 @@ def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> 
     picFolder = Path(parent_folder, config.picFolder)
     picFolder.mkdir(exist_ok=True)
     plotter = bob.plot.Plotter(parent_folder, sims, args.snapshots, args.show, args.select, args.quotient)
-    function = getFunctionByName(args.function, postprocessingFunctions)
-    if isinstance(function, SnapFn):
-        plotter.runSnapFn(args, function)
-    elif isinstance(function, SetFn):
-        plotter.runSetFn(args, function)
-    elif isinstance(function, MultiSetFn):
-        plotter.runMultiSetFn(args, function)
-    elif isinstance(function, SliceFn):
-        plotter.runSliceFn(args, function)
+    if args.function == "replot":
+        plotter.replot(args)
     else:
-        raise NotImplementedError
+        function = getFunctionByName(args.function, postprocessingFunctions)
+        if isinstance(function, SnapFn):
+            plotter.runSnapFn(args, function)
+        elif isinstance(function, SetFn):
+            plotter.runSetFn(args, function)
+        elif isinstance(function, MultiSetFn):
+            plotter.runMultiSetFn(args, function)
+        elif isinstance(function, SliceFn):
+            plotter.runSliceFn(args, function)
+        else:
+            raise NotImplementedError
