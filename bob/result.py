@@ -24,4 +24,3 @@ class Result:
         files = [folder / f for f in os.listdir(folder) if Path(f).suffix == ".npy"]
         files.sort(key=lambda f: int(f.stem))
         return Result([np.load(f) for f in files])
-        

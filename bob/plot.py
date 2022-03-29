@@ -22,6 +22,7 @@ from bob.simulation import Simulation
 from bob.result import Result
 from bob.postprocessingFunctions import PostprocessingFunction
 
+
 def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
     try:
         if type(snap.number) == int:
@@ -65,9 +66,10 @@ class Plotter:
             result = Result.fromFolder(plot_folder)
             plot.plot(plt, result)
             self.saveAndShow(plot_folder.name)
-            
 
-    def runPostAndPlot(self, args: argparse.Namespace, fn: PostprocessingFunction, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]) -> None:
+    def runPostAndPlot(
+        self, args: argparse.Namespace, fn: PostprocessingFunction, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]
+    ) -> None:
         logging.info("Running {}".format(name))
         result = post()
         self.savePlotInfo(fn, name)
@@ -78,12 +80,11 @@ class Plotter:
     def savePlotInfo(self, fn: PostprocessingFunction, plotName: str) -> None:
         filename = self.data_folder / plotName / config.plotSerializationFileName
         pickle.dump(fn, open(filename, "wb"))
- 
+
     def saveResult(self, plotName: str, result: Result) -> None:
         plotDataFolder = self.data_folder / plotName
         plotDataFolder.mkdir(parents=True, exist_ok=True)
         result.save(plotDataFolder)
-
 
     def runMultiSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
         logging.info("Running {}".format(function.name))

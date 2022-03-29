@@ -376,4 +376,5 @@ class Ionization(MultiSetFn):
         becker_2015_high = becker_2015_raw[20:, 1]
         return becker_2015_xHI, becker_2015_low, becker_2015_high
 
+
 addToList("ionization", Ionization())

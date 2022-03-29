@@ -38,6 +38,7 @@ basicFields = [
     Temperature(),
 ]
 
+
 class VoronoiSlice(SnapFn):
     def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
         axis = getAxisByName(args.axis)
@@ -71,16 +72,15 @@ class VoronoiSlice(SnapFn):
         subparser.add_argument("--axis", required=True, choices=["x", "y", "z"])
         subparser.add_argument("--field", required=True, choices=[f.niceName for f in basicFields])
 
+
 def getFieldByName(name: str) -> np.ndarray:
     return next(field for field in basicFields if field.niceName == name)
-    
+
 
 def getAxisByName(name: str) -> np.ndarray:
-    return [
-        np.array([1.0, 0.0, 0.0]),
-        np.array([0.0, 1.0, 0.0]),
-        np.array([0.0, 0.0, 1.0])][["x", "y", "z"].index(name)]
-    
+    return [np.array([1.0, 0.0, 0.0]), np.array([0.0, 1.0, 0.0]), np.array([0.0, 0.0, 1.0])][["x", "y", "z"].index(name)]
+
+
 def getAxisName(axis: np.ndarray) -> str:
     xAxis = np.array([1.0, 0.0, 0.0])
     yAxis = np.array([0.0, 1.0, 0.0])

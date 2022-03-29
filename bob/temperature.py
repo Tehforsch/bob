@@ -16,8 +16,8 @@ class Temperature(Field):
         # The following calculation was taken from voronoi_makeimage.c line 2240
         # and gives the same temperatures as are shown on the Arepo images
         # self.new["density"] = self.new["mass"] / self.new["length"] ** 3
-        densityUnit = snapshot.massUnit / (snapshot.lengthUnit ** 3)
-        numberDensityUnit = 1 / (snapshot.lengthUnit ** 3)
+        densityUnit = snapshot.massUnit / (snapshot.lengthUnit**3)
+        numberDensityUnit = 1 / (snapshot.lengthUnit**3)
         density = BasicField("Density").getData(snapshot)
         try:
             x0He = 0.1
@@ -30,7 +30,7 @@ class Temperature(Field):
             mu = 1.0 / yntot
         except:
             print("TNG style snapshot, using ElectronAbundance")
-            en = BasicField("InternalEnergy").getData(snapshot) * snapshot.velocityUnit ** 2
+            en = BasicField("InternalEnergy").getData(snapshot) * snapshot.velocityUnit**2
             print("energy snap", np.mean(BasicField("InternalEnergy").getData(snapshot)))
             xe = BasicField("ElectronAbundance").getData(snapshot)
             xH = 0.76
