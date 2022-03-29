@@ -42,7 +42,7 @@ class MeanFieldOverTime(MultiSetFn):
 
     def getTemperatureOverRedshift(self, simSet: SimulationSet) -> Result:
         snapshots = [(snap, sim) for sim in simSet for snap in sim.snapshots]
-        snapshots.sort(key=lambda snapSim: -snapSim[0].time)
+        snapshots.sort(key=lambda snapSim: snapSim[0].time)
         temperatures = []
         times = []
         for (snap, sim) in snapshots:
@@ -53,7 +53,7 @@ class MeanFieldOverTime(MultiSetFn):
             if self.time == "z":
                 times.append(sim.getRedshift(snap.scale_factor))
             elif self.time == "t":
-                times.append(snap.time)
+                times.append(snap.time / pq.yr)
 
         return np.array([times, temperatures]).transpose()
 
