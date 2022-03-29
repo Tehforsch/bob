@@ -1,3 +1,4 @@
+import argparse
 from typing import Tuple
 
 import matplotlib.pyplot as plt
@@ -10,23 +11,26 @@ from bob.simulation import Simulation
 from bob.basicField import BasicField
 from bob.plots.slicePlot import findOrthogonalAxes
 import bob.config as config
+from bob.result import Result
+from bob.postprocessingFunctions import SetFn, addToList
 
 
-@addPlot(None)
-def ionizationTime(plt: plt.axes, simSet: SimulationSet) -> None:
-    # ((min1, min2, max1, max2), data) = getIonizationTimeData(simSet)
-    min1 = -15
-    min2 = -15
-    max1 = 15
-    max2 = 15
-    data = np.load("out.npy")
-    plt.xlabel("$x [h^{-1} \mathrm{Mpc}]$")
-    plt.ylabel("$y [h^{-1} \mathrm{Mpc}]$")
+class IonizationTime(SetFn):
+    def post(self, args: argparse.Namespace, simSet: SimulationSet) -> Result:
+        ((self.min1, self.min2, self.max1, self.max2), data) = getIonizationTimeData(simSet)
+        return [data]
 
-    extent = (-15, 15, -15, 15)
-    plt.imshow(data, extent=extent, cmap="Reds", vmin=6, vmax=10)
-    cbar = plt.colorbar()
-    cbar.set_label("$z$")
+    def plot(self, plt: plt.axes, result: Result) -> None:
+        plt.xlabel("$x [h^{-1} \mathrm{Mpc}]$")
+        plt.ylabel("$y [h^{-1} \mathrm{Mpc}]$")
+
+        extent = (self.min1, self.max1, self.min2, self.max2)
+        plt.imshow(data, extent=extent, cmap="Reds", vmin=6, vmax=10)
+        cbar = plt.colorbar()
+        cbar.set_label("$z$")
+
+
+addToList("ionizationTime", IonizationTime())
 
 
 def getIonizationTimeData(simSet: SimulationSet) -> Tuple[Tuple[float, float, float, float], np.ndarray]:

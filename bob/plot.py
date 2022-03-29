@@ -89,19 +89,24 @@ class Plotter:
     def saveResult(self, result: Result, plotDataFolder: Path) -> None:
         result.save(plotDataFolder)
 
-    def runMultiSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
-        logging.info("Running {}".format(function.name))
+    def getQuotient(self) -> [SimulationSet]:
         quotient_params = self.quotient_params
         if quotient_params is None:
             quotient_params = []
         print(self.sims.quotient(quotient_params))
-        quotient = [sims for (config, sims) in self.sims.quotient(quotient_params)]
+        return self.sims.quotient(quotient_params)
 
-        def post():
-            print(function.post)
-            function.post(args, quotient)
+    def runMultiSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
+        quotient = [sims for (config, sims) in self.getQuotient()]
+        logging.info("Running {}".format(function.name))
+        self.runPostAndPlot(args, function, function.name, lambda: function.post(args, quotient), function.plot)
 
-        self.runPostAndPlot(args, function.name, post, function.plot)
+    def runSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
+        quotient = self.getQuotient()
+        logging.info("Running {}".format(function.name))
+        for (i, (config, sims)) in enumerate(quotient):
+            logging.info("For set {}".format(config))
+            self.runPostAndPlot(args, function, f"{i}_{function.name}", lambda: function.post(args, sims), function.plot)
 
     # def runSingleSimPlot(self, function: SingleSimPlotFunction) -> None:
     #     logging.info("Running {}".format(function.name))

@@ -10,7 +10,8 @@ from bob.temperature import Temperature
 from bob.plots.slicePlot import VoronoiSlice
 from bob.postprocessingFunctions import addToList
 
-# import bob.plots.ionizationTime
+import bob.plots.ionizationTime
+
 # import bob.plots.temperaturePlots
 # import bob.plots.thomsonScattering
 # import bob.plots.image
