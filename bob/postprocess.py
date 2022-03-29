@@ -41,7 +41,6 @@ def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> 
     picFolder.mkdir(exist_ok=True)
     plotter = bob.plot.Plotter(parent_folder, sims, args.snapshots, args.show, args.select, args.quotient)
     function = getFunctionByName(args.function, postprocessingFunctions)
-    print(args)
     if isinstance(function, SnapFn):
         plotter.runSnapFn(args, function)
     elif isinstance(function, SetFn):

@@ -65,7 +65,8 @@ class Plotter:
 
     def saveResult(self, plotName, result):
         plotDataFolder = self.data_folder / plotName
-        plotDataFolder.mkdir()
+        plotDataFolder.mkdir(parents=True, exist_ok=True)
+        result.save(plotDataFolder)
 
     def runMultiSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
         logging.info("Running {}".format(function.name))
