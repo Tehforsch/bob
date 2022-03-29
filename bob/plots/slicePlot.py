@@ -72,6 +72,9 @@ class VoronoiSlice(SnapFn):
         subparser.add_argument("--axis", required=True, choices=["x", "y", "z"])
         subparser.add_argument("--field", required=True, choices=[f.niceName for f in basicFields])
 
+    def get_name(self, args: argparse.Namespace) -> str:
+        return f"{self.name}_{args.axis}_{args.field}"
+
 
 def getFieldByName(name: str) -> np.ndarray:
     return next(field for field in basicFields if field.niceName == name)

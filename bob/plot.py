@@ -72,18 +72,21 @@ class Plotter:
     ) -> None:
         logging.info("Running {}".format(name))
         result = post()
-        self.savePlotInfo(fn, name)
-        self.saveResult(name, result)
+        self.save(fn, name, result)
         plot(plt, result)
         self.saveAndShow(name)
 
-    def savePlotInfo(self, fn: PostprocessingFunction, plotName: str) -> None:
-        filename = self.data_folder / plotName / config.plotSerializationFileName
-        pickle.dump(fn, open(filename, "wb"))
-
-    def saveResult(self, plotName: str, result: Result) -> None:
+    def save(self, fn: PostprocessingFunction, plotName: str, result: Result) -> None:
         plotDataFolder = self.data_folder / plotName
         plotDataFolder.mkdir(parents=True, exist_ok=True)
+        self.savePlotInfo(fn, plotDataFolder)
+        self.saveResult(result, plotDataFolder)
+
+    def savePlotInfo(self, fn: PostprocessingFunction, plotDataFolder: Path) -> None:
+        filename = plotDataFolder / config.plotSerializationFileName
+        pickle.dump(fn, open(filename, "wb"))
+
+    def saveResult(self, result: Result, plotDataFolder: Path) -> None:
         result.save(plotDataFolder)
 
     def runMultiSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
@@ -113,7 +116,7 @@ class Plotter:
             logging.info("For sim {}".format(sim.name))
             for snap in self.get_snapshots(sim):
                 logging.info("For snap {}".format(snap.name))
-                name = "{}_{}_{}".format(sim.name, function.name, snap.name)
+                name = "{}_{}_{}".format(function.get_name(args), sim.name, snap.name)
                 self.runPostAndPlot(args, function, name, lambda: function.post(args, sim, snap), function.plot)
 
     # def runSlicePlotFunction(self, function: SlicePlotFunction) -> None:
