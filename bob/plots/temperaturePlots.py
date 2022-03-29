@@ -12,7 +12,6 @@ from bob.result import Result
 from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
 from bob.basicField import BasicField
-from bob.temperature import Temperature
 from bob.plots.slicePlot import findOrthogonalAxes
 import bob.config as config
 from bob.basicField import BasicField
@@ -38,24 +37,24 @@ class MeanFieldOverTime(MultiSetFn):
     def post(self, args: argparse.Namespace, simSets: List[SimulationSet]) -> Result:
         self.field = getFieldByName(args.field)
         self.time = args.time
-        return Result([self.getTemperatureOverRedshift(simSet) for simSet in simSets])
+        return Result([self.getMeanFieldOverTime(simSet) for simSet in simSets])
 
-    def getTemperatureOverRedshift(self, simSet: SimulationSet) -> Result:
+    def getMeanFieldOverTime(self, simSet: SimulationSet) -> Result:
         snapshots = [(snap, sim) for sim in simSet for snap in sim.snapshots]
         snapshots.sort(key=lambda snapSim: snapSim[0].time)
-        temperatures = []
+        values = []
         times = []
         for (snap, sim) in snapshots:
-            temperature = self.field.getData(snap)
-            averageTemperature = np.mean(temperature)
-            print(snap, averageTemperature)
-            temperatures.append(averageTemperature / pq.K)
+            data = self.field.getData(snap)
+            average = np.mean(data)
+            print(snap, average)
+            values.append(average / pq.K)
             if self.time == "z":
                 times.append(sim.getRedshift(snap.scale_factor))
             elif self.time == "t":
                 times.append(snap.time / pq.yr)
 
-        return np.array([times, temperatures]).transpose()
+        return np.array([times, values]).transpose()
 
     def setArgs(self, subparser: argparse.ArgumentParser):
         subparser.add_argument("--field", required=True, choices=[f.niceName for f in allFields])
