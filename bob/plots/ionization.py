@@ -1,3 +1,4 @@
+import argparse
 import re
 import itertools
 from typing import List, Tuple, Any, Optional
@@ -61,9 +62,8 @@ class IonizationData:
         return result
 
 
-@addToList(None)
 class Ionization(MultiSetFn):
-    def post(self, simSets: List[SimulationSet]) -> Result:
+    def post(self, args: argparse.Namespace, simSets: List[SimulationSet]) -> Result:
         return Result([IonizationData().fromSims(sims).toArray() for sims in simSets])
 
     def plot(self, plt: plt.axes, result: Result) -> None:
@@ -375,3 +375,5 @@ class Ionization(MultiSetFn):
         becker_2015_low = becker_2015_raw[10:20, 1]
         becker_2015_high = becker_2015_raw[20:, 1]
         return becker_2015_xHI, becker_2015_low, becker_2015_high
+
+addToList("ionization", Ionization())

@@ -4,6 +4,7 @@ from pathlib import Path
 import argparse
 import matplotlib.pyplot as plt
 import logging
+import numpy as np
 
 from bob.postprocessingFunctions import (
     SetFn,
@@ -43,6 +44,7 @@ class Plotter:
         quotient_params: Optional[List[str]],
     ) -> None:
         self.pic_folder = parent_folder / config.picFolder
+        self.data_folder = self.pic_folder / "plots"
         self.sims = self.filterSims(sims, select)
         self.snapshotFilter = snapshotFilter
         self.show = show
@@ -57,8 +59,13 @@ class Plotter:
     def runPostAndPlot(self, args: argparse.Namespace, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]) -> None:
         logging.info("Running {}".format(name))
         result = post()
-        plot(plt.axes, result)
+        self.saveResult(name, result)
+        plot(plt, result)
         self.saveAndShow(name)
+
+    def saveResult(self, plotName, result):
+        plotDataFolder = self.data_folder / plotName
+        plotDataFolder.mkdir()
 
     def runMultiSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
         logging.info("Running {}".format(function.name))
@@ -69,6 +76,7 @@ class Plotter:
         quotient = [sims for (config, sims) in self.sims.quotient(quotient_params)]
 
         def post():
+            print(function.post)
             function.post(args, quotient)
 
         self.runPostAndPlot(args, function.name, post, function.plot)

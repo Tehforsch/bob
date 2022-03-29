@@ -43,12 +43,12 @@ def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> 
     function = getFunctionByName(args.function, postprocessingFunctions)
     print(args)
     if isinstance(function, SnapFn):
-        plotter.runSnapFn(function)
+        plotter.runSnapFn(args, function)
     elif isinstance(function, SetFn):
-        plotter.runSetFn(function)
+        plotter.runSetFn(args, function)
     elif isinstance(function, MultiSetFn):
-        plotter.runMultiSetFn(function)
+        plotter.runMultiSetFn(args, function)
     elif isinstance(function, SliceFn):
-        plotter.runSliceFn(function)
+        plotter.runSliceFn(args, function)
     else:
         raise NotImplementedError

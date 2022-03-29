@@ -1,11 +1,12 @@
+from pathlib import Path
 from typing import List, Dict, Any
 import numpy as np
 
 
 class Result:
-    def __init__(self, arrs: List[np.ndarray], params: Dict[str, Any] = None) -> None:
+    def __init__(self, arrs: List[np.ndarray]) -> None:
         self.arrs = arrs
-        if params is None:
-            self.params = {}
-        else:
-            self.params = params
+
+    def save(self, folder: Path):
+        for (i, arr) in result.arrs:
+            np.save(plotDataFolder / str(i), arr)

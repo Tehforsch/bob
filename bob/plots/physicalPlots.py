@@ -39,4 +39,4 @@ basicFields = [
 ]
 
 
-addToList("slice")(VoronoiSlice())
+addToList("slice", VoronoiSlice())

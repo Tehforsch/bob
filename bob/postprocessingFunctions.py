@@ -61,17 +61,13 @@ class SliceFn(PostprocessingFunction):
 
 
 # Giving up on mypy hints on this one
-def addToList(name: Optional[str]) -> Any:
-    def wrapper(cls: Any) -> Any:
-        if name is not None:
-            cls.name = name
-        else:
-            cls.name = cls.__name__
-            cls.name = cls.name[0].lower() + cls.name[1:]
-        postprocessingFunctions.append(cls)
-        return cls
-
-    return wrapper
+def addToList(name: Optional[str], fn: PostprocessingFunction) -> Any:
+    if name is not None:
+        fn.name = name
+    else:
+        fn.name = fn.__name__
+        fn.name = fn.name[0].lower() + fn.name[1:]
+    postprocessingFunctions.append(fn)
 
 
 def checkNoDoubledNames() -> None:
