@@ -18,6 +18,19 @@ import bob.config as config
 from bob.basicField import BasicField
 from bob.allFields import allFields, getFieldByName
 
+def addTimeArg(subparser: argparse.ArgumentParser):
+    subparser.add_argument("--time", default="t", choices=["t", "z"])
+
+def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot):
+    if quantity == "z":
+        return sim.getRedshift(snap.scale_factor)
+    elif quantity == "t":
+        if sim.params["ComovingIntegrationOn"]:
+            return sim.getLookbackTime(snap.scale_factor) / pq.yr
+        else:
+            return snap.time / pq.yr
+    else:
+        raise NotImplementedError
 
 class TimePlot(MultiSetFn):
     @abstractmethod
@@ -52,20 +65,12 @@ class TimePlot(MultiSetFn):
         snapshots.sort(key=lambda snapSim: snapSim[0].time)
         result = np.zeros((2, len(snapshots)))
         for (i, (snap, sim)) in enumerate(snapshots):
-            if self.time == "z":
-                result[0, i] = sim.getRedshift(snap.scale_factor)
-            elif self.time == "t":
-                if sim.params["ComovingIntegrationOn"]:
-                    result[0, i] = sim.getLookbackTime(snap.scale_factor) / pq.yr
-                else:
-                    result[0, i] = snap.time / pq.yr
-            else:
-                raise NotImplementedError
+            result[0, i] = getTimeQuantityForSnap(args.time, sim, snap)
             result[1, i] = self.getQuantity(args, sim, snap)
         return result
 
     def setArgs(self, subparser: argparse.ArgumentParser):
-        subparser.add_argument("--time", default="t", choices=["t", "z", "lookback"])
+        addTimeArg(subparser)
 
 
 class MeanFieldOverTime(TimePlot):
