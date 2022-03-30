@@ -23,10 +23,11 @@ class ShadowingLinePlot(TimePlot):
         return "Mass av."
 
     def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> float:
-        start = np.array([0.5, 0.5, 0.5])
+        startRadius = (4 / 16) / np.sqrt(2)
+        safetyFactor = 1.1
+        start = np.array([0.5 + startRadius * safetyFactor, 0.5 + startRadius * safetyFactor, 0.5])
         end = np.array([1.0, 1.0, 0.5])
         data = self.getDataAlongLine(BasicField("ChemicalAbundances", 1), snap, start, end)
-        print(snap.time, np.mean(data))
         masses = self.getDataAlongLine(BasicField("Masses"), snap, start, end)
         return np.sum(data * masses) / np.sum(masses)
 
@@ -40,9 +41,7 @@ class ShadowingLinePlot(TimePlot):
         fractions = np.linspace(0.0, 1.0, numPoints)
         offsets = np.outer(end - start, fractions).transpose()
         points = np.add(start, offsets)
-        result[1, :] = getDataAtPoints(field, snap, points)
-        result[0, :] = fractions
-        return result
+        return getDataAtPoints(field, snap, points)
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         super().plot(plt, result)
