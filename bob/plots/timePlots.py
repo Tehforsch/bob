@@ -1,6 +1,5 @@
 from abc import abstractmethod
 import argparse
-from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,6 +11,7 @@ from bob.result import Result
 from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
 from bob.allFields import allFields, getFieldByName
+from bob.multiSet import MultiSet
 
 
 def addTimeArg(subparser: argparse.ArgumentParser) -> None:
@@ -48,7 +48,8 @@ class TimePlot(MultiSetFn):
     def transform(self, result: np.ndarray) -> np.ndarray:
         return result
 
-    def post(self, args: argparse.Namespace, simSets: List[SimulationSet]) -> Result:
+    def post(self, args: argparse.Namespace, simSets: MultiSet) -> Result:
+        self.labels = simSets.labels
         self.init(args)
         self.time = args.time
         return Result([self.transform(self.getQuantityOverTime(args, simSet)) for simSet in simSets])
@@ -56,8 +57,7 @@ class TimePlot(MultiSetFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.xlabel(self.xlabel())
         plt.ylabel(self.ylabel())
-        labels = ["100%", "200%", "TNG"]
-        for (label, arr) in zip(labels, result.arrs):
+        for (label, arr) in zip(self.labels, result.arrs):
             plt.plot(arr[0, :], arr[1, :], label=label)
         plt.legend()
 
@@ -71,6 +71,7 @@ class TimePlot(MultiSetFn):
         return result
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
+        super().setArgs(subparser)
         addTimeArg(subparser)
 
 

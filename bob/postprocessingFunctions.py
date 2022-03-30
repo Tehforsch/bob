@@ -8,6 +8,7 @@ from bob.simulation import Simulation
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
 from bob.result import Result
+from bob.multiSet import MultiSet
 
 
 class PostprocessingFunction(ABC):
@@ -39,15 +40,21 @@ class SetFn(PostprocessingFunction):
     def plot(self, axes: plt.axes, result: Result) -> None:
         pass
 
+    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
+        subparser.add_argument("--labels", nargs="*", type=str)
+
 
 class MultiSetFn(PostprocessingFunction):
     @abstractmethod
-    def post(self, args: argparse.Namespace, sims: List[SimulationSet]) -> Result:
+    def post(self, args: argparse.Namespace, sims: MultiSet) -> Result:
         pass
 
     @abstractmethod
     def plot(self, axes: plt.axes, result: Result) -> None:
         pass
+
+    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
+        subparser.add_argument("--labels", nargs="*", type=str)
 
 
 class SliceFn(PostprocessingFunction):

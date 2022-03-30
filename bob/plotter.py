@@ -1,6 +1,6 @@
 import os
 import pickle
-from typing import Iterator, List, Optional, Callable, Tuple, Dict, Any
+from typing import Iterator, List, Optional, Callable
 from pathlib import Path
 import argparse
 import matplotlib.pyplot as plt
@@ -18,6 +18,7 @@ import bob.config
 from bob.simulation import Simulation
 from bob.result import Result, getResultFromFolder
 from bob.postprocessingFunctions import PostprocessingFunction
+from bob.multiSet import MultiSet
 
 
 def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
@@ -87,22 +88,21 @@ class Plotter:
     def saveResult(self, result: Result, plotDataFolder: Path) -> None:
         result.save(plotDataFolder)
 
-    def getQuotient(self) -> List[Tuple[Dict[str, Any], SimulationSet]]:
+    def getQuotient(self, labels: Optional[List[str]]) -> MultiSet:
         quotient_params = self.quotient_params
         if quotient_params is None:
             quotient_params = []
-        print(self.sims.quotient(quotient_params))
-        return self.sims.quotient(quotient_params)
+        return MultiSet(self.sims.quotient(quotient_params), labels)
 
     def runMultiSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
-        quotient = [sims for (config, sims) in self.getQuotient()]
+        quotient = self.getQuotient(args.labels)
         logging.info("Running {}".format(function.name))
         self.runPostAndPlot(args, function, function.getName(args), lambda: function.post(args, quotient), function.plot)
 
     def runSetFn(self, args: argparse.Namespace, function: SetFn) -> None:
-        quotient = self.getQuotient()
+        quotient = self.getQuotient(args.labels)
         logging.info("Running {}".format(function.name))
-        for (i, (config, sims)) in enumerate(quotient):
+        for (i, (config, sims)) in enumerate(quotient.iterWithConfigs()):
             logging.info("For set {}".format(config))
             self.runPostAndPlot(args, function, f"{i}_{function.getName(args)}", lambda: function.post(args, sims), function.plot)
 

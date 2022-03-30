@@ -9,10 +9,10 @@ import matplotlib.ticker
 
 from astropy.cosmology import z_at_value
 
-from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
 from bob.postprocessingFunctions import MultiSetFn, addToList
 from bob.result import Result
+from bob.multiSet import MultiSet
 
 
 class IonizationData:
@@ -62,18 +62,14 @@ class IonizationData:
 
 
 class Ionization(MultiSetFn):
-    def post(self, args: argparse.Namespace, simSets: List[SimulationSet]) -> Result:
+    def post(self, args: argparse.Namespace, simSets: MultiSet) -> Result:
+        self.labels = simSets.labels
         return Result([IonizationData().fromSims(sims).toArray() for sims in simSets])
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         ionizationDataList = [IonizationData().fromArray(arr) for arr in result.arrs]
         plt.style.use("classic")
-
-        # labels = [ "L35n270TNG", "L35n270TNG (smaller $\Delta t$)","L35n540TNG"]
-        # labels = ["intermediate", "100%"]
-        labels = ["a", "b", "c", "d", "e"]
         colors = ["b", "r", "g", "purple", "brown", "orange"]
-        assert len(labels) == len(result.arrs)
         linAx, logAx = setupIonizationPlot()
 
         self.addConstraintsToAxis(linAx)
@@ -83,7 +79,7 @@ class Ionization(MultiSetFn):
             self.plotResultsToAxis(ionizationData, linAx, color)
             self.plotResultsToAxis(ionizationData, logAx, color)
         # add legend labels
-        for (label, color) in zip(labels, colors):
+        for (label, color) in zip(self.labels, colors):
             linAx.plot([], [], color=color, label=label, linewidth=3)
         linAx.plot([], [], label="Volume av.", linestyle="-", linewidth=3, color="black")
         linAx.plot([], [], label="Mass av.", linestyle="--", linewidth=3, color="black")
