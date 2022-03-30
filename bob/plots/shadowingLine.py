@@ -2,6 +2,7 @@ import argparse
 
 import numpy as np
 import matplotlib.pyplot as plt
+import astropy.units as pq
 
 from bob.result import Result
 from bob.simulationSet import SimulationSet
@@ -15,6 +16,7 @@ from bob.basicField import BasicField
 class ShadowingLinePlot(SetFn):
     def post(self, args: argparse.Namespace, sims: SimulationSet) -> Result:
         snaps = [sim.snapshots[-1] for sim in sims]
+        print("Using snaps at times:", ",".join(str(snap.time.to(pq.Myr)) for snap in snaps))
         start = np.array([0.5, 0.5, 0.5])
         end = np.array([1.0, 1.0, 0.5])
         data = [self.getDataAlongLine(BasicField("ChemicalAbundances", 1), snap, start, end) for snap in snaps]
