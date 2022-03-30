@@ -103,7 +103,7 @@ class Plotter:
         quotient = self.getQuotient(args.labels)
         logging.info("Running {}".format(function.name))
         for (i, (config, sims)) in enumerate(quotient.iterWithConfigs()):
-            logging.info("For set {}".format(config))
+            logging.info("For set {}".format(i))
             self.runPostAndPlot(args, function, f"{i}_{function.getName(args)}", lambda: function.post(args, sims), function.plot)
 
     def runSnapFn(self, args: argparse.Namespace, function: SnapFn) -> None:

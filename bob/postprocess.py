@@ -18,6 +18,7 @@ import bob.plots.timePlots
 import bob.plots.thomsonScattering
 import bob.plots.arepoSlice
 import bob.plots.bobSlice
+import bob.plots.shadowingLine
 
 
 from bob.postprocessingFunctions import (

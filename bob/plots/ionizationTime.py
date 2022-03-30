@@ -31,6 +31,7 @@ class IonizationTime(SetFn):
         cbar.set_label("$z$")
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
+        super().setArgs(subparser)
         addTimeArg(subparser)
 
     def getIonizationTimeData(self, simSet: SimulationSet) -> Tuple[Tuple[float, float, float, float], np.ndarray]:
