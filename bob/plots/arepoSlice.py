@@ -11,7 +11,7 @@ from bob.postprocessingFunctions import addToList, SliceFn
 from bob.result import Result
 
 
-class Slice:
+class ArepoSlice:
     def __init__(self, path: Path) -> None:
         self.path = path
         self.name = self.getName(path)
@@ -21,7 +21,7 @@ class Slice:
         return name.split("_")[-1]
 
 
-class SlicePlot(SliceFn):
+class ArepoSlicePlot(SliceFn):
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         super().setArgs(subparser)
 
@@ -45,4 +45,4 @@ class SlicePlot(SliceFn):
         cbar.set_label("$x_{\mathrm{H+}}$")
 
 
-addToList("slice", SlicePlot())
+addToList("arepoSlice", ArepoSlicePlot())

@@ -54,7 +54,7 @@ class MultiSetFn(PostprocessingFunction):
 
 class SliceFn(PostprocessingFunction):
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        subparser.add_argument("slice_type", choices=["xHp"], required=True)
+        subparser.add_argument("--slice_field", choices=["xHp"], required=True)
 
     @abstractmethod
     def post(self, args: argparse.Namespace, sim: Simulation, slice_: Any) -> Result:
@@ -63,6 +63,7 @@ class SliceFn(PostprocessingFunction):
     @abstractmethod
     def plot(self, axes: plt.axes, result: Result) -> None:
         pass
+
 
 def addToList(name: str, fn: PostprocessingFunction) -> Any:
     fn.name = name

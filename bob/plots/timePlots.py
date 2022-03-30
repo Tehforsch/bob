@@ -13,7 +13,6 @@ from bob.result import Result
 from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
 from bob.basicField import BasicField
-from bob.plots.slicePlot import findOrthogonalAxes
 import bob.config as config
 from bob.basicField import BasicField
 from bob.allFields import allFields, getFieldByName

@@ -88,12 +88,12 @@ class Simulation:
         return [Snapshot(self, s) for s in snapshotFiles]
 
     def getSlices(self, name: str) -> List[Any]:
-        from bob.plots.image import Slice
+        from bob.plots.arepoSlice import ArepoSlice
 
         def isCorrectSlice(filename: str) -> bool:
             return "slice" in filename and str(filename).split("_")[0] == name
 
-        sliceFiles = [Slice(self.outputDir / f) for f in os.listdir(self.outputDir) if isCorrectSlice(f)]
+        sliceFiles = [ArepoSlice(self.outputDir / f) for f in os.listdir(self.outputDir) if isCorrectSlice(f)]
         sliceFiles.sort(key=lambda s: s.path)
         return sliceFiles
 

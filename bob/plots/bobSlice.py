@@ -9,7 +9,7 @@ from bob.simulation import Simulation
 from bob.snapshot import Snapshot
 from bob.field import Field
 from bob import config
-from bob.postprocessingFunctions import SnapFn
+from bob.postprocessingFunctions import SnapFn, addToList
 from bob.result import Result
 from bob.basicField import BasicField
 from bob.allFields import allFields, getFieldByName
@@ -99,3 +99,6 @@ def findOrthogonalAxes(axis: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     if np.sum(axis2) < 0:
         axis2 = -axis2
     return axis1, axis2
+
+
+addToList("slice", VoronoiSlice())

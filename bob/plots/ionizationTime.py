@@ -9,7 +9,7 @@ from bob.snapshot import Snapshot
 from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
 from bob.basicField import BasicField
-from bob.plots.slicePlot import findOrthogonalAxes
+from bob.plots.bobSlice import findOrthogonalAxes
 import bob.config as config
 from bob.result import Result
 from bob.postprocessingFunctions import SetFn, addToList
