@@ -1,4 +1,5 @@
 import argparse
+import itertools
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -37,15 +38,23 @@ class ShadowingLinePlot(TimePlot):
 
     def getDataAlongLine(self, field: Field, snap: Snapshot, start: np.ndarray, end: np.ndarray) -> np.ndarray:
         numPoints = 2000
-        result = np.zeros((2, numPoints))
         fractions = np.linspace(0.0, 1.0, numPoints)
         offsets = np.outer(end - start, fractions).transpose()
         points = np.add(start, offsets)
         return getDataAtPoints(field, snap, points)
 
     def plot(self, plt: plt.axes, result: Result) -> None:
+        self.styles = [{"color": s[0], "linestyle": s[1]} for s in itertools.product(["b", "r"], ["-", "--", "-."])]
+        self.labels = ["" for _ in result.arrs]
         super().plot(plt, result)
-        plt.ylim(0, 1)
+        plt.ylim(0, 0.45)
+        plt.xlim(35, 60)
+        plt.plot([], [], label="Sweep", color="b")
+        plt.plot([], [], label="SPRAI", color="r")
+        plt.plot([], [], label="$128^3$", linestyle="-")
+        plt.plot([], [], label="$64^3$", linestyle="--")
+        plt.plot([], [], label="$32^3$", linestyle="-.")
+        plt.legend()
 
 
 addToList("shadowingLine", ShadowingLinePlot())

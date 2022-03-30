@@ -1,4 +1,6 @@
+from typing import Dict, Any, List
 from abc import abstractmethod
+import itertools
 import argparse
 
 import matplotlib.pyplot as plt
@@ -32,6 +34,7 @@ def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot) -> fl
 
 class TimePlot(MultiSetFn):
     def init(self, args: argparse.Namespace) -> None:
+        self.styles: List[Dict[str, Any]] = [{}]
         pass
 
     @abstractmethod
@@ -57,8 +60,8 @@ class TimePlot(MultiSetFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.xlabel(self.xlabel())
         plt.ylabel(self.ylabel())
-        for (label, arr) in zip(self.labels, result.arrs):
-            plt.plot(arr[0, :], arr[1, :], label=label)
+        for (style, label, arr) in itertools.zip_longest(self.styles, self.labels, result.arrs):
+            plt.plot(arr[0, :], arr[1, :], label=label, **style)
         plt.legend()
 
     def getQuantityOverTime(self, args: argparse.Namespace, simSet: SimulationSet) -> np.ndarray:
