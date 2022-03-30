@@ -122,7 +122,7 @@ class Plotter:
             logging.info("For sim {}".format(sim.name))
             for snap in self.get_snapshots(sim):
                 logging.info("For snap {}".format(snap.name))
-                name = "{}_{}_{}".format(function.get_name(args), sim.name, snap.name)
+                name = "{}_{}_{}".format(function.getName(args), sim.name, snap.name)
                 self.runPostAndPlot(args, function, name, lambda: function.post(args, sim, snap), function.plot)
 
     # def runSlicePlotFunction(self, function: SlicePlotFunction) -> None:

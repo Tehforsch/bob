@@ -91,7 +91,7 @@ class MeanFieldOverTime(TimePlot):
         super().setArgs(subparser)
         subparser.add_argument("--field", required=True, choices=[f.niceName for f in allFields])
 
-    def get_name(self, args: argparse.Namespace) -> str:
+    def getName(self, args: argparse.Namespace) -> str:
         return f"{self.name}_{args.field}_{args.time}"
 
     def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> float:

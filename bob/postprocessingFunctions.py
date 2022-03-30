@@ -16,7 +16,7 @@ class PostprocessingFunction(ABC):
     def setArgs(self, subparser: argparse.ArgumentParser):
         pass
 
-    def get_name(self):
+    def getName(self):
         return self.name
 
 
