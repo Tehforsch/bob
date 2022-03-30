@@ -27,7 +27,6 @@ class Field(ABC):
         pass
 
 
-
 class RelativeDifference(Field):
     def __init__(self, field: Field, reference: "Snapshot") -> None:
         self.field = field
