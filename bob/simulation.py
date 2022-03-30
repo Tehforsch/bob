@@ -2,14 +2,12 @@ import os
 from pathlib import Path
 
 import numpy as np
-from typing import Dict, Any, List, Tuple, Union, Optional
-import re
+from typing import Dict, Any, List, Tuple, Union
 import yaml
 from astropy.cosmology import FlatLambdaCDM, z_at_value
 
 import bob.config as config
 from bob.snapshot import Snapshot
-from bob.sources import Sources, getSourcesFromParamFile
 
 
 def getParams(folder: Path) -> Dict[str, Any]:
@@ -49,20 +47,6 @@ class Simulation:
     def log(self) -> List[str]:
         with (self.folder / config.arepoLogFile).open("r") as f:
             return f.readlines()
-
-    @property
-    def runTime(self) -> Optional[float]:
-        total = 0.0
-        for line in self.log[::-1]:
-            if self.params["SWEEP"]:
-                match = re.match(config.runTimePatternSweep, line)
-            else:
-                match = re.match(config.runTimePatternSprai, line)
-            if match is not None:
-                total += float(match.groups()[0])
-        if total == 0.0:
-            return None
-        return total
 
     def __repr__(self) -> str:
         return f"Sim{self.name}"
@@ -119,19 +103,6 @@ class Simulation:
         cosmology = self.getCosmology()
         assert self.params["ComovingIntegrationOn"]
         return cosmology.lookback_time(self.getRedshift(scale_factor))
-
-    @property
-    def resolution(self) -> int:
-        return int(self.params["InitCondFile"].replace("ics_", ""))
-
-    @property  # type: ignore
-    def sources(self) -> Sources:
-        if self.params["SX_SOURCES"] == 10:
-            return Sources(Path(self.folder, self.params["TestSrcFile"]))
-        elif self.params["SX_SOURCES"] == 9:
-            return getSourcesFromParamFile(self)
-        else:
-            raise ValueError("This is not implemented yet for actual sink/star particles")
 
     def __hash__(self) -> int:
         return str(self.folder).__hash__()

@@ -63,22 +63,6 @@ def getAxisName(axis: np.ndarray) -> str:
     return ["x", "y", "z"][mostParallel]
 
 
-def getSlice(
-    array: np.ndarray,
-    coordinates: np.ndarray,
-    start: np.ndarray,
-    axis: np.ndarray,
-    thickness: float,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    indices = np.where(np.abs(np.dot(coordinates - start, axis)) < thickness)
-    axis1, axis2 = findOrthogonalAxes(axis)
-    return (
-        np.dot(coordinates[indices], axis1),
-        np.dot(coordinates[indices], axis2),
-        array[indices],
-    )
-
-
 def findOrthogonalAxes(axis: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     xAxis = np.array([1.0, 0.0, 0.0])
     yAxis = np.array([0.0, 1.0, 0.0])

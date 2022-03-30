@@ -1,12 +1,7 @@
-from typing import TYPE_CHECKING
-
 from pathlib import Path
 from typing import Any, Union, List, Optional
 import numpy as np
 import sys
-
-if TYPE_CHECKING:
-    from bob.simulation import Simulation
 
 
 class Sources:
@@ -30,7 +25,7 @@ class Sources:
     def __enter__(self) -> "Sources":
         return self
 
-    def __exit__(self, type: Any, value: Any, tb: Any) -> None:
+    def __exit__(self, type: Any, value: Any, _tb: Any) -> None:
         return
 
     def addSource(self, coord: np.ndarray, sed: np.ndarray, time: Union[List[float], float] = None) -> None:
@@ -84,32 +79,6 @@ class Sources:
         for f in range(self.nFreq):
             s += f"sed {str(self.sed[:, f])}" + "\n"
         return s
-
-
-def getSourcesFromParamFile(sim: "Simulation") -> Sources:
-    s = Sources()
-    s.coord = np.array(
-        [
-            [
-                float(sim.params["TestSourcePosX"]),
-                float(sim.params["TestSourcePosY"]),
-                float(sim.params["TestSourcePosZ"]),
-            ]
-        ]
-    )
-    s.sed = np.array(
-        [
-            [
-                float(sim.params["TestSourceRate056"]),
-                float(sim.params["TestSourceRate112"]),
-                float(sim.params["TestSourceRate136"]),
-                float(sim.params["TestSourceRate152"]),
-                float(sim.params["TestSourceRate246"]),
-            ]
-        ]
-    )
-    s.nSources = 1
-    return s
 
 
 if __name__ == "__main__":

@@ -71,9 +71,4 @@ def addToList(name: str, fn: PostprocessingFunction) -> Any:
     postprocessingFunctions.append(fn)
 
 
-def checkNoDoubledNames() -> None:
-    functionNames: List[str] = [f.name for f in postprocessingFunctions]
-    assert len(set(functionNames)) == len(functionNames), "Two functions with the same name in postprocessing functions!"
-
-
 postprocessingFunctions: List[PostprocessingFunction] = []
