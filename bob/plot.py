@@ -109,13 +109,6 @@ class Plotter:
             logging.info("For set {}".format(config))
             self.runPostAndPlot(args, function, f"{i}_{function.name}", lambda: function.post(args, sims), function.plot)
 
-    # def runSingleSimPlot(self, function: SingleSimPlotFunction) -> None:
-    #     logging.info("Running {}".format(function.name))
-    #     for sim in self.sims:
-    #         logging.info("For sim {}".format(sim.name))
-    #         function(plt, sim)
-    #         self.saveAndShow("{}_{}".format(sim.name, function.name))
-
     def runSnapFn(self, args: argparse.Namespace, function: SnapFn) -> None:
         logging.info("Running {}".format(function.name))
         for sim in self.sims:
@@ -125,16 +118,16 @@ class Plotter:
                 name = "{}_{}_{}".format(function.getName(args), sim.name, snap.name)
                 self.runPostAndPlot(args, function, name, lambda: function.post(args, sim, snap), function.plot)
 
-    # def runSlicePlotFunction(self, function: SlicePlotFunction) -> None:
-    #     logging.info("Running {}".format(function.name))
-    #     for sim in self.sims:
-    #         logging.info("For sim {}".format(sim.name))
-    #         for slice_ in sim.getSlices(function.slice_type):
-    #             logging.info("For slice {}".format(slice_.name))
-    #             function(plt, sim, slice_)
-    #             self.saveAndShow(
-    #                 "{}_{}_{}".format(sim.name, function.name, slice_.name),
-    #             )
+    def runSlicePlotFunction(self, function: SliceFn) -> None:
+        logging.info("Running {}".format(function.name))
+        for sim in self.sims:
+            logging.info("For sim {}".format(sim.name))
+            for slice_ in sim.getSlices(function.slice_type):
+                logging.info("For slice {}".format(slice_.name))
+                function(plt, sim, slice_)
+                self.saveAndShow(
+                    "{}_{}_{}".format(sim.name, function.name, slice_.name),
+                )
 
     def isInSnapshotArgs(self, snap: Snapshot) -> bool:
         return self.snapshotFilter is None or any(isSameSnapshot(arg_snap, snap) for arg_snap in self.snapshotFilter)
