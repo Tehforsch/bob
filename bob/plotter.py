@@ -100,14 +100,14 @@ class Plotter:
     def runMultiSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
         quotient = [sims for (config, sims) in self.getQuotient()]
         logging.info("Running {}".format(function.name))
-        self.runPostAndPlot(args, function, function.name, lambda: function.post(args, quotient), function.plot)
+        self.runPostAndPlot(args, function, function.getName(args), lambda: function.post(args, quotient), function.plot)
 
     def runSetFn(self, args: argparse.Namespace, function: SetFn) -> None:
         quotient = self.getQuotient()
         logging.info("Running {}".format(function.name))
         for (i, (config, sims)) in enumerate(quotient):
             logging.info("For set {}".format(config))
-            self.runPostAndPlot(args, function, f"{i}_{function.name}", lambda: function.post(args, sims), function.plot)
+            self.runPostAndPlot(args, function, f"{i}_{function.getName(args)}", lambda: function.post(args, sims), function.plot)
 
     def runSnapFn(self, args: argparse.Namespace, function: SnapFn) -> None:
         logging.info("Running {}".format(function.name))
@@ -123,9 +123,8 @@ class Plotter:
         for sim in self.sims:
             logging.info("For sim {}".format(sim.name))
             for slice_ in sim.getSlices(args.slice_field):
-                print(slice_)
                 logging.info("For slice {}".format(slice_.name))
-                name = "{}_{}_{}".format(sim.name, function.name, slice_.name)
+                name = "{}_{}_{}".format(function.getName(args), sim.name, slice_.name)
                 self.runPostAndPlot(args, function, name, lambda: function.post(args, sim, slice_), function.plot)
 
     def isInSnapshotArgs(self, snap: Snapshot) -> bool:
