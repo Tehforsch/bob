@@ -23,14 +23,15 @@ class ShadowingLinePlot(TimePlot):
         return "Mass av."
 
     def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> float:
-        start = np.array([0.0, 0.0, 0.5])
+        start = np.array([0.5, 0.5, 0.5])
         end = np.array([1.0, 1.0, 0.5])
         data = self.getDataAlongLine(BasicField("ChemicalAbundances", 1), snap, start, end)
+        print(snap.time, np.mean(data))
         masses = self.getDataAlongLine(BasicField("Masses"), snap, start, end)
         return np.sum(data * masses) / np.sum(masses)
 
     def transform(self, result: np.ndarray) -> np.ndarray:
-        result[0, :] = result[0, :] * ((config.defaultTimeUnit / pq.Myr).decompose().to(1))
+        result[0, :] = result[0, :] * ((config.defaultTimeUnit / pq.kyr).decompose().to(1))
         return result
 
     def getDataAlongLine(self, field: Field, snap: Snapshot, start: np.ndarray, end: np.ndarray) -> np.ndarray:
