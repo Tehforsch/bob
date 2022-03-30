@@ -10,7 +10,7 @@ except ImportError:
 
 from bob.simulationSet import SimulationSet
 from bob import config
-import bob.plot
+import bob.plotter
 import bob.plots.physicalPlots
 
 
@@ -39,7 +39,7 @@ def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> 
 
     picFolder = Path(parent_folder, config.picFolder)
     picFolder.mkdir(exist_ok=True)
-    plotter = bob.plot.Plotter(parent_folder, sims, args.snapshots, args.show, args.select, args.quotient)
+    plotter = bob.plotter.Plotter(parent_folder, sims, args.snapshots, args.show, args.select, args.quotient)
     if args.function == "replot":
         plotter.replot(args)
     else:
