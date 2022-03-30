@@ -122,7 +122,7 @@ class Plotter:
         logging.info("Running {}".format(function.name))
         for sim in self.sims:
             logging.info("For sim {}".format(sim.name))
-            for slice_ in sim.getSlices(function.slice_type):
+            for slice_ in sim.getSlices(args.slice_field):
                 logging.info("For slice {}".format(slice_.name))
                 name = "{}_{}_{}".format(sim.name, function.name, slice_.name)
                 self.runPostAndPlot(args, function, name, lambda: function.post(args, sim, slice_), function.plot)

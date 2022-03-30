@@ -24,7 +24,7 @@ class IonizationData:
         self.neutralVolumeAv = 1.0 - self.volumeAv
         self.neutralMassAv = 1.0 - self.massAv
 
-    def fromSims(self, sims: List[Simulation]) -> IonizationData:
+    def fromSims(self, sims: List[Simulation]) -> "IonizationData":
         for sim in sims:
             assert sim.params.get("ComovingIntegrationOn") == 1
             cosmology = sim.getCosmology()
@@ -45,7 +45,7 @@ class IonizationData:
         self.setNeutralFractions()
         return self
 
-    def fromArray(self, arr: np.ndarray) -> IonizationData:
+    def fromArray(self, arr: np.ndarray) -> "IonizationData":
         self.scale_factor = arr[0, :]
         self.redshift = arr[1, :]
         self.volumeAv = arr[2, :]

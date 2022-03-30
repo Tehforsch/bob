@@ -23,7 +23,7 @@ class Slice:
 
 class SlicePlot(SliceFn):
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        subparser.add_argument("field", choices=["xHp"], required=True)
+        super().setArgs(subparser)
 
     # Taken from arepy
     def post(self, args: argparse.Namespace, sim: Simulation, slice_: Path) -> Result:
