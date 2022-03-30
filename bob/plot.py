@@ -73,8 +73,9 @@ class Plotter:
         logging.info("Running {}".format(name))
         result = post()
         self.save(fn, name, result)
-        plot(plt, result)
-        self.saveAndShow(name)
+        if not args.post:
+            plot(plt, result)
+            self.saveAndShow(name)
 
     def save(self, fn: PostprocessingFunction, plotName: str, result: Result) -> None:
         plotDataFolder = self.data_folder / plotName
