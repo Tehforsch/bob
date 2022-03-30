@@ -33,6 +33,9 @@ def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot):
         raise NotImplementedError
 
 class TimePlot(MultiSetFn):
+    def init(self, args: argparse.Namespace):
+        pass
+
     @abstractmethod
     def getQuantity(self, sims: Simulation, snap: Snapshot) -> float:
         pass
@@ -48,6 +51,7 @@ class TimePlot(MultiSetFn):
         return result
 
     def post(self, args: argparse.Namespace, simSets: List[SimulationSet]) -> Result:
+        self.init(args)
         self.time = args.time
         return Result([self.transform(self.getQuantityOverTime(args, simSet)) for simSet in simSets])
 
@@ -74,10 +78,13 @@ class TimePlot(MultiSetFn):
 
 
 class MeanFieldOverTime(TimePlot):
-    def xlabel(self):
+    def init(self, args: argparse.Namespace) -> None:
+        self.field = getFieldByName(args.field)
+        
+    def xlabel(self) -> str:
         return self.time
 
-    def ylabel(self):
+    def ylabel(self) -> str:
         return self.field.symbol
 
     def setArgs(self, subparser: argparse.ArgumentParser):
