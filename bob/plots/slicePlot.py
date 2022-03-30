@@ -44,7 +44,7 @@ class VoronoiSlice(SnapFn):
         plt.imshow(result.arrs[0], extent=extent, origin="lower", cmap="Reds")
         plt.colorbar()
 
-    def setArgs(self, subparser: argparse.ArgumentParser):
+    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         subparser.add_argument("--axis", required=True, choices=["x", "y", "z"])
         subparser.add_argument("--field", required=True, choices=[f.niceName for f in allFields])
 

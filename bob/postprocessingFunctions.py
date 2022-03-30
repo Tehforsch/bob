@@ -13,10 +13,12 @@ from bob.result import Result
 
 
 class PostprocessingFunction(ABC):
-    def setArgs(self, subparser: argparse.ArgumentParser):
+    name = ""
+
+    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         pass
 
-    def getName(self):
+    def getName(self, args: argparse.Namespace) -> str:
         return self.name
 
 
@@ -26,7 +28,7 @@ class SnapFn(PostprocessingFunction):
         pass
 
     @abstractmethod
-    def plot(self, axes: plt.axes, result: Result):
+    def plot(self, axes: plt.axes, result: Result) -> None:
         pass
 
 
@@ -64,12 +66,8 @@ class SliceFn(PostprocessingFunction):
 
 
 # Giving up on mypy hints on this one
-def addToList(name: Optional[str], fn: PostprocessingFunction) -> Any:
-    if name is not None:
-        fn.name = name
-    else:
-        fn.name = fn.__name__
-        fn.name = fn.name[0].lower() + fn.name[1:]
+def addToList(name: str, fn: PostprocessingFunction) -> Any:
+    fn.name = name
     postprocessingFunctions.append(fn)
 
 

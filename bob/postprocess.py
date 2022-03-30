@@ -24,7 +24,7 @@ from bob.postprocessingFunctions import (
 )
 
 
-def getFunctionByName(name: str, functions: Sequence[PostprocessingFunction]) -> Sequence[PostprocessingFunction]:
+def getFunctionByName(name: str, functions: Sequence[PostprocessingFunction]) -> PostprocessingFunction:
     return next(function for function in functions if function.name == name)
 
 

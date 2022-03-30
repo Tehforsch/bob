@@ -10,6 +10,7 @@ from bob.postprocessingFunctions import addToList
 import bob.plots.ionizationTime
 import bob.plots.timePlots
 import bob.plots.thomsonScattering
+
 # import bob.plots.image
 
 addToList("slice", VoronoiSlice())

@@ -15,7 +15,7 @@ from bob.result import Result
 
 
 class ThomsonScattering(TimePlot):
-    def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> None:
+    def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> float:
         sig = 6.65e-29 * pq.m**2  # Thomson scattering cross-section
         xe = BasicField("Density").getData(snap)
         print("DEFINITELY TODO")
@@ -40,7 +40,7 @@ class ThomsonScattering(TimePlot):
         newResult[1, :] = np.cumsum(result[1, 1:] * dt)
         return newResult
 
-    def ylabel(self):
+    def ylabel(self) -> str:
         return "$\tau$"
 
 

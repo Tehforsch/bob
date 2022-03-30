@@ -1,6 +1,6 @@
 import os
 import pickle
-from typing import Iterator, List, Optional, Callable
+from typing import Iterator, List, Optional, Callable, Tuple, Dict, Any
 import itertools
 from pathlib import Path
 import argparse
@@ -19,7 +19,7 @@ from bob.snapshot import Snapshot
 from bob import config
 import bob.plots.ionization
 from bob.simulation import Simulation
-from bob.result import Result
+from bob.result import Result, getResultFromFolder
 from bob.postprocessingFunctions import PostprocessingFunction
 
 
@@ -46,8 +46,8 @@ class Plotter:
         select: Optional[List[str]],
         quotient_params: Optional[List[str]],
     ) -> None:
-        self.pic_folder = parent_folder / config.picFolder
-        self.data_folder = self.pic_folder / "plots"
+        self.picFolder = parent_folder / config.picFolder
+        self.dataFolder = self.picFolder / "plots"
         self.sims = self.filterSims(sims, select)
         self.snapshotFilter = snapshotFilter
         self.show = show
@@ -60,12 +60,12 @@ class Plotter:
             return SimulationSet(sim for sim in sims if sim.name in select)
 
     def replot(self, args: argparse.Namespace) -> None:
-        for plot in os.listdir(self.data_folder):
-            plot_folder = self.data_folder / plot
-            plot = pickle.load(open(plot_folder / config.plotSerializationFileName, "rb"))
-            result = Result.fromFolder(plot_folder)
+        for plotName in os.listdir(self.dataFolder):
+            plotFolder = self.dataFolder / plotName
+            plot = pickle.load(open(plotFolder / config.plotSerializationFileName, "rb"))
+            result = getResultFromFolder(plotFolder)
             plot.plot(plt, result)
-            self.saveAndShow(plot_folder.name)
+            self.saveAndShow(plotFolder.name)
 
     def runPostAndPlot(
         self, args: argparse.Namespace, fn: PostprocessingFunction, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]
@@ -78,7 +78,7 @@ class Plotter:
             self.saveAndShow(name)
 
     def save(self, fn: PostprocessingFunction, plotName: str, result: Result) -> None:
-        plotDataFolder = self.data_folder / plotName
+        plotDataFolder = self.dataFolder / plotName
         plotDataFolder.mkdir(parents=True, exist_ok=True)
         self.savePlotInfo(fn, plotDataFolder)
         self.saveResult(result, plotDataFolder)
@@ -90,7 +90,7 @@ class Plotter:
     def saveResult(self, result: Result, plotDataFolder: Path) -> None:
         result.save(plotDataFolder)
 
-    def getQuotient(self) -> [SimulationSet]:
+    def getQuotient(self) -> List[Tuple[Dict[str, Any], SimulationSet]]:
         quotient_params = self.quotient_params
         if quotient_params is None:
             quotient_params = []
@@ -102,7 +102,7 @@ class Plotter:
         logging.info("Running {}".format(function.name))
         self.runPostAndPlot(args, function, function.name, lambda: function.post(args, quotient), function.plot)
 
-    def runSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
+    def runSetFn(self, args: argparse.Namespace, function: SetFn) -> None:
         quotient = self.getQuotient()
         logging.info("Running {}".format(function.name))
         for (i, (config, sims)) in enumerate(quotient):
@@ -118,16 +118,14 @@ class Plotter:
                 name = "{}_{}_{}".format(function.getName(args), sim.name, snap.name)
                 self.runPostAndPlot(args, function, name, lambda: function.post(args, sim, snap), function.plot)
 
-    def runSlicePlotFunction(self, function: SliceFn) -> None:
+    def runSliceFn(self, args: argparse.Namespace, function: SliceFn) -> None:
         logging.info("Running {}".format(function.name))
         for sim in self.sims:
             logging.info("For sim {}".format(sim.name))
             for slice_ in sim.getSlices(function.slice_type):
                 logging.info("For slice {}".format(slice_.name))
-                function(plt, sim, slice_)
-                self.saveAndShow(
-                    "{}_{}_{}".format(sim.name, function.name, slice_.name),
-                )
+                name = "{}_{}_{}".format(sim.name, function.name, slice_.name)
+                self.runPostAndPlot(args, function, name, lambda: function.post(args, sim, slice_), function.plot)
 
     def isInSnapshotArgs(self, snap: Snapshot) -> bool:
         return self.snapshotFilter is None or any(isSameSnapshot(arg_snap, snap) for arg_snap in self.snapshotFilter)
@@ -138,7 +136,7 @@ class Plotter:
                 yield snap
 
     def saveAndShow(self, filename: str) -> None:
-        filepath = self.pic_folder / filename
+        filepath = self.picFolder / filename
         filepath.parent.mkdir(exist_ok=True)
         plt.savefig(str(filepath) + ".pdf", dpi=config.dpi)
         if self.show:

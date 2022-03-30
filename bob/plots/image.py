@@ -10,16 +10,20 @@ from bob.simulation import Simulation
 from bob.postprocessingFunctions import addToList, SliceFn
 from bob.result import Result
 
-class Slice(SliceFn):
-    def __init__(self):
-        self.name = self.getName(path)
 
-    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        subparser.add_arg("field", choices=["xHp"], required=True)
+class Slice:
+    def __init__(self, path: Path) -> None:
+        self.path = path
+        self.name = self.getName(path)
 
     def getName(self, path: Path) -> str:
         name = path.stem
         return name.split("_")[-1]
+
+
+class SlicePlot(SliceFn):
+    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
+        subparser.add_argument("field", choices=["xHp"], required=True)
 
     # Taken from arepy
     def post(self, args: argparse.Namespace, sim: Simulation, slice_: Path) -> Result:
@@ -40,4 +44,5 @@ class Slice(SliceFn):
         cbar = plt.colorbar()
         cbar.set_label("$x_{\mathrm{H+}}$")
 
-addToList("slice", Slice())
+
+addToList("slice", SlicePlot())

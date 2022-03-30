@@ -18,10 +18,12 @@ import bob.config as config
 from bob.basicField import BasicField
 from bob.allFields import allFields, getFieldByName
 
-def addTimeArg(subparser: argparse.ArgumentParser):
+
+def addTimeArg(subparser: argparse.ArgumentParser) -> None:
     subparser.add_argument("--time", default="t", choices=["t", "z"])
 
-def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot):
+
+def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot) -> float:
     if quantity == "z":
         return sim.getRedshift(snap.scale_factor)
     elif quantity == "t":
@@ -32,19 +34,20 @@ def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot):
     else:
         raise NotImplementedError
 
+
 class TimePlot(MultiSetFn):
-    def init(self, args: argparse.Namespace):
+    def init(self, args: argparse.Namespace) -> None:
         pass
 
     @abstractmethod
-    def getQuantity(self, sims: Simulation, snap: Snapshot) -> float:
+    def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> float:
         pass
 
-    def xlabel(self):
+    def xlabel(self) -> str:
         return self.time
 
     @abstractmethod
-    def ylabel(self):
+    def ylabel(self) -> str:
         pass
 
     def transform(self, result: np.ndarray) -> np.ndarray:
@@ -59,8 +62,8 @@ class TimePlot(MultiSetFn):
         plt.xlabel(self.xlabel())
         plt.ylabel(self.ylabel())
         labels = ["100%", "200%", "TNG"]
-        for (label, result) in zip(labels, result.arrs):
-            plt.plot(result[0, :], result[1, :], label=label)
+        for (label, arr) in zip(labels, result.arrs):
+            plt.plot(arr[0, :], arr[1, :], label=label)
         plt.legend()
 
     def getQuantityOverTime(self, args: argparse.Namespace, simSet: SimulationSet) -> np.ndarray:
@@ -72,21 +75,21 @@ class TimePlot(MultiSetFn):
             result[1, i] = self.getQuantity(args, sim, snap)
         return result
 
-    def setArgs(self, subparser: argparse.ArgumentParser):
+    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         addTimeArg(subparser)
 
 
 class MeanFieldOverTime(TimePlot):
     def init(self, args: argparse.Namespace) -> None:
         self.field = getFieldByName(args.field)
-        
+
     def xlabel(self) -> str:
         return self.time
 
     def ylabel(self) -> str:
         return self.field.symbol
 
-    def setArgs(self, subparser: argparse.ArgumentParser):
+    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         super().setArgs(subparser)
         subparser.add_argument("--field", required=True, choices=[f.niceName for f in allFields])
 

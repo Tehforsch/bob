@@ -16,6 +16,7 @@ from bob.postprocessingFunctions import SetFn, addToList
 
 from bob.plots.timePlots import addTimeArg, getTimeQuantityForSnap
 
+
 class IonizationTime(SetFn):
     def post(self, args: argparse.Namespace, simSet: SimulationSet) -> Result:
         self.quantity = args.time
@@ -31,9 +32,8 @@ class IonizationTime(SetFn):
         cbar = plt.colorbar()
         cbar.set_label("$z$")
 
-    def setArgs(self, subparser: argparse.ArgumentParser):
+    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         addTimeArg(subparser)
-
 
     def getIonizationTimeData(self, simSet: SimulationSet) -> Tuple[Tuple[float, float, float, float], np.ndarray]:
         axis = np.array([0.0, 0.0, 1.0])
@@ -59,5 +59,6 @@ class IonizationTime(SetFn):
             abundance = xHP[cellIndices]
             data[np.where(abundance > 0.5)] = getTimeQuantityForSnap(self.quantity, sim, snap)
         return (min1, min2, max1, max2), data
+
 
 addToList("ionizationTime", IonizationTime())

@@ -17,14 +17,14 @@ from bob.result import Result
 
 
 class IonizationData:
-    def __init__(self):
-        data = []
+    def __init__(self) -> None:
+        self.data: List[List[float]] = []
 
-    def getNeutralFractions(self):
+    def setNeutralFractions(self) -> None:
         self.neutralVolumeAv = 1.0 - self.volumeAv
         self.neutralMassAv = 1.0 - self.massAv
 
-    def fromSims(self, sims: List[Simulation]):
+    def fromSims(self, sims: List[Simulation]) -> IonizationData:
         for sim in sims:
             assert sim.params.get("ComovingIntegrationOn") == 1
             cosmology = sim.getCosmology()
@@ -34,23 +34,23 @@ class IonizationData:
                 for line in sim.log:
                     match = regex.match(line)
                     if match is not None:
-                        data.append([float(x) for x in match.groups()])
+                        self.data.append([float(x) for x in match.groups()])
             except:
                 pass
 
-        self.scale_factor = np.array([d[0] for d in data])
-        self.volumeAv = np.array([d[1] for d in data])
-        self.massAv = np.array([d[2] for d in data])
+        self.scale_factor = np.array([d[0] for d in self.data])
+        self.volumeAv = np.array([d[1] for d in self.data])
+        self.massAv = np.array([d[2] for d in self.data])
         self.redshift = z_at_value(cosmology.scale_factor, self.scale_factor)
-        self.getNeutralFractions()
+        self.setNeutralFractions()
         return self
 
-    def fromArray(arr: np.ndarray):
-        self.scale_factor = result[0, :]
-        self.redshift = result[1, :]
-        self.volumeAv = result[2, :]
-        self.massAv = result[3, :]
-        self.getNeutralFractions()
+    def fromArray(self, arr: np.ndarray) -> IonizationData:
+        self.scale_factor = arr[0, :]
+        self.redshift = arr[1, :]
+        self.volumeAv = arr[2, :]
+        self.massAv = arr[3, :]
+        self.setNeutralFractions()
         return self
 
     def toArray(self) -> np.ndarray:
@@ -67,23 +67,22 @@ class Ionization(MultiSetFn):
         return Result([IonizationData().fromSims(sims).toArray() for sims in simSets])
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        ionizationDataList = [IonizationData().fromArray(arr) for arr in result]
-        _, (ax1) = ax1.subplots()
+        ionizationDataList = [IonizationData().fromArray(arr) for arr in result.arrs]
         plt.style.use("classic")
 
         # labels = [ "L35n270TNG", "L35n270TNG (smaller $\Delta t$)","L35n540TNG"]
         # labels = ["intermediate", "100%"]
-        labels = [simSet[0].folder.parent for simSet in simSets]
+        labels = ["a", "b", "c", "d", "e"]
         colors = ["b", "r", "g", "purple", "brown", "orange"]
-        assert len(labels) == len(simSets)
+        assert len(labels) == len(result.arrs)
         linAx, logAx = setupIonizationPlot()
 
-        addConstraintsToAxis(linAx)
-        addConstraintsToAxis(logAx)
+        self.addConstraintsToAxis(linAx)
+        self.addConstraintsToAxis(logAx)
 
-        for (ionizationData, color, sims) in zip(ionizationDataList, itertools.cycle(colors), simSets):
-            plotResultsToAxis(ionizationData, linAx, color)
-            plotResultsToAxis(ionizationData, logAx, color)
+        for (ionizationData, color) in zip(ionizationDataList, itertools.cycle(colors)):
+            self.plotResultsToAxis(ionizationData, linAx, color)
+            self.plotResultsToAxis(ionizationData, logAx, color)
         # add legend labels
         for (label, color) in zip(labels, colors):
             linAx.plot([], [], color=color, label=label, linewidth=3)
@@ -91,60 +90,9 @@ class Ionization(MultiSetFn):
         linAx.plot([], [], label="Mass av.", linestyle="--", linewidth=3, color="black")
         plt.legend(loc=(0, -0.2))
 
-    def plotResultsToAxis(data: IonizationData, ax: plt.axes, color: str) -> None:
+    def plotResultsToAxis(self, data: IonizationData, ax: plt.axes, color: str) -> None:
         ax.plot(data.redshift, data.neutralVolumeAv, linewidth=3, color=color, linestyle="-")
         ax.plot(data.redshift, data.neutralMassAv, linewidth=3, color=color, linestyle="--")
-
-    def setupIonizationPlot() -> Tuple[plt.axes, plt.axes]:
-        label_font_size = 17
-        tics_label_size = 15
-        n_split = 4
-        minXHI = 1e-7
-        maxXHI = 1
-        splitXHI = 1e-1
-        minRedshift = 4.2
-        maxRedshift = 10
-
-        fig = plt.figure(figsize=(10, 10), tight_layout=True)
-        grid_spec = gridspec.GridSpec(n_split, 1, hspace=0)
-        logAx = fig.add_subplot(grid_spec[-1, :])
-        linAx = fig.add_subplot(grid_spec[:-1, :])
-
-        linAx.set_xlim(minRedshift, maxRedshift)
-        linAx.set_ylim(splitXHI, 1.0)
-
-        logAx.set_xlim(minRedshift, maxRedshift)
-        logAx.set_ylim(minXHI, splitXHI)
-
-        linAx.invert_xaxis()
-        logAx.invert_xaxis()
-
-        linAx.grid("on")
-        logAx.grid("on")
-        logAx.set_yscale("log")
-
-        linAx.tick_params(which="both", direction="in", top="on", right="on", bottom="off", labelbottom=False, labelsize=tics_label_size)
-        linAx.tick_params(axis="y", pad=+18, labelbottom="off")
-        logAx.tick_params(which="major", direction="in", top="off", right="on", bottom="on", labelsize=tics_label_size)
-        logAx.tick_params(which="minor", direction="in", top="off", right="off", bottom="off", left="off")
-
-        yLabelPositionX = 4.0
-        yLabelPositionY = 2.0 / (n_split + 1)
-        plt.text(yLabelPositionX, yLabelPositionY, "xHI", rotation=90, ha="center", fontsize=label_font_size)
-        logAx.set_xlabel("z", fontsize=label_font_size)
-
-        step = 0.1
-        yticksLin = np.arange(splitXHI + step, maxXHI + step, step)
-        linAx.set_yticks(yticksLin)
-        linAx.set_yticklabels(["{:.1f}".format(x) for x in yticksLin])
-
-        locmaj = matplotlib.ticker.LogLocator(base=10, numticks=int(abs(np.log10(splitXHI) - np.log10(1e-5)) + 1))
-        logAx.yaxis.set_major_locator(locmaj)
-
-        linAx.spines["bottom"].set_visible(False)
-        logAx.spines["top"].set_visible(False)
-
-        return linAx, logAx
 
     def addConstraintsToAxis(self, ax: plt.axes) -> None:
         fan06 = np.reshape(
@@ -305,76 +253,129 @@ class Ionization(MultiSetFn):
         ax.errorbar(mortlock11z, mortlock11, color="darkolivegreen", fmt="s", capsize=5)
         ax.errorbar(schroeder13z, schroeder13, color="darkolivegreen", fmt="s", capsize=5)
 
-    def getBeckerData2015() -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        becker_2015_raw = np.asarray(
-            [
-                3.91779e0,
-                8.92495e-1,
-                4.12493e0,
-                1.04970e0,
-                4.33202e0,
-                1.04970e0,
-                4.54258e0,
-                1.49594e0,
-                4.74988e0,
-                2.15010e0,
-                4.95876e0,
-                2.55071e0,
-                5.16594e0,
-                2.79919e0,
-                5.37482e0,
-                3.20487e0,
-                5.58532e0,
-                3.50406e0,
-                5.79265e0,
-                4.20385e0,
-                3.91606e0,
-                6.79513e-1,
-                4.12485e0,
-                7.86004e-1,
-                4.33194e0,
-                7.86004e-1,
-                4.54080e0,
-                1.13590e0,
-                4.74971e0,
-                1.63793e0,
-                4.95858e0,
-                1.98276e0,
-                5.16574e0,
-                2.20081e0,
-                5.37461e0,
-                2.57099e0,
-                5.58345e0,
-                2.84990e0,
-                5.79240e0,
-                3.45842e0,
-                3.91623e0,
-                1.19168e0,
-                4.12505e0,
-                1.38945e0,
-                4.33379e0,
-                1.38945e0,
-                4.54108e0,
-                1.97769e0,
-                4.75011e0,
-                2.81947e0,
-                4.95902e0,
-                3.31136e0,
-                5.16619e0,
-                3.57505e0,
-                5.37509e0,
-                4.01623e0,
-                5.58394e0,
-                4.32049e0,
-                5.79295e0,
-                5.12677e0,
-            ]
-        ).reshape((30, 2))
 
-        becker_2015_xHI = becker_2015_raw[:10, :]
-        becker_2015_low = becker_2015_raw[10:20, 1]
-        becker_2015_high = becker_2015_raw[20:, 1]
-        return becker_2015_xHI, becker_2015_low, becker_2015_high
+def setupIonizationPlot() -> Tuple[plt.axes, plt.axes]:
+    label_font_size = 17
+    tics_label_size = 15
+    n_split = 4
+    minXHI = 1e-7
+    maxXHI = 1
+    splitXHI = 1e-1
+    minRedshift = 4.2
+    maxRedshift = 10
+
+    fig = plt.figure(figsize=(10, 10), tight_layout=True)
+    grid_spec = gridspec.GridSpec(n_split, 1, hspace=0)
+    logAx = fig.add_subplot(grid_spec[-1, :])
+    linAx = fig.add_subplot(grid_spec[:-1, :])
+
+    linAx.set_xlim(minRedshift, maxRedshift)
+    linAx.set_ylim(splitXHI, 1.0)
+
+    logAx.set_xlim(minRedshift, maxRedshift)
+    logAx.set_ylim(minXHI, splitXHI)
+
+    linAx.invert_xaxis()
+    logAx.invert_xaxis()
+
+    linAx.grid("on")
+    logAx.grid("on")
+    logAx.set_yscale("log")
+
+    linAx.tick_params(which="both", direction="in", top="on", right="on", bottom="off", labelbottom=False, labelsize=tics_label_size)
+    linAx.tick_params(axis="y", pad=+18, labelbottom="off")
+    logAx.tick_params(which="major", direction="in", top="off", right="on", bottom="on", labelsize=tics_label_size)
+    logAx.tick_params(which="minor", direction="in", top="off", right="off", bottom="off", left="off")
+
+    yLabelPositionX = 4.0
+    yLabelPositionY = 2.0 / (n_split + 1)
+    plt.text(yLabelPositionX, yLabelPositionY, "xHI", rotation=90, ha="center", fontsize=label_font_size)
+    logAx.set_xlabel("z", fontsize=label_font_size)
+
+    step = 0.1
+    yticksLin = np.arange(splitXHI + step, maxXHI + step, step)
+    linAx.set_yticks(yticksLin)
+    linAx.set_yticklabels(["{:.1f}".format(x) for x in yticksLin])
+
+    locmaj = matplotlib.ticker.LogLocator(base=10, numticks=int(abs(np.log10(splitXHI) - np.log10(1e-5)) + 1))
+    logAx.yaxis.set_major_locator(locmaj)
+
+    linAx.spines["bottom"].set_visible(False)
+    logAx.spines["top"].set_visible(False)
+
+    return linAx, logAx
+
+
+def getBeckerData2015() -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    becker_2015_raw = np.asarray(
+        [
+            3.91779e0,
+            8.92495e-1,
+            4.12493e0,
+            1.04970e0,
+            4.33202e0,
+            1.04970e0,
+            4.54258e0,
+            1.49594e0,
+            4.74988e0,
+            2.15010e0,
+            4.95876e0,
+            2.55071e0,
+            5.16594e0,
+            2.79919e0,
+            5.37482e0,
+            3.20487e0,
+            5.58532e0,
+            3.50406e0,
+            5.79265e0,
+            4.20385e0,
+            3.91606e0,
+            6.79513e-1,
+            4.12485e0,
+            7.86004e-1,
+            4.33194e0,
+            7.86004e-1,
+            4.54080e0,
+            1.13590e0,
+            4.74971e0,
+            1.63793e0,
+            4.95858e0,
+            1.98276e0,
+            5.16574e0,
+            2.20081e0,
+            5.37461e0,
+            2.57099e0,
+            5.58345e0,
+            2.84990e0,
+            5.79240e0,
+            3.45842e0,
+            3.91623e0,
+            1.19168e0,
+            4.12505e0,
+            1.38945e0,
+            4.33379e0,
+            1.38945e0,
+            4.54108e0,
+            1.97769e0,
+            4.75011e0,
+            2.81947e0,
+            4.95902e0,
+            3.31136e0,
+            5.16619e0,
+            3.57505e0,
+            5.37509e0,
+            4.01623e0,
+            5.58394e0,
+            4.32049e0,
+            5.79295e0,
+            5.12677e0,
+        ]
+    ).reshape((30, 2))
+
+    becker_2015_xHI = becker_2015_raw[:10, :]
+    becker_2015_low = becker_2015_raw[10:20, 1]
+    becker_2015_high = becker_2015_raw[20:, 1]
+    return becker_2015_xHI, becker_2015_low, becker_2015_high
 
 
 addToList("ionization", Ionization())
