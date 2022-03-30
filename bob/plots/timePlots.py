@@ -60,7 +60,6 @@ class TimePlot(MultiSetFn):
         plt.ylabel(self.ylabel())
         labels = ["100%", "200%", "TNG"]
         for (label, result) in zip(labels, result.arrs):
-            print(result)
             plt.plot(result[0, :], result[1, :], label=label)
         plt.legend()
 
