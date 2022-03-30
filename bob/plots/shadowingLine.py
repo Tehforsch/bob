@@ -44,7 +44,7 @@ class ShadowingLinePlot(TimePlot):
         return getDataAtPoints(field, snap, points)
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        self.styles = [{"color": s[0], "linestyle": s[1]} for s in itertools.product(["b", "r"], ["-", "--", "-."])]
+        self.styles = [{"color": s[0], "linestyle": s[1]} for s in itertools.product(["r", "b"], ["-", "--", "-."])]
         self.labels = ["" for _ in result.arrs]
         super().plot(plt, result)
         plt.ylim(0, 0.45)
