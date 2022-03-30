@@ -26,8 +26,8 @@ class ArepoSlicePlot(SliceFn):
         super().setArgs(subparser)
 
     # Taken from arepy
-    def post(self, args: argparse.Namespace, sim: Simulation, slice_: Path) -> Result:
-        f = open(slice_, mode="rb")
+    def post(self, args: argparse.Namespace, sim: Simulation, slice_: ArepoSlice) -> Result:
+        f = open(slice_.path, mode="rb")
         npix_x = np.fromfile(f, np.uint32, 1)[0]
         npix_y = np.fromfile(f, np.uint32, 1)[0]
         arepo_image = np.fromfile(f, np.float32, int(npix_x * npix_y)).reshape((int(npix_x), int(npix_y)))
