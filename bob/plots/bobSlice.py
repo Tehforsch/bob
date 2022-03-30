@@ -11,6 +11,14 @@ from bob import config
 from bob.postprocessingFunctions import SnapFn, addToList
 from bob.result import Result
 from bob.allFields import allFields, getFieldByName
+from bob.field import Field
+
+
+def getDataAtPoints(field: Field, snapshot: Snapshot, points: np.ndarray) -> np.ndarray:
+    tree = cKDTree(snapshot.coordinates)
+    cellIndices = tree.query(points)[1]
+    data = field.getData(snapshot)
+    return data[cellIndices]
 
 
 class VoronoiSlice(SnapFn):
@@ -28,12 +36,10 @@ class VoronoiSlice(SnapFn):
         n2 = config.dpi * 3
         p1, p2 = np.meshgrid(np.linspace(self.min1, self.max1, n1), np.linspace(self.min2, self.max2, n2))
         coordinates = axis * (center * axis) + np.outer(p1, self.ortho1) + np.outer(p2, self.ortho2)
-        tree = cKDTree(snap.coordinates)
-        cellIndices = tree.query(coordinates)[1]
-        cellIndices = cellIndices.reshape((n1, n2))
-        data = field.getData(snap)
+        data = getDataAtPoints(field, snap, coordinates)
+        data = data.reshape((n1, n2))
         print(f"Field: {field.niceName}: min: {np.min(data):.2e}, mean: {np.mean(data):.2e}, max: {np.max(data):.2e}")
-        return Result([data[cellIndices]])
+        return Result([data])
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.xlabel(getAxisName(self.ortho1))
