@@ -2,7 +2,7 @@ import os
 import logging
 
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List
 import numpy as np
 import astropy.units as pq
 

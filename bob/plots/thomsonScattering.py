@@ -1,7 +1,5 @@
 import argparse
-from typing import List
 import astropy.units as pq
-from bob.simulationSet import SimulationSet
 import matplotlib.pyplot as plt
 import numpy as np
 

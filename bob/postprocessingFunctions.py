@@ -1,11 +1,9 @@
 import argparse
-from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 
 from abc import ABC, abstractmethod
-from typing import Callable, Any, List, Optional
+from typing import Any, List
 from bob.simulation import Simulation
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot

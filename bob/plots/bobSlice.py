@@ -1,17 +1,15 @@
 import argparse
 
-from typing import Any, Dict, Tuple, List
+from typing import Tuple
 import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
 import numpy as np
 
 from bob.simulation import Simulation
 from bob.snapshot import Snapshot
-from bob.field import Field
 from bob import config
 from bob.postprocessingFunctions import SnapFn, addToList
 from bob.result import Result
-from bob.basicField import BasicField
 from bob.allFields import allFields, getFieldByName
 
 

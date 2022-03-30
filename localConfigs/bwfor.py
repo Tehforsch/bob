@@ -1,6 +1,3 @@
-from pathlib import Path
-from bob import config
-
 arepoDir = "/beegfs/home/hd/hd_hd/hd_hp240/projects/arepo"
 
 jobParams = {

@@ -1,10 +1,9 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 import argparse
-from typing import Tuple, List
+from typing import List
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.spatial import cKDTree
 import astropy.units as pq
 
 from bob.snapshot import Snapshot
@@ -12,9 +11,6 @@ from bob.postprocessingFunctions import addToList, MultiSetFn
 from bob.result import Result
 from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
-from bob.basicField import BasicField
-import bob.config as config
-from bob.basicField import BasicField
 from bob.allFields import allFields, getFieldByName
 
 

@@ -1,5 +1,3 @@
-from pathlib import Path
-
 arepoDir = "/beegfs/home/hd/hd_hd/hd_hp240/projects/arepo"
 
 jobParams = {"numCores": 2, "logFile": "stdout.log", "maxCoresPerNode": 2}

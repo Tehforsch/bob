@@ -11,7 +11,13 @@ except ImportError:
 from bob.simulationSet import SimulationSet
 from bob import config
 import bob.plotter
-import bob.plots.physicalPlots
+
+import bob.plots.ionization
+import bob.plots.ionizationTime
+import bob.plots.timePlots
+import bob.plots.thomsonScattering
+import bob.plots.arepoSlice
+import bob.plots.bobSlice
 
 
 from bob.postprocessingFunctions import (

@@ -1,14 +1,13 @@
 import argparse
 import re
 import itertools
-from typing import List, Tuple, Any, Optional
+from typing import List, Tuple
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.ticker
 
-from astropy.cosmology import FlatLambdaCDM, z_at_value
-import astropy.units as u
+from astropy.cosmology import z_at_value
 
 from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation

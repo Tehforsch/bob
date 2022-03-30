@@ -1,7 +1,5 @@
 import argparse
 from pathlib import Path
-import os
-from typing import Any
 
 import numpy as np
 import matplotlib.pyplot as plt

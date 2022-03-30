@@ -5,9 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial import cKDTree
 
-from bob.snapshot import Snapshot
 from bob.simulationSet import SimulationSet
-from bob.simulation import Simulation
 from bob.basicField import BasicField
 from bob.plots.bobSlice import findOrthogonalAxes
 import bob.config as config

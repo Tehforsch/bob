@@ -1,12 +1,10 @@
 import os
 import pickle
 from typing import Iterator, List, Optional, Callable, Tuple, Dict, Any
-import itertools
 from pathlib import Path
 import argparse
 import matplotlib.pyplot as plt
 import logging
-import numpy as np
 
 from bob.postprocessingFunctions import (
     SetFn,
@@ -16,8 +14,7 @@ from bob.postprocessingFunctions import (
 )
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
-from bob import config
-import bob.plots.ionization
+import bob.config
 from bob.simulation import Simulation
 from bob.result import Result, getResultFromFolder
 from bob.postprocessingFunctions import PostprocessingFunction
@@ -46,7 +43,7 @@ class Plotter:
         select: Optional[List[str]],
         quotient_params: Optional[List[str]],
     ) -> None:
-        self.picFolder = parent_folder / config.picFolder
+        self.picFolder = parent_folder / bob.config.picFolder
         self.dataFolder = self.picFolder / "plots"
         self.sims = self.filterSims(sims, select)
         self.snapshotFilter = snapshotFilter
@@ -62,7 +59,7 @@ class Plotter:
     def replot(self, args: argparse.Namespace) -> None:
         for plotName in os.listdir(self.dataFolder):
             plotFolder = self.dataFolder / plotName
-            plot = pickle.load(open(plotFolder / config.plotSerializationFileName, "rb"))
+            plot = pickle.load(open(plotFolder / bob.config.plotSerializationFileName, "rb"))
             result = getResultFromFolder(plotFolder)
             plot.plot(plt, result)
             self.saveAndShow(plotFolder.name)
@@ -84,7 +81,7 @@ class Plotter:
         self.saveResult(result, plotDataFolder)
 
     def savePlotInfo(self, fn: PostprocessingFunction, plotDataFolder: Path) -> None:
-        filename = plotDataFolder / config.plotSerializationFileName
+        filename = plotDataFolder / bob.config.plotSerializationFileName
         pickle.dump(fn, open(filename, "wb"))
 
     def saveResult(self, result: Result, plotDataFolder: Path) -> None:
@@ -138,7 +135,7 @@ class Plotter:
     def saveAndShow(self, filename: str) -> None:
         filepath = self.picFolder / filename
         filepath.parent.mkdir(exist_ok=True)
-        plt.savefig(str(filepath) + ".pdf", dpi=config.dpi)
+        plt.savefig(str(filepath) + ".pdf", dpi=bob.config.dpi)
         if self.show:
             plt.show()
         plt.clf()

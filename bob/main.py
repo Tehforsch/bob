@@ -1,9 +1,8 @@
 from pathlib import Path
-import shutil
 import logging
 import argparse
 
-from bob import postprocess, config
+from bob import postprocess
 from bob import postprocessingFunctions
 from bob.simulationSet import getSimsFromFolders
 from bob.util import getCommonParentFolder
