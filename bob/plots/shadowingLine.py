@@ -23,7 +23,7 @@ class ShadowingLinePlot(SetFn):
         return Result(data)
 
     def getDataAlongLine(self, field: Field, snap: Snapshot, start: np.ndarray, end: np.ndarray) -> np.ndarray:
-        numPoints = 100
+        numPoints = 2000
         result = np.zeros((2, numPoints))
         fractions = np.linspace(0.0, 1.0, numPoints)
         offsets = np.outer(end - start, fractions).transpose()
