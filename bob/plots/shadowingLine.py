@@ -16,8 +16,8 @@ from bob.basicField import BasicField
 class ShadowingLinePlot(SetFn):
     def post(self, args: argparse.Namespace, sims: SimulationSet) -> Result:
         snaps = [sim.snapshots[-1] for sim in sims]
-        print("Using snaps at times:", ",".join(str(snap.time.to(pq.Myr)) for snap in snaps))
-        start = np.array([0.5, 0.5, 0.5])
+        print("Using snaps at times:", ",".join(str(snap.time.to(pq.kyr)) for snap in snaps))
+        start = np.array([0.0, 0.0, 0.5])
         end = np.array([1.0, 1.0, 0.5])
         data = [self.getDataAlongLine(BasicField("ChemicalAbundances", 1), snap, start, end) for snap in snaps]
         return Result(data)
