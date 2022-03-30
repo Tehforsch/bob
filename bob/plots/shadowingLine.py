@@ -4,23 +4,34 @@ import numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as pq
 
+import bob.config as config
 from bob.result import Result
-from bob.simulationSet import SimulationSet
-from bob.postprocessingFunctions import SetFn, addToList
+from bob.postprocessingFunctions import addToList
+from bob.plots.timePlots import TimePlot
 from bob.snapshot import Snapshot
 from bob.field import Field
 from bob.plots.bobSlice import getDataAtPoints
 from bob.basicField import BasicField
+from bob.simulation import Simulation
 
 
-class ShadowingLinePlot(SetFn):
-    def post(self, args: argparse.Namespace, sims: SimulationSet) -> Result:
-        snaps = [sim.snapshots[-1] for sim in sims]
-        print("Using snaps at times:", ",".join(str(snap.time.to(pq.kyr)) for snap in snaps))
+class ShadowingLinePlot(TimePlot):
+    def xlabel(self) -> str:
+        return "$t \; [\mathrm{Myr}]$"
+
+    def ylabel(self) -> str:
+        return "Mass av."
+
+    def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> float:
         start = np.array([0.0, 0.0, 0.5])
         end = np.array([1.0, 1.0, 0.5])
-        data = [self.getDataAlongLine(BasicField("ChemicalAbundances", 1), snap, start, end) for snap in snaps]
-        return Result(data)
+        data = self.getDataAlongLine(BasicField("ChemicalAbundances", 1), snap, start, end)
+        masses = self.getDataAlongLine(BasicField("Masses"), snap, start, end)
+        return np.sum(data * masses) / np.sum(masses)
+
+    def transform(self, result: np.ndarray) -> np.ndarray:
+        result[0, :] = result[0, :] * ((config.defaultTimeUnit / pq.Myr).decompose().to(1))
+        return result
 
     def getDataAlongLine(self, field: Field, snap: Snapshot, start: np.ndarray, end: np.ndarray) -> np.ndarray:
         numPoints = 2000
@@ -33,8 +44,8 @@ class ShadowingLinePlot(SetFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        for arr in result.arrs:
-            plt.plot(arr[0, :], arr[1, :])
+        super().plot(plt, result)
+        plt.ylim(0, 1)
 
 
 addToList("shadowingLine", ShadowingLinePlot())

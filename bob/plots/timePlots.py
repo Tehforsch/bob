@@ -3,8 +3,8 @@ import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
-import astropy.units as pq
 
+import bob.config as config
 from bob.snapshot import Snapshot
 from bob.postprocessingFunctions import addToList, MultiSetFn
 from bob.result import Result
@@ -23,9 +23,9 @@ def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot) -> fl
         return sim.getRedshift(snap.scale_factor)
     elif quantity == "t":
         if sim.params["ComovingIntegrationOn"]:
-            return sim.getLookbackTime(snap.scale_factor) / pq.yr
+            return sim.getLookbackTime(snap.scale_factor) / config.defaultTimeUnit
         else:
-            return snap.time / pq.yr
+            return snap.time / config.defaultTimeUnit
     else:
         raise NotImplementedError
 

@@ -1,3 +1,5 @@
+import astropy.units as pq
+
 arepoLogFile = "stdout.log"
 
 # Bob names
@@ -7,3 +9,5 @@ picFolder = "pics"
 dpi = 600
 
 plotSerializationFileName = "plot.info"
+
+defaultTimeUnit = pq.yr
