@@ -20,14 +20,14 @@ class IonizationTime(SetFn):
     def post(self, args: argparse.Namespace, simSet: SimulationSet) -> Result:
         self.quantity = args.time
         ((self.min1, self.min2, self.max1, self.max2), data) = self.getIonizationTimeData(simSet)
-        return [data]
+        return Result([data])
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.xlabel("$x [h^{-1} \mathrm{Mpc}]$")
         plt.ylabel("$y [h^{-1} \mathrm{Mpc}]$")
 
         extent = (self.min1, self.max1, self.min2, self.max2)
-        plt.imshow(data, extent=extent, cmap="Reds", vmin=6, vmax=10)
+        plt.imshow(result.arrs[0], extent=extent, cmap="Reds", vmin=6, vmax=10)
         cbar = plt.colorbar()
         cbar.set_label("$z$")
 
@@ -40,9 +40,9 @@ class IonizationTime(SetFn):
         n1 = config.dpi * 3
         n2 = config.dpi * 3
         data = np.zeros((n1, n2))
-        snapshots = [(snap, sim) for sim in simSet for snap in sim.snapshots]
-        snapshots.sort(key=lambda snapSim: -snapSim[0].time)
-        for (snap, sim) in snapshots:
+        snapshots = [(sim, snap) for sim in simSet for snap in sim.snapshots]
+        snapshots.sort(key=lambda simSnap: -getTimeQuantityForSnap(self.quantity, simSnap[0], simSnap[1]))
+        for (sim, snap) in snapshots:
             print(snap)
             xHP = BasicField("ChemicalAbundances", 1).getData(snap)
             center = snap.center
