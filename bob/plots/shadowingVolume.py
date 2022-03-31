@@ -81,14 +81,14 @@ class ShadowingVolumePlot(TimePlot):
         self.labels = ["" for _ in result.arrs]
 
         super().plot(plt, result)
-        plt.ylim(0, 0.45)
-        plt.xlim(35, 60)
+        plt.xlim(0, 60)
+        plt.ylim(0, 1.0)
         plt.plot([], [], label="Sweep", color="b")
         plt.plot([], [], label="SPRAI", color="r")
         plt.plot([], [], label="$128^3$", linestyle="-", color="black")
         plt.plot([], [], label="$64^3$", linestyle="--", color="black")
         plt.plot([], [], label="$32^3$", linestyle=":", color="black")
-        plt.legend()
+        plt.legend(loc="upper left")
 
 
 addToList("shadowingVolume", ShadowingVolumePlot())
