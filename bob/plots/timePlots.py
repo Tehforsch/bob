@@ -35,7 +35,6 @@ def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot) -> fl
 class TimePlot(MultiSetFn):
     def init(self, args: argparse.Namespace) -> None:
         self.styles: List[Dict[str, Any]] = [{}]
-        pass
 
     @abstractmethod
     def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> float:
@@ -80,6 +79,7 @@ class TimePlot(MultiSetFn):
 
 class MeanFieldOverTime(TimePlot):
     def init(self, args: argparse.Namespace) -> None:
+        super().init(args)
         self.field = getFieldByName(args.field)
 
     def xlabel(self) -> str:
