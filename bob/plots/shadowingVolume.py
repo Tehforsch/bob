@@ -15,15 +15,16 @@ from bob.simulation import Simulation
 
 
 class InfiniteCone:
-    def __init__(self, tip: np.ndarray, normal: np.ndarray, radiusPerDistance: float) -> None:
+    def __init__(self, tip: np.ndarray, normal: np.ndarray, radiusPerDistance: float, start: np.ndarray) -> None:
         self.tip = tip
         self.normal = normal
         self.radiusPerDistance = radiusPerDistance
+        self.start = np.dot(start, self.normal)
 
     def contains(self, point: np.ndarray) -> bool:
         dist = point - self.tip
         lengthAlongCentralLine = np.dot(dist, self.normal)
-        if lengthAlongCentralLine < 0:
+        if lengthAlongCentralLine < self.start:
             return False
         coneRadiusAtPoint = lengthAlongCentralLine * self.radiusPerDistance
         orthogonalDistance = np.linalg.norm((point - self.tip) - lengthAlongCentralLine * self.normal)
@@ -35,29 +36,38 @@ class ShadowingVolumePlot(TimePlot):
         super().__init__()
         self.L = 32
         self.boxSize = 1.0
+        self.center = np.array([self.boxSize / 2.0, self.boxSize / 2.0, self.boxSize / 2.0])
 
     def plotToBox(self, x: np.ndarray) -> np.ndarray:
-        center = np.array([self.boxSize / 2.0, self.boxSize / 2.0, self.boxSize / 2.0])
-        return (x - center) * self.L
+        return x / self.L + self.center
 
     def init(self, args: argparse.Namespace) -> None:
         distanceFromCenter = 14.0
         radiusBlob = 4.0
         self.cone1 = InfiniteCone(
-            self.plotToBox(np.array([-distanceFromCenter, 0.0, 0.0])), np.array([1.0, 0.0, 0.0]), radiusBlob / distanceFromCenter
+            self.plotToBox(np.array([-distanceFromCenter, 0.0, 0.0])), np.array([1.0, 0.0, 0.0]), radiusBlob / distanceFromCenter, self.center
         )
         self.cone2 = InfiniteCone(
-            self.plotToBox(np.array([0.0, -distanceFromCenter, 0.0])), np.array([0.0, 1.0, 0.0]), radiusBlob / distanceFromCenter
+            self.plotToBox(np.array([0.0, -distanceFromCenter, 0.0])), np.array([0.0, 1.0, 0.0]), radiusBlob / distanceFromCenter, self.center
         )
 
     def xlabel(self) -> str:
-        return "$t \; [\mathrm{Myr}]$"
+        return "$t \; [\mathrm{kyr}]$"
 
     def ylabel(self) -> str:
         return "$\overline{x_{\mathrm{H}}}$"
 
     def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> float:
-        selection = np.array([(1 if self.cone1.contains(coord) & self.cone2.contains(coord) else 0) for coord in snap.coordinates])
+        print("At", sims.name, snap.time.to(pq.kyr))
+        densities = BasicField("Density").getData(snap)
+        densityThreshold = 1500
+        selection = np.array(
+            [
+                i
+                for (i, coord) in enumerate(snap.coordinates)
+                if (self.cone1.contains(coord) and self.cone2.contains(coord) and densities[i] < densityThreshold)
+            ]
+        )
         data = BasicField("ChemicalAbundances", 1).getData(snap)[selection]
         masses = BasicField("Masses").getData(snap)[selection]
         return np.sum(data * masses) / np.sum(masses)
