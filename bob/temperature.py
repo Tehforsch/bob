@@ -8,14 +8,6 @@ import astropy.units as pq
 
 class Temperature(Field):
     def getData(self, snapshot: Snapshot) -> np.ndarray:
-        # The follwoing seems to be wrong
-        # inten = self.sf[pt]['InternalEnergy'][:]
-        # utherm = inten[ids] * self.sf['Header'].attrs['UnitVelocity_in_cm_per_s']**2
-        # return ( calcGamma() - 1. ) * utherm * (calcMu() * apy.const.m_p) / apy.const.k_B
-
-        # The following calculation was taken from voronoi_makeimage.c line 2240
-        # and gives the same temperatures as are shown on the Arepo images
-        # self.new["density"] = self.new["mass"] / self.new["length"] ** 3
         densityUnit = snapshot.massUnit / (snapshot.lengthUnit**3)
         numberDensityUnit = 1 / (snapshot.lengthUnit**3)
         density = BasicField("Density").getData(snapshot)

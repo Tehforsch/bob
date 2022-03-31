@@ -10,13 +10,13 @@ from bob.basicField import BasicField
 from bob.constants import speedOfLight, protonMass
 from bob.plots.timePlots import TimePlot
 from bob.result import Result
+from bob.electronAbundance import ElectronAbundance
 
 
 class ThomsonScattering(TimePlot):
     def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> float:
         sig = 6.65e-29 * pq.m**2  # Thomson scattering cross-section
-        xe = BasicField("Density").getData(snap)
-        print("DEFINITELY TODO")
+        xe = ElectronAbundance().getData(snap)
         density = BasicField("Density").getData(snap) * snap.lengthUnit ** (-3) * snap.massUnit
         ne = xe * density / protonMass
         self.timeUnit = pq.yr
