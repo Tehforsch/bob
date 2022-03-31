@@ -21,7 +21,7 @@ class ShadowingLinePlot(TimePlot):
         return "$t \; [\mathrm{Myr}]$"
 
     def ylabel(self) -> str:
-        return "Mass av."
+        return "$\overline{x_{\mathrm{H}}}$"
 
     def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> float:
         startRadius = (4 / 16) / np.sqrt(2)
@@ -44,16 +44,16 @@ class ShadowingLinePlot(TimePlot):
         return getDataAtPoints(field, snap, points)
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        self.styles = [{"color": s[0], "linestyle": s[1]} for s in itertools.product(["r", "b"], ["-", "--", "-."])]
+        self.styles = [{"color": s[0], "linestyle": s[1]} for s in itertools.product(["r", "b"], ["-", "--", ":"])]
         self.labels = ["" for _ in result.arrs]
         super().plot(plt, result)
         plt.ylim(0, 0.45)
         plt.xlim(35, 60)
         plt.plot([], [], label="Sweep", color="b")
         plt.plot([], [], label="SPRAI", color="r")
-        plt.plot([], [], label="$128^3$", linestyle="-")
-        plt.plot([], [], label="$64^3$", linestyle="--")
-        plt.plot([], [], label="$32^3$", linestyle="-.")
+        plt.plot([], [], label="$128^3$", linestyle="-", color="black")
+        plt.plot([], [], label="$64^3$", linestyle="--", color="black")
+        plt.plot([], [], label="$32^3$", linestyle=":", color="black")
         plt.legend()
 
 
