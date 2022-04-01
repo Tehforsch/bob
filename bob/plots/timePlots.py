@@ -34,6 +34,7 @@ def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot) -> fl
 
 class TimePlot(MultiSetFn):
     def init(self, args: argparse.Namespace) -> None:
+        super().init(args)
         self.styles: List[Dict[str, Any]] = [{}]
 
     @abstractmethod
@@ -52,7 +53,6 @@ class TimePlot(MultiSetFn):
 
     def post(self, args: argparse.Namespace, simSets: MultiSet) -> Result:
         self.labels = simSets.labels
-        self.init(args)
         self.time = args.time
         return Result([self.transform(self.getQuantityOverTime(args, simSet)) for simSet in simSets])
 

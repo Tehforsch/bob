@@ -14,6 +14,9 @@ from bob.multiSet import MultiSet
 class PostprocessingFunction(ABC):
     name = ""
 
+    def init(self, args: argparse.Namespace) -> None:
+        pass
+
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         pass
 
@@ -58,6 +61,9 @@ class MultiSetFn(PostprocessingFunction):
 
 
 class SliceFn(PostprocessingFunction):
+    def init(self, args: argparse.Namespace) -> None:
+        self.slice_field = args.slice_field
+
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         subparser.add_argument("--slice_field", choices=["xHP", "temp"], required=True)
 

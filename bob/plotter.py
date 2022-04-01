@@ -70,6 +70,7 @@ class Plotter:
         self, args: argparse.Namespace, fn: PostprocessingFunction, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]
     ) -> None:
         logging.info("Running {}".format(name))
+        fn.init(args)
         result = post()
         self.save(fn, name, result)
         if not args.post:

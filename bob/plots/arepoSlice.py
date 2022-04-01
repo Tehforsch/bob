@@ -36,6 +36,7 @@ class ArepoSlicePlot(SliceFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.xlabel("$x [h^{-1} \mathrm{kpc}]$")
         plt.ylabel("$y [h^{-1} \mathrm{kpc}]$")
+        print(self.slice_name)
         if self.slice_name == "xHP":
             vmin = 1e-6
             vmax = 1
