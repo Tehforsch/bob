@@ -59,7 +59,7 @@ class MultiSetFn(PostprocessingFunction):
 
 class SliceFn(PostprocessingFunction):
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        subparser.add_argument("--slice_field", choices=["xHP"], required=True)
+        subparser.add_argument("--slice_field", choices=["xHP", "temp"], required=True)
 
     def getName(self, args: argparse.Namespace) -> str:
         return f"{self.name}_{args.slice_field}"
