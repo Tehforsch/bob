@@ -60,7 +60,9 @@ class Plotter:
             return SimulationSet(sim for sim in sims if sim.name in select)
 
     def replot(self, args: argparse.Namespace) -> None:
-        for plotName in os.listdir(self.dataFolder):
+        plots = os.listdir(self.dataFolder)
+        plots.sort()
+        for plotName in plots:
             print("Replotting", plotName)
             plotFolder = self.dataFolder / plotName
             plot = pickle.load(open(plotFolder / bob.config.plotSerializationFileName, "rb"))
