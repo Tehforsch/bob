@@ -59,6 +59,7 @@ class Plotter:
 
     def replot(self, args: argparse.Namespace) -> None:
         for plotName in os.listdir(self.dataFolder):
+            print("Replotting", plotName)
             plotFolder = self.dataFolder / plotName
             plot = pickle.load(open(plotFolder / bob.config.plotSerializationFileName, "rb"))
             result = getResultFromFolder(plotFolder)
