@@ -46,7 +46,8 @@ def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> 
 
     picFolder = Path(parent_folder, config.picFolder)
     picFolder.mkdir(exist_ok=True)
-    plotter = bob.plotter.Plotter(parent_folder, sims, args.snapshots, args.show, args.select, args.quotient)
+    outputFileType = ".png" if args.png else ".pdf"
+    plotter = bob.plotter.Plotter(parent_folder, sims, args.snapshots, args.show, args.select, args.quotient, outputFileType)
     if args.function == "replot":
         plotter.replot(args)
     else:

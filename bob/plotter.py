@@ -43,6 +43,7 @@ class Plotter:
         show: bool,
         select: Optional[List[str]],
         quotient_params: Optional[List[str]],
+        outputFileType: str,
     ) -> None:
         self.picFolder = parent_folder / bob.config.picFolder
         self.dataFolder = self.picFolder / "plots"
@@ -50,6 +51,7 @@ class Plotter:
         self.snapshotFilter = snapshotFilter
         self.show = show
         self.quotient_params = quotient_params
+        self.outputFileType = outputFileType
 
     def filterSims(self, sims: SimulationSet, select: Optional[List[str]]) -> SimulationSet:
         if select is None:
@@ -137,7 +139,7 @@ class Plotter:
     def saveAndShow(self, filename: str) -> None:
         filepath = self.picFolder / filename
         filepath.parent.mkdir(exist_ok=True)
-        plt.savefig(str(filepath) + ".pdf", dpi=bob.config.dpi)
+        plt.savefig(str(filepath) + self.outputFileType, dpi=bob.config.dpi)
         if self.show:
             plt.show()
         plt.clf()
