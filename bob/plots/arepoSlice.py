@@ -36,15 +36,15 @@ class ArepoSlicePlot(SliceFn):
         plt.xlabel("$x [h^{-1} \mathrm{kpc}]$")
         plt.ylabel("$y [h^{-1} \mathrm{kpc}]$")
         if self.slice_field == "xHP":
-            vmin = 1e-6
-            vmax = 1
+            vmin = 1.0e-6
+            vmax = 1.0
             plt.clim(vmin, vmax)
             cbar = plt.colorbar()
             cbar.set_label("$x_{\mathrm{H+}}$")
             plt.imshow(result.arrs[0], cmap="Reds", norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=(-17.5, 17.5, -17.5, 17.5))
         elif self.slice_field == "temp":
-            vmin = np.min(result.arrs[0])
-            vmax = np.max(result.arrs[0])
+            vmin = 1.0e1
+            vmax = 1.0e6
             plt.imshow(result.arrs[0], cmap="Reds", norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=(-17.5, 17.5, -17.5, 17.5))
             cbar = plt.colorbar()
             cbar.set_label("$T$")
