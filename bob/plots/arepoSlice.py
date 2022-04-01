@@ -25,7 +25,6 @@ class ArepoSlicePlot(SliceFn):
 
     # Taken from arepy
     def post(self, args: argparse.Namespace, sim: Simulation, slice_: ArepoSlice) -> Result:
-        self.slice_name = slice_.name
         f = open(slice_.path, mode="rb")
         npix_x = np.fromfile(f, np.uint32, 1)[0]
         npix_y = np.fromfile(f, np.uint32, 1)[0]
@@ -36,18 +35,19 @@ class ArepoSlicePlot(SliceFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.xlabel("$x [h^{-1} \mathrm{kpc}]$")
         plt.ylabel("$y [h^{-1} \mathrm{kpc}]$")
-        print(self.slice_name)
-        if self.slice_name == "xHP":
+        if self.slice_field == "xHP":
             vmin = 1e-6
             vmax = 1
             plt.clim(vmin, vmax)
             cbar = plt.colorbar()
             cbar.set_label("$x_{\mathrm{H+}}$")
             plt.imshow(result.arrs[0], cmap="Reds", norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=(-17.5, 17.5, -17.5, 17.5))
-        elif self.slice_name == "temp":
+        elif self.slice_field == "temp":
             vmin = np.min(result.arrs[0])
             vmax = np.max(result.arrs[0])
             plt.imshow(result.arrs[0], cmap="Reds", norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=(-17.5, 17.5, -17.5, 17.5))
+            cbar = plt.colorbar()
+            cbar.set_label("$T$")
 
 
 addToList("arepoSlice", ArepoSlicePlot())
