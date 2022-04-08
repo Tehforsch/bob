@@ -1,3 +1,4 @@
+from typing import List
 from pathlib import Path
 import logging
 import argparse
@@ -8,19 +9,22 @@ from bob.simulationSet import getSimsFromFolders
 from bob.util import getCommonParentFolder
 
 
+def commaSeparatedList(s: str) -> List[str]:
+    return s.split(",")
+
+
 def setupArgs() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Postprocess arepo sims")
     parser.add_argument("simFolders", type=Path, nargs="*", help="Path to simulation directories")
     parser.add_argument(
         "--snapshots",
-        nargs="+",
-        type=str,
+        type=commaSeparatedList,
         help="Run postprocessing scripts for selected snapshots",
     )
     parser.add_argument(
         "-s",
         "--select",
-        nargs="*",
+        type=commaSeparatedList,
         help="Select only some of the sims for postprocessing/running/compiling",
     )
     parser.add_argument("-q", "--quotient", nargs="*", help="Parameters by which to divide the simulations into sets")
