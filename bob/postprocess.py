@@ -19,6 +19,7 @@ import bob.plots.thomsonScattering
 import bob.plots.arepoSlice
 import bob.plots.bobSlice
 import bob.plots.shadowingVolume
+import bob.plots.temperatureDensityHistogram
 
 
 from bob.postprocessingFunctions import (

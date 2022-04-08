@@ -28,7 +28,7 @@ class Temperature(Field):
             xH = 0.76
             mu = 4.0 / (1 + 3 * xH + 4 * xH * xe) * protonMass
         temperature = ((gamma - 1.0) * en * mu / kB).decompose()
-        return temperature
+        return temperature.value
 
     @property
     def niceName(self) -> str:
