@@ -63,12 +63,13 @@ class Plotter:
         plots = os.listdir(self.dataFolder)
         plots.sort()
         for plotName in plots:
-            print("Replotting", plotName)
-            plotFolder = self.dataFolder / plotName
-            plot = pickle.load(open(plotFolder / bob.config.plotSerializationFileName, "rb"))
-            result = getResultFromFolder(plotFolder)
-            plot.plot(plt, result)
-            self.saveAndShow(plotFolder.name)
+            if args.plots is None or plotName in args.plots:
+                print("Replotting", plotName)
+                plotFolder = self.dataFolder / plotName
+                plot = pickle.load(open(plotFolder / bob.config.plotSerializationFileName, "rb"))
+                result = getResultFromFolder(plotFolder)
+                plot.plot(plt, result)
+                self.saveAndShow(plotFolder.name)
 
     def runPostAndPlot(
         self, args: argparse.Namespace, fn: PostprocessingFunction, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]

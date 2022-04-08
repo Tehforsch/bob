@@ -31,13 +31,13 @@ def setupArgs() -> argparse.Namespace:
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     parser.add_argument("--show", action="store_true", help="Show figures instead of saving them")
     parser.add_argument("--post", action="store_true", help="Only postprocess the data, do not run the corresponding plot scripts (for cluster)")
-    parser.add_argument("--replot", action="store_true", help="Only run the plots, do not run the corresponding plot scripts (for cluster)")
     parser.add_argument("--png", action="store_true", help="Use png instead of pdf as output type for generating movies")
     subparsers = parser.add_subparsers(dest="function")
     for function in postprocessingFunctions.postprocessingFunctions:
         subparser = subparsers.add_parser(function.name)
         function.setArgs(subparser)
-    subparsers.add_parser("replot")
+    replotParser = subparsers.add_parser("replot")
+    replotParser.add_argument("--plots", type=str, nargs="*", help="The plots to replot")
 
     args = parser.parse_args()
     return args
