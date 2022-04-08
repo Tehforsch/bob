@@ -2,6 +2,7 @@ import argparse
 
 from typing import Tuple
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 from scipy.spatial import cKDTree
 import numpy as np
 
@@ -45,7 +46,9 @@ class VoronoiSlice(SnapFn):
         plt.xlabel(getAxisName(self.ortho1))
         plt.ylabel(getAxisName(self.ortho2))
         extent = (self.min1, self.max1, self.min2, self.max2)
-        plt.imshow(result.arrs[0], extent=extent, origin="lower", cmap="Reds")
+        vmin = 1.0e1
+        vmax = 1.0e6
+        plt.imshow(result.arrs[0], norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=extent, origin="lower", cmap="Reds")
         plt.colorbar()
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
