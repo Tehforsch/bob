@@ -23,15 +23,10 @@ from bob.multiSet import MultiSet
 
 def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
     try:
-        if type(snap.number) == int:
-            arg_num = int(arg_snap)
-            return snap.number == arg_num
-        else:
-            assert type(snap.number) == tuple
-            arg_tuple = tuple(int(x) for x in arg_snap.split(","))
-            return snap.number == arg_tuple
+        arg_num = int(arg_snap)
+        return snap.number.value == arg_num
     except ValueError:
-        raise ValueError("WRONG type of snapshot argument. Either pass an int or int,int for subbox snapshots")
+        raise ValueError("WRONG type of snapshot argument. Need an integer")
 
 
 class Plotter:
@@ -138,8 +133,6 @@ class Plotter:
         for snap in sim.snapshots:
             if self.isInSnapshotArgs(snap):
                 yield snap
-            else:
-                print("Skipping", snap)
 
     def saveAndShow(self, filename: str) -> None:
         filepath = self.picFolder / filename
