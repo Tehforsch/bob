@@ -126,9 +126,10 @@ class Plotter:
         for sim in self.sims:
             logging.info("For sim {}".format(sim.name))
             for slice_ in sim.getSlices(args.slice_field):
-                logging.info("For slice {}".format(slice_.name))
-                name = "{}_{}_{}".format(function.getName(args), sim.name, slice_.name)
-                self.runPostAndPlot(args, function, name, lambda: function.post(args, sim, slice_), function.plot)
+                if self.snapshotFilter is None or any(arg_snap == slice_.name for arg_snap in self.snapshotFilter):
+                    logging.info("For slice {}".format(slice_.name))
+                    name = "{}_{}_{}".format(function.getName(args), sim.name, slice_.name)
+                    self.runPostAndPlot(args, function, name, lambda: function.post(args, sim, slice_), function.plot)
 
     def isInSnapshotArgs(self, snap: Snapshot) -> bool:
         return self.snapshotFilter is None or any(isSameSnapshot(arg_snap, snap) for arg_snap in self.snapshotFilter)
@@ -137,6 +138,8 @@ class Plotter:
         for snap in sim.snapshots:
             if self.isInSnapshotArgs(snap):
                 yield snap
+            else:
+                print("Skipping", snap)
 
     def saveAndShow(self, filename: str) -> None:
         filepath = self.picFolder / filename
