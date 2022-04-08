@@ -25,4 +25,4 @@ class ElectronAbundance(Field):
 
     @property
     def unit(self) -> pq.Quantity:
-        return pq.K
+        return 1
