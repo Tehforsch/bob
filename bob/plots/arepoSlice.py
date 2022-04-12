@@ -33,14 +33,14 @@ class ArepoSlicePlot(SliceFn):
         return Result([arepo_image])
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        plt.xlabel("$x [h^{-1} \mathrm{kpc}]$")
-        plt.ylabel("$y [h^{-1} \mathrm{kpc}]$")
+        plt.xlabel("$x [h^{-1} \\mathrm{kpc}]$")
+        plt.ylabel("$y [h^{-1} \\mathrm{kpc}]$")
         if self.slice_field == "xHP":
             vmin = 1.0e-6
             vmax = 1.0
             plt.clim(vmin, vmax)
             cbar = plt.colorbar()
-            cbar.set_label("$x_{\mathrm{H+}}$")
+            cbar.set_label("$x_{\\mathrm{H+}}$")
             plt.imshow(result.arrs[0], cmap="Reds", norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=(-17.5, 17.5, -17.5, 17.5))
         elif self.slice_field == "temp":
             vmin = 1.0e1
@@ -48,6 +48,10 @@ class ArepoSlicePlot(SliceFn):
             plt.imshow(result.arrs[0], cmap="Reds", norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=(-17.5, 17.5, -17.5, 17.5))
             cbar = plt.colorbar()
             cbar.set_label("$T$")
+        elif self.slice_field == "density":
+            plt.imshow(result.arrs[0], cmap="Reds", norm=colors.LogNorm(), extent=(-17.5, 17.5, -17.5, 17.5))
+            cbar = plt.colorbar()
+            cbar.set_label("$\\rho$")
 
 
 addToList("arepoSlice", ArepoSlicePlot())
