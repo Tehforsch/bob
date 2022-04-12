@@ -9,7 +9,6 @@ from bob.simulation import Simulation
 class SimulationSet(list):
     def __init__(self, sims: Iterable[Simulation]) -> None:
         super().__init__(sims)
-        assert len(self) > 0, "Error: No sim found!"
 
     def quotient(self, parameters: List[str]) -> List[Tuple[Dict[str, Any], "SimulationSet"]]:
         def getConfiguration(sim: Simulation) -> Tuple[Tuple[Any, Any], ...]:
