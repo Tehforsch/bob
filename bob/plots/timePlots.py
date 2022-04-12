@@ -1,6 +1,5 @@
 from typing import Dict, Any, List
 from abc import abstractmethod
-import itertools
 import argparse
 
 import matplotlib.pyplot as plt
@@ -35,7 +34,7 @@ def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot) -> fl
 class TimePlot(MultiSetFn):
     def init(self, args: argparse.Namespace) -> None:
         super().init(args)
-        self.styles: List[Dict[str, Any]] = [{}, {}, {}]
+        self.styles: List[Dict[str, Any]] = [{} for _ in range(100)]
 
     @abstractmethod
     def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> float:
@@ -59,9 +58,7 @@ class TimePlot(MultiSetFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.xlabel(self.xlabel())
         plt.ylabel(self.ylabel())
-        self.labels = ["SWEEP", "TNG"]
-        for (style, label, arr) in itertools.zip_longest(self.styles, self.labels, result.arrs):
-            print(style, label, arr)
+        for (style, label, arr) in zip(self.styles, self.labels, result.arrs):
             plt.plot(arr[0, :], arr[1, :], label=label)
         plt.legend()
 
