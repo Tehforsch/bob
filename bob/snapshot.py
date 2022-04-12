@@ -15,7 +15,6 @@ class SnapNumber:
         self.value = value
 
 
-
 class Snapshot:
     def __init__(self, sim: "Simulation", filename: Path) -> None:
         self.filename = filename

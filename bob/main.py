@@ -5,7 +5,7 @@ import argparse
 
 from bob import postprocess
 from bob import postprocessingFunctions
-from bob.simulationSet import getSimsFromFolders
+from bob.simulationSet import getSimsFromFolders, SimulationSet
 from bob.util import getCommonParentFolder
 
 
@@ -53,6 +53,9 @@ def setupLogging(args: argparse.Namespace) -> None:
 def main() -> None:
     args = setupArgs()
     setupLogging(args)
-    sims = getSimsFromFolders(args)
+    if not args.function == "replot":
+        sims = getSimsFromFolders(args)
+    else:
+        sims = SimulationSet([])
     folder = getCommonParentFolder(args.simFolders)
     postprocess.main(args, folder, sims)

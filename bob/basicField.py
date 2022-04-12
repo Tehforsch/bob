@@ -55,7 +55,11 @@ class BasicField(Field):
         return 1
 
     def getData(self, snapshot: "Snapshot") -> np.ndarray:
-        fieldData = readIntoNumpyArray(snapshot.hdf5File["PartType0"][self.name])
+        if self.name == "Density":
+            unit = snapshot.massUnit / (snapshot.lengthUnit**3)
+        else:
+            unit = 1
+        fieldData = readIntoNumpyArray(snapshot.hdf5File["PartType0"][self.name]) * unit
         if self.index is None:
             return fieldData
         else:

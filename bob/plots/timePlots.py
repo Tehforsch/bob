@@ -35,7 +35,7 @@ def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot) -> fl
 class TimePlot(MultiSetFn):
     def init(self, args: argparse.Namespace) -> None:
         super().init(args)
-        self.styles: List[Dict[str, Any]] = [{}]
+        self.styles: List[Dict[str, Any]] = [{}, {}, {}]
 
     @abstractmethod
     def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> float:
@@ -59,8 +59,10 @@ class TimePlot(MultiSetFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.xlabel(self.xlabel())
         plt.ylabel(self.ylabel())
+        self.labels = ["SWEEP", "TNG"]
         for (style, label, arr) in itertools.zip_longest(self.styles, self.labels, result.arrs):
-            plt.plot(arr[0, :], arr[1, :], label=label, **style)
+            print(style, label, arr)
+            plt.plot(arr[0, :], arr[1, :], label=label)
         plt.legend()
 
     def getQuantityOverTime(self, args: argparse.Namespace, simSet: SimulationSet) -> np.ndarray:
