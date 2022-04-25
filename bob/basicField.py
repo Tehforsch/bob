@@ -25,8 +25,9 @@ class BasicField(Field):
     @property
     def niceName(self) -> str:
         fieldName: Dict[str, str] = {
-            "ChemicalAbundances": "Abundance",
             "SGCHEM_HeatCoolRates": "SGCHEM_HeatCoolRates",
+            "InternalEnergy": "InternalEnergy",
+            "ChemicalAbundances": "Abundance",
             "PhotonFlux": "Flux",
             "Density": "Density",
             "PhotonRates": "PhotonRate",
@@ -41,6 +42,7 @@ class BasicField(Field):
     def symbol(self) -> str:
         fieldName: Dict[str, str] = {
             "SGCHEM_HeatCoolRates": "SGCHEM_HeatCoolRates",
+            "InternalEnergy": "InternalEnergy",
             "ChemicalAbundances": "Abundance",
             "PhotonFlux": "Flux",
             "Density": "$\rho$",

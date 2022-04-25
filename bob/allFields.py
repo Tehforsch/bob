@@ -14,6 +14,7 @@ allFields = [
     BasicField("Density", None),
     BasicField("Masses", None),
     BasicField("Coordinates", None),
+    BasicField("InternalEnergy", None),
     Temperature(),
 ]
 
