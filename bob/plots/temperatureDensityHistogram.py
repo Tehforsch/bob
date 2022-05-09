@@ -14,6 +14,13 @@ from bob.temperature import Temperature
 
 
 class TemperatureDensityHistogram(SnapFn):
+    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
+        subparser.add_argument("--only_ionized", action="store_true")
+
+    def getName(self, args: argparse.Namespace) -> str:
+        ionizedStr = "_only_ionized" if args.only_ionized else ""
+        return f"{self.name}_{ionizedStr}"
+
     def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
         temperature = Temperature().getData(snap) / pq.K
         density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)
