@@ -20,6 +20,7 @@ import bob.plots.arepoSlice
 import bob.plots.bobSlice
 import bob.plots.shadowingVolume
 import bob.plots.temperatureDensityHistogram
+import bob.plots.temperatureIonizationHistogram
 
 
 from bob.postprocessingFunctions import (
