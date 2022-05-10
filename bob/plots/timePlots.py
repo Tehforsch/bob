@@ -98,8 +98,9 @@ class MeanFieldOverTime(TimePlot):
         return f"{self.name}_{args.field}_{args.time}"
 
     def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> List[float]:
+        masses = BasicField("Masses").getData(snap)
         data = self.field.getData(snap) / self.field.unit
-        return [np.mean(data)]
+        return [np.mean(data * masses) / np.mean(masses)]
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         if self.field.niceName == "Temperature":
