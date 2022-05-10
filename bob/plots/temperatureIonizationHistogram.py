@@ -19,7 +19,7 @@ class TemperatureIonizationHistogram(SnapFn):
 
     def getName(self, args: argparse.Namespace) -> str:
         ionizedStr = "_only_ionized" if args.only_ionized else ""
-        return f"{self.name}_{ionizedStr}"
+        return f"{self.name}{ionizedStr}"
 
     def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
         temperature = Temperature().getData(snap) / pq.K
