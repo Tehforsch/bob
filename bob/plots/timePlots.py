@@ -59,7 +59,8 @@ class TimePlot(MultiSetFn):
         plt.xlabel(self.xlabel())
         plt.ylabel(self.ylabel())
         for (style, label, arr) in zip(self.styles, self.labels, result.arrs):
-            plt.plot(arr[0, :], arr[1, :], label=label)
+            for i in range(1, arr.shape[1] - 1):
+                plt.plot(arr[:, 0], arr[:, i], label=label)
         plt.legend()
 
     def getQuantityOverTime(self, args: argparse.Namespace, simSet: SimulationSet) -> np.ndarray:
