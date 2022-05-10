@@ -13,6 +13,7 @@ from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
 from bob.allFields import allFields, getFieldByName
 from bob.multiSet import MultiSet
+from bob.basicField import BasicField
 
 
 def addTimeArg(subparser: argparse.ArgumentParser) -> None:
