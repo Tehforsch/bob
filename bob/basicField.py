@@ -25,6 +25,8 @@ class BasicField(Field):
     @property
     def niceName(self) -> str:
         fieldName: Dict[str, str] = {
+            "SGCHEM_HeatCoolRates": "SGCHEM_HeatCoolRates",
+            "InternalEnergy": "InternalEnergy",
             "ChemicalAbundances": "Abundance",
             "PhotonFlux": "Flux",
             "Density": "Density",
@@ -39,6 +41,8 @@ class BasicField(Field):
     @property
     def symbol(self) -> str:
         fieldName: Dict[str, str] = {
+            "SGCHEM_HeatCoolRates": "SGCHEM_HeatCoolRates",
+            "InternalEnergy": "InternalEnergy",
             "ChemicalAbundances": "Abundance",
             "PhotonFlux": "Flux",
             "Density": "$\rho$",
@@ -52,6 +56,8 @@ class BasicField(Field):
 
     @property
     def unit(self) -> pq.Quantity:
+        if self.name == "Density":
+            return pq.g / pq.cm**3
         return 1
 
     def getData(self, snapshot: "Snapshot") -> np.ndarray:
