@@ -19,15 +19,17 @@ class TemperatureOverTime(TimePlot):
         return "$T [\\mathrm{K}]$"
 
     def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> List[float]:
-        densities = BasicField("Density").getData(snap)
+        density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)
         masses = BasicField("Masses").getData(snap)
         temperature = Temperature().getData(snap) / pq.K
-        minDens = 1e-33
+        minDens = 1e-31
         maxDens = 1e-24
-        densities = np.logspace(np.log10(minDens), np.log10(maxDens), num=10)
+        self.densityBins = np.logspace(np.log10(minDens), np.log10(maxDens), num=10)
         result = []
-        for (density1, density2) in zip(densities, densities[1:]):
-            indices = np.where((density1 < densities) & (densities < density2))
+        for (density1, density2) in zip(self.densityBins, self.densityBins[1:]):
+            indices = np.where((density1 < density) & (density < density2))
+            avTemp = np.sum(temperature[indices] * masses[indices] / np.sum(masses[indices]))
+            print(f"{density1}-{density2}: {avTemp} K")
             result.append(np.sum(temperature[indices] * masses[indices] / np.sum(masses[indices])))
         return result
 
