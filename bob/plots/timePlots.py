@@ -37,7 +37,7 @@ class TimePlot(MultiSetFn):
         self.styles: List[Dict[str, Any]] = [{} for _ in range(100)]
 
     @abstractmethod
-    def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> float:
+    def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> List[float]:
         pass
 
     def xlabel(self) -> str:
@@ -68,7 +68,8 @@ class TimePlot(MultiSetFn):
         result = np.zeros((2, len(snapshots)))
         for (i, (snap, sim)) in enumerate(snapshots):
             result[0, i] = getTimeQuantityForSnap(args.time, sim, snap)
-            result[1, i] = self.getQuantity(args, sim, snap)
+            for (value, j) in enumerate(self.getQuantity(args, sim, snap)):
+                result[j + 1, i] = value
         return result
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
@@ -94,9 +95,9 @@ class MeanFieldOverTime(TimePlot):
     def getName(self, args: argparse.Namespace) -> str:
         return f"{self.name}_{args.field}_{args.time}"
 
-    def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> float:
+    def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> List[float]:
         data = self.field.getData(snap) / self.field.unit
-        return np.mean(data)
+        return [np.mean(data)]
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         if self.field.niceName == "Temperature":

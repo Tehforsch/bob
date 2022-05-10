@@ -1,3 +1,4 @@
+from typing import List
 import argparse
 import itertools
 
@@ -57,7 +58,7 @@ class ShadowingVolumePlot(TimePlot):
     def ylabel(self) -> str:
         return "$\overline{x_{\mathrm{H}}}$"
 
-    def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> float:
+    def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> List[float]:
         print("At", sims.name, snap.time.to(pq.kyr))
         densities = BasicField("Density").getData(snap)
         densityThreshold = 1500
@@ -70,7 +71,7 @@ class ShadowingVolumePlot(TimePlot):
         )
         data = BasicField("ChemicalAbundances", 1).getData(snap)[selection]
         masses = BasicField("Masses").getData(snap)[selection]
-        return np.sum(data * masses) / np.sum(masses)
+        return [np.sum(data * masses) / np.sum(masses)]
 
     def transform(self, result: np.ndarray) -> np.ndarray:
         result[0, :] = result[0, :] * ((config.defaultTimeUnit / pq.kyr).decompose().to(1))
