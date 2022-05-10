@@ -65,11 +65,12 @@ class TimePlot(MultiSetFn):
     def getQuantityOverTime(self, args: argparse.Namespace, simSet: SimulationSet) -> np.ndarray:
         snapshots = [(snap, sim) for sim in simSet for snap in sim.snapshots]
         snapshots.sort(key=lambda snapSim: snapSim[0].time)
-        result = np.zeros((2, len(snapshots)))
+        result = []
         for (i, (snap, sim)) in enumerate(snapshots):
-            result[0, i] = getTimeQuantityForSnap(args.time, sim, snap)
-            for (value, j) in enumerate(self.getQuantity(args, sim, snap)):
-                result[j + 1, i] = value
+            result.append([])
+            result[-1].append(getTimeQuantityForSnap(args.time, sim, snap))
+            for (j, value) in enumerate(self.getQuantity(args, sim, snap)):
+                result[-1].append(value)
         return result
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:

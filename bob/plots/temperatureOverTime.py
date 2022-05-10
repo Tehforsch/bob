@@ -36,15 +36,7 @@ class TemperatureOverTime(TimePlot):
         self.styles = [{"color": s[0], "linestyle": s[1]} for s in itertools.product(["r", "b"], ["-", "--", ":"])]
         self.labels = ["" for _ in result.arrs]
 
-        print(result.arrs)
         super().plot(plt, result)
-        # plt.xlim(0, 60)
-        # plt.ylim(0, 1.0)
-        # plt.plot([], [], label="Sweep", color="b")
-        # plt.plot([], [], label="SPRAI", color="r")
-        # plt.plot([], [], label="$128^3$", linestyle="-", color="black")
-        # plt.plot([], [], label="$64^3$", linestyle="--", color="black")
-        # plt.plot([], [], label="$32^3$", linestyle=":", color="black")
         plt.legend(loc="upper left")
 
 
