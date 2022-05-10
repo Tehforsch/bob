@@ -22,10 +22,7 @@ class TemperatureOverTime(TimePlot):
         density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)
         masses = BasicField("Masses").getData(snap)
         temperature = Temperature().getData(snap) / pq.K
-        minDens = 1e-31
-        maxDens = 1e-23
-        self.densityBins = np.logspace(np.log10(minDens), np.log10(maxDens), num=5)
-        print(self.densityBins)
+        self.densityBins = [1e-31, 1e-29, 1e-27, 1e-25]
         result = []
         for (density1, density2) in zip(self.densityBins, self.densityBins[1:]):
             indices = np.where((density1 < density) & (density < density2))
