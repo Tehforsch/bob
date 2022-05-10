@@ -52,6 +52,8 @@ def setupLogging(args: argparse.Namespace) -> None:
 
 def main() -> None:
     args = setupArgs()
+    if args.simFolders == []:
+        raise ValueError("No sim folders given")
     setupLogging(args)
     if not args.function == "replot":
         sims = getSimsFromFolders(args)
