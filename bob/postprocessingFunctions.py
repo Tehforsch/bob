@@ -65,7 +65,7 @@ class SliceFn(PostprocessingFunction):
         self.slice_field = args.slice_field
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        subparser.add_argument("--slice_field", choices=["xHP", "temp"], required=True)
+        subparser.add_argument("--slice_field", choices=["xHP", "temp", "density"], required=True)
 
     def getName(self, args: argparse.Namespace) -> str:
         return f"{self.name}_{args.slice_field}"
