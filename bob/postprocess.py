@@ -21,6 +21,7 @@ import bob.plots.bobSlice
 import bob.plots.shadowingVolume
 import bob.plots.temperatureDensityHistogram
 import bob.plots.temperatureIonizationHistogram
+import bob.plots.temperatureOverTime
 
 
 from bob.postprocessingFunctions import (
