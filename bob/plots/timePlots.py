@@ -59,8 +59,8 @@ class TimePlot(MultiSetFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.xlabel(self.xlabel())
         plt.ylabel(self.ylabel())
-        for (style, label, arr) in zip(self.styles, self.labels, result.arrs):
-            for i in range(1, arr.shape[1] - 1):
+        for (style, labels, arr) in zip(self.styles, self.labels, result.arrs):
+            for (i, label) in zip(range(1, arr.shape[1] - 1), labels):
                 plt.plot(arr[:, 0], arr[:, i], label=label)
         plt.legend()
 
