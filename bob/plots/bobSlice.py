@@ -46,8 +46,8 @@ class VoronoiSlice(SnapFn):
         plt.xlabel(getAxisName(self.ortho1))
         plt.ylabel(getAxisName(self.ortho2))
         extent = (self.min1, self.max1, self.min2, self.max2)
-        vmin = 1.0e1
-        vmax = 1.0e6
+        vmin = 1.0e2
+        vmax = 1.0e5
         plt.imshow(result.arrs[0], norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=extent, origin="lower", cmap="Reds")
         plt.colorbar()
 

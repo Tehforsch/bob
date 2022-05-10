@@ -24,6 +24,11 @@ class TemperatureDensityHistogram(SnapFn):
     def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
         temperature = Temperature().getData(snap) / pq.K
         density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)
+        if args.only_ionized:
+            hpAbundance = BasicField("ChemicalAbundances", 1).getData(snap)
+            indices = np.where(hpAbundance > 0.5)
+            temperature = temperature[indices]
+            density = density[indices]
         print(np.min(temperature), np.mean(temperature), np.max(temperature))
         print(np.min(density), np.mean(density), np.max(density))
         return Result([temperature, density])
