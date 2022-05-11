@@ -35,13 +35,17 @@ class TemperatureOverTime(TimePlot):
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         ax.set_yscale("log")
-        sublabels = ["$10^{-31} - 10^{-29}$", "$10^{-29} - 10^{-27}$", "$10^{-27} - 10^{-25}$", "$10^{-25} - 10^{-23}$"]
+        sublabels = [
+            "$\\rho = 10^{-31} - 10^{-29} \mathrm{g} / \mathrm{cm}^3$",
+            "$\\rho = 10^{-29} - 10^{-27} \mathrm{g} / \mathrm{cm}^3$",
+            "$\\rho = 10^{-27} - 10^{-25} \mathrm{g} / \mathrm{cm}^3$",
+        ]
 
         plt.xlabel(self.xlabel())
         plt.ylabel(self.ylabel())
         plt.ylim((1e1, 1e5))
         for (style, labels, arr) in zip(self.styles, self.labels, result.arrs):
-            for (i, label) in zip(range(1, arr.shape[1] - 1), sublabels):
+            for (i, label) in zip(range(1, arr.shape[1]), sublabels):
                 plt.plot(arr[:, 0], arr[:, i], label=label)
         plt.legend(loc="lower left")
 
