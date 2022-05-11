@@ -52,8 +52,6 @@ class TemperatureDensityHistogram(SnapFn):
         binsY = np.logspace(np.log10(minY), np.log10(maxY), num=104)
         plt.xticks([1e-31, 1e-30, 1e-29, 1e-28, 1e-27, 1e-26])
         plt.yticks([1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7])
-        print(result.arrs[0])
-        print(result.arrs[1])
         plt.hist2d(result.arrs[1], result.arrs[0], [binsX, binsY], density=True, norm=colors.LogNorm())
         colorbar = plt.colorbar()
         colorbar.set_ticks([1e17, 1e22, 1e27])
