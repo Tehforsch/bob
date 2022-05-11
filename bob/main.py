@@ -38,6 +38,12 @@ def setupArgs() -> argparse.Namespace:
         function.setArgs(subparser)
     replotParser = subparsers.add_parser("replot")
     replotParser.add_argument("--plots", type=str, nargs="*", help="The plots to replot")
+    replotParser.add_argument(
+        "--only-new",
+        dest="onlyNew",
+        action="store_true",
+        help="Replot all plots that have new data or havent been generated yet but don't refresh old ones",
+    )
 
     args = parser.parse_args()
     return args

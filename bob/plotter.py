@@ -21,6 +21,14 @@ from bob.postprocessingFunctions import PostprocessingFunction
 from bob.multiSet import MultiSet
 
 
+def walkfiles(path: Path) -> Iterator[Path]:
+    for root, dirs, files in os.walk(path):
+        for f in files:
+            yield path / f
+        for d in dirs:
+            walkfiles(path / d)
+
+
 def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
     try:
         arg_num = int(arg_snap)
@@ -54,8 +62,24 @@ class Plotter:
         else:
             return SimulationSet(sim for sim in sims if sim.name in select)
 
-    def replot(self, args: argparse.Namespace) -> None:
+    def isNew(self, plotName: str) -> bool:
+        pdfPath = (self.picFolder / plotName).with_suffix(self.outputFileType)
+        if not pdfPath.is_file():
+            return True
+        plotPath = self.dataFolder / plotName
+        mtimePlot = max(os.path.getmtime(str(f)) for f in walkfiles(plotPath))
+        mtimePdf = os.path.getmtime(pdfPath)
+        return mtimePdf < mtimePlot
+
+    def getNewPlots(self) -> List[str]:
         plots = os.listdir(self.dataFolder)
+        return [plot for plot in plots if self.isNew(plot)]
+
+    def replot(self, args: argparse.Namespace) -> None:
+        if args.onlyNew:
+            plots = self.getNewPlots()
+        else:
+            plots = os.listdir(self.dataFolder)
         plots.sort()
         for plotName in plots:
             if args.plots is None or plotName in args.plots:
