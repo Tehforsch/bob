@@ -45,7 +45,7 @@ class Simulation:
 
     @property  # type: ignore
     def log(self) -> List[str]:
-        with (self.folder / config.arepoLogFile).open("r") as f:
+        with (self.folder / config.arepoLogFile).open("r", errors="replace") as f:
             return f.readlines()
 
     def __repr__(self) -> str:
