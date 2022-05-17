@@ -19,6 +19,9 @@ class TemperatureOverTime(TimePlot):
         return "$T [\\mathrm{K}]$"
 
     def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> List[float]:
+        redshiftStartOfSim = sim.getRedshift(sim.snapshots[0].scale_factor)
+        redshiftNow = sim.getRedshift(snap.scale_factor)
+        correctionFactor = (1 + redshiftNow) ** 2 / (1 + redshiftStartOfSim) ** 2
         density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)
         masses = BasicField("Masses").getData(snap)
         temperature = Temperature().getData(snap) / pq.K
@@ -28,7 +31,7 @@ class TemperatureOverTime(TimePlot):
             indices = np.where((density1 < density) & (density < density2))
             avTemp = np.sum(temperature[indices] * masses[indices] / np.sum(masses[indices]))
             print(f"{density1}-{density2}: {avTemp} K")
-            result.append(np.sum(temperature[indices] * masses[indices] / np.sum(masses[indices])))
+            result.append(correctionFactor * np.sum(temperature[indices] * masses[indices] / np.sum(masses[indices])))
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
