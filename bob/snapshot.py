@@ -29,7 +29,6 @@ class Snapshot:
             self.minExtent = np.array([0.0, 0.0, 0.0])
             self.maxExtent = np.array([1.0, 1.0, 1.0]) * sim.params["BoxSize"]
             self.center = (self.maxExtent + self.minExtent) * 0.5
-        self.initConversionFactors()
 
     @property
     def hdf5File(self) -> h5py.File:
@@ -49,12 +48,34 @@ class Snapshot:
     def __repr__(self) -> str:
         return str(self.filename)
 
-    def initConversionFactors(self) -> None:
-        self.h = self.hdf5File["Header"].attrs["HubbleParam"]
-        self.lengthUnit = self.hdf5File["Header"].attrs["UnitLength_in_cm"] * pq.cm
-        self.massUnit = self.hdf5File["Header"].attrs["UnitMass_in_g"] * pq.g
-        self.velocityUnit = self.hdf5File["Header"].attrs["UnitVelocity_in_cm_per_s"] * pq.cm / pq.s
-        self.timeUnit = self.lengthUnit / self.velocityUnit
-        self.energyUnit = self.lengthUnit**2 / (self.timeUnit**2) * self.massUnit
-        self.scale_factor = self.hdf5File["Header"].attrs["Time"]
-        self.time = self.hdf5File["Header"].attrs["Time"] * self.timeUnit
+    @property
+    def h(self) -> pq.Quantity:
+        return self.hdf5File["Header"].attrs["HubbleParam"]
+
+    @property
+    def lengthUnit(self) -> pq.Quantity:
+        return self.hdf5File["Header"].attrs["UnitLength_in_cm"] * pq.cm
+
+    @property
+    def massUnit(self) -> pq.Quantity:
+        return self.hdf5File["Header"].attrs["UnitMass_in_g"] * pq.g
+
+    @property
+    def velocityUnit(self) -> pq.Quantity:
+        return self.hdf5File["Header"].attrs["UnitVelocity_in_cm_per_s"] * pq.cm / pq.s
+
+    @property
+    def timeUnit(self) -> pq.Quantity:
+        return self.lengthUnit / self.velocityUnit
+
+    @property
+    def energyUnit(self) -> pq.Quantity:
+        return self.lengthUnit**2 / (self.timeUnit**2) * self.massUnit
+
+    @property
+    def scale_factor(self) -> float:
+        return self.hdf5File["Header"].attrs["Time"]
+
+    @property
+    def time(self) -> pq.Quantity:
+        return self.hdf5File["Header"].attrs["Time"] * self.timeUnit
