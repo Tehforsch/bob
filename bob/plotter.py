@@ -5,6 +5,7 @@ from pathlib import Path
 import argparse
 import matplotlib.pyplot as plt
 import logging
+import multiprocessing
 
 from bob.postprocessingFunctions import (
     SetFn,
@@ -19,6 +20,7 @@ from bob.simulation import Simulation
 from bob.result import Result, getResultFromFolder
 from bob.postprocessingFunctions import PostprocessingFunction
 from bob.multiSet import MultiSet
+from bob.config import numProcesses
 
 
 def walkfiles(path: Path) -> Iterator[Path]:
@@ -81,14 +83,8 @@ class Plotter:
         else:
             plots = os.listdir(self.dataFolder)
         plots.sort()
-        for plotName in plots:
-            if args.plots is None or plotName in args.plots:
-                print("Replotting", plotName)
-                plotFolder = self.dataFolder / plotName
-                plot = pickle.load(open(plotFolder / bob.config.plotSerializationFileName, "rb"))
-                result = getResultFromFolder(plotFolder)
-                plot.plot(plt, result)
-                self.saveAndShow(plotFolder.name)
+        with multiprocessing.Pool(numProcesses) as pool:
+            pool.starmap(runPlot, zip([self for _ in plots], [args for _ in plots], plots))
 
     def runPostAndPlot(
         self, args: argparse.Namespace, fn: PostprocessingFunction, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]
@@ -166,3 +162,14 @@ class Plotter:
         if self.show:
             plt.show()
         plt.clf()
+
+
+# Needs to be a top-level function so it can be used by multiprocessing
+def runPlot(plotter: Plotter, args: argparse.Namespace, plotName: str) -> None:
+    if args.plots is None or plotName in args.plots:
+        print("Replotting", plotName)
+        plotFolder = plotter.dataFolder / plotName
+        plot = pickle.load(open(plotFolder / bob.config.plotSerializationFileName, "rb"))
+        result = getResultFromFolder(plotFolder)
+        plot.plot(plt, result)
+        plotter.saveAndShow(plotFolder.name)
