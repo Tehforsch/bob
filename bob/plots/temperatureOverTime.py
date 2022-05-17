@@ -18,7 +18,7 @@ class TemperatureOverTime(TimePlot):
     def ylabel(self) -> str:
         return "$T [\\mathrm{K}]$"
 
-    def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> List[float]:
+    def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> List[float]:
         density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)
         masses = BasicField("Masses").getData(snap)
         temperature = Temperature().getData(snap) / pq.K

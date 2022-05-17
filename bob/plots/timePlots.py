@@ -38,7 +38,7 @@ class TimePlot(MultiSetFn):
         self.styles: List[Dict[str, Any]] = [{} for _ in range(100)]
 
     @abstractmethod
-    def getQuantity(self, args: argparse.Namespace, sims: Simulation, snap: Snapshot) -> List[float]:
+    def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> List[float]:
         pass
 
     def xlabel(self) -> str:
