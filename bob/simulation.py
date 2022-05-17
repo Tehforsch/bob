@@ -15,6 +15,8 @@ def getParams(folder: Path) -> Dict[str, Any]:
     contents = yaml.load(bobParamsFile.open("r"), Loader=yaml.SafeLoader)
     result = {}
     for (k, v) in contents.items():
+        if v == "None":
+            continue
         readValue = getParamValue(*list(v.items())[0])
         result[k] = readValue
     return result
