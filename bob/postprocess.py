@@ -22,6 +22,7 @@ import bob.plots.shadowingVolume
 import bob.plots.temperatureDensityHistogram
 import bob.plots.temperatureIonizationHistogram
 import bob.plots.temperatureOverTime
+import bob.plots.meanFieldOverTime
 
 
 from bob.postprocessingFunctions import (

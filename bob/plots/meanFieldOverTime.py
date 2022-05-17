@@ -10,7 +10,7 @@ from bob.result import Result
 from bob.simulation import Simulation
 from bob.allFields import allFields, getFieldByName
 from bob.basicField import BasicField
-from bob.plots.timePlot import TimePlot
+from bob.plots.timePlots import TimePlot
 
 
 class MeanFieldOverTime(TimePlot):

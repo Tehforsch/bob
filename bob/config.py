@@ -12,4 +12,4 @@ plotSerializationFileName = "plot.info"
 
 defaultTimeUnit = pq.yr
 
-numProcesses = 8
+numProcesses = 16
