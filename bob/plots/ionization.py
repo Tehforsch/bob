@@ -37,7 +37,7 @@ class IonizationData:
         self.scale_factor = np.array([d[0] for d in self.data])
         self.volumeAv = np.array([d[1] for d in self.data])
         self.massAv = np.array([d[2] for d in self.data])
-        self.redshift = [z_at_value(cosmology.scale_factor, sf) for sf in self.scale_factor]
+        self.redshift = np.array([z_at_value(cosmology.scale_factor, sf) for sf in self.scale_factor])
         self.setNeutralFractions()
         return self
 
