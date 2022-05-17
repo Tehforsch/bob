@@ -5,7 +5,6 @@ from pathlib import Path
 import argparse
 import matplotlib.pyplot as plt
 import logging
-import multiprocessing
 
 from bob.postprocessingFunctions import (
     SetFn,
@@ -20,7 +19,7 @@ from bob.simulation import Simulation
 from bob.result import Result, getResultFromFolder
 from bob.postprocessingFunctions import PostprocessingFunction
 from bob.multiSet import MultiSet
-from bob.config import numProcesses
+from bob.pool import runInPool
 
 
 def walkfiles(path: Path) -> Iterator[Path]:
@@ -83,8 +82,7 @@ class Plotter:
         else:
             plots = os.listdir(self.dataFolder)
         plots.sort()
-        with multiprocessing.Pool(numProcesses) as pool:
-            pool.starmap(runPlot, zip([self for _ in plots], [args for _ in plots], plots))
+        runInPool(runPlot, plots, self, args)
 
     def runPostAndPlot(
         self, args: argparse.Namespace, fn: PostprocessingFunction, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]

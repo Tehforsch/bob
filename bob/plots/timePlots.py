@@ -4,7 +4,6 @@ import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
-import multiprocessing
 
 import bob.config as config
 from bob.snapshot import Snapshot
@@ -13,6 +12,7 @@ from bob.result import Result
 from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
 from bob.multiSet import MultiSet
+from bob.pool import runInPool
 
 
 def addTimeArg(subparser: argparse.ArgumentParser) -> None:
@@ -66,8 +66,7 @@ class TimePlot(MultiSetFn):
     def getQuantityOverTime(self, args: argparse.Namespace, simSet: SimulationSet) -> np.ndarray:
         snapshots = [(snap, sim) for sim in simSet for snap in sim.snapshots]
 
-        with multiprocessing.Pool(config.numProcesses) as pool:
-            result = pool.starmap(getTimeAndResultForSnap, zip([self for _ in snapshots], [args for _ in snapshots], snapshots))
+        result = runInPool(getTimeAndResultForSnap, snapshots, self, args)
         result.sort(key=lambda x: x[0])
         return np.array(result)
 
