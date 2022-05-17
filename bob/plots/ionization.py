@@ -29,18 +29,15 @@ class IonizationData:
             cosmology = sim.getCosmology()
             # "Time" is just the scale factor here. To make sure that this is true, check that ComovingIntegrationOn is 1
             regex = re.compile("Time ([0-9.+]+): Volume Av. H ionization: ([0-9.+]+), Mass Av. H ionization: ([0-9.+]+)")
-            try:
-                for line in sim.log:
-                    match = regex.match(line)
-                    if match is not None:
-                        self.data.append([float(x) for x in match.groups()])
-            except:
-                pass
+            for line in sim.log:
+                match = regex.match(line)
+                if match is not None:
+                    self.data.append([float(x) for x in match.groups()])
 
         self.scale_factor = np.array([d[0] for d in self.data])
         self.volumeAv = np.array([d[1] for d in self.data])
         self.massAv = np.array([d[2] for d in self.data])
-        self.redshift = z_at_value(cosmology.scale_factor, self.scale_factor)
+        self.redshift = [z_at_value(cosmology.scale_factor, sf) for sf in self.scale_factor]
         self.setNeutralFractions()
         return self
 
