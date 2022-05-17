@@ -1,9 +1,10 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 from abc import abstractmethod
 import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
+import multiprocessing
 
 import bob.config as config
 from bob.snapshot import Snapshot
@@ -66,18 +67,24 @@ class TimePlot(MultiSetFn):
 
     def getQuantityOverTime(self, args: argparse.Namespace, simSet: SimulationSet) -> np.ndarray:
         snapshots = [(snap, sim) for sim in simSet for snap in sim.snapshots]
-        snapshots.sort(key=lambda snapSim: snapSim[0].time)
-        result: List[List[float]] = []
-        for (i, (snap, sim)) in enumerate(snapshots):
-            result.append([])
-            result[-1].append(getTimeQuantityForSnap(args.time, sim, snap))
-            for (j, value) in enumerate(self.getQuantity(args, sim, snap)):
-                result[-1].append(value)
+
+        with multiprocessing.Pool(config.numProcesses) as pool:
+            result = pool.starmap(getTimeAndResultForSnap, zip([self for _ in snapshots], [args for _ in snapshots], snapshots))
+        result.sort(key=lambda x: x[0])
         return np.array(result)
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         super().setArgs(subparser)
         addTimeArg(subparser)
+
+
+def getTimeAndResultForSnap(plot: TimePlot, args: argparse.Namespace, snapSim: Tuple[Snapshot, Simulation]) -> List[float]:
+    (snap, sim) = snapSim
+    result = []
+    result.append(getTimeQuantityForSnap(args.time, sim, snap))
+    for value in plot.getQuantity(args, sim, snap):
+        result.append(value)
+    return result
 
 
 class MeanFieldOverTime(TimePlot):

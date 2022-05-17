@@ -29,8 +29,11 @@ class Snapshot:
             self.minExtent = np.array([0.0, 0.0, 0.0])
             self.maxExtent = np.array([1.0, 1.0, 1.0]) * sim.params["BoxSize"]
             self.center = (self.maxExtent + self.minExtent) * 0.5
-        self.hdf5File: h5py.File = h5py.File(self.filename, "r")
         self.initConversionFactors()
+
+    @property
+    def hdf5File(self) -> h5py.File:
+        return h5py.File(self.filename, "r")
 
     def getName(self) -> str:
         match = re.match("snap_(.*).hdf5", self.filename.name)

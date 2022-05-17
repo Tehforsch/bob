@@ -11,3 +11,5 @@ dpi = 600
 plotSerializationFileName = "plot.info"
 
 defaultTimeUnit = pq.yr
+
+numProcesses = 8
