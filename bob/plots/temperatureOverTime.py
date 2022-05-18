@@ -15,34 +15,45 @@ from bob.temperature import Temperature
 
 
 class TemperatureOverTime(TimePlot):
+    def init(self, args: argparse.Namespace) -> None:
+        super().init(args)
+        self.bins = args.bins
+
     def ylabel(self) -> str:
         return "$T [\\mathrm{K}]$"
 
+    def getName(self, args: argparse.Namespace) -> str:
+        binString = "_binned" if args.bins else ""
+        return f"{self.name}_{args.time}{binString}"
+
     def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> List[float]:
-        redshiftStartOfSim = sim.getRedshift(sim.snapshots[0].scale_factor)
-        redshiftNow = sim.getRedshift(snap.scale_factor)
-        correctionFactor = (1 + redshiftNow) ** 2 / (1 + redshiftStartOfSim) ** 2
         density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)
         masses = BasicField("Masses").getData(snap)
         temperature = Temperature().getData(snap) / pq.K
-        self.densityBins = [1e-31, 1e-29, 1e-27, 1e-25]
         result = []
-        for (density1, density2) in zip(self.densityBins, self.densityBins[1:]):
-            indices = np.where((density1 < density) & (density < density2))
-            avTemp = np.sum(temperature[indices] * masses[indices] / np.sum(masses[indices]))
-            print(f"{density1}-{density2}: {avTemp} K")
-            result.append(correctionFactor * np.sum(temperature[indices] * masses[indices] / np.sum(masses[indices])))
+        if self.bins:
+            self.densityBins = [1e-31, 1e-29, 1e-27, 1e-25]
+            for (density1, density2) in zip(self.densityBins, self.densityBins[1:]):
+                indices = np.where((density1 < density) & (density < density2))
+                avTemp = np.sum(temperature[indices] * masses[indices] / np.sum(masses[indices]))
+                result.append(avTemp)
+        else:
+            avTemp = np.sum(temperature * masses / np.sum(masses))
+            result.append(avTemp)
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         ax.set_yscale("log")
-        sublabels = [
-            "$\\rho = 10^{-31} - 10^{-29} \mathrm{g} / \mathrm{cm}^3$",
-            "$\\rho = 10^{-29} - 10^{-27} \mathrm{g} / \mathrm{cm}^3$",
-            "$\\rho = 10^{-27} - 10^{-25} \mathrm{g} / \mathrm{cm}^3$",
-        ]
+        if self.bins:
+            sublabels = [
+                "$\\rho = 10^{-31} - 10^{-29} \mathrm{g} / \mathrm{cm}^3$",
+                "$\\rho = 10^{-29} - 10^{-27} \mathrm{g} / \mathrm{cm}^3$",
+                "$\\rho = 10^{-27} - 10^{-25} \mathrm{g} / \mathrm{cm}^3$",
+            ]
+        else:
+            sublabels = [""]
 
         plt.xlabel(self.xlabel())
         plt.ylabel(self.ylabel())
@@ -51,6 +62,41 @@ class TemperatureOverTime(TimePlot):
             for (i, label) in zip(range(1, arr.shape[1]), sublabels):
                 plt.plot(arr[:, 0], arr[:, i], label=label)
         plt.legend(loc="lower left")
+        if self.time == "t":
+            self.addConstraints(plt)
+
+    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
+        super().setArgs(subparser)
+        subparser.add_argument("--bins", action="store_true")
+
+    def addConstraints(self, ax: plt.axes) -> None:
+        boera19_temps = np.asarray([[4.6, 7.31e3, 0.88e3, 1.35e3], [5.0, 7.37e3, 1.39e3, 1.67e3]])
+
+        walther19_zeds = np.asarray([4.6, 5.0, 5.4])
+        walther19_temps = np.asarray([[0.877e4, 0.106e4, 0.130e4], [0.533e4, 0.091e4, 0.122e4], [0.599e4, 0.134e4, 0.152e4]])
+        ax.errorbar(
+            boera19_temps[:, 0],
+            boera19_temps[:, 1],
+            yerr=boera19_temps[:, 2:],
+            label="Boera+19",
+            c="k",
+            ls="none",
+            marker="D",
+            capsize=3,
+            elinewidth=1,
+        )
+
+        ax.errorbar(
+            walther19_zeds - 0.01,
+            walther19_temps[:, 0],
+            yerr=walther19_temps[:, 1:].T,
+            label="Walther+19",
+            c="k",
+            ls="none",
+            marker="o",
+            capsize=3,
+            elinewidth=1,
+        )
 
 
 addToList("temperatureOverTime", TemperatureOverTime())
