@@ -1,33 +1,149 @@
 import os
-import logging
-
+import tempfile
+from typing import Iterator, Any, Union, List
+import shutil
 from pathlib import Path
-from typing import List
+
+import unittest
 import numpy as np
 import astropy.units as pq
 
+numpyFileEnding = ".npy"
+unitFileEnding = ".unit"
 
-def getNpyFiles(folder: Path) -> List[Path]:
-    return [folder / f for f in os.listdir(folder) if Path(f).suffix == ".npy"]
+
+def listdir(folder: Path) -> Iterator[Path]:
+    return (folder / f for f in os.listdir(folder))
+
+
+def getFolders(folder: Path) -> Iterator[Path]:
+    return (f for f in listdir(folder) if f.is_dir())
+
+
+def getFilesWithSuffix(folder: Path, suffix: str) -> Iterator[Path]:
+    return (folder / f for f in os.listdir(folder) if Path(f).suffix == suffix)
+
+
+def getNpyFiles(folder: Path) -> Iterator[Path]:
+    return getFilesWithSuffix(folder, numpyFileEnding)
+
+
+def readUnit(filename: Path) -> pq.Unit:
+    f = open(filename, "r")
+    return pq.Unit(f.readline().replace("\n", ""))
+
+
+def readQuantity(filenameBase: Path) -> pq.Quantity:
+    numpyFileName = filenameBase.with_suffix(numpyFileEnding)
+    unitFileName = filenameBase.with_suffix(unitFileEnding)
+    unit = readUnit(unitFileName)
+    return np.load(numpyFileName) * unit
+
+
+def readQuantityFromNumpyFilePath(numpyFilePath: Path) -> pq.Quantity:
+    return readQuantity(numpyFilePath.with_suffix(""))
+
+
+def saveUnit(filename: Path, unit: pq.UnitBase) -> None:
+    f = open(filename, "w")
+    f.write(str(unit))
+
+
+def saveQuantity(filenameBase: Path, quantity: pq.Quantity) -> None:
+    dataFileName = filenameBase.with_suffix(numpyFileEnding)
+    unitFileName = filenameBase.with_suffix(unitFileEnding)
+    np.save(dataFileName, quantity.value)
+    saveUnit(unitFileName, quantity.unit)
+
+
+def filenameBase(folder: Path, quantityName: str) -> Path:
+    return folder / f"{quantityName}"
 
 
 class Result:
-    def __init__(self, arrs: List[np.ndarray]) -> None:
-        self.arrs = arrs
-
     def save(self, folder: Path) -> None:
+        # shutil.rmtree(folder)
+        for (name, quantity) in self.__dict__.items():
+            if type(quantity) == pq.Quantity:
+                saveQuantity(filenameBase(folder, name), quantity)
+            elif type(quantity) == np.ndarray:
+                print(name, quantity)
+                raise ValueError("Refusing to save array without units for now")
+
+    @staticmethod
+    def loadFromFolder(folder: Path) -> "Result":
+        result = Result()
         for f in getNpyFiles(folder):
-            os.unlink(f)
-        for (i, arr) in enumerate(self.arrs):
-            if type(arr) == pq.Quantity:
-                value = arr.value
-                logging.warning(f"Saving array with units: {arr.unit}")
+            result.__setattr__(f.stem, readQuantityFromNumpyFilePath(f))
+        for subdir in getFolders(folder):
+            arrs = []
+            for f in getNpyFiles(subdir):
+                arrs.append(readQuantityFromNumpyFilePath(f))
+            result.__setattr__(f.stem, arrs)
+        return result
+
+    def __repr__(self) -> str:
+        def formatField(name: str, value: Union[pq.Quantity, List[pq.Quantity]]) -> str:
+            if type(value) == pq.Quantity:
+                return f"{name:<15} [{value.unit:>10}]: {value.value}"
+            elif type(value) == list:
+                return "\n".join(formatField(name, x) for x in value)
             else:
-                value = arr
-            np.save(folder / str(i), value)
+                raise ValueError("Wrong type in result: {}", type(value))
+
+        return "\n".join(formatField(name, value) for (name, value) in self.__dict__.items())
 
 
-def getResultFromFolder(folder: Path) -> Result:
-    files = getNpyFiles(folder)
-    files.sort(key=lambda f: int(f.stem))
-    return Result([np.load(f) for f in files])
+class Tests(unittest.TestCase):
+    def getTestResultA(self) -> Any:
+        class A(Result):
+            def __init__(self) -> None:
+                self.temperature = np.array([1.0, 2.0, 3.0]) * pq.K
+                self.lengths = np.array([1.0, 0.0, 0.0]) * pq.m
+
+        return A()
+
+    def getTestResultB(self) -> Any:
+        class B(Result):
+            def __init__(self) -> None:
+                self.densities = [np.array([1.0, 0.0]), np.array([2.0, 1.0]), np.array([3.0, 2.0])] * pq.kg / pq.m**3
+                self.volumes = np.array([0.0, 0.0]) * pq.cm**3
+                self.some_other = np.array([5.0, 1.0]) * pq.J
+
+        return B()
+
+    def check_write_and_read_result(self, result: Result) -> None:
+        with Path(tempfile.TemporaryDirectory().name) as folder:
+            folder.mkdir()
+            result.save(folder)
+            resultRead = Result.loadFromFolder(folder)
+            shutil.rmtree(folder)
+            self.assert_equal_results(result, resultRead)
+
+    def test_a(self) -> None:
+        self.check_write_and_read_result(self.getTestResultA())
+
+    def test_b(self) -> None:
+        self.check_write_and_read_result(self.getTestResultB())
+
+    def assert_equal_quantities(self, q1: pq.Quantity, q2: pq.Quantity) -> None:
+        assert q1.unit == q2.unit
+        assert np.equal(q1.value, q2.value).all()
+
+    def assert_result_contains_other_result(self, res1: Result, res2: Result) -> None:
+        for (k, v) in res1.__dict__.items():
+            assert k in res2.__dict__
+            if type(v) == pq.Quantity:
+                self.assert_equal_quantities(res2.__getattribute__(k), v)
+            else:
+                print(type(v))
+                for (q1, q2) in zip(res2.__getattribute__(k), v):
+                    self.assert_equal_quantities(q1, q2)
+
+    def assert_equal_results(self, res1: Result, res2: Result) -> None:
+        self.assert_result_contains_other_result(res1, res2)
+        self.assert_result_contains_other_result(res2, res1)
+
+
+if __name__ == "__main__":
+    unittest.main()
