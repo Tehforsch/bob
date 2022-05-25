@@ -31,12 +31,13 @@ class MeanFieldOverTime(TimePlot):
     def getName(self, args: argparse.Namespace) -> str:
         return f"{self.name}_{args.field}_{args.time}"
 
-    def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> List[float]:
+    def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> float:
         masses = BasicField("Masses").getData(snap)
-        data = self.field.getData(snap) / self.field.unit
-        return [np.mean(data * masses) / np.mean(masses)]
+        data = self.field.getData(snap)
+        return np.mean(data * masses) / np.mean(masses)
 
     def plot(self, plt: plt.axes, result: Result) -> None:
+        print(result)
         super().plot(plt, result)
 
 

@@ -40,6 +40,7 @@ class VoronoiSlice(SnapFn):
         result = Result()
         result.data = getDataAtPoints(field, snap, coordinates)
         result.data = result.data.reshape((n1, n2))
+        print(result.data.shape)
         print(f"Field: {field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
         return result
 
@@ -49,7 +50,7 @@ class VoronoiSlice(SnapFn):
         extent = (self.min1, self.max1, self.min2, self.max2)
         vmin = 1.0e2
         vmax = 1.0e5
-        plt.imshow(result.data[0], norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=extent, origin="lower", cmap="Reds")
+        plt.imshow(result.data, norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=extent, origin="lower", cmap="Reds")
         plt.colorbar()
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:

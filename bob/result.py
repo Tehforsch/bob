@@ -71,6 +71,8 @@ class Result:
                 saveQuantity(filenameBase(folder, name), quantity)
             elif type(quantity) == np.ndarray:
                 raise ValueError("Refusing to save array without units")
+            else:
+                raise ValueError(f"Currently unsupported type: {type(quantity)}")
 
     @staticmethod
     def readFromFolder(folder: Path) -> "Result":
