@@ -15,11 +15,12 @@ from bob.temperature import Temperature
 
 class TemperatureIonizationHistogram(SnapFn):
     def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
-        temperature = Temperature().getData(snap) / pq.K
-        ionization = BasicField("ChemicalAbundances", 1).getData(snap)
-        print(np.min(temperature), np.mean(temperature), np.max(temperature))
-        print(np.min(ionization), np.mean(ionization), np.max(ionization))
-        return Result([temperature, ionization])
+        result = Result()
+        result.temperature = Temperature().getData(snap) / pq.K
+        result.ionization = BasicField("ChemicalAbundances", 1).getData(snap)
+        print(np.min(result.temperature), np.mean(result.temperature), np.max(result.temperature))
+        print(np.min(result.ionization), np.mean(result.ionization), np.max(result.ionization))
+        return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         fig = plt.figure()
@@ -36,7 +37,7 @@ class TemperatureIonizationHistogram(SnapFn):
         binsY = np.logspace(np.log10(minY), np.log10(maxY), num=104)
         plt.xticks([1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1e0])
         plt.yticks([1e0, 1e1, 1e2, 1e3, 1e4, 1e5])
-        plt.hist2d(result.arrs[1], result.arrs[0], [binsX, binsY], density=True, norm=colors.LogNorm())
+        plt.hist2d(result.ionization, result.temperature, [binsX, binsY], density=True, norm=colors.LogNorm())
         colorbar = plt.colorbar()
         colorbar.set_ticks([1e-9, 1e-6, 1e-3, 1e0, 1e3])
 

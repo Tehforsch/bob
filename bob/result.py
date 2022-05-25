@@ -61,12 +61,8 @@ def filenameBase(folder: Path, quantityName: str) -> Path:
 
 
 class Result:
-    def __init__(self, arr: Union[pq.Quantity, List[pq.Quantity]]):
-        self.arr = arr
-
-    @staticmethod
-    def empty() -> "Result":
-        return Result([])
+    def __init__(self) -> None:
+        pass
 
     def save(self, folder: Path) -> None:
         # shutil.rmtree(folder)
@@ -78,7 +74,7 @@ class Result:
 
     @staticmethod
     def readFromFolder(folder: Path) -> "Result":
-        result = Result.empty()
+        result = Result()
         for f in getNpyFiles(folder):
             result.__setattr__(f.stem, readQuantityFromNumpyFilePath(f))
         for subdir in getFolders(folder):

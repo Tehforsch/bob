@@ -33,13 +33,14 @@ class ThomsonScattering(TimePlot):
         plt.fill_between(ztau, taumin, taumax, facecolor="gray", alpha=0.25, label=r"Planck+18")
 
     def transform(self, result: np.ndarray) -> np.ndarray:
-        print("times: ", result[0, :] * self.timeUnit)
-        baseValue = 0.0  # Tng at z=6
-        dt = np.diff(result[0, :], 1) * self.timeUnit
-        newResult = np.zeros((2, result.shape[1] - 1))
-        newResult[0, :] = result[0, 1:]
-        newResult[1, :] = baseValue + np.cumsum(result[1, 1:] * dt)
-        return newResult
+        raise ValueError("TODO: THIS DOESNT WORK YET")
+        # print("times: ", result[0, :] * self.timeUnit)
+        # baseValue = 0.0  # Tng at z=6
+        # dt = np.diff(result[0, :], 1) * self.timeUnit
+        # newResult = np.zeros((2, result.shape[1] - 1))
+        # newResult[0, :] = result[0, 1:]
+        # newResult[1, :] = baseValue + np.cumsum(result[1, 1:] * dt)
+        # return newResult
 
     def ylabel(self) -> str:
         return "$\tau$"

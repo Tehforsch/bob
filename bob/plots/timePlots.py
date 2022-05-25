@@ -3,7 +3,7 @@ from abc import abstractmethod
 import argparse
 
 import matplotlib.pyplot as plt
-import numpy as np
+import astropy.units as pq
 
 import bob.config as config
 from bob.snapshot import Snapshot
@@ -13,6 +13,7 @@ from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
 from bob.multiSet import MultiSet
 from bob.pool import runInPool
+from bob.util import getArrayQuantity
 
 
 def addTimeArg(subparser: argparse.ArgumentParser) -> None:
@@ -37,7 +38,7 @@ class TimePlot(MultiSetFn):
         self.styles: List[Dict[str, Any]] = [{} for _ in range(100)]
 
     @abstractmethod
-    def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> List[float]:
+    def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> pq.Quantity:
         pass
 
     def xlabel(self) -> str:
@@ -47,38 +48,35 @@ class TimePlot(MultiSetFn):
     def ylabel(self) -> str:
         pass
 
-    def transform(self, result: np.ndarray) -> np.ndarray:
-        return result
-
     def post(self, args: argparse.Namespace, simSets: MultiSet) -> Result:
         self.labels = simSets.labels
         self.time = args.time
-        return Result([self.transform(self.getQuantityOverTime(args, simSet)) for simSet in simSets])
+        results = Result()
+        results.data = [self.getQuantityOverTime(args, simSet) for simSet in simSets]
+        return results
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.xlabel(self.xlabel())
         plt.ylabel(self.ylabel())
-        for (style, label, arr) in zip(self.styles, self.labels, result.arrs):
-            for i in range(1, arr.shape[1]):
-                plt.plot(arr[:, 0], arr[:, i], label=label)
+        for (style, label, result) in zip(self.styles, self.labels, result.data):
+            plt.plot(result.times, result.values, label=label)
         plt.legend()
 
-    def getQuantityOverTime(self, args: argparse.Namespace, simSet: SimulationSet) -> np.ndarray:
+    def getQuantityOverTime(self, args: argparse.Namespace, simSet: SimulationSet) -> Result:
         snapshots = [(snap, sim) for sim in simSet for snap in sim.snapshots]
 
-        result = runInPool(getTimeAndResultForSnap, snapshots, self, args)
-        result.sort(key=lambda x: x[0])
-        return np.array(result)
+        data = runInPool(getTimeAndResultForSnap, snapshots, self, args)
+        data.sort(key=lambda x: x[0])
+        result = Result()
+        result.times = getArrayQuantity([x[0] for x in data])
+        result.values = getArrayQuantity([x[1] for x in data])
+        return result
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         super().setArgs(subparser)
         addTimeArg(subparser)
 
 
-def getTimeAndResultForSnap(plot: TimePlot, args: argparse.Namespace, snapSim: Tuple[Snapshot, Simulation]) -> List[float]:
+def getTimeAndResultForSnap(plot: TimePlot, args: argparse.Namespace, snapSim: Tuple[Snapshot, Simulation]) -> Tuple[pq.Quantity, pq.Quantity]:
     (snap, sim) = snapSim
-    result = []
-    result.append(getTimeQuantityForSnap(args.time, sim, snap))
-    for value in plot.getQuantity(args, sim, snap):
-        result.append(value)
-    return result
+    return (getTimeQuantityForSnap(args.time, sim, snap), plot.getQuantity(args, sim, snap))

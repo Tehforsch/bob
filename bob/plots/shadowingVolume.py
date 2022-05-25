@@ -6,7 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as pq
 
-import bob.config as config
 from bob.result import Result
 from bob.postprocessingFunctions import addToList
 from bob.plots.timePlots import TimePlot
@@ -73,13 +72,9 @@ class ShadowingVolumePlot(TimePlot):
         masses = BasicField("Masses").getData(snap)[selection]
         return [np.sum(data * masses) / np.sum(masses)]
 
-    def transform(self, result: np.ndarray) -> np.ndarray:
-        result[0, :] = result[0, :] * ((config.defaultTimeUnit / pq.kyr).decompose().to(1))
-        return result
-
     def plot(self, plt: plt.axes, result: Result) -> None:
         self.styles = [{"color": s[0], "linestyle": s[1]} for s in itertools.product(["r", "b"], ["-", "--", ":"])]
-        self.labels = ["" for _ in result.arrs]
+        self.labels = ["" for _ in result.data]
 
         super().plot(plt, result)
         plt.xlim(0, 60)

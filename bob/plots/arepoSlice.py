@@ -26,11 +26,12 @@ class ArepoSlicePlot(SliceFn):
     # Taken from arepy
     def post(self, args: argparse.Namespace, sim: Simulation, slice_: ArepoSlice) -> Result:
         f = open(slice_.path, mode="rb")
+        result = Result()
         npix_x = np.fromfile(f, np.uint32, 1)[0]
         npix_y = np.fromfile(f, np.uint32, 1)[0]
-        result = np.fromfile(f, np.float32, int(npix_x * npix_y)).reshape((int(npix_x), int(npix_y)))
-        result = np.rot90(result)
-        return Result(result)
+        result.image = np.fromfile(f, np.float32, int(npix_x * npix_y)).reshape((int(npix_x), int(npix_y)))
+        result.image = np.rot90(result.image)
+        return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.xlabel("$x [h^{-1} \\mathrm{kpc}]$")
@@ -41,15 +42,15 @@ class ArepoSlicePlot(SliceFn):
             plt.clim(vmin, vmax)
             cbar = plt.colorbar()
             cbar.set_label("$x_{\\mathrm{H+}}$")
-            plt.imshow(result.arrs[0], cmap="Reds", norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=(-17.5, 17.5, -17.5, 17.5))
+            plt.imshow(result.image, cmap="Reds", norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=(-17.5, 17.5, -17.5, 17.5))
         elif self.slice_field == "temp":
             vmin = 1.0e1
             vmax = 1.0e6
-            plt.imshow(result.arrs[0], cmap="Reds", norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=(-17.5, 17.5, -17.5, 17.5))
+            plt.imshow(result.image, cmap="Reds", norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=(-17.5, 17.5, -17.5, 17.5))
             cbar = plt.colorbar()
             cbar.set_label("$T$")
         elif self.slice_field == "density":
-            plt.imshow(result.arrs[0], cmap="Reds", norm=colors.LogNorm(), extent=(-17.5, 17.5, -17.5, 17.5))
+            plt.imshow(result.image, cmap="Reds", norm=colors.LogNorm(), extent=(-17.5, 17.5, -17.5, 17.5))
             cbar = plt.colorbar()
             cbar.set_label("$\\rho$")
 

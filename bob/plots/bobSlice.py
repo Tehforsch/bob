@@ -37,10 +37,11 @@ class VoronoiSlice(SnapFn):
         n2 = config.dpi * 3
         p1, p2 = np.meshgrid(np.linspace(self.min1, self.max1, n1), np.linspace(self.min2, self.max2, n2))
         coordinates = axis * (center * axis) + np.outer(p1, self.ortho1) + np.outer(p2, self.ortho2)
-        data = getDataAtPoints(field, snap, coordinates)
-        data = data.reshape((n1, n2))
-        print(f"Field: {field.niceName}: min: {np.min(data):.2e}, mean: {np.mean(data):.2e}, max: {np.max(data):.2e}")
-        return Result([data])
+        result = Result()
+        result.data = getDataAtPoints(field, snap, coordinates)
+        result.data = result.data.reshape((n1, n2))
+        print(f"Field: {field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
+        return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.xlabel(getAxisName(self.ortho1))
@@ -48,7 +49,7 @@ class VoronoiSlice(SnapFn):
         extent = (self.min1, self.max1, self.min2, self.max2)
         vmin = 1.0e2
         vmax = 1.0e5
-        plt.imshow(result.arrs[0], norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=extent, origin="lower", cmap="Reds")
+        plt.imshow(result.data[0], norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=extent, origin="lower", cmap="Reds")
         plt.colorbar()
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
