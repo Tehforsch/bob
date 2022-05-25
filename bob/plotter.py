@@ -16,7 +16,7 @@ from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
 import bob.config
 from bob.simulation import Simulation
-from bob.result import Result, getResultFromFolder
+from bob.result import Result
 from bob.postprocessingFunctions import PostprocessingFunction
 from bob.multiSet import MultiSet
 from bob.pool import runInPool
@@ -168,6 +168,6 @@ def runPlot(plotter: Plotter, args: argparse.Namespace, plotName: str) -> None:
         print("Replotting", plotName)
         plotFolder = plotter.dataFolder / plotName
         plot = pickle.load(open(plotFolder / bob.config.plotSerializationFileName, "rb"))
-        result = getResultFromFolder(plotFolder)
+        result = Result.readFromFolder(plotFolder)
         plot.plot(plt, result)
         plotter.saveAndShow(plotFolder.name)

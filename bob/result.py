@@ -61,18 +61,24 @@ def filenameBase(folder: Path, quantityName: str) -> Path:
 
 
 class Result:
+    def __init__(self, arr: Union[pq.Quantity, List[pq.Quantity]]):
+        self.arr = arr
+
+    @staticmethod
+    def empty() -> "Result":
+        return Result([])
+
     def save(self, folder: Path) -> None:
         # shutil.rmtree(folder)
         for (name, quantity) in self.__dict__.items():
             if type(quantity) == pq.Quantity:
                 saveQuantity(filenameBase(folder, name), quantity)
             elif type(quantity) == np.ndarray:
-                print(name, quantity)
-                raise ValueError("Refusing to save array without units for now")
+                raise ValueError("Refusing to save array without units")
 
     @staticmethod
-    def loadFromFolder(folder: Path) -> "Result":
-        result = Result()
+    def readFromFolder(folder: Path) -> "Result":
+        result = Result.empty()
         for f in getNpyFiles(folder):
             result.__setattr__(f.stem, readQuantityFromNumpyFilePath(f))
         for subdir in getFolders(folder):
@@ -92,6 +98,12 @@ class Result:
                 raise ValueError("Wrong type in result: {}", type(value))
 
         return "\n".join(formatField(name, value) for (name, value) in self.__dict__.items())
+
+    def __setattr__(self, name: str, value: Union[pq.Quantity, List[pq.Quantity]]) -> None:
+        object.__setattr__(self, name, value)
+
+    def __getattr__(self, name: str) -> Any:
+        object.__getattribute__(self, name)
 
 
 class Tests(unittest.TestCase):
@@ -116,7 +128,7 @@ class Tests(unittest.TestCase):
         with Path(tempfile.TemporaryDirectory().name) as folder:
             folder.mkdir()
             result.save(folder)
-            resultRead = Result.loadFromFolder(folder)
+            resultRead = Result.readFromFolder(folder)
             shutil.rmtree(folder)
             self.assert_equal_results(result, resultRead)
 

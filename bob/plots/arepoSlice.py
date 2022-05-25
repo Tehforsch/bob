@@ -28,9 +28,9 @@ class ArepoSlicePlot(SliceFn):
         f = open(slice_.path, mode="rb")
         npix_x = np.fromfile(f, np.uint32, 1)[0]
         npix_y = np.fromfile(f, np.uint32, 1)[0]
-        arepo_image = np.fromfile(f, np.float32, int(npix_x * npix_y)).reshape((int(npix_x), int(npix_y)))
-        arepo_image = np.rot90(arepo_image)
-        return Result([arepo_image])
+        result = np.fromfile(f, np.float32, int(npix_x * npix_y)).reshape((int(npix_x), int(npix_y)))
+        result = np.rot90(result)
+        return Result(result)
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.xlabel("$x [h^{-1} \\mathrm{kpc}]$")
