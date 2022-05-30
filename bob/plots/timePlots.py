@@ -21,15 +21,19 @@ def addTimeArg(subparser: argparse.ArgumentParser) -> None:
 
 
 def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot) -> float:
+    return getTimeQuantityFromTimeOrScaleFactor(quantity, sim, snap, snap.scale_factor)
+
+def getTimeQuantityFromTimeOrScaleFactor(quantity: str, sim: Simulation, snap: Snapshot, time_or_scale_factor: pq.Quantity) -> pq.Quantity:
     if quantity == "z":
-        return sim.getRedshift(snap.scale_factor)
+        return sim.getRedshift(time_or_scale_factor)
     elif quantity == "t":
         if sim.params["ComovingIntegrationOn"]:
-            return sim.getLookbackTime(snap.scale_factor) / config.defaultTimeUnit
+            return sim.getLookbackTime(time_or_scale_factor) / config.defaultTimeUnit
         else:
-            return snap.time / config.defaultTimeUnit
+            return time_or_scale_factor * snap.timeUnit
     else:
         raise NotImplementedError
+
 
 
 class TimePlot(MultiSetFn):

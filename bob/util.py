@@ -14,5 +14,5 @@ def getCommonParentFolder(folders: List[Path]) -> Path:
 
 
 def getArrayQuantity(quantities: List[pq.Quantity]) -> pq.Quantity:
-    unit = quantities[0].unit
-    return np.array((y / unit).decompose().value for y in quantities) * unit
+    unit = quantities[0].unit * 1.0
+    return np.array([(y / unit).decompose().value for y in quantities]) * unit
