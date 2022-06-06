@@ -29,8 +29,8 @@ def getNpyFiles(folder: Path) -> Iterator[Path]:
 
 
 def readUnit(filename: Path) -> pq.Unit:
-    f = open(filename, "r")
-    return pq.Unit(f.readline().replace("\n", ""))
+    with open(filename, "r") as f:
+        return pq.Unit(f.readline().replace("\n", ""))
 
 
 def readQuantity(filenameBase: Path) -> pq.Quantity:
@@ -45,8 +45,8 @@ def readQuantityFromNumpyFilePath(numpyFilePath: Path) -> pq.Quantity:
 
 
 def saveUnit(filename: Path, unit: pq.UnitBase) -> None:
-    f = open(filename, "w")
-    f.write(str(unit))
+    with open(filename, "w") as f:
+        f.write(str(unit))
 
 
 def saveQuantity(filenameBase: Path, quantity: pq.Quantity) -> None:
@@ -55,10 +55,14 @@ def saveQuantity(filenameBase: Path, quantity: pq.Quantity) -> None:
     np.save(dataFileName, quantity.value)
     saveUnit(unitFileName, quantity.unit)
 
+def saveQuantityList(folder: Path, quantities: List[pq.Quantity]) -> None:
+    folder.mkdir()
+    for (i, quantity) in enumerate(quantities):
+        assert type(quantity) == pq.Quantity, f"Wrong type in list result: {type(quantity)}"
+        saveQuantity(folder / str(i), quantity)
 
 def filenameBase(folder: Path, quantityName: str) -> Path:
     return folder / f"{quantityName}"
-
 
 class Result:
     def __init__(self) -> None:
@@ -69,6 +73,8 @@ class Result:
         for (name, quantity) in self.__dict__.items():
             if type(quantity) == pq.Quantity:
                 saveQuantity(filenameBase(folder, name), quantity)
+            elif type(quantity) == list:
+                saveQuantityList(filenameBase(folder, name), quantity)
             elif type(quantity) == np.ndarray:
                 raise ValueError("Refusing to save array without units")
             else:
@@ -81,9 +87,9 @@ class Result:
             result.__setattr__(f.stem, readQuantityFromNumpyFilePath(f))
         for subdir in getFolders(folder):
             arrs = []
-            for f in getNpyFiles(subdir):
+            for f in sorted(getNpyFiles(subdir), key=lambda f:int(f.stem)):
                 arrs.append(readQuantityFromNumpyFilePath(f))
-            result.__setattr__(f.stem, arrs)
+            result.__setattr__(subdir.stem, arrs)
         return result
 
     def __repr__(self) -> str:
@@ -116,18 +122,17 @@ class Tests(unittest.TestCase):
     def getTestResultB(self) -> Any:
         class B(Result):
             def __init__(self) -> None:
-                self.densities = [np.array([1.0, 0.0]), np.array([2.0, 1.0]), np.array([3.0, 2.0])] * pq.kg / pq.m**3
+                self.densities = [np.array([1.0, 0.0]) * pq.kg/pq.m**3, np.array([2.0, 5.0, 1.0]) * pq.g/pq.m**3, np.array([3.0, 2.0]) * pq.kg / pq.m**3]
                 self.volumes = np.array([0.0, 0.0]) * pq.cm**3
                 self.some_other = np.array([5.0, 1.0]) * pq.J
 
         return B()
 
     def check_write_and_read_result(self, result: Result) -> None:
-        with Path(tempfile.TemporaryDirectory().name) as folder:
-            folder.mkdir()
+        with tempfile.TemporaryDirectory() as f:
+            folder = Path(f)
             result.save(folder)
             resultRead = Result.readFromFolder(folder)
-            shutil.rmtree(folder)
             self.assert_equal_results(result, resultRead)
 
     def test_a(self) -> None:
