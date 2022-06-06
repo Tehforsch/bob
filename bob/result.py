@@ -107,6 +107,8 @@ class Result:
         def formatField(name: str, value: Union[pq.Quantity, List[pq.Quantity]]) -> str:
             if type(value) == pq.Quantity:
                 return f"{name:<15} [{value.unit:>10}]: {value.value}"
+            elif type(value) == Result:
+                return value.__repr__()
             elif type(value) == list:
                 return "\n".join(formatField(name, x) for x in value)
             else:
