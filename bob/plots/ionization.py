@@ -25,6 +25,7 @@ class IonizationData(Result):
         self.redshift: List[pq.Quantity] = []
 
     def addSims(self, sims: List[Simulation]) -> "IonizationData":
+        data = []
         for sim in sims:
             # "Time" is just the scale factor here. To make sure that this is true, check that ComovingIntegrationOn is 1
             assert sim.params.get("ComovingIntegrationOn") == 1
@@ -33,13 +34,11 @@ class IonizationData(Result):
             for line in sim.log:
                 match = regex.match(line)
                 if match is not None:
-                    self.data.append([float(x) for x in match.groups()])
+                    data.append([float(x) for x in match.groups()])
 
-        self.scale_factor.append(pq.dimensionless * np.array([d[0] for d in self.data]))
-        self.volumeAv.append((1.0 - np.array([d[1] for d in self.data])) * pq.dimensionless)
-        self.massAv.append((1.0 - np.array([d[2] for d in self.data])) * pq.dimensionless)
-        self.redshift.append(getArrayQuantity([z_at_value(cosmology.scale_factor, sf) for sf in self.scale_factor]))
-        self.setNeutralFractions()
+        self.redshift.append(np.array([z_at_value(cosmology.scale_factor, d[0]) for d in data]) * pq.dimensionless_unscaled)
+        self.volumeAv.append((1.0 - np.array([d[1] for d in data])) * pq.dimensionless_unscaled)
+        self.massAv.append((1.0 - np.array([d[2] for d in data])) * pq.dimensionless_unscaled)
         return self
 
 
