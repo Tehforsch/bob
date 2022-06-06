@@ -4,6 +4,7 @@ from typing import Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial import cKDTree
+import astropy.units as pq
 
 from bob.simulationSet import SimulationSet
 from bob.basicField import BasicField
@@ -11,8 +12,8 @@ from bob.plots.bobSlice import findOrthogonalAxes
 import bob.config as config
 from bob.result import Result
 from bob.postprocessingFunctions import SetFn, addToList
-
-from bob.plots.timePlots import addTimeArg, getTimeQuantityForSnap
+from bob.util import getArrayQuantity
+from bob.plots.timePlots import addTimeArg, getTimeQuantityForSnap, getTimeQuantityFromTimeOrScaleFactor
 
 
 class IonizationTime(SetFn):
@@ -28,7 +29,7 @@ class IonizationTime(SetFn):
         plt.ylabel("$y [h^{-1} \mathrm{Mpc}]$")
 
         extent = (self.min1, self.max1, self.min2, self.max2)
-        plt.imshow(result.data, extent=extent, cmap="Reds", vmin=6, vmax=10)
+        plt.imshow(result.data.to(pq.Myr), extent=extent, cmap="Reds", vmin=0, vmax=1000)
         cbar = plt.colorbar()
         cbar.set_label("$z$")
 
@@ -42,23 +43,21 @@ class IonizationTime(SetFn):
         n2 = config.dpi * 3
         data = np.zeros((n1, n2))
         snapshots = [(sim, snap) for sim in simSet for snap in sim.snapshots]
-        snapshots.sort(key=lambda simSnap: -getTimeQuantityForSnap(self.quantity, simSnap[0], simSnap[1]))
-        for (sim, snap) in snapshots:
-            print(snap)
-            xHP = BasicField("ChemicalAbundances", 1).getData(snap)
-            center = snap.center
-            ortho1, ortho2 = findOrthogonalAxes(axis)
-            min1 = np.dot(ortho1, snap.minExtent)
-            min2 = np.dot(ortho2, snap.minExtent)
-            max1 = np.dot(ortho1, snap.maxExtent)
-            max2 = np.dot(ortho2, snap.maxExtent)
-            p1, p2 = np.meshgrid(np.linspace(min1, max1, n1), np.linspace(min2, max2, n2))
-            coordinates = axis * (center * axis) + np.outer(p1, ortho1) + np.outer(p2, ortho2)
-            tree = cKDTree(snap.coordinates)
-            cellIndices = tree.query(coordinates)[1]
-            cellIndices = cellIndices.reshape((n1, n2))
-            abundance = xHP[cellIndices]
-            data[np.where(abundance > 0.5)] = getTimeQuantityForSnap(self.quantity, sim, snap)
+        (sim, snap) = max(snapshots, key=lambda simSnap: getTimeQuantityForSnap(self.quantity, simSnap[0], simSnap[1]))
+        ionizationTime = BasicField("IonizationTime").getData(snap)
+        ionizationTime = getArrayQuantity([getTimeQuantityFromTimeOrScaleFactor(self.quantity, sim, snap, x) for x in ionizationTime])
+        center = snap.center
+        ortho1, ortho2 = findOrthogonalAxes(axis)
+        min1 = np.dot(ortho1, snap.minExtent)
+        min2 = np.dot(ortho2, snap.minExtent)
+        max1 = np.dot(ortho1, snap.maxExtent)
+        max2 = np.dot(ortho2, snap.maxExtent)
+        p1, p2 = np.meshgrid(np.linspace(min1, max1, n1), np.linspace(min2, max2, n2))
+        coordinates = axis * (center * axis) + np.outer(p1, ortho1) + np.outer(p2, ortho2)
+        tree = cKDTree(snap.coordinates)
+        cellIndices = tree.query(coordinates)[1]
+        cellIndices = cellIndices.reshape((n1, n2))
+        data = ionizationTime[cellIndices]
         return (min1, min2, max1, max2), data
 
 
