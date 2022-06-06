@@ -14,7 +14,6 @@ from bob.simulation import Simulation
 from bob.postprocessingFunctions import MultiSetFn, addToList
 from bob.result import Result
 from bob.multiSet import MultiSet
-from bob.util import getArrayQuantity
 
 
 class IonizationData(Result):
@@ -24,7 +23,7 @@ class IonizationData(Result):
         self.massAv: List[pq.Quantity] = []
         self.redshift: List[pq.Quantity] = []
 
-    def addSims(self, sims: List[Simulation]) -> "IonizationData":
+    def addSims(self, sims: List[Simulation]) -> None:
         data = []
         for sim in sims:
             # "Time" is just the scale factor here. To make sure that this is true, check that ComovingIntegrationOn is 1
@@ -39,7 +38,6 @@ class IonizationData(Result):
         self.redshift.append(np.array([z_at_value(cosmology.scale_factor, d[0]) for d in data]) * pq.dimensionless_unscaled)
         self.volumeAv.append((1.0 - np.array([d[1] for d in data])) * pq.dimensionless_unscaled)
         self.massAv.append((1.0 - np.array([d[2] for d in data])) * pq.dimensionless_unscaled)
-        return self
 
 
 class Ionization(MultiSetFn):
@@ -58,9 +56,7 @@ class Ionization(MultiSetFn):
         self.addConstraintsToAxis(linAx)
         self.addConstraintsToAxis(logAx)
 
-        for (redshift, neutralVolumeAv, neutralMassAv, color) in zip(
-            result.redshifts, result.neutralVolumeAvs, result.neutralMassAvs, itertools.cycle(colors)
-        ):
+        for (redshift, neutralVolumeAv, neutralMassAv, color) in zip(result.redshift, result.volumeAv, result.massAv, itertools.cycle(colors)):
             self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, linAx, color)
             self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, logAx, color)
         # add legend labels

@@ -55,21 +55,24 @@ def saveQuantity(filenameBase: Path, quantity: pq.Quantity) -> None:
     np.save(dataFileName, quantity.value)
     saveUnit(unitFileName, quantity.unit)
 
+
 def saveQuantityList(folder: Path, quantities: List[pq.Quantity]) -> None:
     folder.mkdir()
     for (i, quantity) in enumerate(quantities):
         assert type(quantity) == pq.Quantity, f"Wrong type in list result: {type(quantity)}"
         saveQuantity(folder / str(i), quantity)
 
+
 def filenameBase(folder: Path, quantityName: str) -> Path:
     return folder / f"{quantityName}"
+
 
 class Result:
     def __init__(self) -> None:
         pass
 
     def save(self, folder: Path) -> None:
-        # shutil.rmtree(folder)
+        shutil.rmtree(folder)
         for (name, quantity) in self.__dict__.items():
             if type(quantity) == pq.Quantity:
                 saveQuantity(filenameBase(folder, name), quantity)
@@ -87,7 +90,7 @@ class Result:
             result.__setattr__(f.stem, readQuantityFromNumpyFilePath(f))
         for subdir in getFolders(folder):
             arrs = []
-            for f in sorted(getNpyFiles(subdir), key=lambda f:int(f.stem)):
+            for f in sorted(getNpyFiles(subdir), key=lambda f: int(f.stem)):
                 arrs.append(readQuantityFromNumpyFilePath(f))
             result.__setattr__(subdir.stem, arrs)
         return result
@@ -122,7 +125,11 @@ class Tests(unittest.TestCase):
     def getTestResultB(self) -> Any:
         class B(Result):
             def __init__(self) -> None:
-                self.densities = [np.array([1.0, 0.0]) * pq.kg/pq.m**3, np.array([2.0, 5.0, 1.0]) * pq.g/pq.m**3, np.array([3.0, 2.0]) * pq.kg / pq.m**3]
+                self.densities = [
+                    np.array([1.0, 0.0]) * pq.kg / pq.m**3,
+                    np.array([2.0, 5.0, 1.0]) * pq.g / pq.m**3,
+                    np.array([3.0, 2.0]) * pq.kg / pq.m**3,
+                ]
                 self.volumes = np.array([0.0, 0.0]) * pq.cm**3
                 self.some_other = np.array([5.0, 1.0]) * pq.J
 
