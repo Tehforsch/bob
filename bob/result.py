@@ -63,6 +63,10 @@ def saveQuantityList(folder: Path, quantities: List[pq.Quantity]) -> None:
         saveQuantity(folder / str(i), quantity)
 
 
+def saveResultList(folder: Path, quantities: List["Result"]) -> None:
+    folder.mkdir()
+
+
 def filenameBase(folder: Path, quantityName: str) -> Path:
     return folder / f"{quantityName}"
 
@@ -72,12 +76,16 @@ class Result:
         pass
 
     def save(self, folder: Path) -> None:
-        shutil.rmtree(folder)
+        for item in os.listdir(folder):
+            shutil.rmtree(folder / item)
         for (name, quantity) in self.__dict__.items():
             if type(quantity) == pq.Quantity:
                 saveQuantity(filenameBase(folder, name), quantity)
             elif type(quantity) == list:
-                saveQuantityList(filenameBase(folder, name), quantity)
+                if type(quantity[0]) == pq.Quantity:
+                    saveQuantityList(filenameBase(folder, name), quantity)
+                elif isinstance(quantity[0], Result):
+                    saveResultList(filenameBase(folder, name), quantity)
             elif type(quantity) == np.ndarray:
                 raise ValueError("Refusing to save array without units")
             else:
@@ -114,7 +122,8 @@ class Result:
 
 
 class Tests(unittest.TestCase):
-    def getTestResultA(self) -> Any:
+    @staticmethod
+    def getTestResultA() -> Any:
         class A(Result):
             def __init__(self) -> None:
                 self.temperature = np.array([1.0, 2.0, 3.0]) * pq.K
@@ -122,7 +131,8 @@ class Tests(unittest.TestCase):
 
         return A()
 
-    def getTestResultB(self) -> Any:
+    @staticmethod
+    def getTestResultB() -> Any:
         class B(Result):
             def __init__(self) -> None:
                 self.densities = [
@@ -134,6 +144,14 @@ class Tests(unittest.TestCase):
                 self.some_other = np.array([5.0, 1.0]) * pq.J
 
         return B()
+
+    @staticmethod
+    def getTestResultC() -> Any:
+        class C(Result):
+            def __init__(self) -> None:
+                self.results = [Tests.getTestResultA(), Tests.getTestResultB()]
+
+        return C()
 
     def check_write_and_read_result(self, result: Result) -> None:
         with tempfile.TemporaryDirectory() as f:
@@ -148,6 +166,9 @@ class Tests(unittest.TestCase):
     def test_b(self) -> None:
         self.check_write_and_read_result(self.getTestResultB())
 
+    def test_c(self) -> None:
+        self.check_write_and_read_result(self.getTestResultC())
+
     def assert_equal_quantities(self, q1: pq.Quantity, q2: pq.Quantity) -> None:
         assert q1.unit == q2.unit
         assert np.equal(q1.value, q2.value).all()
@@ -158,7 +179,6 @@ class Tests(unittest.TestCase):
             if type(v) == pq.Quantity:
                 self.assert_equal_quantities(res2.__getattribute__(k), v)
             else:
-                print(type(v))
                 for (q1, q2) in zip(res2.__getattribute__(k), v):
                     self.assert_equal_quantities(q1, q2)
 
