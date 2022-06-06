@@ -76,8 +76,8 @@ class Result:
         pass
 
     def save(self, folder: Path) -> None:
-        for item in os.listdir(folder):
-            shutil.rmtree(folder / item)
+        shutil.rmtree(folder)
+        folder.mkdir()
         for (name, quantity) in self.__dict__.items():
             if type(quantity) == pq.Quantity:
                 saveQuantity(filenameBase(folder, name), quantity)
