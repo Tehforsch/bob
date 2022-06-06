@@ -2,7 +2,6 @@ import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
-from typing import List
 
 from bob.snapshot import Snapshot
 from bob.postprocessingFunctions import addToList

@@ -8,63 +8,50 @@ import matplotlib.gridspec as gridspec
 import matplotlib.ticker
 
 from astropy.cosmology import z_at_value
+import astropy.units as pq
 
 from bob.simulation import Simulation
 from bob.postprocessingFunctions import MultiSetFn, addToList
 from bob.result import Result
 from bob.multiSet import MultiSet
+from bob.util import getArrayQuantity
 
 
-class IonizationData:
+class IonizationData(Result):
     def __init__(self) -> None:
-        self.data: List[List[float]] = []
+        self.scale_factor: List[pq.Quantity] = []
+        self.volumeAv: List[pq.Quantity] = []
+        self.massAv: List[pq.Quantity] = []
+        self.redshift: List[pq.Quantity] = []
 
-    def setNeutralFractions(self) -> None:
-        self.neutralVolumeAv = 1.0 - self.volumeAv
-        self.neutralMassAv = 1.0 - self.massAv
-
-    def fromSims(self, sims: List[Simulation]) -> "IonizationData":
+    def addSims(self, sims: List[Simulation]) -> "IonizationData":
         for sim in sims:
+            # "Time" is just the scale factor here. To make sure that this is true, check that ComovingIntegrationOn is 1
             assert sim.params.get("ComovingIntegrationOn") == 1
             cosmology = sim.getCosmology()
-            # "Time" is just the scale factor here. To make sure that this is true, check that ComovingIntegrationOn is 1
             regex = re.compile("Time ([0-9.+]+): Volume Av. H ionization: ([0-9.+]+), Mass Av. H ionization: ([0-9.+]+)")
             for line in sim.log:
                 match = regex.match(line)
                 if match is not None:
                     self.data.append([float(x) for x in match.groups()])
 
-        self.scale_factor = np.array([d[0] for d in self.data])
-        self.volumeAv = np.array([d[1] for d in self.data])
-        self.massAv = np.array([d[2] for d in self.data])
-        self.redshift = np.array([z_at_value(cosmology.scale_factor, sf) for sf in self.scale_factor])
+        self.scale_factor.append(pq.dimensionless * np.array([d[0] for d in self.data]))
+        self.volumeAv.append((1.0 - np.array([d[1] for d in self.data])) * pq.dimensionless)
+        self.massAv.append((1.0 - np.array([d[2] for d in self.data])) * pq.dimensionless)
+        self.redshift.append(getArrayQuantity([z_at_value(cosmology.scale_factor, sf) for sf in self.scale_factor]))
         self.setNeutralFractions()
         return self
-
-    def fromArray(self, arr: np.ndarray) -> "IonizationData":
-        self.scale_factor = arr[0, :]
-        self.redshift = arr[1, :]
-        self.volumeAv = arr[2, :]
-        self.massAv = arr[3, :]
-        self.setNeutralFractions()
-        return self
-
-    def toArray(self) -> np.ndarray:
-        result = np.zeros((4, self.scale_factor.shape[0]))
-        result[0, :] = self.scale_factor
-        result[1, :] = self.redshift
-        result[2, :] = self.volumeAv
-        result[3, :] = self.massAv
-        return result
 
 
 class Ionization(MultiSetFn):
     def post(self, args: argparse.Namespace, simSets: MultiSet) -> Result:
         self.labels = simSets.labels
-        return Result([IonizationData().fromSims(sims).toArray() for sims in simSets])
+        result = IonizationData()
+        for sims in simSets:
+            result.addSims(sims)
+        return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        ionizationDataList = [IonizationData().fromArray(arr) for arr in result.arrs]
         plt.style.use("classic")
         colors = ["b", "r", "g", "purple", "brown", "orange"]
         linAx, logAx = setupIonizationPlot()
@@ -72,9 +59,11 @@ class Ionization(MultiSetFn):
         self.addConstraintsToAxis(linAx)
         self.addConstraintsToAxis(logAx)
 
-        for (ionizationData, color) in zip(ionizationDataList, itertools.cycle(colors)):
-            self.plotResultsToAxis(ionizationData, linAx, color)
-            self.plotResultsToAxis(ionizationData, logAx, color)
+        for (redshift, neutralVolumeAv, neutralMassAv, color) in zip(
+            result.redshifts, result.neutralVolumeAvs, result.neutralMassAvs, itertools.cycle(colors)
+        ):
+            self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, linAx, color)
+            self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, logAx, color)
         # add legend labels
         for (label, color) in zip(self.labels, colors):
             linAx.plot([], [], color=color, label=label, linewidth=3)
@@ -82,9 +71,9 @@ class Ionization(MultiSetFn):
         linAx.plot([], [], label="Mass av.", linestyle="--", linewidth=3, color="black")
         plt.legend(loc=(0, -0.2))
 
-    def plotResultsToAxis(self, data: IonizationData, ax: plt.axes, color: str) -> None:
-        ax.plot(data.redshift, data.neutralVolumeAv, linewidth=3, color=color, linestyle="-")
-        ax.plot(data.redshift, data.neutralMassAv, linewidth=3, color=color, linestyle="--")
+    def plotResultsToAxis(self, redshift: pq.Quantity, neutralVolumeAv: pq.Quantity, neutralMassAv: pq.Quantity, ax: plt.axes, color: str) -> None:
+        ax.plot(redshift, neutralVolumeAv, linewidth=3, color=color, linestyle="-")
+        ax.plot(redshift, neutralMassAv, linewidth=3, color=color, linestyle="--")
 
     def addConstraintsToAxis(self, ax: plt.axes) -> None:
         fan06 = np.reshape(

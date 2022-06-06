@@ -21,6 +21,7 @@ def getArrayQuantity(quantities: List[pq.Quantity]) -> pq.Quantity:
             raise ValueError("Different units in quantity array")
     return np.array([(y / unit).decompose().value for y in quantities]) * unit
 
+
 class Test(unittest.TestCase):
     def test_get_array_quantity(self) -> None:
         a = [1.0 * pq.m, 1.0 * pq.cm]
@@ -32,7 +33,7 @@ class Test(unittest.TestCase):
         # try:
         a = [1.0 * pq.m, 1.0 * pq.J]
         try:
-            result = getArrayQuantity(a)
+            getArrayQuantity(a)
             assert False
         except ValueError:
             pass
