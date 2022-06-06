@@ -3,7 +3,7 @@ import argparse
 import matplotlib.pyplot as plt
 
 from abc import ABC, abstractmethod
-from typing import Any, List
+from typing import Any, List, Dict
 from bob.simulation import Simulation
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
@@ -15,13 +15,19 @@ class PostprocessingFunction(ABC):
     name = ""
 
     def init(self, args: argparse.Namespace) -> None:
-        pass
+        self.style: Dict[str, Any] = {}
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         pass
 
     def getName(self, args: argparse.Namespace) -> str:
         return self.name
+
+    def getStyleDefaults(self) -> Dict[str, Any]:
+        return {}
+
+    def setStyle(self, style: Dict[str, Any]) -> None:
+        self.style = style
 
 
 class SnapFn(PostprocessingFunction):

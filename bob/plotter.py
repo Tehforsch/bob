@@ -1,10 +1,11 @@
 import os
 import pickle
-from typing import Iterator, List, Optional, Callable
+from typing import Iterator, List, Optional, Callable, Dict, Any
 from pathlib import Path
 import argparse
 import matplotlib.pyplot as plt
 import logging
+import yaml
 
 from bob.postprocessingFunctions import (
     SetFn,
@@ -36,6 +37,13 @@ def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
         return snap.number.value == arg_num
     except ValueError:
         raise ValueError("WRONG type of snapshot argument. Need an integer")
+
+
+def readStyle(args: argparse.Namespace) -> Dict[str, Any]:
+    if args.style is None:
+        return {}
+    else:
+        return yaml.load(args.style.open("r"), Loader=yaml.SafeLoader)
 
 
 class Plotter:
@@ -92,6 +100,10 @@ class Plotter:
         result = post()
         self.save(fn, name, result)
         if not args.post:
+            style = fn.getStyleDefaults()
+            style.update(readStyle(args))
+            print(style)
+            fn.setStyle(style)
             plot(plt, result)
             self.saveAndShow(name)
 
