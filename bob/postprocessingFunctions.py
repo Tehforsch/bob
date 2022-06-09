@@ -1,5 +1,6 @@
 import argparse
 
+import astropy.units as pq
 import matplotlib.pyplot as plt
 
 from abc import ABC, abstractmethod
@@ -9,13 +10,14 @@ from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
 from bob.result import Result
 from bob.multiSet import MultiSet
+from bob.style import Style
 
 
 class PostprocessingFunction(ABC):
     name = ""
 
     def init(self, args: argparse.Namespace) -> None:
-        self.style: Dict[str, Any] = {}
+        self.style: Style = Style({})
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         pass
@@ -23,11 +25,21 @@ class PostprocessingFunction(ABC):
     def getName(self, args: argparse.Namespace) -> str:
         return self.name
 
-    def getStyleDefaults(self) -> Dict[str, Any]:
-        return {}
-
-    def setStyle(self, style: Dict[str, Any]) -> None:
+    def setStyle(self, style: Style) -> None:
         self.style = style
+
+    def setupLinePlot(self) -> None:
+        plt.xlabel(self.style["xLabel"])
+        plt.ylabel(self.style["yLabel"])
+        if "xLim" in self.style:
+            plt.xlim(*self.style["xLim"])
+        if "yLim" in self.style:
+            plt.ylim(*self.style["yLim"])
+
+    def addLine(self, xQuantity: pq.Quantity, yQuantity: pq.Quantity, *args: List[Any], **kwargs: Dict[str, Any]) -> None:
+        xUnit = pq.Unit(self.style["xUnit"])
+        yUnit = pq.Unit(self.style["yUnit"])
+        plt.plot(xQuantity.to(xUnit).value, yQuantity.to(yUnit).value, *args, **kwargs)
 
 
 class SnapFn(PostprocessingFunction):

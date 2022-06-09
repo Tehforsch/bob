@@ -1,4 +1,3 @@
-from typing import Dict, Any
 import argparse
 import matplotlib.pyplot as plt
 import astropy.units as pq
@@ -23,17 +22,13 @@ class LuminosityOverTime(MultiSetFn):
             result.data.append(subresult)
         return result
 
-    def getStyleDefaults(self) -> Dict[str, Any]:
-        return {
-            "xLabel": "t",
-            "yLabel": "L",
-        }
-
     def plot(self, plt: plt.axes, result: Result) -> None:
-        plt.xlabel(self.style["xLabel"])
-        plt.ylabel(self.style["yLabel"])
+        self.style.setDefault("xLabel", "t")
+        self.style.setDefault("yLabel", "L")
+        self.style.setDefault("xUnit", "Gyr")
+        self.style.setDefault("yUnit", "1 / s")
         for subresult in result.data:
-            plt.plot(subresult.time.to(pq.Gyr) / pq.Gyr, subresult.luminosity.to(1.0 / pq.s) * pq.s)
+            self.addLine(subresult.time, subresult.luminosity)
         plt.legend()
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:

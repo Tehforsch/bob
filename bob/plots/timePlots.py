@@ -51,12 +51,6 @@ class TimePlot(MultiSetFn):
     def ylabel(self) -> str:
         pass
 
-    def getStyleDefaults(self) -> Dict[str, Any]:
-        return {
-            "xLabel": self.xlabel(),
-            "yLabel": self.ylabel(),
-        }
-
     def post(self, args: argparse.Namespace, simSets: MultiSet) -> Result:
         self.labels = simSets.labels
         self.time = args.time

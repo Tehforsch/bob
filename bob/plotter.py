@@ -1,6 +1,6 @@
 import os
 import pickle
-from typing import Iterator, List, Optional, Callable, Dict, Any
+from typing import Iterator, List, Optional, Callable
 from pathlib import Path
 import argparse
 import matplotlib.pyplot as plt
@@ -21,6 +21,7 @@ from bob.result import Result
 from bob.postprocessingFunctions import PostprocessingFunction
 from bob.multiSet import MultiSet
 from bob.pool import runInPool
+from bob.style import Style
 
 
 def walkfiles(path: Path) -> Iterator[Path]:
@@ -39,11 +40,11 @@ def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
         raise ValueError("WRONG type of snapshot argument. Need an integer")
 
 
-def readStyle(args: argparse.Namespace) -> Dict[str, Any]:
+def readStyle(args: argparse.Namespace) -> Style:
     if args.style is None:
-        return {}
+        return Style({})
     else:
-        return yaml.load(args.style.open("r"), Loader=yaml.SafeLoader)
+        return Style(yaml.load(args.style.open("r"), Loader=yaml.SafeLoader))
 
 
 class Plotter:
@@ -100,9 +101,7 @@ class Plotter:
         result = post()
         self.save(fn, name, result)
         if not args.post:
-            style = fn.getStyleDefaults()
-            style.update(readStyle(args))
-            fn.setStyle(style)
+            fn.setStyle(readStyle(args))
             plot(plt, result)
             self.saveAndShow(name)
 
