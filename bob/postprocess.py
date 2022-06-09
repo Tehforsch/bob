@@ -23,6 +23,7 @@ import bob.plots.temperatureDensityHistogram
 import bob.plots.temperatureIonizationHistogram
 import bob.plots.temperatureOverTime
 import bob.plots.meanFieldOverTime
+import bob.plots.luminosityOverTime
 
 
 from bob.postprocessingFunctions import (

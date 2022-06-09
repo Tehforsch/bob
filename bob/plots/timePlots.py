@@ -5,7 +5,6 @@ import argparse
 import matplotlib.pyplot as plt
 import astropy.units as pq
 
-import bob.config as config
 from bob.snapshot import Snapshot
 from bob.postprocessingFunctions import MultiSetFn
 from bob.result import Result
@@ -29,7 +28,7 @@ def getTimeQuantityFromTimeOrScaleFactor(quantity: str, sim: Simulation, snap: S
         return sim.getRedshift(time_or_scale_factor)
     elif quantity == "t":
         if sim.params["ComovingIntegrationOn"]:
-            return sim.getLookbackTime(time_or_scale_factor) / config.defaultTimeUnit
+            return sim.getLookbackTime(time_or_scale_factor)
         else:
             return time_or_scale_factor * snap.timeUnit
     else:

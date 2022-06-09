@@ -102,7 +102,6 @@ class Plotter:
         if not args.post:
             style = fn.getStyleDefaults()
             style.update(readStyle(args))
-            print(style)
             fn.setStyle(style)
             plot(plt, result)
             self.saveAndShow(name)
