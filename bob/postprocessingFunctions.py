@@ -29,12 +29,15 @@ class PostprocessingFunction(ABC):
         self.style = style
 
     def setupLinePlot(self) -> None:
-        plt.xlabel(self.style["xLabel"])
-        plt.ylabel(self.style["yLabel"])
+        self.setupLabels()
         if "xLim" in self.style:
             plt.xlim(*self.style["xLim"])
         if "yLim" in self.style:
             plt.ylim(*self.style["yLim"])
+
+    def setupLabels(self) -> None:
+        plt.xlabel(self.style["xLabel"])
+        plt.ylabel(self.style["yLabel"])
 
     def addLine(self, xQuantity: pq.Quantity, yQuantity: pq.Quantity, *args: Any, **kwargs: Any) -> None:
         xUnit = pq.Unit(self.style["xUnit"])

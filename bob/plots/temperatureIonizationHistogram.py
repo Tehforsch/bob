@@ -25,8 +25,11 @@ class TemperatureIonizationHistogram(SnapFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         fig = plt.figure()
         ax = fig.add_subplot(2, 1, 1)
-        plt.xlabel("$x_{\mathrm{H}}$")
-        plt.ylabel("T [K]")
+        self.style.setDefault("xUnit", pq.dimensionless_unscaled)
+        self.style.setDefault("yUnit", pq.K)
+        self.style.setDefault("xLabel", "$x_{\\mathrm{H}} [UNIT]$")
+        self.style.setDefault("yLabel", "T [UNIT]")
+        self.setupLabels()
         ax.set_xscale("log")
         ax.set_yscale("log")
         minX = 1e-10

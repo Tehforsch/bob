@@ -37,8 +37,11 @@ class TemperatureDensityHistogram(SnapFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         fig = plt.figure()
         ax = fig.add_subplot(2, 1, 1)
-        plt.xlabel("$\\rho [\mathrm{g} / \mathrm{cm}^3]$")
-        plt.ylabel("T [K]")
+        self.style.setDefault("xUnit", "g / cm^3")
+        self.style.setDefault("yUnit", "K")
+        self.style.setDefault("xLabel", "$\\rho [UNIT]$")
+        self.style.setDefault("yLabel", "T [UNIT]")
+        self.setupLabels()
         ax.set_xscale("log")
         ax.set_yscale("log")
         minX = 1e-31

@@ -72,6 +72,10 @@ class BasicField(Field):
             unit = snapshot.energyUnit
         elif self.name == "Masses":
             unit = snapshot.massUnit
+        elif self.name == "ChemicalAbundances":
+            unit = 1
+        elif self.name == "ElectronAbundance":
+            unit = 1
         else:
             raise ValueError("Fix units here")
         fieldData = readIntoNumpyArray(snapshot.hdf5File["PartType0"][self.name]) * unit

@@ -8,24 +8,23 @@ import astropy.units as pq
 
 class Temperature(Field):
     def getData(self, snapshot: Snapshot) -> np.ndarray:
-        densityUnit = snapshot.massUnit / (snapshot.lengthUnit**3)
-        numberDensityUnit = 1 / (snapshot.lengthUnit**3)
         density = BasicField("Density").getData(snapshot)
-        try:
+        if snapshot.hasField("ChemicalAbundances"):
             x0He = 0.1
-            yn = density * densityUnit / ((1.0 + 4.0 * x0He) * protonMass)
-            en = BasicField("InternalEnergy").getData(snapshot) * density * numberDensityUnit * snapshot.energyUnit
+            yn = density / ((1.0 + 4.0 * x0He) * protonMass)
+            en = BasicField("InternalEnergy").getData(snapshot) * density
             xH2 = BasicField("ChemicalAbundances", 0).getData(snapshot)
             xHP = BasicField("ChemicalAbundances", 1).getData(snapshot)
             yntot = (1.0 + x0He - xH2 + xHP) * yn
             mu = 1.0 / yntot
-        except:
+        else:
             print("TNG style snapshot, using ElectronAbundance")
-            en = BasicField("InternalEnergy").getData(snapshot) * snapshot.velocityUnit**2
+            en = BasicField("InternalEnergy").getData(snapshot)
             xe = BasicField("ElectronAbundance").getData(snapshot)
             xH = 0.76
             mu = 4.0 / (1 + 3 * xH + 4 * xH * xe) * protonMass
         temperature = ((gamma - 1.0) * en * mu / kB).decompose()
+        assert temperature.unit == pq.K
         return temperature
 
     @property

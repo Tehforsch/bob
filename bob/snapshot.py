@@ -34,6 +34,9 @@ class Snapshot:
     def hdf5File(self) -> h5py.File:
         return h5py.File(self.filename, "r")
 
+    def hasField(self, field: str) -> bool:
+        return field in self.hdf5File["PartType0"]
+
     def getName(self) -> str:
         match = re.match("snap_(.*).hdf5", self.filename.name)
         if match is None:
