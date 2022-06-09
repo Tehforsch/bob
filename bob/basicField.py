@@ -59,7 +59,7 @@ class BasicField(Field):
         if self.name == "Density":
             return pq.g / pq.cm**3
         if self.name == "InternalEnergy":
-            return pq.cm**2 * pq.g / (pq.s**2)
+            return pq.cm**2 / pq.s**2
         else:
             return 1
 
