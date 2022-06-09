@@ -4,7 +4,7 @@ import astropy.units as pq
 import matplotlib.pyplot as plt
 
 from abc import ABC, abstractmethod
-from typing import Any, List, Dict
+from typing import Any, List
 from bob.simulation import Simulation
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
@@ -36,7 +36,7 @@ class PostprocessingFunction(ABC):
         if "yLim" in self.style:
             plt.ylim(*self.style["yLim"])
 
-    def addLine(self, xQuantity: pq.Quantity, yQuantity: pq.Quantity, *args: List[Any], **kwargs: Dict[str, Any]) -> None:
+    def addLine(self, xQuantity: pq.Quantity, yQuantity: pq.Quantity, *args: Any, **kwargs: Any) -> None:
         xUnit = pq.Unit(self.style["xUnit"])
         yUnit = pq.Unit(self.style["yUnit"])
         plt.plot(xQuantity.to(xUnit).value, yQuantity.to(yUnit).value, *args, **kwargs)

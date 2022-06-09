@@ -36,7 +36,7 @@ class MeanFieldOverTime(TimePlot):
         return np.mean(data * masses) / np.mean(masses)
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        print(result)
+        self.style.setDefault("yUnit", self.field.unit)
         super().plot(plt, result)
 
 

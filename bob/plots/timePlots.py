@@ -59,10 +59,12 @@ class TimePlot(MultiSetFn):
         return results
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        plt.xlabel(self.style["xLabel"])
-        plt.ylabel(self.style["yLabel"])
+        self.style.setDefault("xUnit", "Myr")
+        self.style.setDefault("xLabel", format(f"{self.xlabel()} [UNIT]"))
+        self.style.setDefault("yLabel", format(f"{self.ylabel()} [UNIT]"))
+        self.setupLinePlot()
         for (style, label, result) in zip(self.styles, self.labels, result.data):
-            plt.plot(result.times, result.values, label=label)
+            self.addLine(result.times, result.values, label=label)
         plt.legend()
 
     def getQuantityOverTime(self, args: argparse.Namespace, simSet: SimulationSet) -> Result:
