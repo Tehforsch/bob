@@ -44,6 +44,11 @@ class PostprocessingFunction(ABC):
         yUnit = pq.Unit(self.style["yUnit"])
         plt.plot(xQuantity.to(xUnit).value, yQuantity.to(yUnit).value, *args, **kwargs)
 
+    def histogram(self, xQuantity: pq.Quantity, yQuantity: pq.Quantity, *args: Any, **kwargs: Any) -> None:
+        xUnit = pq.Unit(self.style["xUnit"])
+        yUnit = pq.Unit(self.style["yUnit"])
+        plt.hist2d(xQuantity.to(xUnit).value, yQuantity.to(yUnit).value, *args, **kwargs)
+
 
 class SnapFn(PostprocessingFunction):
     @abstractmethod

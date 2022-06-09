@@ -69,13 +69,13 @@ class BasicField(Field):
         elif self.name == "Coordinates":
             unit = snapshot.lengthUnit
         elif self.name == "InternalEnergy":
-            unit = snapshot.energyUnit
+            unit = snapshot.velocityUnit**2  # This isnt even a energy but it says so in the documentation.
         elif self.name == "Masses":
             unit = snapshot.massUnit
         elif self.name == "ChemicalAbundances":
-            unit = 1
+            unit = pq.dimensionless_unscaled
         elif self.name == "ElectronAbundance":
-            unit = 1
+            unit = pq.dimensionless_unscaled
         else:
             raise ValueError("Fix units here")
         fieldData = readIntoNumpyArray(snapshot.hdf5File["PartType0"][self.name]) * unit
