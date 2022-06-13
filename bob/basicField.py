@@ -76,6 +76,8 @@ class BasicField(Field):
             unit = pq.dimensionless_unscaled
         elif self.name == "ElectronAbundance":
             unit = pq.dimensionless_unscaled
+        elif self.name == "IonizationTime":
+            unit = snapshot.timeUnit
         else:
             raise ValueError("Fix units here")
         fieldData = readIntoNumpyArray(snapshot.hdf5File["PartType0"][self.name]) * unit
