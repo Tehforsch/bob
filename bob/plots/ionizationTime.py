@@ -45,7 +45,7 @@ class IonizationTime(SetFn):
         snapshots = [(sim, snap) for sim in simSet for snap in sim.snapshots]
         (sim, snap) = max(snapshots, key=lambda simSnap: getTimeQuantityForSnap(self.quantity, simSnap[0], simSnap[1]))
         ionizationTime = BasicField("IonizationTime").getData(snap)
-        ionizationTime = getArrayQuantity([getTimeQuantityFromTimeOrScaleFactor(self.quantity, sim, snap, x) for x in ionizationTime])
+        ionizationTime = getTimeQuantityFromTimeOrScaleFactor(self.quantity, sim, snap, ionizationTime)
         center = snap.center
         ortho1, ortho2 = findOrthogonalAxes(axis)
         min1 = np.dot(ortho1, snap.minExtent)
