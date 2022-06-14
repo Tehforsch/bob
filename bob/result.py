@@ -74,11 +74,11 @@ class Result:
         pass
 
     def delete_old_files(self, folder: Path) -> None:
-        files = (folder / f for f in os.listdir(folder)) 
+        files = (folder / f for f in os.listdir(folder))
         toRemove = (f for f in files if f.is_dir() or f.stem in [numpyFileEnding, unitFileEnding])
         for f in toRemove:
             shutil.rmtree(f)
-            
+
     def save(self, folder: Path) -> None:
         self.delete_old_files(folder)
         folder.mkdir(exist_ok=True)

@@ -12,7 +12,6 @@ from bob.plots.bobSlice import findOrthogonalAxes
 import bob.config as config
 from bob.result import Result
 from bob.postprocessingFunctions import SetFn, addToList
-from bob.util import getArrayQuantity
 from bob.plots.timePlots import addTimeArg, getTimeQuantityForSnap, getTimeQuantityFromTimeOrScaleFactor
 
 
