@@ -41,10 +41,15 @@ class IonizationTime(SetFn):
         n1 = config.dpi * 3
         n2 = config.dpi * 3
         data = np.zeros((n1, n2))
-        snapshots = [(sim, snap) for sim in simSet for snap in sim.snapshots]
-        (sim, snap) = max(snapshots, key=lambda simSnap: getTimeQuantityForSnap(self.quantity, simSnap[0], simSnap[1]))
-        ionizationTime = BasicField("IonizationTime").getData(snap)
-        ionizationTime = getTimeQuantityFromTimeOrScaleFactor(self.quantity, sim, snap, ionizationTime / snap.timeUnit)
+        ionizationTime = None
+        for sim in simSet:
+            snap = max(sim.snapshots, key=lambda snap: getTimeQuantityForSnap(self.quantity, sim, snap))
+            newIonizationTime = BasicField("IonizationTime").getData(snap)
+            newIonizationTime = getTimeQuantityFromTimeOrScaleFactor(self.quantity, sim, snap, ionizationTime / snap.timeUnit)
+            if ionizationTime is None:
+                ionizationTime = newIonizationTime
+            else:
+                ionizationTime = np.min(ionizationTime, newIonizationTime)
         center = snap.center
         ortho1, ortho2 = findOrthogonalAxes(axis)
         min1 = np.dot(ortho1, snap.minExtent)
@@ -56,8 +61,11 @@ class IonizationTime(SetFn):
         tree = cKDTree(snap.coordinates)
         cellIndices = tree.query(coordinates)[1]
         cellIndices = cellIndices.reshape((n1, n2))
-        data = ionizationTime[cellIndices]
-        return (min1, min2, max1, max2), data
+        if ionizationTime is not None:
+            data = ionizationTime[cellIndices]
+            return (min1, min2, max1, max2), data
+        else:
+            raise ValueError("No sims/snaps")
 
 
 addToList("ionizationTime", IonizationTime())
