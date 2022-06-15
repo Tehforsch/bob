@@ -21,8 +21,8 @@ class IonizationTime(SetFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        self.style.setDefault("xLabel", "$x [h^{-1} \mathrm{Gpc}]$")
-        self.style.setDefault("yLabel", "$y [h^{-1} \mathrm{Gpc}]$")
+        self.style.setDefault("xLabel", "$x [h^{-1} \mathrm{Mpc}]$")
+        self.style.setDefault("yLabel", "$y [h^{-1} \mathrm{Mpc}]$")
         self.style.setDefault("cLabel", "$t [\mathrm{Myr}]$")
         self.style.setDefault("xUnit", pq.Gpc)
         self.style.setDefault("yUnit", pq.Gpc)
@@ -30,9 +30,8 @@ class IonizationTime(SetFn):
         self.style.setDefault("vLim", (0.0, 2e2))
         self.setupLabels()
 
-        extent = (self.min1, self.max1, self.min2, self.max2)
         vmin, vmax = self.style["vLim"]
-        self.image(result.data, extent=extent, cmap="Reds", vmin=vmin, vmax=vmax)
+        self.image(result.data, self.extent, cmap="Reds", vmin=vmin, vmax=vmax)
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         super().setArgs(subparser)
@@ -45,7 +44,7 @@ class IonizationTime(SetFn):
                 print("No snapshots in sim? Continuing.")
                 continue
             snap = max(sim.snapshots, key=lambda snap: getTimeQuantityForSnap(self.quantity, sim, snap))
-            ((self.min1, self.max1, self.min2, self.max2), newIonizationTime) = getSlice(BasicField("IonizationTime"), snap, "z")
+            (self.extent, newIonizationTime) = getSlice(BasicField("IonizationTime"), snap, "z")
             newIonizationTime = getTimeQuantityFromTimeOrScaleFactor(self.quantity, sim, snap, newIonizationTime / snap.timeUnit)
             if ionizationTime is None:
                 ionizationTime = newIonizationTime

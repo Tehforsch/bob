@@ -45,7 +45,7 @@ class VoronoiSlice(SnapFn):
         self.axis = args.axis
         field = getFieldByName(args.field)
         result = Result()
-        ((self.min1, self.max1, self.min2, self.max2), result.data) = getSlice(field, snap, args.axis)
+        (self.extent, result.data) = getSlice(field, snap, args.axis)
         print(f"Field: {field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
         return result
 
@@ -59,9 +59,8 @@ class VoronoiSlice(SnapFn):
         self.style.setDefault("vUnit", pq.dimensionless_unscaled)
         self.style.setDefault("vLim", (1e-6, 1e0))
         self.setupLabels()
-        extent = (self.min1, self.max1, self.min2, self.max2)
         vmin, vmax = self.style["vLim"]
-        self.image(result.data, norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=extent, origin="lower", cmap="Reds")
+        self.image(result.data, self.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         super().setArgs(subparser)
