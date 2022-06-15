@@ -21,13 +21,14 @@ class IonizationTime(SetFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        self.style.setDefault("xLabel", "$x [h^{-1} \mathrm{Mpc}]$")
-        self.style.setDefault("yLabel", "$y [h^{-1} \mathrm{Mpc}]$")
+        self.style.setDefault("xLabel", "$x [h^{-1} \mathrm{Gpc}]$")
+        self.style.setDefault("yLabel", "$y [h^{-1} \mathrm{Gpc}]$")
         self.style.setDefault("cLabel", "$t [\mathrm{Myr}]$")
-        self.style.setDefault("xUnit", pq.Mpc)
-        self.style.setDefault("yUnit", pq.Mpc)
+        self.style.setDefault("xUnit", pq.Gpc)
+        self.style.setDefault("yUnit", pq.Gpc)
         self.style.setDefault("vUnit", pq.Myr)
-        self.style.setDefault("vLim", (0.0, 1e3))
+        self.style.setDefault("vLim", (0.0, 2e2))
+        self.setupLabels()
 
         extent = (self.min1, self.max1, self.min2, self.max2)
         vmin, vmax = self.style["vLim"]
