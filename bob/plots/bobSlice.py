@@ -22,6 +22,7 @@ def getDataAtPoints(field: Field, snapshot: Snapshot, points: np.ndarray) -> np.
     data = field.getData(snapshot)
     return data[cellIndices]
 
+
 class VoronoiSlice(SnapFn):
     def getSlice(self, field: Field, snapshot: Snapshot, axisName: str) -> pq.Quantity:
         axis = getAxisByName(axisName)
@@ -49,12 +50,16 @@ class VoronoiSlice(SnapFn):
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         xAxis, yAxis = getOtherAxes(self.axis)
-        plt.xlabel(xAxis)
-        plt.ylabel(yAxis)
+        self.style.setDefault("xLabel", f"${xAxis} [UNIT]$")
+        self.style.setDefault("yLabel", f"${yAxis} [UNIT]$")
+        self.style.setDefault("xUnit", pq.Mpc)
+        self.style.setDefault("yUnit", pq.Mpc)
+        self.style.setDefault("vUnit", pq.dimensionless_unscaled)
+        self.style.setDefault("vLim", (1e-6, 1e0))
+        self.setupLabels()
         extent = (self.min1, self.max1, self.min2, self.max2)
-        vmin = 1.0e2
-        vmax = 1.0e5
-        plt.imshow(result.data, norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=extent, origin="lower", cmap="Reds")
+        vmin, vmax = self.style["vLim"]
+        self.image(result.data, norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=extent, origin="lower", cmap="Reds")
         plt.colorbar()
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
@@ -78,13 +83,17 @@ def getAxisName(axis: np.ndarray) -> str:
     mostParallel = np.argmax(dotProducts)
     return ["x", "y", "z"][mostParallel]
 
-def getOtherAxes(axis: str) -> str:
+
+def getOtherAxes(axis: str) -> Tuple[str, str]:
     if axis == "x":
         return "y", "z"
     elif axis == "y":
         return "x", "z"
     elif axis == "z":
         return "x", "y"
+    else:
+        raise ValueError(f"Invalid axis: {axis}")
+
 
 def findOrthogonalAxes(axis: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     xAxis = np.array([1.0, 0.0, 0.0])

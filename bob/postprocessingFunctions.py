@@ -49,6 +49,10 @@ class PostprocessingFunction(ABC):
         yUnit = pq.Unit(self.style["yUnit"])
         plt.hist2d(xQuantity.to(xUnit).value, yQuantity.to(yUnit).value, *args, **kwargs)
 
+    def image(self, image: pq.Quantity, *args: Any, **kwargs: Any) -> None:
+        vUnit = pq.Unit(self.style["vUnit"])
+        plt.imshow(image.to(vUnit).value, *args, **kwargs)
+
 
 class SnapFn(PostprocessingFunction):
     @abstractmethod

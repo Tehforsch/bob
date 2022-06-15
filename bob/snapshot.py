@@ -45,7 +45,7 @@ class Snapshot:
             return match.groups()[0]
 
     @property  # type: ignore
-    def coordinates(self) -> np.ndarray:
+    def coordinates(self) -> pq.Quantity:
         return BasicField("Coordinates").getData(self)
 
     def __repr__(self) -> str:
