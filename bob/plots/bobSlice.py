@@ -52,6 +52,7 @@ class VoronoiSlice(SnapFn):
         xAxis, yAxis = getOtherAxes(self.axis)
         self.style.setDefault("xLabel", f"${xAxis} [UNIT]$")
         self.style.setDefault("yLabel", f"${yAxis} [UNIT]$")
+        self.style.setDefault("cLabel", "")
         self.style.setDefault("xUnit", pq.Mpc)
         self.style.setDefault("yUnit", pq.Mpc)
         self.style.setDefault("vUnit", pq.dimensionless_unscaled)
@@ -60,7 +61,6 @@ class VoronoiSlice(SnapFn):
         extent = (self.min1, self.max1, self.min2, self.max2)
         vmin, vmax = self.style["vLim"]
         self.image(result.data, norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=extent, origin="lower", cmap="Reds")
-        plt.colorbar()
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         super().setArgs(subparser)

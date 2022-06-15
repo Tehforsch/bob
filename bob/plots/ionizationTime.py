@@ -24,13 +24,17 @@ class IonizationTime(SetFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        plt.xlabel("$x [h^{-1} \mathrm{Mpc}]$")
-        plt.ylabel("$y [h^{-1} \mathrm{Mpc}]$")
+        self.style.setDefault("xLabel", "$x [h^{-1} \mathrm{Mpc}]$")
+        self.style.setDefault("yLabel", "$y [h^{-1} \mathrm{Mpc}]$")
+        self.style.setDefault("cLabel", "$t [\mathrm{Myr}]$")
+        self.style.setDefault("xUnit", pq.Mpc)
+        self.style.setDefault("yUnit", pq.Mpc)
+        self.style.setDefault("vUnit", pq.Myr)
+        self.style.setDefault("vLim", (0.0, 1e3))
 
         extent = (self.min1, self.max1, self.min2, self.max2)
-        plt.imshow(result.data.to(pq.Myr), extent=extent, cmap="Reds", vmin=0, vmax=1000)
-        cbar = plt.colorbar()
-        cbar.set_label("$z$")
+        vmin, vmax = self.style["vLim"]
+        self.image(result.data, extent=extent, cmap="Reds", vmin=vmin, vmax=vmax)
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         super().setArgs(subparser)

@@ -52,6 +52,8 @@ class PostprocessingFunction(ABC):
     def image(self, image: pq.Quantity, *args: Any, **kwargs: Any) -> None:
         vUnit = pq.Unit(self.style["vUnit"])
         plt.imshow(image.to(vUnit).value, *args, **kwargs)
+        cbar = plt.colorbar()
+        cbar.set_label(self.style["cLabel"])
 
 
 class SnapFn(PostprocessingFunction):
