@@ -58,9 +58,14 @@ class VoronoiSlice(SnapFn):
         self.style.setDefault("yUnit", pq.Mpc)
         self.style.setDefault("vUnit", pq.dimensionless_unscaled)
         self.style.setDefault("vLim", (1e-6, 1e0))
+        self.style.setDefault("log", True)
         self.setupLabels()
         vmin, vmax = self.style["vLim"]
-        self.image(result.data, self.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
+        print(f"min: {np.min(result.data)}, max: {np.max(result.data)}")
+        if self.style["log"]:
+            self.image(result.data, self.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
+        else:
+            self.image(result.data, self.extent, vmin=vmin, vmax=vmax, origin="lower", cmap="Reds")
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         super().setArgs(subparser)
