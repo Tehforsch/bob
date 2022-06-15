@@ -45,6 +45,7 @@ class IonizationTime(SetFn):
                 continue
             snap = max(sim.snapshots, key=lambda snap: getTimeQuantityForSnap(self.quantity, sim, snap))
             (self.extent, newIonizationTime) = getSlice(BasicField("IonizationTime"), snap, "z")
+            print("add snap base time here")
             newIonizationTime = getTimeQuantityFromTimeOrScaleFactor(self.quantity, sim, snap, newIonizationTime / snap.timeUnit)
             if ionizationTime is None:
                 ionizationTime = newIonizationTime

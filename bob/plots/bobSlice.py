@@ -18,7 +18,7 @@ from bob.field import Field
 
 def getDataAtPoints(field: Field, snapshot: Snapshot, points: np.ndarray) -> np.ndarray:
     tree = cKDTree(snapshot.coordinates.to(snapshot.lengthUnit).value)
-    cellIndices = tree.query(points)[1]
+    cellIndices = tree.query(points.to(snapshot.lengthUnit))[1]
     data = field.getData(snapshot)
     return data[cellIndices]
 
@@ -32,8 +32,8 @@ def getSlice(field: Field, snapshot: Snapshot, axisName: str) -> Tuple[Tuple[flo
     min2 = np.dot(ortho2, snapshot.minExtent)
     max1 = np.dot(ortho1, snapshot.maxExtent)
     max2 = np.dot(ortho2, snapshot.maxExtent)
-    n1 = config.dpi * 3
-    n2 = config.dpi * 3
+    n1 = config.dpi * 1
+    n2 = config.dpi * 1
     p1, p2 = np.meshgrid(np.linspace(min1, max1, n1), np.linspace(min2, max2, n2))
     coordinates = axis * (center * axis) + np.outer(p1, ortho1) + np.outer(p2, ortho2)
     data = getDataAtPoints(field, snapshot, coordinates)
