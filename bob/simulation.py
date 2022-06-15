@@ -99,15 +99,19 @@ class Simulation:
         H0 = self.params["HubbleParam"] * 100.0
         return FlatLambdaCDM(H0=H0, Om0=Om0, Ob0=Ob0)
 
-    def getRedshift(self, scale_factor: float) -> float:
+    def getRedshift(self, scale_factor: float, doAssert: bool = True) -> float:
         cosmology = self.getCosmology()
-        assert self.params["ComovingIntegrationOn"]
+        if doAssert:
+            assert self.params["ComovingIntegrationOn"]
         return z_at_value(cosmology.scale_factor, scale_factor)
 
-    def getLookbackTime(self, scale_factor: float) -> float:
+    def getLookbackTime(self, scale_factor: float, doAssert: bool = True) -> float:
         cosmology = self.getCosmology()
-        assert self.params["ComovingIntegrationOn"]
-        return cosmology.lookback_time(self.getRedshift(scale_factor))
+        return cosmology.lookback_time(self.getRedshift(scale_factor, doAssert=doAssert))
+
+    def getAge(self, scale_factor: float, doAssert: bool = True) -> float:
+        cosmology = self.getCosmology()
+        return cosmology.age(self.getRedshift(scale_factor, doAssert=doAssert))
 
     def __hash__(self) -> int:
         return str(self.folder).__hash__()

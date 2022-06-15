@@ -47,6 +47,11 @@ class IonizationTime(SetFn):
             (self.extent, newIonizationTime) = getSlice(BasicField("IonizationTime"), snap, "z")
             print("add snap base time here")
             newIonizationTime = getTimeQuantityFromTimeOrScaleFactor(self.quantity, sim, snap, newIonizationTime / snap.timeUnit)
+            if not sim["ComovingIntegrationOn"]:
+                # this plot only makes sense in cosmological runs, but since ComovingIntegration is not on, we'll assume that
+                # the real time is given by converting the time in the snapshot header (which is the scale factor of the original
+                # tng snap) to age and adding the time delta from the simulation run
+                newIonizationTime += sim.getAge(snap.scale_factor, doAssert=False)
             if ionizationTime is None:
                 ionizationTime = newIonizationTime
             else:
