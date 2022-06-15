@@ -16,7 +16,7 @@ from bob.allFields import allFields, getFieldByName
 from bob.field import Field
 
 
-def getDataAtPoints(field: Field, snapshot: Snapshot, points: np.ndarray) -> np.ndarray:
+def getDataAtPoints(field: Field, snapshot: Snapshot, points: pq.Quantity) -> np.ndarray:
     tree = cKDTree(snapshot.coordinates.to(snapshot.lengthUnit).value)
     cellIndices = tree.query(points.to(snapshot.lengthUnit))[1]
     data = field.getData(snapshot)
