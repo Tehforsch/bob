@@ -5,6 +5,7 @@ import numpy as np
 from typing import Dict, Any, List, Tuple, Union
 import yaml
 from astropy.cosmology import FlatLambdaCDM, z_at_value
+import astropy.units as pq
 
 import bob.config as config
 from bob.snapshot import Snapshot
@@ -83,12 +84,14 @@ class Simulation:
         sliceFiles.sort(key=lambda s: s.path)
         return sliceFiles
 
-    def subboxCoords(self) -> Tuple[np.ndarray, np.ndarray]:
+    def subboxCoords(self) -> Tuple[pq.Quantity, pq.Quantity]:
         with open(Path(self.folder, self.params["SubboxCoordinatesPath"])) as f:
             lines = f.readlines()
             assert len(lines) == 1
             minX, maxX, minY, maxY, minZ, maxZ = [float(x) for x in lines[0].split(" ")]
-            return (np.array([minX, minY, minZ]), np.array([maxX, maxY, maxZ]))
+            raise NotImplementedError("Need to get the length unit of the subbox snapshot here")
+            unit = pq.m
+            return (unit * np.array([minX, minY, minZ]), unit * np.array([maxX, maxY, maxZ]))
 
     def getCosmology(self) -> FlatLambdaCDM:
         Ob0 = self.params["OmegaBaryon"]
