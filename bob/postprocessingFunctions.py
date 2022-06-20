@@ -4,7 +4,7 @@ import astropy.units as pq
 import matplotlib.pyplot as plt
 
 from abc import ABC, abstractmethod
-from typing import Any, List
+from typing import Any, List, Tuple
 from bob.simulation import Simulation
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
@@ -48,6 +48,15 @@ class PostprocessingFunction(ABC):
         xUnit = pq.Unit(self.style["xUnit"])
         yUnit = pq.Unit(self.style["yUnit"])
         plt.hist2d(xQuantity.to(xUnit).value, yQuantity.to(yUnit).value, *args, **kwargs)
+
+    def image(self, image: pq.Quantity, extent: Tuple[pq.Quantity, pq.Quantity, pq.Quantity, pq.Quantity], *args: Any, **kwargs: Any) -> None:
+        xUnit = pq.Unit(self.style["xUnit"])
+        yUnit = pq.Unit(self.style["yUnit"])
+        extent = (extent[0].to_value(xUnit), extent[1].to_value(xUnit), extent[2].to_value(yUnit), extent[3].to_value(yUnit))
+        vUnit = pq.Unit(self.style["vUnit"])
+        plt.imshow(image.to(vUnit).value, extent=extent, *args, **kwargs)
+        cbar = plt.colorbar()
+        cbar.set_label(self.style["cLabel"])
 
 
 class SnapFn(PostprocessingFunction):

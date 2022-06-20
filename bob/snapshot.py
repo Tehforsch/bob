@@ -26,8 +26,8 @@ class Snapshot:
             self.center = (self.maxExtent + self.minExtent) * 0.5
         else:
             self.number = SnapNumber(int(self.name))
-            self.minExtent = np.array([0.0, 0.0, 0.0])
-            self.maxExtent = np.array([1.0, 1.0, 1.0]) * sim.params["BoxSize"]
+            self.minExtent = np.array([0.0, 0.0, 0.0]) * self.lengthUnit
+            self.maxExtent = np.array([1.0, 1.0, 1.0]) * sim.params["BoxSize"] * self.lengthUnit
             self.center = (self.maxExtent + self.minExtent) * 0.5
 
     @property
@@ -45,7 +45,7 @@ class Snapshot:
             return match.groups()[0]
 
     @property  # type: ignore
-    def coordinates(self) -> np.ndarray:
+    def coordinates(self) -> pq.Quantity:
         return BasicField("Coordinates").getData(self)
 
     def __repr__(self) -> str:

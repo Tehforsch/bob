@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 from scipy.spatial import cKDTree
 import numpy as np
+import astropy.units as pq
 
 from bob.simulation import Simulation
 from bob.snapshot import Snapshot
@@ -15,43 +16,56 @@ from bob.allFields import allFields, getFieldByName
 from bob.field import Field
 
 
-def getDataAtPoints(field: Field, snapshot: Snapshot, points: np.ndarray) -> np.ndarray:
-    tree = cKDTree(snapshot.coordinates)
-    cellIndices = tree.query(points)[1]
+def getDataAtPoints(field: Field, snapshot: Snapshot, points: pq.Quantity) -> np.ndarray:
+    tree = cKDTree(snapshot.coordinates.to(snapshot.lengthUnit).value)
+    cellIndices = tree.query(points.to(snapshot.lengthUnit))[1]
     data = field.getData(snapshot)
     return data[cellIndices]
 
 
+def getSlice(field: Field, snapshot: Snapshot, axisName: str) -> Tuple[Tuple[float, float, float, float], pq.Quantity]:
+    axis = getAxisByName(axisName)
+    axis = np.array(axis)
+    center = snapshot.center
+    ortho1, ortho2 = findOrthogonalAxes(axis)
+    min1 = np.dot(ortho1, snapshot.minExtent)
+    min2 = np.dot(ortho2, snapshot.minExtent)
+    max1 = np.dot(ortho1, snapshot.maxExtent)
+    max2 = np.dot(ortho2, snapshot.maxExtent)
+    n1 = config.dpi * 1
+    n2 = config.dpi * 1
+    p1, p2 = np.meshgrid(np.linspace(min1, max1, n1), np.linspace(min2, max2, n2))
+    coordinates = axis * (center * axis) + np.outer(p1, ortho1) + np.outer(p2, ortho2)
+    data = getDataAtPoints(field, snapshot, coordinates)
+    return (min1, max1, min2, max2), data.reshape((n1, n2))
+
+
 class VoronoiSlice(SnapFn):
     def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
-        axis = getAxisByName(args.axis)
+        self.axis = args.axis
         field = getFieldByName(args.field)
-        axis = np.array(axis)
-        center = snap.center
-        self.ortho1, self.ortho2 = findOrthogonalAxes(axis)
-        self.min1 = np.dot(self.ortho1, snap.minExtent)
-        self.min2 = np.dot(self.ortho2, snap.minExtent)
-        self.max1 = np.dot(self.ortho1, snap.maxExtent)
-        self.max2 = np.dot(self.ortho2, snap.maxExtent)
-        n1 = config.dpi * 3
-        n2 = config.dpi * 3
-        p1, p2 = np.meshgrid(np.linspace(self.min1, self.max1, n1), np.linspace(self.min2, self.max2, n2))
-        coordinates = axis * (center * axis) + np.outer(p1, self.ortho1) + np.outer(p2, self.ortho2)
         result = Result()
-        result.data = getDataAtPoints(field, snap, coordinates)
-        result.data = result.data.reshape((n1, n2))
-        print(result.data.shape)
+        (self.extent, result.data) = getSlice(field, snap, args.axis)
         print(f"Field: {field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        plt.xlabel(getAxisName(self.ortho1))
-        plt.ylabel(getAxisName(self.ortho2))
-        extent = (self.min1, self.max1, self.min2, self.max2)
-        vmin = 1.0e2
-        vmax = 1.0e5
-        plt.imshow(result.data, norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=extent, origin="lower", cmap="Reds")
-        plt.colorbar()
+        xAxis, yAxis = getOtherAxes(self.axis)
+        self.style.setDefault("xLabel", f"${xAxis} [UNIT]$")
+        self.style.setDefault("yLabel", f"${yAxis} [UNIT]$")
+        self.style.setDefault("cLabel", "")
+        self.style.setDefault("xUnit", pq.Mpc)
+        self.style.setDefault("yUnit", pq.Mpc)
+        self.style.setDefault("vUnit", pq.dimensionless_unscaled)
+        self.style.setDefault("vLim", (1e-6, 1e0))
+        self.style.setDefault("log", True)
+        self.setupLabels()
+        vmin, vmax = self.style["vLim"]
+        print(f"min: {np.min(result.data)}, max: {np.max(result.data)}")
+        if self.style["log"]:
+            self.image(result.data, self.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
+        else:
+            self.image(result.data, self.extent, vmin=vmin, vmax=vmax, origin="lower", cmap="Reds")
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         super().setArgs(subparser)
@@ -73,6 +87,17 @@ def getAxisName(axis: np.ndarray) -> str:
     dotProducts = [np.abs(np.dot(axis, a)) for a in [xAxis, yAxis, zAxis]]
     mostParallel = np.argmax(dotProducts)
     return ["x", "y", "z"][mostParallel]
+
+
+def getOtherAxes(axis: str) -> Tuple[str, str]:
+    if axis == "x":
+        return "y", "z"
+    elif axis == "y":
+        return "x", "z"
+    elif axis == "z":
+        return "x", "y"
+    else:
+        raise ValueError(f"Invalid axis: {axis}")
 
 
 def findOrthogonalAxes(axis: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
