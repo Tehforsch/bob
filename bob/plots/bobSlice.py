@@ -43,10 +43,10 @@ def getSlice(field: Field, snapshot: Snapshot, axisName: str) -> Tuple[Tuple[flo
 class VoronoiSlice(SnapFn):
     def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
         self.axis = args.axis
-        field = getFieldByName(args.field)
+        self.field = getFieldByName(args.field)
         result = Result()
-        (self.extent, result.data) = getSlice(field, snap, args.axis)
-        print(f"Field: {field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
+        (self.extent, result.data) = getSlice(self.field, snap, args.axis)
+        print(f"Field: {self.field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
@@ -56,7 +56,7 @@ class VoronoiSlice(SnapFn):
         self.style.setDefault("cLabel", "")
         self.style.setDefault("xUnit", pq.Mpc)
         self.style.setDefault("yUnit", pq.Mpc)
-        self.style.setDefault("vUnit", pq.dimensionless_unscaled)
+        self.style.setDefault("vUnit", self.field.unit)
         self.style.setDefault("vLim", (1e-6, 1e0))
         self.style.setDefault("log", True)
         self.setupLabels()
