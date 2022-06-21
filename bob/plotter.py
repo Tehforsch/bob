@@ -40,11 +40,15 @@ def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
         raise ValueError("WRONG type of snapshot argument. Need an integer")
 
 
-def readStyle(args: argparse.Namespace) -> Style:
+def readStyle(args: argparse.Namespace, name: str) -> Style:
     if args.style is None:
         return Style({})
     else:
-        return Style(yaml.load(args.style.open("r"), Loader=yaml.SafeLoader))
+        styleDict = yaml.load(args.style.open("r"), Loader=yaml.SafeLoader)
+        if "multiple" in styleDict and styleDict["multiple"]:
+            return Style(styleDict[name])
+        else:
+            return Style(styleDict)
 
 
 class Plotter:
@@ -101,7 +105,7 @@ class Plotter:
         result = post()
         self.save(fn, name, result)
         if not args.post:
-            fn.setStyle(readStyle(args))
+            fn.setStyle(readStyle(args, fn.name))
             plot(plt, result)
             self.saveAndShow(name)
 
@@ -179,6 +183,6 @@ def runPlot(plotter: Plotter, args: argparse.Namespace, plotName: str) -> None:
         plotFolder = plotter.dataFolder / plotName
         plot = pickle.load(open(plotFolder / bob.config.plotSerializationFileName, "rb"))
         result = Result.readFromFolder(plotFolder)
-        plot.setStyle(readStyle(args))
+        plot.setStyle(readStyle(args, plot.name))
         plot.plot(plt, result)
         plotter.saveAndShow(plotFolder.name)

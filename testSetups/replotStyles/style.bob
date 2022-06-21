@@ -1,0 +1,6 @@
+multiple: True
+meanFieldOverTime:
+  xLabel: "l"
+slice:
+  xLabel: "a"
+  vUnit: "100 * K"
