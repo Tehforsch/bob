@@ -8,7 +8,6 @@ from bob.simulationSet import SimulationSet
 from bob.basicField import BasicField
 from bob.result import Result
 from bob.postprocessingFunctions import SetFn, addToList
-from bob.plots.timePlots import addTimeArg, getTimeQuantityForSnap
 from bob.plots.bobSlice import getSlice
 from bob.plots.ionization import translateTime
 
@@ -34,23 +33,16 @@ class IonizationTime(SetFn):
         vmin, vmax = self.style["vLim"]
         self.image(result.data, self.extent, cmap="Reds", vmin=vmin, vmax=vmax)
 
-    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        super().setArgs(subparser)
-        addTimeArg(subparser)
-
     def getIonizationTimeData(self, simSet: SimulationSet) -> pq.Quantity:
         ionizationTime = None
         for sim in simSet:
             if len(sim.snapshots) == 0:
                 print("No snapshots in sim? Continuing.")
                 continue
-            snap = max(sim.snapshots, key=lambda snap: getTimeQuantityForSnap(self.quantity, sim, snap))
+            snap = sim.snapshots[-1]
             (self.extent, newIonizationTime) = getSlice(BasicField("IonizationTime"), snap, "z")
             redshift, scale_factor = translateTime(sim, newIonizationTime)
-            if self.quantity == "z":
-                ionizationTime = redshift
-            elif self.quantity == "t":
-                ionizationTime = sim.getAge(scale_factor, doAssert=False)
+            ionizationTime = redshift
             if ionizationTime is None:
                 ionizationTime = newIonizationTime
             else:

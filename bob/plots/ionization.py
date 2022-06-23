@@ -39,8 +39,22 @@ def translateTime(sim: Simulation, time: pq.Quantity) -> Tuple[pq.Quantity, pq.Q
         scaleFactorIcs = icsFile.attrs["Time"]
         ageIcs = cosmology.age(z_at_value(cosmology.scale_factor, scaleFactorIcs))
         ageNow = ageIcs + time
-        redshiftNow = z_at_value(cosmology.age, ageNow)
-        print(redshiftNow)
+        # Astropy v5 can take arbitrary arrays in z_at_value, however
+        # I cant get astropy v5 on bwfor, since we still live in the 90s.
+        # Therefore, I will manually vectorize here.
+        if ageNow.shape == ():
+            redshiftNow = z_at_value(cosmology.age, ageNow)
+        else:
+            redshiftNow = np.zeros(ageNow.shape)
+            it = np.nditer(ageNow, flags=["multi_index"])
+            for age in it:
+                index = it.multi_index
+                age = age * ageNow.unit
+                if age == np.Infinity:
+                    redshiftNow[index] = np.Infinity * pq.dimensionless_unscaled
+                else:
+                    redshiftNow[index] = z_at_value(cosmology.age, age)
+
         return cosmology.scale_factor(redshiftNow) * pq.dimensionless_unscaled, redshiftNow * pq.dimensionless_unscaled
 
 
