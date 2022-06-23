@@ -10,7 +10,7 @@ class SimulationSet(list):
     def __init__(self, sims: Iterable[Simulation]) -> None:
         super().__init__(sims)
 
-    def quotient(self, parameters: List[str]) -> List[Tuple[Dict[str, Any], "SimulationSet"]]:
+    def quotient(self, parameters: List[str], single: bool) -> List[Tuple[Dict[str, Any], "SimulationSet"]]:
         def getConfiguration(sim: Simulation) -> Tuple[Tuple[Any, Any], ...]:
             def getValue(k: str) -> Any:
                 if k == "name":  # For cases where sim sets are indistuingishable by actual sim parameters
@@ -21,6 +21,9 @@ class SimulationSet(list):
 
         configurations = list(set(getConfiguration(sim) for sim in self))
         configurations.sort()
+        if single:
+            # Return one SimSet per simulation
+            return [(dict(getConfiguration(sim)), SimulationSet([sim])) for sim in self]
         return [
             (
                 dict(configuration),

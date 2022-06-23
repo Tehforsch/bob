@@ -28,6 +28,7 @@ def setupArgs() -> argparse.Namespace:
         help="Select only some of the sims for postprocessing/running/compiling",
     )
     parser.add_argument("-q", "--quotient", nargs="*", help="Parameters by which to divide the simulations into sets")
+    parser.add_argument("--single", action="store_true", help="Create simulation set for each simulation")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     parser.add_argument("--show", action="store_true", help="Show figures instead of saving them")
     parser.add_argument("--post", action="store_true", help="Only postprocess the data, do not run the corresponding plot scripts (for cluster)")

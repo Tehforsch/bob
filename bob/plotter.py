@@ -60,6 +60,7 @@ class Plotter:
         show: bool,
         select: Optional[List[str]],
         quotient_params: Optional[List[str]],
+        single: bool,
         outputFileType: str,
     ) -> None:
         self.picFolder = parent_folder / bob.config.picFolder
@@ -68,6 +69,7 @@ class Plotter:
         self.snapshotFilter = snapshotFilter
         self.show = show
         self.quotient_params = quotient_params
+        self.single = single
         self.outputFileType = outputFileType
 
     def filterSims(self, sims: SimulationSet, select: Optional[List[str]]) -> SimulationSet:
@@ -126,7 +128,7 @@ class Plotter:
         quotient_params = self.quotient_params
         if quotient_params is None:
             quotient_params = []
-        return MultiSet(self.sims.quotient(quotient_params), labels)
+        return MultiSet(self.sims.quotient(quotient_params, self.single), labels)
 
     def runMultiSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
         quotient = self.getQuotient(args.labels)

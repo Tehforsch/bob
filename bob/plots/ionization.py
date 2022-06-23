@@ -72,8 +72,8 @@ class IonizationData(Result):
         self.redshift.append(getArrayQuantity([d[1] for d in data]))
         self.volumeAv.append((1.0 - np.array([d[2] for d in data])) * pq.dimensionless_unscaled)
         self.massAv.append((1.0 - np.array([d[3] for d in data])) * pq.dimensionless_unscaled)
-        self.volumeAvRate.append(np.array([d[4] for d in data]) * pq.dimensionless_unscaled)
-        self.massAvRate.append(np.array([d[5] for d in data]) * pq.dimensionless_unscaled)
+        self.volumeAvRate.append(np.array([d[4] for d in data]) / pq.s)
+        self.massAvRate.append(np.array([d[5] for d in data]) / pq.s)
 
 
 class Ionization(MultiSetFn):

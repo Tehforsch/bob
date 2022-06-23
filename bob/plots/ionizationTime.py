@@ -46,7 +46,7 @@ class IonizationTime(SetFn):
                 continue
             snap = max(sim.snapshots, key=lambda snap: getTimeQuantityForSnap(self.quantity, sim, snap))
             (self.extent, newIonizationTime) = getSlice(BasicField("IonizationTime"), snap, "z")
-            redshift, scale_factor = translateTime(sim, newIonizationTime / snap.timeUnit)
+            redshift, scale_factor = translateTime(sim, newIonizationTime)
             if self.quantity == "z":
                 ionizationTime = redshift
             elif self.quantity == "t":
