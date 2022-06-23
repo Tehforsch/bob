@@ -61,8 +61,12 @@ def saveQuantityList(folder: Path, quantities: List[pq.Quantity]) -> None:
         saveQuantity(folder / str(i), quantity)
 
 
-def saveResultList(folder: Path, quantities: List["Result"]) -> None:
+def saveResultList(folder: Path, results: List["Result"]) -> None:
     folder.mkdir()
+    for (i, result) in enumerate(results):
+        subfolder = folder / str(i)
+        subfolder.mkdir()
+        result.save(subfolder)
 
 
 def filenameBase(folder: Path, quantityName: str) -> Path:
@@ -102,19 +106,34 @@ class Result:
             result.__setattr__(f.stem, readQuantityFromNumpyFilePath(f))
         for subdir in getFolders(folder):
             arrs = []
-            for f in sorted(getNpyFiles(subdir), key=lambda f: int(f.stem)):
-                arrs.append(readQuantityFromNumpyFilePath(f))
-            result.__setattr__(subdir.stem, arrs)
+            npyFiles = list(getNpyFiles(subdir))
+            # List of quantities
+            if len(npyFiles) > 0:
+                for f in sorted(npyFiles, key=lambda f: int(f.stem)):
+                    arrs.append(readQuantityFromNumpyFilePath(f))
+                result.__setattr__(subdir.stem, arrs)
+            # List of results
+            else:
+                results = []
+                subSubFolders = list(getFolders(subdir))
+                subSubFolders.sort(key=lambda folder: int(folder.stem))
+                for subSubFolder in subSubFolders:
+                    results.append(Result.readFromFolder(subSubFolder))
+                result.__setattr__(subdir.stem, results)
+
         return result
 
     def __repr__(self) -> str:
         def formatField(name: str, value: Union[pq.Quantity, List[pq.Quantity]]) -> str:
             if type(value) == pq.Quantity:
                 return f"{name:<15} [{value.unit:>10}]: {value.value}"
-            elif type(value) == Result:
+            elif isinstance(value, Result):
                 return value.__repr__()
             elif type(value) == list:
-                return "\n".join(formatField(name, x) for x in value)
+                if type(value[0]) == Result:
+                    return "\n\n".join("{}".format(result) for result in value)
+                else:
+                    return "\n".join(formatField(name, x) for x in value)
             else:
                 raise ValueError("Wrong type in result: {}", type(value))
 

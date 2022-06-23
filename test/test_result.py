@@ -67,8 +67,13 @@ class Tests(unittest.TestCase):
             if type(v) == pq.Quantity:
                 self.assert_equal_quantities(res2.__getattribute__(k), v)
             else:
-                for (q1, q2) in zip(res2.__getattribute__(k), v):
-                    self.assert_equal_quantities(q1, q2)
+                assert type(v) == list
+                if isinstance(v[0], Result):
+                    for (subres1, subres2) in zip(v, res2.__getattribute__(k)):
+                        self.assert_equal_results(subres1, subres2)
+                else:
+                    for (q1, q2) in zip(res2.__getattribute__(k), v):
+                        self.assert_equal_quantities(q1, q2)
 
     def assert_equal_results(self, res1: Result, res2: Result) -> None:
         self.assert_result_contains_other_result(res1, res2)
