@@ -1,4 +1,4 @@
-from typing import Union, Tuple, TYPE_CHECKING
+from typing import Union, Tuple, TYPE_CHECKING, Dict, Any
 from pathlib import Path
 import numpy as np
 import h5py
@@ -82,3 +82,7 @@ class Snapshot:
     @property
     def time(self) -> pq.Quantity:
         return self.hdf5File["Header"].attrs["Time"] * self.timeUnit
+
+    @property
+    def attrs(self) -> Dict[str, Any]:
+        return self.hdf5File["Header"].attrs

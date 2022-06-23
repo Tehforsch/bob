@@ -74,6 +74,9 @@ class Simulation:
         snapshotFiles.sort(key=getNumber)
         return [Snapshot(self, s) for s in snapshotFiles]
 
+    def icsFile(self) -> Snapshot:
+        return Snapshot(self, self.folder / "{}.hdf5".format(self.params["InitCondFile"]))
+
     def getSlices(self, name: str) -> List[Any]:
         from bob.plots.arepoSlice import ArepoSlice
 

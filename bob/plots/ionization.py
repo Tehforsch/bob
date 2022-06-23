@@ -1,7 +1,7 @@
 import argparse
 import re
 import itertools
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -10,34 +10,68 @@ import matplotlib.ticker
 from astropy.cosmology import z_at_value
 import astropy.units as pq
 
+from bob.util import getArrayQuantity
 from bob.simulation import Simulation
 from bob.postprocessingFunctions import MultiSetFn, addToList
 from bob.result import Result
 from bob.multiSet import MultiSet
 
 
+def printOnce(s: str, previousRuns: Dict[str, bool] = {}) -> None:
+    if s in previousRuns:
+        return
+    else:
+        previousRuns[s] = True
+        print(s)
+
+
+def translateTime(sim: Simulation, time: pq.Quantity) -> Tuple[pq.Quantity, pq.Quantity]:
+    cosmology = sim.getCosmology()
+    if sim.params["ComovingIntegrationOn"] == 1:
+        redshift = z_at_value(cosmology.scale_factor, time) * pq.dimensionless_unscaled
+        return time * pq.dimensionless_unscaled, redshift * pq.dimensionless_unscaled
+    else:
+        # In the noCascade runs, we have the initial scale_factor
+        # in the ICS snapshot header, whereas the simulation time runs from
+        # 0 to however much time we ran for and doesn't really give much information
+        printOnce("Assuming scale factor is the time scale in the original snapshot! (i.e. ComovingIntegrationOn = 1)")
+        icsFile = sim.icsFile()
+        scaleFactorIcs = icsFile.attrs["Time"]
+        ageIcs = cosmology.age(z_at_value(cosmology.scale_factor, scaleFactorIcs))
+        ageNow = ageIcs + time
+        redshiftNow = z_at_value(cosmology.age, ageNow)
+        print(redshiftNow)
+        return cosmology.scale_factor(redshiftNow) * pq.dimensionless_unscaled, redshiftNow * pq.dimensionless_unscaled
+
+
 class IonizationData(Result):
     def __init__(self) -> None:
-        self.scale_factor: List[pq.Quantity] = []
+        self.time: List[pq.Quantity] = []
+        self.redshift: List[pq.Quantity] = []
         self.volumeAv: List[pq.Quantity] = []
         self.massAv: List[pq.Quantity] = []
-        self.redshift: List[pq.Quantity] = []
+        self.volumeAvRate: List[pq.Quantity] = []
+        self.massAvRate: List[pq.Quantity] = []
 
     def addSims(self, sims: List[Simulation]) -> None:
         data = []
         for sim in sims:
-            # "Time" is just the scale factor here. To make sure that this is true, check that ComovingIntegrationOn is 1
-            assert sim.params.get("ComovingIntegrationOn") == 1
-            cosmology = sim.getCosmology()
-            regex = re.compile("Time ([0-9.+]+): Volume Av. H ionization: ([0-9.+]+), Mass Av. H ionization: ([0-9.+]+)")
+            regex = re.compile(
+                "Time ([0-9.+]+): Volume Av. H ionization: ([0-9.+]+), Mass Av. H ionization: ([0-9.+]+), Volume av. Ionization rate: ([0-9.+-e]+), Mass av. Ionization rate: ([0-9.+-e]+)"
+            )
             for line in sim.log:
                 match = regex.match(line)
                 if match is not None:
-                    data.append([float(x) for x in match.groups()])
+                    (time, *remainder) = [float(x) for x in match.groups()]
+                    time, redshift = translateTime(sim, time)
+                    data.append((time, redshift, *remainder))
 
-        self.redshift.append(np.array([z_at_value(cosmology.scale_factor, d[0]) for d in data]) * pq.dimensionless_unscaled)
-        self.volumeAv.append((1.0 - np.array([d[1] for d in data])) * pq.dimensionless_unscaled)
-        self.massAv.append((1.0 - np.array([d[2] for d in data])) * pq.dimensionless_unscaled)
+        self.time.append(getArrayQuantity([d[0] for d in data]))
+        self.redshift.append(getArrayQuantity([d[1] for d in data]))
+        self.volumeAv.append((1.0 - np.array([d[2] for d in data])) * pq.dimensionless_unscaled)
+        self.massAv.append((1.0 - np.array([d[3] for d in data])) * pq.dimensionless_unscaled)
+        self.volumeAvRate.append(np.array([d[4] for d in data]) * pq.dimensionless_unscaled)
+        self.massAvRate.append(np.array([d[5] for d in data]) * pq.dimensionless_unscaled)
 
 
 class Ionization(MultiSetFn):
