@@ -45,13 +45,15 @@ def translateTime(sim: Simulation, time: pq.Quantity) -> Tuple[pq.Quantity, pq.Q
 
 
 class IonizationData(Result):
-    def __init__(self) -> None:
+    def __init__(self, simSets: MultiSet) -> None:
         self.time: List[pq.Quantity] = []
         self.redshift: List[pq.Quantity] = []
         self.volumeAv: List[pq.Quantity] = []
         self.massAv: List[pq.Quantity] = []
         self.volumeAvRate: List[pq.Quantity] = []
         self.massAvRate: List[pq.Quantity] = []
+        for sims in simSets:
+            self.addSims(sims)
 
     def addSims(self, sims: List[Simulation]) -> None:
         data = []
@@ -63,7 +65,7 @@ class IonizationData(Result):
                 match = regex.match(line)
                 if match is not None:
                     (time, *remainder) = [float(x) for x in match.groups()]
-                    time, redshift = translateTime(sim, time)
+                    time, redshift = translateTime(sim, time * sim.snapshots[0].timeUnit)
                     data.append((time, redshift, *remainder))
 
         self.time.append(getArrayQuantity([d[0] for d in data]))
@@ -77,9 +79,7 @@ class IonizationData(Result):
 class Ionization(MultiSetFn):
     def post(self, args: argparse.Namespace, simSets: MultiSet) -> Result:
         self.labels = simSets.labels
-        result = IonizationData()
-        for sims in simSets:
-            result.addSims(sims)
+        result = IonizationData(simSets)
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:

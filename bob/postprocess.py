@@ -13,6 +13,7 @@ from bob import config
 import bob.plotter
 
 import bob.plots.ionization
+import bob.plots.ionizationRate
 import bob.plots.ionizationTime
 import bob.plots.timePlots
 import bob.plots.thomsonScattering
