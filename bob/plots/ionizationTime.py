@@ -14,7 +14,6 @@ from bob.plots.ionization import translateTime
 
 class IonizationTime(SetFn):
     def post(self, args: argparse.Namespace, simSet: SimulationSet) -> Result:
-        self.quantity = args.time
         data = self.getIonizationTimeData(simSet)
         result = Result()
         result.data = data
@@ -42,7 +41,7 @@ class IonizationTime(SetFn):
             snap = sim.snapshots[-1]
             (self.extent, newIonizationTime) = getSlice(BasicField("IonizationTime"), snap, "z")
             redshift, scale_factor = translateTime(sim, newIonizationTime)
-            ionizationTime = redshift
+            print(redshift, scale_factor, ionizationTime)
             if ionizationTime is None:
                 ionizationTime = newIonizationTime
             else:
