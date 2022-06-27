@@ -9,6 +9,7 @@ import astropy.units as pq
 
 import bob.config as config
 from bob.snapshot import Snapshot
+from bob.sources import Sources
 
 
 def getParams(folder: Path) -> Dict[str, Any]:
@@ -76,6 +77,9 @@ class Simulation:
 
     def icsFile(self) -> Snapshot:
         return Snapshot(self, self.folder / "{}.hdf5".format(self.params["InitCondFile"]))
+
+    def sources(self) -> Sources:
+        return Sources(self.folder / self.params["TestSrcFile"])
 
     def getSlices(self, name: str) -> List[Any]:
         from bob.plots.arepoSlice import ArepoSlice

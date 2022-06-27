@@ -25,6 +25,7 @@ import bob.plots.temperatureIonizationHistogram
 import bob.plots.temperatureOverTime
 import bob.plots.meanFieldOverTime
 import bob.plots.luminosityOverTime
+import bob.plots.sourcePosition
 
 
 from bob.postprocessingFunctions import (
