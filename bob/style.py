@@ -1,12 +1,20 @@
-from typing import Any
+from typing import Any, Dict
 
 
 class Style(dict):
+    def __init__(self, entries: Dict[str, Any]):
+        super().__init__(entries)
+        self.name_in_defaults = {k: False for k in entries}
+
     def setDefault(self, param: str, value: Any) -> None:
         if param not in self:
             self[param] = value
+        self.name_in_defaults[param] = True
 
     def __getitem__(self, k: str) -> Any:
+        for (paramName, exists) in self.name_in_defaults.items():
+            if not exists:
+                raise ValueError(f"Parameter set from style file that does not appear in set defaults: {paramName}")
         if k == "xLabel":
             return fillInUnit(super().__getitem__(k), self["xUnit"])
         elif k == "yLabel":
