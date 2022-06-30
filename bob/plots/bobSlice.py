@@ -37,7 +37,10 @@ def getSlice(field: Field, snapshot: Snapshot, axisName: str) -> Tuple[Tuple[flo
     p1, p2 = np.meshgrid(np.linspace(min1, max1, n1), np.linspace(min2, max2, n2))
     coordinates = axis * (center * axis) + np.outer(p1, ortho1) + np.outer(p2, ortho2)
     data = getDataAtPoints(field, snapshot, coordinates)
-    return (min1, max1, min2, max2), data.reshape((n1, n2))
+    if len(data.shape) == 1:
+        return (min1, max1, min2, max2), data.reshape((n1, n2))
+    else:
+        return (min1, max1, min2, max2), data.reshape((n1, n2, 3))
 
 
 class VoronoiSlice(SnapFn):
