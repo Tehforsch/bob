@@ -25,6 +25,7 @@ class SliceWithStarParticles(VoronoiSlice):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
+        self.style.setDefault("circleSize", 0.05)
         if self.axis != "z":
             raise NotImplementedError("Implement other axes by adjusting the coordinates below")
         fig = plt.figure()
@@ -34,7 +35,7 @@ class SliceWithStarParticles(VoronoiSlice):
             print(f"num stars: {result.coords.shape[0]}")
             for i in range(result.coords.shape[0]):
                 coord = (result.coords[i, 0].to_value(self.style["xUnit"]), result.coords[i, 1].to_value(self.style["yUnit"]))
-                circ = Circle((coord[0], coord[1]), 0.03)
+                circ = Circle((coord[0], coord[1]), self.style["circleSize"])
                 ax.add_patch(circ)
 
 
