@@ -29,11 +29,11 @@ class SliceWithStarParticles(VoronoiSlice):
             raise NotImplementedError("Implement other axes by adjusting the coordinates below")
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
-        super().plot(plt, result)
+        super().plot(ax, result)
         if len(result.coords.shape) > 0:
-            print(result.coords.shape[0])
+            print(f"num stars: {result.coords.shape[0]}")
             for i in range(result.coords.shape[0]):
-                coord = (result.coords[i, 0].to_value(self.style["xUnit"]), result.coords[i, 1].to_value(self.style["yUnit"]))
+                coord = (result.coords[i, 1].to_value(self.style["xUnit"]), result.coords[i, 0].to_value(self.style["yUnit"]))
                 circ = Circle((coord[0], coord[1]), 0.03)
                 ax.add_patch(circ)
 
