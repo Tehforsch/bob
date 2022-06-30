@@ -178,9 +178,16 @@ class Plotter:
         plt.clf()
 
 
+def getBaseName(plotName: str) -> str:
+    if not "_" in plotName:
+        return plotName
+    return plotName[: plotName.index("_")]
+
+
 # Needs to be a top-level function so it can be used by multiprocessing
 def runPlot(plotter: Plotter, args: argparse.Namespace, plotName: str) -> None:
-    if args.plots is None or plotName in args.plots:
+    baseName = getBaseName(plotName)
+    if (args.plots is None or plotName in args.plots) and (args.types is None or baseName in args.types):
         print("Replotting", plotName)
         plotFolder = plotter.dataFolder / plotName
         plot = pickle.load(open(plotFolder / bob.config.plotSerializationFileName, "rb"))

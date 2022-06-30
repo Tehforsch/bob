@@ -40,6 +40,7 @@ def setupArgs() -> argparse.Namespace:
         function.setArgs(subparser)
     replotParser = subparsers.add_parser("replot")
     replotParser.add_argument("--plots", type=str, nargs="*", help="The plots to replot")
+    replotParser.add_argument("--types", type=str, nargs="*", help="The plot types to replot")
     replotParser.add_argument(
         "--only-new",
         dest="onlyNew",
