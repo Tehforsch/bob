@@ -19,7 +19,7 @@ class CombinedField(Field):
 
     def getData(self, snapshot: Snapshot) -> np.ndarray:
         data = [field.getData(snapshot) for field in self.fields]
-        return sum((np.outer(d / np.max(d), color) for (d, color) in zip(data, self.colors)), np.array([0.0, 0.0, 0.0]))
+        return sum((np.outer((d - np.min(d)) / (np.max(d) - np.min(d)), color) for (d, color) in zip(data, self.colors)), np.array([0.0, 0.0, 0.0]))
 
     @property
     def niceName(self) -> str:

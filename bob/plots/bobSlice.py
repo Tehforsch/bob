@@ -52,6 +52,20 @@ class VoronoiSlice(SnapFn):
         print(f"Field: {self.field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
         return result
 
+    def transformLog(self, data: pq.Quantity) -> pq.Quantity:
+        epsilon = 1e-50
+        for i in range(3):
+            logmin = self.style[f"logmin{i}"]
+            logmax = self.style[f"logmax{i}"]
+            log = np.maximum(np.log10(data[:, :, i] + epsilon), logmin)
+            data[:, :, i] = (log + (-logmin)) / (logmax - logmin)
+        print(np.min(data[:, :, 0]))
+        print(np.mean(data[:, :, 0]))
+        print(np.max(data[:, :, 0]))
+        print(np.min(data[:, :, 1]))
+        print(np.mean(data[:, :, 1]))
+        print(np.max(data[:, :, 1]))
+
     def plot(self, plt: plt.axes, result: Result) -> None:
         xAxis, yAxis = getOtherAxes(self.axis)
         self.style.setDefault("xLabel", f"${xAxis} [UNIT]$")
@@ -62,13 +76,23 @@ class VoronoiSlice(SnapFn):
         self.style.setDefault("vUnit", self.field.unit)
         self.style.setDefault("vLim", (1e-6, 1e0))
         self.style.setDefault("log", True)
+        self.style.setDefault("logmin0", -9)
+        self.style.setDefault("logmin1", -9)
+        self.style.setDefault("logmin2", -9)
+        self.style.setDefault("logmax0", 0)
+        self.style.setDefault("logmax1", 0)
+        self.style.setDefault("logmax2", 0)
         self.setupLabels()
         vmin, vmax = self.style["vLim"]
+        if result.data.ndim == 3:
+            # Combined fields: each entry is a color
+            if self.style["log"]:
+                self.transformLog(result.data)
         print(f"min: {np.min(result.data)}, max: {np.max(result.data)}")
         if self.style["log"]:
             self.image(result.data, self.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
         else:
-            self.image(result.data, self.extent, vmin=vmin, vmax=vmax, origin="lower", cmap="Reds")
+            self.image(result.data, self.extent, vmin=vmin, vmax=vmax, origin="lower")
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         super().setArgs(subparser)
