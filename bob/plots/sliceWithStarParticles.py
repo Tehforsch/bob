@@ -33,7 +33,7 @@ class SliceWithStarParticles(VoronoiSlice):
         if len(result.coords.shape) > 0:
             print(f"num stars: {result.coords.shape[0]}")
             for i in range(result.coords.shape[0]):
-                coord = (result.coords[i, 1].to_value(self.style["xUnit"]), result.coords[i, 0].to_value(self.style["yUnit"]))
+                coord = (result.coords[i, 0].to_value(self.style["xUnit"]), result.coords[i, 1].to_value(self.style["yUnit"]))
                 circ = Circle((coord[0], coord[1]), 0.03)
                 ax.add_patch(circ)
 

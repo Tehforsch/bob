@@ -117,7 +117,9 @@ def findOrthogonalAxes(axis: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         axis1 = -axis1
     if np.sum(axis2) < 0:
         axis2 = -axis2
-    return axis1, axis2
+    axes = [axis1, axis2]
+    axes.sort(key=lambda coord: (-coord[0], -coord[1], -coord[2]))
+    return axes[0], axes[1]
 
 
 addToList("slice", VoronoiSlice())
