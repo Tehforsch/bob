@@ -26,6 +26,7 @@ import bob.plots.temperatureOverTime
 import bob.plots.meanFieldOverTime
 import bob.plots.luminosityOverTime
 import bob.plots.sourcePosition
+import bob.plots.sliceWithStarParticles
 
 
 from bob.postprocessingFunctions import (
