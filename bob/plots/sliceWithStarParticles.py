@@ -19,7 +19,7 @@ class SliceWithStarParticles(VoronoiSlice):
         if "PartType4" in f:
             coords = snap.hdf5File["PartType4"]["Coordinates"] * snap.lengthUnit
             zRelativeDist = np.abs((coords[:, 2] - centerZ) / extentZ)
-            result.coords = coords[np.where(zRelativeDist < 0.1)]
+            result.coords = coords[np.where(zRelativeDist < 0.02)]
         else:
             result.coords = np.zeros(()) * snap.lengthUnit
         return result
