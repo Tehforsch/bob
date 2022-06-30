@@ -58,6 +58,11 @@ class PostprocessingFunction(ABC):
         cbar = plt.colorbar()
         cbar.set_label(self.style["cLabel"])
 
+    def scatter(self, xdata: pq.Quantity, ydata: pq.Quantity, *args: Any, **kwargs: Any) -> None:
+        xUnit = pq.Unit(self.style["xUnit"])
+        yUnit = pq.Unit(self.style["yUnit"])
+        plt.scatter(xdata.to_value(xUnit), ydata.to_value(yUnit), *args, **kwargs)
+
 
 class SnapFn(PostprocessingFunction):
     @abstractmethod
