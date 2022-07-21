@@ -46,7 +46,11 @@ def readStyle(args: argparse.Namespace, name: str) -> Style:
     else:
         styleDict = yaml.load(args.style.open("r"), Loader=yaml.SafeLoader)
         if "multiple" in styleDict and styleDict["multiple"]:
-            return Style(styleDict[name])
+            if name in styleDict:
+                return Style(styleDict[name])
+            else:
+                print(f"No style specified for plot: {name}")
+                return Style({})
         else:
             return Style(styleDict)
 
