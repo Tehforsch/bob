@@ -1,10 +1,11 @@
 import argparse
+import itertools
 
 import astropy.units as pq
 import matplotlib.pyplot as plt
 
 from abc import ABC, abstractmethod
-from typing import Any, List, Tuple
+from typing import Any, List, Tuple, Iterable
 from bob.simulation import Simulation
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
@@ -98,6 +99,13 @@ class MultiSetFn(PostprocessingFunction):
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         subparser.add_argument("--labels", nargs="*", type=str)
+
+    def getColors(self) -> Iterable[str]:
+        return itertools.cycle(["b", "r", "g", "purple", "brown", "orange"])
+
+    def getLabels(self) -> Iterable[str]:
+        self.style.setDefault("labels", [])
+        return itertools.chain(self.style["labels"], itertools.cycle(""))
 
 
 class SliceFn(PostprocessingFunction):

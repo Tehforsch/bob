@@ -196,6 +196,8 @@ def runPlot(plotter: Plotter, args: argparse.Namespace, plotName: str) -> None:
         plotFolder = plotter.dataFolder / plotName
         plot = pickle.load(open(plotFolder / bob.config.plotSerializationFileName, "rb"))
         result = Result.readFromFolder(plotFolder)
-        plot.setStyle(readStyle(args, plot.name))
+        style = readStyle(args, plot.name)
+        plot.setStyle(style)
         plot.plot(plt, result)
+        style.verifyAllSetParamsUsed()
         plotter.saveAndShow(plotFolder.name)

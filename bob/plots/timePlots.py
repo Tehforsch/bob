@@ -52,7 +52,6 @@ class TimePlot(MultiSetFn):
         pass
 
     def post(self, args: argparse.Namespace, simSets: MultiSet) -> Result:
-        self.labels = simSets.labels
         self.time = args.time
         results = Result()
         results.data = [self.getQuantityOverTime(args, simSet) for simSet in simSets]
@@ -63,7 +62,7 @@ class TimePlot(MultiSetFn):
         self.style.setDefault("xLabel", format(f"{self.xlabel()} [UNIT]"))
         self.style.setDefault("yLabel", format(f"{self.ylabel()} [UNIT]"))
         self.setupLinePlot()
-        for (style, label, result) in zip(self.styles, self.labels, result.data):
+        for (style, label, result) in zip(self.styles, self.getLabels(), result.data):
             self.addLine(result.times, result.values, label=label)
         plt.legend()
 

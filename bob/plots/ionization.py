@@ -92,7 +92,6 @@ class IonizationData(Result):
 
 class Ionization(MultiSetFn):
     def post(self, args: argparse.Namespace, simSets: MultiSet) -> Result:
-        self.labels = simSets.labels
         result = IonizationData(simSets)
         return result
 
@@ -108,7 +107,7 @@ class Ionization(MultiSetFn):
             self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, linAx, color)
             self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, logAx, color)
         # add legend labels
-        for (label, color) in zip(self.labels, colors):
+        for (label, color) in zip(self.getLabels(), self.getColors()):
             linAx.plot([], [], color=color, label=label, linewidth=3)
         linAx.plot([], [], label="Volume av.", linestyle="-", linewidth=3, color="black")
         linAx.plot([], [], label="Mass av.", linestyle="--", linewidth=3, color="black")

@@ -74,7 +74,6 @@ class ShadowingVolumePlot(TimePlot):
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         self.styles = [{"color": s[0], "linestyle": s[1]} for s in itertools.product(["r", "b"], ["-", "--", ":"])]
-        self.labels = ["" for _ in result.data]
 
         super().plot(plt, result)
         plt.xlim(0, 60)

@@ -12,14 +12,16 @@ class Style(dict):
         self.name_in_defaults[param] = True
 
     def __getitem__(self, k: str) -> Any:
-        for (paramName, exists) in self.name_in_defaults.items():
-            if not exists:
-                raise ValueError(f"Parameter set from style file that does not appear in set defaults: {paramName}")
         if k == "xLabel":
             return fillInUnit(super().__getitem__(k), self["xUnit"])
         elif k == "yLabel":
             return fillInUnit(super().__getitem__(k), self["yUnit"])
         return super().__getitem__(k)
+
+    def verifyAllSetParamsUsed(self) -> None:
+        for (paramName, exists) in self.name_in_defaults.items():
+            if not exists:
+                raise ValueError(f"Parameter set from style file that does not appear in set defaults: {paramName}")
 
 
 def fillInUnit(label: str, unit: str) -> str:
