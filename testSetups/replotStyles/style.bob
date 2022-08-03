@@ -4,3 +4,4 @@ meanFieldOverTime:
 slice:
   xLabel: "a"
   vUnit: "100 * K"
+  showTime: False

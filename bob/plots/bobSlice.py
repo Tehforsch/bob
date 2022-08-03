@@ -14,6 +14,7 @@ from bob.postprocessingFunctions import SnapFn, addToList
 from bob.result import Result
 from bob.allFields import allFields, getFieldByName
 from bob.field import Field
+from bob.plots.timePlots import getTimeOrRedshift
 
 
 def getDataAtPoints(field: Field, snapshot: Snapshot, points: pq.Quantity) -> np.ndarray:
@@ -48,6 +49,7 @@ class VoronoiSlice(SnapFn):
         self.axis = args.axis
         self.field = getFieldByName(args.field)
         result = Result()
+        result.redshift = getTimeOrRedshift(sim, snap)
         (self.extent, result.data) = getSlice(self.field, snap, args.axis)
         print(f"Field: {self.field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
         return result
@@ -82,6 +84,7 @@ class VoronoiSlice(SnapFn):
         self.style.setDefault("logmax0", 0)
         self.style.setDefault("logmax1", 0)
         self.style.setDefault("logmax2", 0)
+        self.style.setDefault("showTime", True)
         self.setupLabels()
         vmin, vmax = self.style["vLim"]
         if result.data.ndim == 3:
@@ -93,6 +96,8 @@ class VoronoiSlice(SnapFn):
             self.image(result.data, self.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
         else:
             self.image(result.data, self.extent, vmin=vmin, vmax=vmax, origin="lower")
+        if self.style["showTime"]:
+            plt.text(0, 0, f"Redshift: {result.redshift:.01f}", fontsize=12)
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         super().setArgs(subparser)

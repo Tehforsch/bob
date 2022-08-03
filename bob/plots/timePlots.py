@@ -25,7 +25,7 @@ def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot) -> fl
 
 def getTimeQuantityFromTimeOrScaleFactor(quantity: str, sim: Simulation, snap: Snapshot, time_or_scale_factor: pq.Quantity) -> pq.Quantity:
     if quantity == "z":
-        return sim.getRedshift(time_or_scale_factor)
+        return sim.getRedshift(time_or_scale_factor) * pq.dimensionless_unscaled
     elif quantity == "t":
         if sim.params["ComovingIntegrationOn"]:
             return sim.getLookbackTime(time_or_scale_factor)
@@ -33,6 +33,13 @@ def getTimeQuantityFromTimeOrScaleFactor(quantity: str, sim: Simulation, snap: S
             return time_or_scale_factor * snap.timeUnit
     else:
         raise NotImplementedError
+
+
+def getTimeOrRedshift(sim: Simulation, snap: Snapshot) -> pq.Quantity:
+    if sim.params["ComovingIntegrationOn"] == 1:
+        return getTimeQuantityForSnap("z", sim, snap)
+    else:
+        return getTimeQuantityForSnap("t", sim, snap)
 
 
 class TimePlot(MultiSetFn):
