@@ -5,7 +5,6 @@ from pathlib import Path
 import argparse
 import matplotlib.pyplot as plt
 import logging
-import yaml
 
 from bob.postprocessingFunctions import (
     SetFn,
@@ -21,7 +20,6 @@ from bob.result import Result
 from bob.postprocessingFunctions import PostprocessingFunction
 from bob.multiSet import MultiSet
 from bob.pool import runInPool
-from bob.plotConfig import PlotConfig
 
 
 def walkfiles(path: Path) -> Iterator[Path]:
@@ -38,21 +36,6 @@ def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
         return snap.number.value == arg_num
     except ValueError:
         raise ValueError("WRONG type of snapshot argument. Need an integer")
-
-
-def readPlotConfig(args: argparse.Namespace, name: str) -> PlotConfig:
-    if args.plot is None:
-        return PlotConfig({})
-    else:
-        styleDict = yaml.load(args.style.open("r"), Loader=yaml.SafeLoader)
-        if "multiple" in styleDict and styleDict["multiple"]:
-            if name in styleDict:
-                return PlotConfig(styleDict[name])
-            else:
-                print(f"No style specified for plot: {name}")
-                return PlotConfig({})
-        else:
-            return PlotConfig(styleDict)
 
 
 class Plotter:
@@ -107,11 +90,9 @@ class Plotter:
         self, args: argparse.Namespace, fn: PostprocessingFunction, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]
     ) -> None:
         logging.info("Running {}".format(name))
-        fn.init(args)
         result = post()
         self.save(fn, name, result)
         if not args.post:
-            fn.setPlotConfig(readPlotConfig(args, fn.name))
             plot(plt, result)
             self.saveAndShow(name)
 
@@ -196,8 +177,5 @@ def runPlot(plotter: Plotter, args: argparse.Namespace, plotName: str) -> None:
         plotFolder = plotter.dataFolder / plotName
         plot = pickle.load(open(plotFolder / bob.config.plotSerializationFileName, "rb"))
         result = Result.readFromFolder(plotFolder)
-        style = readPlotConfig(args, plot.name)
-        plot.setStyle(style)
         plot.plot(plt, result)
-        style.verifyAllSetParamsUsed()
         plotter.saveAndShow(plotFolder.name)

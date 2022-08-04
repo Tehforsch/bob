@@ -17,9 +17,6 @@ from bob.plotConfig import PlotConfig
 class PostprocessingFunction(ABC):
     name = ""
 
-    def init(self, args: argparse.Namespace) -> None:
-        self.config: PlotConfig = PlotConfig({})
-
     def setArgs(self) -> None:
         pass
 
@@ -63,6 +60,9 @@ class PostprocessingFunction(ABC):
         xUnit = pq.Unit(self.config["xUnit"])
         yUnit = pq.Unit(self.config["yUnit"])
         plt.scatter(xdata.to_value(xUnit), ydata.to_value(yUnit), *args, **kwargs)
+
+    def __repr__(self) -> str:
+        return f"{self.name}: {self.config}"
 
 
 class SnapFn(PostprocessingFunction):
@@ -109,14 +109,12 @@ class MultiSetFn(PostprocessingFunction):
 
 
 class SliceFn(PostprocessingFunction):
-    def init(self, args: argparse.Namespace) -> None:
-        self.slice_field = args.slice_field
-
     def setArgs(self) -> None:
         self.config.setRequired("field")
 
     def getName(self, args: argparse.Namespace) -> str:
-        return f"{self.name}_{args.slice_field}"
+        field = self.config["field"]
+        return f"{self.name}_{field}"
 
     @abstractmethod
     def post(self, args: argparse.Namespace, sim: Simulation, slice_: Any) -> Result:

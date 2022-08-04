@@ -33,20 +33,20 @@ class ArepoSlicePlot(SliceFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.xlabel("$x [h^{-1} \\mathrm{kpc}]$")
         plt.ylabel("$y [h^{-1} \\mathrm{kpc}]$")
-        if self.slice_field == "xHP":
+        if self.config["field"] == "xHP":
             vmin = 1.0e-6
             vmax = 1.0
             plt.clim(vmin, vmax)
             cbar = plt.colorbar()
             cbar.set_label("$x_{\\mathrm{H+}}$")
             plt.imshow(result.image, cmap="Reds", norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=(-17.5, 17.5, -17.5, 17.5))
-        elif self.slice_field == "temp":
+        elif self.config["field"] == "temp":
             vmin = 1.0e1
             vmax = 1.0e6
             plt.imshow(result.image, cmap="Reds", norm=colors.LogNorm(vmin=vmin, vmax=vmax), extent=(-17.5, 17.5, -17.5, 17.5))
             cbar = plt.colorbar()
             cbar.set_label("$T$")
-        elif self.slice_field == "density":
+        elif self.config["field"] == "density":
             plt.imshow(result.image, cmap="Reds", norm=colors.LogNorm(), extent=(-17.5, 17.5, -17.5, 17.5))
             cbar = plt.colorbar()
             cbar.set_label("$\\rho$")

@@ -3,6 +3,7 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 
+from bob.field import Field
 from bob.snapshot import Snapshot
 from bob.postprocessingFunctions import addToList
 from bob.result import Result
@@ -13,15 +14,14 @@ from bob.plots.timePlots import TimePlot
 
 
 class MeanFieldOverTime(TimePlot):
-    def init(self, args: argparse.Namespace) -> None:
-        super().init(args)
-        self.field = getFieldByName(args.field)
-
     def xlabel(self) -> str:
         return self.time
 
     def ylabel(self) -> str:
-        return self.field.symbol
+        return self.field().symbol
+
+    def field(self) -> Field:
+        return getFieldByName(self.config["field"])
 
     def setArgs(self) -> None:
         super().setArgs()
@@ -32,11 +32,11 @@ class MeanFieldOverTime(TimePlot):
 
     def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> float:
         masses = BasicField("Masses").getData(snap)
-        data = self.field.getData(snap)
+        data = self.field().getData(snap)
         return np.mean(data * masses) / np.mean(masses)
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        self.config.setDefault("yUnit", self.field.unit)
+        self.config.setDefault("yUnit", self.field().unit)
         super().plot(plt, result)
 
 

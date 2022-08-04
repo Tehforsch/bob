@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Tuple
+from typing import Tuple
 from abc import abstractmethod
 import argparse
 
@@ -43,10 +43,6 @@ def getTimeOrRedshift(sim: Simulation, snap: Snapshot) -> pq.Quantity:
 
 
 class TimePlot(MultiSetFn):
-    def init(self, args: argparse.Namespace) -> None:
-        super().init(args)
-        self.styles: List[Dict[str, Any]] = [{} for _ in range(100)]
-
     @abstractmethod
     def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> pq.Quantity:
         pass
@@ -69,7 +65,7 @@ class TimePlot(MultiSetFn):
         self.config.setDefault("xLabel", format(f"{self.xlabel()} [UNIT]"))
         self.config.setDefault("yLabel", format(f"{self.ylabel()} [UNIT]"))
         self.setupLinePlot()
-        for (style, label, result) in zip(self.styles, self.getLabels(), result.data):
+        for (label, result) in zip(self.getLabels(), result.data):
             self.addLine(result.times, result.values, label=label)
         plt.legend()
 

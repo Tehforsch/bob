@@ -46,11 +46,11 @@ def getSlice(field: Field, snapshot: Snapshot, axisName: str) -> Tuple[Tuple[flo
 
 class VoronoiSlice(SnapFn):
     def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
-        self.axis = args.axis
-        self.field = getFieldByName(args.field)
+        self.axis = self.config["axis"]
+        self.field = getFieldByName(self.config["field"])
         result = Result()
         result.redshift = getTimeOrRedshift(sim, snap)
-        (self.extent, result.data) = getSlice(self.field, snap, args.axis)
+        (self.extent, result.data) = getSlice(self.field, snap, self.config["axis"])
         print(f"Field: {self.field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
         return result
 
@@ -105,7 +105,9 @@ class VoronoiSlice(SnapFn):
         self.config.setRequired("field", choices=[f.niceName for f in allFields])
 
     def getName(self, args: argparse.Namespace) -> str:
-        return f"{self.name}_{args.axis}_{args.field}"
+        axis = self.config["axis"]
+        field = self.config["field"]
+        return f"{self.name}_{axis}_{field}"
 
 
 def getAxisByName(name: str) -> np.ndarray:

@@ -1,7 +1,9 @@
 import os
 import argparse
-from typing import Sequence
+from typing import Sequence, List
 from pathlib import Path
+import yaml
+import logging
 
 try:
     import matplotlib.pyplot as plt
@@ -27,11 +29,11 @@ import bob.plots.meanFieldOverTime
 import bob.plots.luminosityOverTime
 import bob.plots.sourcePosition
 import bob.plots.sliceWithStarParticles
+from bob.postprocessingFunctions import PostprocessingFunction
 
 
 from bob.postprocessingFunctions import (
     postprocessingFunctions,
-    PostprocessingFunction,
     SnapFn,
     SetFn,
     MultiSetFn,
@@ -48,6 +50,18 @@ def setMatplotlibStyle() -> None:
     plt.style.use(Path(file_path).parent / "../styles/plot.mlpstyle")
 
 
+def readPlotFile(filename: Path) -> List[PostprocessingFunction]:
+    config = yaml.load(filename.open("r"), Loader=yaml.SafeLoader)
+    functions: List[PostprocessingFunction] = []
+    for fnName in config:
+        function = getFunctionByName(fnName, postprocessingFunctions)
+        config = config[fnName]
+        function.setPlotConfig(config)
+        functions.append(function)
+        print("still need to verify")
+    return functions
+
+
 def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> None:
     if not args.post:
         setMatplotlibStyle()
@@ -59,14 +73,16 @@ def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> 
     if args.function == "replot":
         plotter.replot(args)
     else:
-        function = getFunctionByName(args.function, postprocessingFunctions)
-        if isinstance(function, SnapFn):
-            plotter.runSnapFn(args, function)
-        elif isinstance(function, SetFn):
-            plotter.runSetFn(args, function)
-        elif isinstance(function, MultiSetFn):
-            plotter.runMultiSetFn(args, function)
-        elif isinstance(function, SliceFn):
-            plotter.runSliceFn(args, function)
-        else:
-            raise NotImplementedError
+        functions = readPlotFile(args.plot)
+        logging.debug(functions)
+        for function in functions:
+            if isinstance(function, SnapFn):
+                plotter.runSnapFn(args, function)
+            elif isinstance(function, SetFn):
+                plotter.runSetFn(args, function)
+            elif isinstance(function, MultiSetFn):
+                plotter.runMultiSetFn(args, function)
+            elif isinstance(function, SliceFn):
+                plotter.runSliceFn(args, function)
+            else:
+                raise NotImplementedError

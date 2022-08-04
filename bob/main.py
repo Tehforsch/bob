@@ -14,27 +14,31 @@ def commaSeparatedList(s: str) -> List[str]:
 
 def setupArgs() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Postprocess arepo sims")
-    parser.add_argument("simFolders", type=Path, nargs="*", help="Path to simulation directories")
-    parser.add_argument("plot", type=Path, help="The plot configuration")
-    parser.add_argument(
+    parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
+    parser.add_argument("--show", action="store_true", help="Show figures instead of saving them")
+    parser.add_argument("--png", action="store_true", help="Use png instead of pdf as output type for generating movies")
+
+    subparsers = parser.add_subparsers(dest="function")
+    plotParser = subparsers.add_parser("plot")
+    plotParser.add_argument("simFolders", type=Path, nargs="+", help="Path to simulation directories")
+    plotParser.add_argument("plot", type=Path, help="The plot configuration")
+    plotParser.add_argument(
         "--snapshots",
         type=commaSeparatedList,
         help="Run postprocessing scripts for selected snapshots",
     )
-    parser.add_argument(
+    plotParser.add_argument(
         "-s",
         "--select",
         type=commaSeparatedList,
         help="Select only some of the sims for postprocessing/running/compiling",
     )
-    parser.add_argument("-q", "--quotient", nargs="*", help="Parameters by which to divide the simulations into sets")
-    parser.add_argument("--single", action="store_true", help="Create simulation set for each simulation")
-    parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
-    parser.add_argument("--show", action="store_true", help="Show figures instead of saving them")
-    parser.add_argument("--post", action="store_true", help="Only postprocess the data, do not run the corresponding plot scripts (for cluster)")
-    parser.add_argument("--png", action="store_true", help="Use png instead of pdf as output type for generating movies")
-    subparsers = parser.add_subparsers(dest="replot")
+    plotParser.add_argument("-q", "--quotient", nargs="*", help="Parameters by which to divide the simulations into sets")
+    plotParser.add_argument("--single", action="store_true", help="Create simulation set for each simulation")
+    plotParser.add_argument("--post", action="store_true", help="Only postprocess the data, do not run the corresponding plot scripts (for cluster)")
+
     replotParser = subparsers.add_parser("replot")
+    replotParser.add_argument("simFolders", type=Path, nargs="+", help="Path to simulation directories")
     replotParser.add_argument("--plots", type=str, nargs="*", help="The plots to replot")
     replotParser.add_argument("--types", type=str, nargs="*", help="The plot types to replot")
     replotParser.add_argument(
@@ -60,7 +64,7 @@ def main() -> None:
     if args.simFolders == []:
         raise ValueError("No sim folders given")
     setupLogging(args)
-    if not args.function == "replot":
+    if args.plot != "replot":
         sims = getSimsFromFolders(args)
     else:
         sims = SimulationSet([])
