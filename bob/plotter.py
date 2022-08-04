@@ -21,7 +21,7 @@ from bob.result import Result
 from bob.postprocessingFunctions import PostprocessingFunction
 from bob.multiSet import MultiSet
 from bob.pool import runInPool
-from bob.style import Style
+from bob.plotConfig import PlotConfig
 
 
 def walkfiles(path: Path) -> Iterator[Path]:
@@ -40,19 +40,19 @@ def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
         raise ValueError("WRONG type of snapshot argument. Need an integer")
 
 
-def readStyle(args: argparse.Namespace, name: str) -> Style:
-    if args.style is None:
-        return Style({})
+def readPlotConfig(args: argparse.Namespace, name: str) -> PlotConfig:
+    if args.plot is None:
+        return PlotConfig({})
     else:
         styleDict = yaml.load(args.style.open("r"), Loader=yaml.SafeLoader)
         if "multiple" in styleDict and styleDict["multiple"]:
             if name in styleDict:
-                return Style(styleDict[name])
+                return PlotConfig(styleDict[name])
             else:
                 print(f"No style specified for plot: {name}")
-                return Style({})
+                return PlotConfig({})
         else:
-            return Style(styleDict)
+            return PlotConfig(styleDict)
 
 
 class Plotter:
@@ -111,7 +111,7 @@ class Plotter:
         result = post()
         self.save(fn, name, result)
         if not args.post:
-            fn.setStyle(readStyle(args, fn.name))
+            fn.setPlotConfig(readPlotConfig(args, fn.name))
             plot(plt, result)
             self.saveAndShow(name)
 
@@ -196,7 +196,7 @@ def runPlot(plotter: Plotter, args: argparse.Namespace, plotName: str) -> None:
         plotFolder = plotter.dataFolder / plotName
         plot = pickle.load(open(plotFolder / bob.config.plotSerializationFileName, "rb"))
         result = Result.readFromFolder(plotFolder)
-        style = readStyle(args, plot.name)
+        style = readPlotConfig(args, plot.name)
         plot.setStyle(style)
         plot.plot(plt, result)
         style.verifyAllSetParamsUsed()

@@ -22,10 +22,10 @@ class LuminosityOverTime(MultiSetFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        self.style.setDefault("xLabel", "t")
-        self.style.setDefault("yLabel", "L")
-        self.style.setDefault("xUnit", "Gyr")
-        self.style.setDefault("yUnit", "1 / s")
+        self.config.setDefault("xLabel", "t")
+        self.config.setDefault("yLabel", "L")
+        self.config.setDefault("xUnit", "Gyr")
+        self.config.setDefault("yUnit", "1 / s")
         for subresult in result.data:
             self.addLine(subresult.time, subresult.luminosity)
         plt.legend()

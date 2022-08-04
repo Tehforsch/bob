@@ -33,7 +33,7 @@ def setupArgs() -> argparse.Namespace:
     parser.add_argument("--show", action="store_true", help="Show figures instead of saving them")
     parser.add_argument("--post", action="store_true", help="Only postprocess the data, do not run the corresponding plot scripts (for cluster)")
     parser.add_argument("--png", action="store_true", help="Use png instead of pdf as output type for generating movies")
-    parser.add_argument("--style", type=Path, help="Path to a style sheet to overwrite plot defaults with")
+    parser.add_argument("--plot", type=Path, help="The plot configuration")
     subparsers = parser.add_subparsers(dest="function")
     for function in postprocessingFunctions.postprocessingFunctions:
         subparser = subparsers.add_parser(function.name)

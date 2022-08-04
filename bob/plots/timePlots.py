@@ -65,9 +65,9 @@ class TimePlot(MultiSetFn):
         return results
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        self.style.setDefault("xUnit", "Myr")
-        self.style.setDefault("xLabel", format(f"{self.xlabel()} [UNIT]"))
-        self.style.setDefault("yLabel", format(f"{self.ylabel()} [UNIT]"))
+        self.config.setDefault("xUnit", "Myr")
+        self.config.setDefault("xLabel", format(f"{self.xlabel()} [UNIT]"))
+        self.config.setDefault("yLabel", format(f"{self.ylabel()} [UNIT]"))
         self.setupLinePlot()
         for (style, label, result) in zip(self.styles, self.getLabels(), result.data):
             self.addLine(result.times, result.values, label=label)

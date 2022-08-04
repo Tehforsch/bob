@@ -17,12 +17,12 @@ class IonizationRate(MultiSetFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        self.style.setDefault("xLabel", "z")
-        self.style.setDefault("yLabel", "R")
-        self.style.setDefault("xUnit", pq.dimensionless_unscaled)
-        self.style.setDefault("yUnit", 1 / pq.s)
-        self.style.setDefault("legend_loc", "upper right")
-        self.style.setDefault("yLim", [1e-18, 1e-12])
+        self.config.setDefault("xLabel", "z")
+        self.config.setDefault("yLabel", "R")
+        self.config.setDefault("xUnit", pq.dimensionless_unscaled)
+        self.config.setDefault("yUnit", 1 / pq.s)
+        self.config.setDefault("legend_loc", "upper right")
+        self.config.setDefault("yLim", [1e-18, 1e-12])
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         ax.set_yscale("log")
@@ -35,7 +35,7 @@ class IonizationRate(MultiSetFn):
         plt.plot([], [], color="black", linestyle="-", label="volume av.")
         plt.plot([], [], color="black", linestyle="--", label="mass av.")
         self.addConstraints()
-        plt.legend(loc=self.style["legend_loc"])
+        plt.legend(loc=self.config["legend_loc"])
 
     def addConstraints(self) -> None:
         data = ascii.read(".obs/faucher-giguere2008/table1")

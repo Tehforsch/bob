@@ -57,8 +57,8 @@ class VoronoiSlice(SnapFn):
     def transformLog(self, data: pq.Quantity) -> pq.Quantity:
         epsilon = 1e-50
         for i in range(3):
-            logmin = self.style[f"logmin{i}"]
-            logmax = self.style[f"logmax{i}"]
+            logmin = self.config[f"logmin{i}"]
+            logmax = self.config[f"logmax{i}"]
             log = np.maximum(np.log10(data[:, :, i] + epsilon), logmin)
             data[:, :, i] = (log + (-logmin)) / (logmax - logmin)
         print(np.min(data[:, :, 0]))
@@ -70,33 +70,33 @@ class VoronoiSlice(SnapFn):
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         xAxis, yAxis = getOtherAxes(self.axis)
-        self.style.setDefault("xLabel", f"${xAxis} [UNIT]$")
-        self.style.setDefault("yLabel", f"${yAxis} [UNIT]$")
-        self.style.setDefault("cLabel", "")
-        self.style.setDefault("xUnit", pq.Mpc)
-        self.style.setDefault("yUnit", pq.Mpc)
-        self.style.setDefault("vUnit", self.field.unit)
-        self.style.setDefault("vLim", (1e-6, 1e0))
-        self.style.setDefault("log", True)
-        self.style.setDefault("logmin0", -9)
-        self.style.setDefault("logmin1", -9)
-        self.style.setDefault("logmin2", -9)
-        self.style.setDefault("logmax0", 0)
-        self.style.setDefault("logmax1", 0)
-        self.style.setDefault("logmax2", 0)
-        self.style.setDefault("showTime", True)
+        self.config.setDefault("xLabel", f"${xAxis} [UNIT]$")
+        self.config.setDefault("yLabel", f"${yAxis} [UNIT]$")
+        self.config.setDefault("cLabel", "")
+        self.config.setDefault("xUnit", pq.Mpc)
+        self.config.setDefault("yUnit", pq.Mpc)
+        self.config.setDefault("vUnit", self.field.unit)
+        self.config.setDefault("vLim", (1e-6, 1e0))
+        self.config.setDefault("log", True)
+        self.config.setDefault("logmin0", -9)
+        self.config.setDefault("logmin1", -9)
+        self.config.setDefault("logmin2", -9)
+        self.config.setDefault("logmax0", 0)
+        self.config.setDefault("logmax1", 0)
+        self.config.setDefault("logmax2", 0)
+        self.config.setDefault("showTime", True)
         self.setupLabels()
-        vmin, vmax = self.style["vLim"]
+        vmin, vmax = self.config["vLim"]
         if result.data.ndim == 3:
             # Combined fields: each entry is a color
-            if self.style["log"]:
+            if self.config["log"]:
                 self.transformLog(result.data)
         print(f"min: {np.min(result.data)}, max: {np.max(result.data)}")
-        if self.style["log"]:
+        if self.config["log"]:
             self.image(result.data, self.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
         else:
             self.image(result.data, self.extent, vmin=vmin, vmax=vmax, origin="lower")
-        if self.style["showTime"]:
+        if self.config["showTime"]:
             plt.text(0, 0, f"Redshift: {result.redshift:.01f}", fontsize=12)
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:

@@ -11,14 +11,14 @@ from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
 from bob.result import Result
 from bob.multiSet import MultiSet
-from bob.style import Style
+from bob.plotConfig import PlotConfig
 
 
 class PostprocessingFunction(ABC):
     name = ""
 
     def init(self, args: argparse.Namespace) -> None:
-        self.style: Style = Style({})
+        self.config: PlotConfig = PlotConfig({})
 
     def setArgs(self, subparser: argparse.ArgumentParser) -> None:
         pass
@@ -26,42 +26,42 @@ class PostprocessingFunction(ABC):
     def getName(self, args: argparse.Namespace) -> str:
         return self.name
 
-    def setStyle(self, style: Style) -> None:
-        self.style = style
+    def setPlotConfig(self, plotConfig: PlotConfig) -> None:
+        self.config = plotConfig
 
     def setupLinePlot(self) -> None:
         self.setupLabels()
-        if "xLim" in self.style:
-            plt.xlim(*self.style["xLim"])
-        if "yLim" in self.style:
-            plt.ylim(*self.style["yLim"])
+        if "xLim" in self.config:
+            plt.xlim(*self.config["xLim"])
+        if "yLim" in self.config:
+            plt.ylim(*self.config["yLim"])
 
     def setupLabels(self) -> None:
-        plt.xlabel(self.style["xLabel"])
-        plt.ylabel(self.style["yLabel"])
+        plt.xlabel(self.config["xLabel"])
+        plt.ylabel(self.config["yLabel"])
 
     def addLine(self, xQuantity: pq.Quantity, yQuantity: pq.Quantity, *args: Any, **kwargs: Any) -> None:
-        xUnit = pq.Unit(self.style["xUnit"])
-        yUnit = pq.Unit(self.style["yUnit"])
+        xUnit = pq.Unit(self.config["xUnit"])
+        yUnit = pq.Unit(self.config["yUnit"])
         plt.plot(xQuantity.to(xUnit).value, yQuantity.to(yUnit).value, *args, **kwargs)
 
     def histogram(self, xQuantity: pq.Quantity, yQuantity: pq.Quantity, *args: Any, **kwargs: Any) -> None:
-        xUnit = pq.Unit(self.style["xUnit"])
-        yUnit = pq.Unit(self.style["yUnit"])
+        xUnit = pq.Unit(self.config["xUnit"])
+        yUnit = pq.Unit(self.config["yUnit"])
         plt.hist2d(xQuantity.to(xUnit).value, yQuantity.to(yUnit).value, *args, **kwargs)
 
     def image(self, image: pq.Quantity, extent: Tuple[pq.Quantity, pq.Quantity, pq.Quantity, pq.Quantity], *args: Any, **kwargs: Any) -> None:
-        xUnit = pq.Unit(self.style["xUnit"])
-        yUnit = pq.Unit(self.style["yUnit"])
+        xUnit = pq.Unit(self.config["xUnit"])
+        yUnit = pq.Unit(self.config["yUnit"])
         extent = (extent[0].to_value(xUnit), extent[1].to_value(xUnit), extent[2].to_value(yUnit), extent[3].to_value(yUnit))
-        vUnit = pq.Unit(self.style["vUnit"])
+        vUnit = pq.Unit(self.config["vUnit"])
         plt.imshow(image.to(vUnit).value, extent=extent, *args, **kwargs)
         cbar = plt.colorbar()
-        cbar.set_label(self.style["cLabel"])
+        cbar.set_label(self.config["cLabel"])
 
     def scatter(self, xdata: pq.Quantity, ydata: pq.Quantity, *args: Any, **kwargs: Any) -> None:
-        xUnit = pq.Unit(self.style["xUnit"])
-        yUnit = pq.Unit(self.style["yUnit"])
+        xUnit = pq.Unit(self.config["xUnit"])
+        yUnit = pq.Unit(self.config["yUnit"])
         plt.scatter(xdata.to_value(xUnit), ydata.to_value(yUnit), *args, **kwargs)
 
 
@@ -104,8 +104,8 @@ class MultiSetFn(PostprocessingFunction):
         return itertools.cycle(["b", "r", "g", "purple", "brown", "orange"])
 
     def getLabels(self) -> Iterable[str]:
-        self.style.setDefault("labels", [])
-        return itertools.chain(self.style["labels"], itertools.cycle(""))
+        self.config.setDefault("labels", [])
+        return itertools.chain(self.config["labels"], itertools.cycle(""))
 
 
 class SliceFn(PostprocessingFunction):

@@ -20,16 +20,16 @@ class IonizationTime(SetFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        self.style.setDefault("cLabel", "$t [\\mathrm{Myr}]$")
-        self.style.setDefault("xUnit", pq.Mpc)
-        self.style.setDefault("yUnit", pq.Mpc)
-        self.style.setDefault("xLabel", "$x [h^{-1} \\mathrm{UNIT}]$")
-        self.style.setDefault("yLabel", "$y [h^{-1} \\mathrm{UNIT}]$")
-        self.style.setDefault("vUnit", pq.Myr)
-        self.style.setDefault("vLim", (0.0, 2e2))
+        self.config.setDefault("cLabel", "$t [\\mathrm{Myr}]$")
+        self.config.setDefault("xUnit", pq.Mpc)
+        self.config.setDefault("yUnit", pq.Mpc)
+        self.config.setDefault("xLabel", "$x [h^{-1} \\mathrm{UNIT}]$")
+        self.config.setDefault("yLabel", "$y [h^{-1} \\mathrm{UNIT}]$")
+        self.config.setDefault("vUnit", pq.Myr)
+        self.config.setDefault("vLim", (0.0, 2e2))
         self.setupLabels()
 
-        vmin, vmax = self.style["vLim"]
+        vmin, vmax = self.config["vLim"]
         self.image(result.data, self.extent, cmap="Reds", vmin=vmin, vmax=vmax)
 
     def getIonizationTimeData(self, simSet: SimulationSet) -> pq.Quantity:

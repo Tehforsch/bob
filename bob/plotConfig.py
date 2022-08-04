@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
 
-class Plot(dict):
+class PlotConfig(dict):
     def __init__(self, entries: Dict[str, Any]):
         super().__init__(entries)
         self.name_in_defaults = {k: False for k in entries}
@@ -21,7 +21,7 @@ class Plot(dict):
     def verifyAllSetParamsUsed(self) -> None:
         for (paramName, exists) in self.name_in_defaults.items():
             if not exists:
-                raise ValueError(f"Parameter set from style file that does not appear in set defaults: {paramName}")
+                raise ValueError(f"Parameter set from plot config file that does not appear in set defaults: {paramName}")
 
 
 def fillInUnit(label: str, unit: str) -> str:
