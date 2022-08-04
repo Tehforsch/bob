@@ -1,5 +1,4 @@
 from typing import List
-import argparse
 import astropy.units as pq
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,7 +14,7 @@ from bob.electronAbundance import ElectronAbundance
 
 
 class ThomsonScattering(TimePlot):
-    def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> List[float]:
+    def getQuantity(self, sim: Simulation, snap: Snapshot) -> List[float]:
         sig = 6.65e-29 * pq.m**2  # Thomson scattering cross-section
         xe = ElectronAbundance().getData(snap)
         density = BasicField("Density").getData(snap) * snap.lengthUnit ** (-3) * snap.massUnit

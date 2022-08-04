@@ -35,7 +35,7 @@ def setupArgs() -> argparse.Namespace:
     )
     plotParser.add_argument("-q", "--quotient", nargs="*", help="Parameters by which to divide the simulations into sets")
     plotParser.add_argument("--single", action="store_true", help="Create simulation set for each simulation")
-    plotParser.add_argument("--post", action="store_true", help="Only postprocess the data, do not run the corresponding plot scripts (for cluster)")
+    parser.add_argument("--post", action="store_true", help="Only postprocess the data, do not run the corresponding plot scripts (for cluster)")
 
     replotParser = subparsers.add_parser("replot")
     replotParser.add_argument("simFolders", type=Path, nargs="+", help="Path to simulation directories")
@@ -64,7 +64,7 @@ def main() -> None:
     if args.simFolders == []:
         raise ValueError("No sim folders given")
     setupLogging(args)
-    if args.plot != "replot":
+    if args.function != "replot":
         sims = getSimsFromFolders(args)
     else:
         sims = SimulationSet([])

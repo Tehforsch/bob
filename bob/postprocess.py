@@ -30,6 +30,7 @@ import bob.plots.luminosityOverTime
 import bob.plots.sourcePosition
 import bob.plots.sliceWithStarParticles
 from bob.postprocessingFunctions import PostprocessingFunction
+from bob.plotConfig import PlotConfig
 
 
 from bob.postprocessingFunctions import (
@@ -56,7 +57,8 @@ def readPlotFile(filename: Path) -> List[PostprocessingFunction]:
     for fnName in config:
         function = getFunctionByName(fnName, postprocessingFunctions)
         config = config[fnName]
-        function.setPlotConfig(config)
+        function.setArgs()
+        function.setPlotConfig(PlotConfig(config))
         functions.append(function)
         print("still need to verify")
     return functions

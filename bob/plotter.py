@@ -116,12 +116,12 @@ class Plotter:
         return MultiSet(self.sims.quotient(quotient_params, self.single), labels)
 
     def runMultiSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
-        quotient = self.getQuotient(args.labels)
+        quotient = self.getQuotient(function.config["labels"])
         logging.info("Running {}".format(function.name))
         self.runPostAndPlot(args, function, function.getName(args), lambda: function.post(args, quotient), function.plot)
 
     def runSetFn(self, args: argparse.Namespace, function: SetFn) -> None:
-        quotient = self.getQuotient(args.labels)
+        quotient = self.getQuotient(function.config["labels"])
         logging.info("Running {}".format(function.name))
         for (i, (config, sims)) in enumerate(quotient.iterWithConfigs()):
             logging.info("For set {}".format(i))

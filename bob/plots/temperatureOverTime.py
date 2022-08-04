@@ -22,7 +22,7 @@ class TemperatureOverTime(TimePlot):
         binString = "_binned" if self.config["bins"] else ""
         return f"{self.name}_{args.time}{binString}"
 
-    def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> List[float]:
+    def getQuantity(self, sim: Simulation, snap: Snapshot) -> List[float]:
         density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)
         masses = BasicField("Masses").getData(snap)
         temperature = Temperature().getData(snap) / pq.K
@@ -58,7 +58,7 @@ class TemperatureOverTime(TimePlot):
             for (i, label) in zip(range(1, arr.shape[1]), sublabels):
                 plt.plot(arr[:, 0], arr[:, i], label=label)
         plt.legend(loc="lower left")
-        if self.time == "t":
+        if self.config["time"] == "t":
             self.addConstraints(plt)
 
     def setArgs(self) -> None:
@@ -66,7 +66,7 @@ class TemperatureOverTime(TimePlot):
         self.config.setDefault("bins", False)
 
     def addConstraints(self, ax: plt.axes) -> None:
-        if self.time == "z":
+        if self.config["time"] == "z":
             boera19_temps = np.asarray([[4.6, 7.31e3, 0.88e3, 1.35e3], [5.0, 7.37e3, 1.39e3, 1.67e3]])
 
             walther19_zeds = np.asarray([4.6, 5.0, 5.4])

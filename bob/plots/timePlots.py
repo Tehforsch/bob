@@ -44,20 +44,19 @@ def getTimeOrRedshift(sim: Simulation, snap: Snapshot) -> pq.Quantity:
 
 class TimePlot(MultiSetFn):
     @abstractmethod
-    def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> pq.Quantity:
+    def getQuantity(self, sim: Simulation, snap: Snapshot) -> pq.Quantity:
         pass
 
     def xlabel(self) -> str:
-        return self.time
+        return self.config["time"]
 
     @abstractmethod
     def ylabel(self) -> str:
         pass
 
     def post(self, args: argparse.Namespace, simSets: MultiSet) -> Result:
-        self.time = args.time
         results = Result()
-        results.data = [self.getQuantityOverTime(args, simSet) for simSet in simSets]
+        results.data = [self.getQuantityOverTime(self.config["time"], simSet) for simSet in simSets]
         return results
 
     def plot(self, plt: plt.axes, result: Result) -> None:
@@ -69,10 +68,10 @@ class TimePlot(MultiSetFn):
             self.addLine(result.times, result.values, label=label)
         plt.legend()
 
-    def getQuantityOverTime(self, args: argparse.Namespace, simSet: SimulationSet) -> Result:
+    def getQuantityOverTime(self, timeQuantity: str, simSet: SimulationSet) -> Result:
         snapshots = [(snap, sim) for sim in simSet for snap in sim.snapshots]
 
-        data = runInPool(getTimeAndResultForSnap, snapshots, self, args)
+        data = runInPool(getTimeAndResultForSnap, snapshots, self, timeQuantity)
         data.sort(key=lambda x: x[0])
         result = Result()
         result.times = getArrayQuantity([x[0] for x in data])
@@ -84,6 +83,6 @@ class TimePlot(MultiSetFn):
         addTimeArg(self)
 
 
-def getTimeAndResultForSnap(plot: TimePlot, args: argparse.Namespace, snapSim: Tuple[Snapshot, Simulation]) -> Tuple[pq.Quantity, pq.Quantity]:
+def getTimeAndResultForSnap(plot: TimePlot, timeQuantity: str, snapSim: Tuple[Snapshot, Simulation]) -> Tuple[pq.Quantity, pq.Quantity]:
     (snap, sim) = snapSim
-    return (getTimeQuantityForSnap(args.time, sim, snap), plot.getQuantity(args, sim, snap))
+    return (getTimeQuantityForSnap(timeQuantity, sim, snap), plot.getQuantity(sim, snap))

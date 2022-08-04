@@ -25,5 +25,7 @@ class Test(unittest.TestCase):
             self.runTest(Path(f))
 
     def runTest(self, folder: Path) -> None:
-        args = self.readArgs(folder)
-        subprocess.check_call(["python", self.pybobPath, *args.split(" ")], cwd=folder)
+        if (folder / "plot.bob").is_file():
+            subprocess.check_call(["python", self.pybobPath, "plot", ".", "plot.bob"], cwd=folder)
+        else:
+            subprocess.check_call(["python", self.pybobPath, "replot", ".", "replot.bob"], cwd=folder)

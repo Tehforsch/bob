@@ -1,0 +1,3 @@
+slice:
+  field: Temperature
+  axis: z

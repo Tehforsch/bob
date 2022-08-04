@@ -15,7 +15,7 @@ from bob.plots.timePlots import TimePlot
 
 class MeanFieldOverTime(TimePlot):
     def xlabel(self) -> str:
-        return self.time
+        return self.config["time"]
 
     def ylabel(self) -> str:
         return self.field().symbol
@@ -28,9 +28,11 @@ class MeanFieldOverTime(TimePlot):
         self.config.setRequired("field", choices=[f.niceName for f in allFields])
 
     def getName(self, args: argparse.Namespace) -> str:
-        return f"{self.name}_{args.field}_{args.time}"
+        field = self.config["field"]
+        timeQuantity = self.config["time"]
+        return f"{self.name}_{field}_{timeQuantity}"
 
-    def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> float:
+    def getQuantity(self, sim: Simulation, snap: Snapshot) -> float:
         masses = BasicField("Masses").getData(snap)
         data = self.field().getData(snap)
         return np.mean(data * masses) / np.mean(masses)

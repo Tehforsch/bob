@@ -18,13 +18,13 @@ class PostprocessingFunction(ABC):
     name = ""
 
     def setArgs(self) -> None:
-        pass
+        self.config = PlotConfig({})
 
     def getName(self, args: argparse.Namespace) -> str:
         return self.name
 
     def setPlotConfig(self, plotConfig: PlotConfig) -> None:
-        self.config = plotConfig
+        self.config.update(plotConfig)
 
     def setupLinePlot(self) -> None:
         self.setupLabels()
@@ -85,6 +85,7 @@ class SetFn(PostprocessingFunction):
         pass
 
     def setArgs(self) -> None:
+        super().setArgs()
         self.config.setDefault("labels", None)
 
 
@@ -98,18 +99,22 @@ class MultiSetFn(PostprocessingFunction):
         pass
 
     def setArgs(self) -> None:
+        super().setArgs()
         self.config.setDefault("labels", None)
 
     def getColors(self) -> Iterable[str]:
         return itertools.cycle(["b", "r", "g", "purple", "brown", "orange"])
 
     def getLabels(self) -> Iterable[str]:
-        self.config.setDefault("labels", [])
-        return itertools.chain(self.config["labels"], itertools.cycle(""))
+        labels = self.config["labels"]
+        if labels is None:
+            labels = []
+        return itertools.chain(labels, itertools.cycle(""))
 
 
 class SliceFn(PostprocessingFunction):
     def setArgs(self) -> None:
+        super().setArgs()
         self.config.setRequired("field")
 
     def getName(self, args: argparse.Namespace) -> str:

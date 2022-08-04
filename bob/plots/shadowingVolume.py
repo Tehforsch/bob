@@ -57,7 +57,7 @@ class ShadowingVolumePlot(TimePlot):
     def ylabel(self) -> str:
         return "$\overline{x_{\mathrm{H}}}$"
 
-    def getQuantity(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> List[float]:
+    def getQuantity(self, sim: Simulation, snap: Snapshot) -> List[float]:
         print("At", sim.name, snap.time.to(pq.kyr))
         densities = BasicField("Density").getData(snap)
         densityThreshold = 1500
