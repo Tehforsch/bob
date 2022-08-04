@@ -65,9 +65,9 @@ class TemperatureOverTime(TimePlot):
         if self.time == "t":
             self.addConstraints(plt)
 
-    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        super().setArgs(subparser)
-        subparser.add_argument("--bins", action="store_true")
+    def setArgs(self) -> None:
+        super().setArgs()
+        self.config.setDefault("bins", False)
 
     def addConstraints(self, ax: plt.axes) -> None:
         if self.time == "z":

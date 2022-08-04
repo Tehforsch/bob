@@ -23,9 +23,9 @@ class MeanFieldOverTime(TimePlot):
     def ylabel(self) -> str:
         return self.field.symbol
 
-    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        super().setArgs(subparser)
-        subparser.add_argument("--field", required=True, choices=[f.niceName for f in allFields])
+    def setArgs(self) -> None:
+        super().setArgs()
+        self.config.setRequired("field", choices=[f.niceName for f in allFields])
 
     def getName(self, args: argparse.Namespace) -> str:
         return f"{self.name}_{args.field}_{args.time}"

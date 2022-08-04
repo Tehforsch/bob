@@ -20,7 +20,7 @@ class PostprocessingFunction(ABC):
     def init(self, args: argparse.Namespace) -> None:
         self.config: PlotConfig = PlotConfig({})
 
-    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
+    def setArgs(self) -> None:
         pass
 
     def getName(self, args: argparse.Namespace) -> str:
@@ -84,8 +84,8 @@ class SetFn(PostprocessingFunction):
     def plot(self, axes: plt.axes, result: Result) -> None:
         pass
 
-    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        subparser.add_argument("--labels", nargs="*", type=str)
+    def setArgs(self) -> None:
+        self.config.setDefault("labels", None)
 
 
 class MultiSetFn(PostprocessingFunction):
@@ -97,8 +97,8 @@ class MultiSetFn(PostprocessingFunction):
     def plot(self, axes: plt.axes, result: Result) -> None:
         pass
 
-    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        subparser.add_argument("--labels", nargs="*", type=str)
+    def setArgs(self) -> None:
+        self.config.setDefault("labels", None)
 
     def getColors(self) -> Iterable[str]:
         return itertools.cycle(["b", "r", "g", "purple", "brown", "orange"])
@@ -112,8 +112,8 @@ class SliceFn(PostprocessingFunction):
     def init(self, args: argparse.Namespace) -> None:
         self.slice_field = args.slice_field
 
-    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        subparser.add_argument("--slice_field", choices=["xHP", "temp", "density"], required=True)
+    def setArgs(self) -> None:
+        self.config.setRequired("field")
 
     def getName(self, args: argparse.Namespace) -> str:
         return f"{self.name}_{args.slice_field}"

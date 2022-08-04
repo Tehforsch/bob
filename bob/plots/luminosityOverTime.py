@@ -30,9 +30,9 @@ class LuminosityOverTime(MultiSetFn):
             self.addLine(subresult.time, subresult.luminosity)
         plt.legend()
 
-    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        super().setArgs(subparser)
-        addTimeArg(subparser)
+    def setArgs(self) -> None:
+        super().setArgs()
+        addTimeArg(self)
 
 
 addToList("luminosityOverTime", LuminosityOverTime())

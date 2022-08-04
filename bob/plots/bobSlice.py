@@ -99,10 +99,10 @@ class VoronoiSlice(SnapFn):
         if self.config["showTime"]:
             plt.text(0, 0, f"Redshift: {result.redshift:.01f}", fontsize=12)
 
-    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        super().setArgs(subparser)
-        subparser.add_argument("--axis", required=True, choices=["x", "y", "z"])
-        subparser.add_argument("--field", required=True, choices=[f.niceName for f in allFields])
+    def setArgs(self) -> None:
+        super().setArgs()
+        self.config.setRequired("axis", choices=["x", "y", "z"])
+        self.config.setRequired("field", choices=[f.niceName for f in allFields])
 
     def getName(self, args: argparse.Namespace) -> str:
         return f"{self.name}_{args.axis}_{args.field}"

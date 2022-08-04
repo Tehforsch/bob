@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import astropy.units as pq
 
 from bob.snapshot import Snapshot
-from bob.postprocessingFunctions import MultiSetFn
+from bob.postprocessingFunctions import MultiSetFn, PostprocessingFunction
 from bob.result import Result
 from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
@@ -15,8 +15,8 @@ from bob.pool import runInPool
 from bob.util import getArrayQuantity
 
 
-def addTimeArg(subparser: argparse.ArgumentParser) -> None:
-    subparser.add_argument("--time", default="t", choices=["t", "z"])
+def addTimeArg(fn: PostprocessingFunction) -> None:
+    fn.config.setDefault("time", "t", choices=["t", "z"])
 
 
 def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot) -> float:
@@ -83,9 +83,9 @@ class TimePlot(MultiSetFn):
         result.values = getArrayQuantity([x[1] for x in data])
         return result
 
-    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        super().setArgs(subparser)
-        addTimeArg(subparser)
+    def setArgs(self) -> None:
+        super().setArgs()
+        addTimeArg(self)
 
 
 def getTimeAndResultForSnap(plot: TimePlot, args: argparse.Namespace, snapSim: Tuple[Snapshot, Simulation]) -> Tuple[pq.Quantity, pq.Quantity]:

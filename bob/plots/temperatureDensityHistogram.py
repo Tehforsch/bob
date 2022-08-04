@@ -14,8 +14,9 @@ from bob.temperature import Temperature
 
 
 class TemperatureDensityHistogram(SnapFn):
-    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        subparser.add_argument("--only_ionized", action="store_true")
+    def setArgs(self) -> None:
+        super().setArgs()
+        self.config.setDefault("only_ionized", False)
 
     def getName(self, args: argparse.Namespace) -> str:
         ionizedStr = "_only_ionized" if args.only_ionized else ""

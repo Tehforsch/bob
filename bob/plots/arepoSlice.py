@@ -20,9 +20,6 @@ class ArepoSlice:
 
 
 class ArepoSlicePlot(SliceFn):
-    def setArgs(self, subparser: argparse.ArgumentParser) -> None:
-        super().setArgs(subparser)
-
     # Taken from arepy
     def post(self, args: argparse.Namespace, sim: Simulation, slice_: ArepoSlice) -> Result:
         f = open(slice_.path, mode="rb")
