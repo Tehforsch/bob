@@ -40,19 +40,21 @@ def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
         raise ValueError("WRONG type of snapshot argument. Need an integer")
 
 
+def getOutputFilename(filename: str, outputFileType: str) -> Path:
+    return Path("{}.{}".format(filename, outputFileType))
+
+
 class Plotter:
     def __init__(
         self,
         parent_folder: Path,
         sims: SimulationSet,
         show: bool,
-        outputFileType: str,
     ) -> None:
         self.picFolder = parent_folder / bob.config.picFolder
         self.sims = sims
         self.dataFolder = self.picFolder / "plots"
         self.show = show
-        self.outputFileType = outputFileType
 
     def filterSims(self, select: Optional[List[str]]) -> SimulationSet:
         if select is None:
@@ -61,13 +63,15 @@ class Plotter:
             return SimulationSet(sim for sim in self.sims if sim.name in select)
 
     def isNew(self, plotName: str) -> bool:
-        pdfPath = (self.picFolder / plotName).with_suffix(self.outputFileType)
-        if not pdfPath.is_file():
+        images = [(self.picFolder / plotName).with_suffix(suffix) for suffix in bob.config.possibleImageSuffixes]
+        images = [image for image in images if image.is_file()]
+        if len(images) == 0:
             return True
-        plotPath = self.dataFolder / plotName
-        mtimePlot = max(os.path.getmtime(str(f)) for f in walkfiles(plotPath))
-        mtimePdf = os.path.getmtime(pdfPath)
-        return mtimePdf < mtimePlot
+        else:
+            plotPath = self.dataFolder / plotName
+            mtimePlot = max(os.path.getmtime(str(f)) for f in walkfiles(plotPath))
+            mtimeImage = max(os.path.getmtime(image) for image in images)
+            return mtimeImage < mtimePlot
 
     def getNewPlots(self) -> List[str]:
         plots = os.listdir(self.dataFolder)
@@ -89,7 +93,7 @@ class Plotter:
         self.save(fn, name, result)
         if not args.post:
             plot(plt, result)
-            self.saveAndShow(name)
+            self.saveAndShow(name, fn)
 
     def save(self, fn: PostprocessingFunction, plotName: str, result: Result) -> None:
         plotDataFolder = self.dataFolder / plotName
@@ -149,10 +153,10 @@ class Plotter:
             if self.isInSnapshotArgs(snapshotFilter, snap):
                 yield snap
 
-    def saveAndShow(self, filename: str) -> None:
-        filepath = self.picFolder / filename
+    def saveAndShow(self, filename: str, fn: PostprocessingFunction) -> None:
+        filepath = self.picFolder / getOutputFilename(filename, fn.config["outputFileType"])
         filepath.parent.mkdir(exist_ok=True)
-        plt.savefig(str(filepath) + self.outputFileType, dpi=bob.config.dpi)
+        plt.savefig(str(filepath), dpi=bob.config.dpi)
         if self.show:
             plt.show()
         plt.clf()
@@ -176,4 +180,4 @@ def runPlot(plotter: Plotter, args: argparse.Namespace, plotName: str) -> None:
         assert len(functions) == 1, "More than one plot in replot information."
         result = Result.readFromFolder(plotFolder)
         functions[0].plot(plt, result)
-        plotter.saveAndShow(plotFolder.name)
+        plotter.saveAndShow(plotFolder.name, functions[0])

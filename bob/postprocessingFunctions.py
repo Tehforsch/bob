@@ -19,6 +19,7 @@ class PostprocessingFunction(ABC):
     def __init__(self, config: PlotConfig) -> None:
         self.config = config
         self.config.setDefault("sims", None)
+        self.config.setDefault("outputFileType", "png")
 
     def getName(self) -> str:
         return self.name

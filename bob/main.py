@@ -17,7 +17,6 @@ def setupArgs() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Postprocess arepo sims")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     parser.add_argument("--show", action="store_true", help="Show figures instead of saving them")
-    parser.add_argument("--png", action="store_true", help="Use png instead of pdf as output type for generating movies")
 
     subparsers = parser.add_subparsers(dest="function")
     plotParser = subparsers.add_parser("plot")
