@@ -8,10 +8,10 @@ from bob.postprocess import runFunctionsWithPlotter, readPlotFile, create_pic_fo
 from bob.simulationSet import getSimsFromFolders
 
 
-def runPlots(commFolder: Path, files: Sequence[Path]) -> None:
+def runPlots(commFolder: Path, workFolder: Path, files: Sequence[Path]) -> None:
     for f in files:
         f = commFolder / f
-        path = Path(f.name.replace("##", "/"))  # amazing stuff
+        path = workFolder / Path(f.name.replace("##", "/"))  # amazing stuff
         if not path.is_dir():
             raise ValueError(f"No folder at {path}")
             continue
@@ -28,5 +28,5 @@ def watch(commFolder: Path, workFolder: Path) -> None:
     while True:
         files = os.listdir(commFolder)
         if len(files) > 0:
-            runPlots(commFolder, list(Path(f) for f in files))
+            runPlots(commFolder, workFolder, list(Path(f) for f in files))
         sleep(1)
