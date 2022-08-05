@@ -34,6 +34,12 @@ def getTimeQuantityFromTimeOrScaleFactor(quantity: str, sim: Simulation, snap: S
     else:
         raise NotImplementedError
 
+def getTimeOrRedshift(sim: Simulation, snap: Snapshot):
+    if sim.params["ComovingIntegrationOn"] == 1:
+        return getTimeQuantityForSnap("z", sim, snap)
+    else:
+        return getTimeQuantityForSnap("t", sim, snap)
+
 
 def getTimeOrRedshift(sim: Simulation, snap: Snapshot) -> pq.Quantity:
     if sim.params["ComovingIntegrationOn"] == 1:

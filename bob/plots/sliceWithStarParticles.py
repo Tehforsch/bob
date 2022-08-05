@@ -7,6 +7,7 @@ from bob.snapshot import Snapshot
 from bob.result import Result
 from bob.plots.bobSlice import Slice
 from bob.plotConfig import PlotConfig
+from bob.plots.timePlots import getTimeOrRedshift
 
 
 class SliceWithStarParticles(Slice):
@@ -27,6 +28,7 @@ class SliceWithStarParticles(Slice):
             result.coords = coords[np.where(zRelativeDist < 0.02)]
         else:
             result.coords = np.zeros(()) * snap.lengthUnit
+        result.redshift = getTimeOrRedshift(sim, snap)
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
