@@ -36,6 +36,10 @@ def readPlotFile(filename: Path, safe: bool) -> List[PostprocessingFunction]:
     else:
         loader = yaml.Loader
     config = yaml.load(filename.open("r"), Loader=loader)
+    return getFunctionsFromPlotConfigs(config)
+
+
+def getFunctionsFromPlotConfigs(config: dict) -> List[PostprocessingFunction]:
     functions: List[PostprocessingFunction] = []
     for fnName in config:
         config = config[fnName]

@@ -6,7 +6,7 @@ import argparse
 import bob.postprocess
 from bob.simulationSet import getSimsFromFolders, SimulationSet
 from bob.util import getCommonParentFolder
-from bob.watch import watch
+from bob.watch import watchPost, watchReplot
 from bob.plotter import Plotter
 from bob.postprocess import readPlotFile, setMatplotlibStyle
 
@@ -37,9 +37,15 @@ def setupArgs() -> argparse.Namespace:
         help="Replot all plots that have new data or havent been generated yet but don't refresh old ones",
     )
 
-    replotParser = subparsers.add_parser("watch")
-    replotParser.add_argument("communicationFolder", type=Path, help="The folder to watch for new commands")
-    replotParser.add_argument("workFolder", type=Path, help="The work folder to execute the commands in")
+    watchPostParser = subparsers.add_parser("watchPost")
+    watchPostParser.add_argument("communicationFolder", type=Path, help="The folder to watch for new commands")
+    watchPostParser.add_argument("workFolder", type=Path, help="The work folder to execute the commands in")
+
+    watchReplotParser = subparsers.add_parser("watchReplot")
+    watchReplotParser.add_argument("communicationFolder", type=Path, help="The folder to watch for new replot commands (.done files)")
+    watchReplotParser.add_argument("remoteWorkFolder", type=Path, help="The folder from which the plots should be copied")
+    watchReplotParser.add_argument("localWorkFolder", type=Path, help="The folder to which the plots should be copied and replotted")
+
     args = parser.parse_args()
     return args
 
@@ -54,14 +60,16 @@ def setupLogging(args: argparse.Namespace) -> None:
 def main() -> None:
     args = setupArgs()
     setupLogging(args)
-    if args.function == "watch":
-        watch(args.communicationFolder, args.workFolder)
-        return
+    if args.function == "watchPost":
+        watchPost(args.communicationFolder, args.workFolder)
+    if args.function == "watchReplot":
+        setMatplotlibStyle()
+        watchReplot(args.communicationFolder, args.localWorkFolder, args.remoteWorkFolder)
     if not args.post:
         setMatplotlibStyle()
     if args.function == "replot":
         plotter = Plotter(Path("."), SimulationSet([]), args.post, args.show)
-        plotter.replot(args)
+        plotter.replot(args.plots, args.onlyNew)
     else:
         sims = getSimsFromFolders(args.simFolders)
         parent_folder = getCommonParentFolder(args.simFolders)

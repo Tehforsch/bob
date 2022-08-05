@@ -2,7 +2,6 @@ import os
 import yaml
 from typing import Iterator, List, Optional, Callable, Union
 from pathlib import Path
-import argparse
 import matplotlib.pyplot as plt
 import logging
 
@@ -80,13 +79,13 @@ class Plotter:
         plots = os.listdir(self.dataFolder)
         return [plot for plot in plots if self.isNew(plot)]
 
-    def replot(self, args: argparse.Namespace) -> None:
-        if args.onlyNew:
+    def replot(self, plotFilter: Optional[List[str]], onlyNew: bool) -> None:
+        if onlyNew:
             plots = self.getNewPlots()
         else:
             plots = os.listdir(self.dataFolder)
         plots.sort()
-        runInPool(runPlot, plots, self, args)
+        runInPool(runPlot, plots, self, plotFilter)
 
     def runPostAndPlot(self, fn: PostprocessingFunction, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]) -> str:
         logging.info("Running {}".format(name))
@@ -171,11 +170,10 @@ def getBaseName(plotName: str) -> str:
 
 
 # Needs to be a top-level function so it can be used by multiprocessing
-def runPlot(plotter: Plotter, args: argparse.Namespace, plotName: str) -> None:
+def runPlot(plotter: Plotter, plotFilter: Optional[List[str]], plotName: str) -> None:
     from bob.postprocess import readPlotFile
 
-    baseName = getBaseName(plotName)
-    if (args.plots is None or plotName in args.plots) and (args.types is None or baseName in args.types):
+    if plotFilter is None or plotName in plotFilter:
         print("Replotting", plotName)
         plotFolder = plotter.dataFolder / plotName
         functions = readPlotFile(plotFolder / bob.config.plotSerializationFileName, False)
