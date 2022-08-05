@@ -40,11 +40,10 @@ class PlotConfig(dict):
         for param in self.required:
             if param not in self:
                 raise ValueError(f"Required parameter not set: {param}")
-        for param in self:
-            if param in self.choices:
-                value = self.choices[param]
-                if not self[param] in value:
-                    raise ValueError(f"Wrong parameter value for {param}: {value}")
+        for (param, choices) in self.choices.items():
+            if not self[param] in choices:
+                value = self[param]
+                raise ValueError(f"Wrong parameter value for {param}: {value}")
 
 
 def fillInUnit(label: str, unit: str) -> str:

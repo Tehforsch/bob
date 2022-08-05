@@ -15,13 +15,21 @@ class Test(unittest.TestCase):
         folders = [testPath / f for f in os.listdir(testPath)]
         runInPool(runTestInTemporaryDirectory, folders, pybobPath)
 
+
 def runTestInTemporaryDirectory(pybobPath: Path, folder: Path) -> None:
     with tempfile.TemporaryDirectory() as f:
         shutil.copytree(folder, f, dirs_exist_ok=True)
         runTest(Path(f), pybobPath)
 
+
 def runTest(folder: Path, pybobPath: Path) -> None:
     if (folder / "plot.bob").is_file():
-        subprocess.check_call(["python", pybobPath, "plot", ".", "plot.bob"], cwd=folder)
+        args = ["python", str(pybobPath), "plot", ".", "plot.bob"]
     else:
-        subprocess.check_call(["python", pybobPath, "replot", ".", "replot.bob"], cwd=folder)
+        args = ["python", str(pybobPath), "replot", ".", "replot.bob"]
+    try:
+        subprocess.check_call(args, cwd=folder, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except:
+        # Welcome to the worlds laziest error handling but I can't be bothered to find out
+        # how to properly handle stdout/stderr in subprocess
+        subprocess.check_call(args, cwd=folder)
