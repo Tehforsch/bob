@@ -9,12 +9,17 @@ from bob.postprocessingFunctions import SnapFn, addToList
 from bob.result import Result
 from bob.basicField import BasicField
 from bob.temperature import Temperature
+from bob.plotConfig import PlotConfig
 
 
 class TemperatureDensityHistogram(SnapFn):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, config: PlotConfig) -> None:
+        super().__init__(config)
         self.config.setDefault("only_ionized", False)
+        self.config.setDefault("xUnit", "g / cm^3")
+        self.config.setDefault("yUnit", "K")
+        self.config.setDefault("xLabel", "$\\rho [UNIT]$")
+        self.config.setDefault("yLabel", "T [UNIT]")
 
     def getName(self) -> str:
         ionizedStr = "_only_ionized" if self.config["only_ionized"] else ""
@@ -36,10 +41,6 @@ class TemperatureDensityHistogram(SnapFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         fig = plt.figure()
         ax = fig.add_subplot(2, 1, 1)
-        self.config.setDefault("xUnit", "g / cm^3")
-        self.config.setDefault("yUnit", "K")
-        self.config.setDefault("xLabel", "$\\rho [UNIT]$")
-        self.config.setDefault("yLabel", "T [UNIT]")
         self.setupLabels()
         ax.set_xscale("log")
         ax.set_yscale("log")
@@ -56,4 +57,4 @@ class TemperatureDensityHistogram(SnapFn):
         colorbar.set_ticks([1e17, 1e22, 1e27])
 
 
-addToList("temperatureDensityHistogram", TemperatureDensityHistogram())
+addToList("temperatureDensityHistogram", TemperatureDensityHistogram)

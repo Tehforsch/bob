@@ -45,4 +45,4 @@ class ThomsonScattering(TimePlot):
         return "$\tau$"
 
 
-addToList("thomsonScattering", ThomsonScattering())
+addToList("thomsonScattering", ThomsonScattering)

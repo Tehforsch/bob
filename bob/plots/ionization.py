@@ -400,4 +400,4 @@ def getBeckerData2015() -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     return becker_2015_xHI, becker_2015_low, becker_2015_high
 
 
-addToList("ionization", Ionization())
+addToList("ionization", Ionization)

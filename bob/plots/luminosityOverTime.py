@@ -7,11 +7,17 @@ from bob.plots.timePlots import getTimeQuantityForSnap, addTimeArg
 from bob.postprocessingFunctions import addToList
 from bob.util import getArrayQuantity
 
+from bob.plotConfig import PlotConfig
+
 
 class LuminosityOverTime(MultiSetFn):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, config: PlotConfig) -> None:
+        super().__init__(config)
         addTimeArg(self)
+        self.config.setDefault("xLabel", "t")
+        self.config.setDefault("yLabel", "L")
+        self.config.setDefault("xUnit", "Gyr")
+        self.config.setDefault("yUnit", "1 / s")
 
     def post(self, simSets: MultiSet) -> Result:
         result = Result()
@@ -25,13 +31,9 @@ class LuminosityOverTime(MultiSetFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        self.config.setDefault("xLabel", "t")
-        self.config.setDefault("yLabel", "L")
-        self.config.setDefault("xUnit", "Gyr")
-        self.config.setDefault("yUnit", "1 / s")
         for subresult in result.data:
             self.addLine(subresult.time, subresult.luminosity)
         plt.legend()
 
 
-addToList("luminosityOverTime", LuminosityOverTime())
+addToList("luminosityOverTime", LuminosityOverTime)

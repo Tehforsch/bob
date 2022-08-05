@@ -12,6 +12,7 @@ from bob.simulation import Simulation
 from bob.multiSet import MultiSet
 from bob.pool import runInPool
 from bob.util import getArrayQuantity
+from bob.plotConfig import PlotConfig
 
 
 def addTimeArg(fn: PostprocessingFunction) -> None:
@@ -42,9 +43,12 @@ def getTimeOrRedshift(sim: Simulation, snap: Snapshot) -> pq.Quantity:
 
 
 class TimePlot(MultiSetFn):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, config: PlotConfig) -> None:
+        super().__init__(config)
         addTimeArg(self)
+        self.config.setDefault("xUnit", "Myr")
+        self.config.setDefault("xLabel", format(f"{self.xlabel()} [UNIT]"))
+        self.config.setDefault("yLabel", format(f"{self.ylabel()} [UNIT]"))
 
     @abstractmethod
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> pq.Quantity:
@@ -63,9 +67,6 @@ class TimePlot(MultiSetFn):
         return results
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        self.config.setDefault("xUnit", "Myr")
-        self.config.setDefault("xLabel", format(f"{self.xlabel()} [UNIT]"))
-        self.config.setDefault("yLabel", format(f"{self.ylabel()} [UNIT]"))
         self.setupLinePlot()
         for (label, result) in zip(self.getLabels(), result.data):
             self.addLine(result.times, result.values, label=label)

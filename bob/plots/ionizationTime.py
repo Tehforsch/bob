@@ -53,4 +53,4 @@ class IonizationTime(SetFn):
             raise ValueError("No sims/snaps")
 
 
-addToList("ionizationTime", IonizationTime())
+addToList("ionizationTime", IonizationTime)

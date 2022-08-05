@@ -1,6 +1,6 @@
 import os
 import argparse
-from typing import Sequence, List
+from typing import Sequence, List, Type
 from pathlib import Path
 import yaml
 import logging
@@ -42,7 +42,7 @@ from bob.postprocessingFunctions import (
 )
 
 
-def getFunctionByName(name: str, functions: Sequence[PostprocessingFunction]) -> PostprocessingFunction:
+def getFunctionByName(name: str, functions: Sequence[Type[PostprocessingFunction]]) -> Type[PostprocessingFunction]:
     return next(function for function in functions if function.name == name)
 
 
@@ -55,11 +55,10 @@ def readPlotFile(filename: Path) -> List[PostprocessingFunction]:
     config = yaml.load(filename.open("r"), Loader=yaml.SafeLoader)
     functions: List[PostprocessingFunction] = []
     for fnName in config:
-        function = getFunctionByName(fnName, postprocessingFunctions)
         config = config[fnName]
-        function.setPlotConfig(PlotConfig(config))
+        function = getFunctionByName(fnName, postprocessingFunctions)(PlotConfig(config))
+        function.config.verify()
         functions.append(function)
-        print("still need to verify")
     return functions
 
 

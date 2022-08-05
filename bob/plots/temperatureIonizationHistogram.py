@@ -9,9 +9,17 @@ from bob.postprocessingFunctions import SnapFn, addToList
 from bob.result import Result
 from bob.basicField import BasicField
 from bob.temperature import Temperature
+from bob.plotConfig import PlotConfig
 
 
 class TemperatureIonizationHistogram(SnapFn):
+    def __init__(self, config: PlotConfig) -> None:
+        super().__init__(config)
+        self.config.setDefault("xUnit", pq.dimensionless_unscaled)
+        self.config.setDefault("yUnit", pq.K)
+        self.config.setDefault("xLabel", "$x_{\\mathrm{H}} [UNIT]$")
+        self.config.setDefault("yLabel", "T [UNIT]")
+
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         result = Result()
         result.temperature = Temperature().getData(snap)
@@ -23,10 +31,6 @@ class TemperatureIonizationHistogram(SnapFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         fig = plt.figure()
         ax = fig.add_subplot(2, 1, 1)
-        self.config.setDefault("xUnit", pq.dimensionless_unscaled)
-        self.config.setDefault("yUnit", pq.K)
-        self.config.setDefault("xLabel", "$x_{\\mathrm{H}} [UNIT]$")
-        self.config.setDefault("yLabel", "T [UNIT]")
         self.setupLabels()
         ax.set_xscale("log")
         ax.set_yscale("log")
@@ -43,4 +47,4 @@ class TemperatureIonizationHistogram(SnapFn):
         colorbar.set_ticks([1e-9, 1e-6, 1e-3, 1e0, 1e3])
 
 
-addToList("temperatureIonizationHistogram", TemperatureIonizationHistogram())
+addToList("temperatureIonizationHistogram", TemperatureIonizationHistogram)

@@ -7,9 +7,14 @@ from bob.snapshot import Snapshot
 from bob.result import Result
 from bob.plots.bobSlice import VoronoiSlice
 from bob.postprocessingFunctions import addToList
+from bob.plotConfig import PlotConfig
 
 
 class SliceWithStarParticles(VoronoiSlice):
+    def __init__(self, config: PlotConfig) -> None:
+        super().__init__(config)
+        self.config.setDefault("circleSize", 0.05)
+
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         result = super().post(sim, snap)
         f = snap.hdf5File
@@ -26,7 +31,6 @@ class SliceWithStarParticles(VoronoiSlice):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        self.config.setDefault("circleSize", 0.05)
         if self.axis != "z":
             raise NotImplementedError("Implement other axes by adjusting the coordinates below")
         fig = plt.figure()
@@ -40,4 +44,4 @@ class SliceWithStarParticles(VoronoiSlice):
                 ax.add_patch(circ)
 
 
-addToList("sliceWithStarParticles", SliceWithStarParticles())
+addToList("sliceWithStarParticles", SliceWithStarParticles)

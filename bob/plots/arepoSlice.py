@@ -51,4 +51,4 @@ class ArepoSlicePlot(SliceFn):
             cbar.set_label("$\\rho$")
 
 
-addToList("arepoSlice", ArepoSlicePlot())
+addToList("arepoSlice", ArepoSlicePlot)

@@ -12,6 +12,7 @@ from bob.plots.timePlots import TimePlot
 from bob.snapshot import Snapshot
 from bob.basicField import BasicField
 from bob.simulation import Simulation
+from bob.plotConfig import PlotConfig
 
 
 class InfiniteCone:
@@ -32,8 +33,8 @@ class InfiniteCone:
 
 
 class ShadowingVolumePlot(TimePlot):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, config: PlotConfig) -> None:
+        super().__init__(config)
         self.L = 32
         self.boxSize = 1.0
         self.center = np.array([self.boxSize / 2.0, self.boxSize / 2.0, self.boxSize / 2.0])
@@ -86,4 +87,4 @@ class ShadowingVolumePlot(TimePlot):
         plt.legend(loc="upper left")
 
 
-addToList("shadowingVolume", ShadowingVolumePlot())
+addToList("shadowingVolume", ShadowingVolumePlot)

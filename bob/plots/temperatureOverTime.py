@@ -11,11 +11,12 @@ from bob.snapshot import Snapshot
 from bob.basicField import BasicField
 from bob.simulation import Simulation
 from bob.temperature import Temperature
+from bob.plotConfig import PlotConfig
 
 
 class TemperatureOverTime(TimePlot):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, config: PlotConfig) -> None:
+        super().__init__(config)
         self.config.setDefault("bins", False)
 
     def ylabel(self) -> str:
@@ -96,4 +97,4 @@ class TemperatureOverTime(TimePlot):
             )
 
 
-addToList("temperatureOverTime", TemperatureOverTime())
+addToList("temperatureOverTime", TemperatureOverTime)

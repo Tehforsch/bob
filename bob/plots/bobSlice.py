@@ -13,6 +13,7 @@ from bob.result import Result
 from bob.allFields import allFields, getFieldByName
 from bob.field import Field
 from bob.plots.timePlots import getTimeOrRedshift
+from bob.plotConfig import PlotConfig
 
 
 def getDataAtPoints(field: Field, snapshot: Snapshot, points: pq.Quantity) -> np.ndarray:
@@ -43,14 +44,30 @@ def getSlice(field: Field, snapshot: Snapshot, axisName: str) -> Tuple[Tuple[flo
 
 
 class VoronoiSlice(SnapFn):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, config: PlotConfig) -> None:
+        super().__init__(config)
         self.config.setRequired("axis", choices=["x", "y", "z"])
         self.config.setRequired("field", choices=[f.niceName for f in allFields])
+        self.field = getFieldByName(self.config["field"])
+        xAxis, yAxis = getOtherAxes(config["axis"])
+        self.config.setDefault("xLabel", f"${xAxis} [UNIT]$")
+        self.config.setDefault("yLabel", f"${yAxis} [UNIT]$")
+        self.config.setDefault("cLabel", "")
+        self.config.setDefault("xUnit", pq.Mpc)
+        self.config.setDefault("yUnit", pq.Mpc)
+        self.config.setDefault("vUnit", self.field.unit)
+        self.config.setDefault("vLim", (1e-6, 1e0))
+        self.config.setDefault("log", True)
+        self.config.setDefault("logmin0", -9)
+        self.config.setDefault("logmin1", -9)
+        self.config.setDefault("logmin2", -9)
+        self.config.setDefault("logmax0", 0)
+        self.config.setDefault("logmax1", 0)
+        self.config.setDefault("logmax2", 0)
+        self.config.setDefault("showTime", True)
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         self.axis = self.config["axis"]
-        self.field = getFieldByName(self.config["field"])
         result = Result()
         result.redshift = getTimeOrRedshift(sim, snap)
         (self.extent, result.data) = getSlice(self.field, snap, self.config["axis"])
@@ -73,21 +90,6 @@ class VoronoiSlice(SnapFn):
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         xAxis, yAxis = getOtherAxes(self.axis)
-        self.config.setDefault("xLabel", f"${xAxis} [UNIT]$")
-        self.config.setDefault("yLabel", f"${yAxis} [UNIT]$")
-        self.config.setDefault("cLabel", "")
-        self.config.setDefault("xUnit", pq.Mpc)
-        self.config.setDefault("yUnit", pq.Mpc)
-        self.config.setDefault("vUnit", self.field.unit)
-        self.config.setDefault("vLim", (1e-6, 1e0))
-        self.config.setDefault("log", True)
-        self.config.setDefault("logmin0", -9)
-        self.config.setDefault("logmin1", -9)
-        self.config.setDefault("logmin2", -9)
-        self.config.setDefault("logmax0", 0)
-        self.config.setDefault("logmax1", 0)
-        self.config.setDefault("logmax2", 0)
-        self.config.setDefault("showTime", True)
         self.setupLabels()
         vmin, vmax = self.config["vLim"]
         if result.data.ndim == 3:
@@ -154,4 +156,4 @@ def findOrthogonalAxes(axis: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     return axes[0], axes[1]
 
 
-addToList("slice", VoronoiSlice())
+addToList("slice", VoronoiSlice)

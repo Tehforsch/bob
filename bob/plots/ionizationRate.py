@@ -1,27 +1,29 @@
 import matplotlib.pyplot as plt
 import astropy.units as pq
+from astropy.io import ascii
 
 from bob.postprocessingFunctions import MultiSetFn, addToList
 from bob.result import Result
 from bob.multiSet import MultiSet
 from bob.plots.ionization import IonizationData
-
-
-from astropy.io import ascii
+from bob.plotConfig import PlotConfig
 
 
 class IonizationRate(MultiSetFn):
-    def post(self, simSets: MultiSet) -> Result:
-        result = IonizationData(simSets)
-        return result
-
-    def plot(self, plt: plt.axes, result: Result) -> None:
+    def __init__(self, config: PlotConfig) -> None:
+        super().__init__(config)
         self.config.setDefault("xLabel", "z")
         self.config.setDefault("yLabel", "R")
         self.config.setDefault("xUnit", pq.dimensionless_unscaled)
         self.config.setDefault("yUnit", 1 / pq.s)
         self.config.setDefault("legend_loc", "upper right")
         self.config.setDefault("yLim", [1e-18, 1e-12])
+
+    def post(self, simSets: MultiSet) -> Result:
+        result = IonizationData(simSets)
+        return result
+
+    def plot(self, plt: plt.axes, result: Result) -> None:
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         ax.set_yscale("log")
@@ -66,4 +68,4 @@ class IonizationRate(MultiSetFn):
         #             label=r"D'Aloisio+18",capsize=5)
 
 
-addToList("ionizationRate", IonizationRate())
+addToList("ionizationRate", IonizationRate)

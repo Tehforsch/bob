@@ -4,7 +4,7 @@ import astropy.units as pq
 import matplotlib.pyplot as plt
 
 from abc import ABC, abstractmethod
-from typing import Any, List, Tuple, Iterable
+from typing import Any, List, Tuple, Iterable, Type
 from bob.simulation import Simulation
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
@@ -16,14 +16,11 @@ from bob.plotConfig import PlotConfig
 class PostprocessingFunction(ABC):
     name = ""
 
-    def __init__(self) -> None:
-        self.config = PlotConfig({})
+    def __init__(self, config: PlotConfig) -> None:
+        self.config = config
 
     def getName(self) -> str:
         return self.name
-
-    def setPlotConfig(self, plotConfig: PlotConfig) -> None:
-        self.config.update(plotConfig)
 
     def setupLinePlot(self) -> None:
         self.setupLabels()
@@ -75,8 +72,8 @@ class SnapFn(PostprocessingFunction):
 
 
 class SetFn(PostprocessingFunction):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, config: PlotConfig) -> None:
+        super().__init__(config)
         self.config.setDefault("labels", None)
 
     @abstractmethod
@@ -89,8 +86,8 @@ class SetFn(PostprocessingFunction):
 
 
 class MultiSetFn(PostprocessingFunction):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, config: PlotConfig) -> None:
+        super().__init__(config)
         self.config.setDefault("labels", None)
 
     @abstractmethod
@@ -112,8 +109,8 @@ class MultiSetFn(PostprocessingFunction):
 
 
 class SliceFn(PostprocessingFunction):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, config: PlotConfig) -> None:
+        super().__init__(config)
         self.config.setRequired("field")
 
     def getName(self) -> str:
@@ -129,9 +126,9 @@ class SliceFn(PostprocessingFunction):
         pass
 
 
-def addToList(name: str, fn: PostprocessingFunction) -> Any:
+def addToList(name: str, fn: Type[PostprocessingFunction]) -> Any:
     fn.name = name
     postprocessingFunctions.append(fn)
 
 
-postprocessingFunctions: List[PostprocessingFunction] = []
+postprocessingFunctions: List[Type[PostprocessingFunction]] = []
