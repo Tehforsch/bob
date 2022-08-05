@@ -12,6 +12,10 @@ from bob.plots.timePlots import TimePlot
 
 
 class MeanFieldOverTime(TimePlot):
+    def __init__(self) -> None:
+        super().__init__()
+        self.config.setRequired("field", choices=[f.niceName for f in allFields])
+
     def xlabel(self) -> str:
         return self.config["time"]
 
@@ -20,10 +24,6 @@ class MeanFieldOverTime(TimePlot):
 
     def field(self) -> Field:
         return getFieldByName(self.config["field"])
-
-    def setArgs(self) -> None:
-        super().setArgs()
-        self.config.setRequired("field", choices=[f.niceName for f in allFields])
 
     def getName(self) -> str:
         field = self.config["field"]

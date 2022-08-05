@@ -12,8 +12,8 @@ from bob.temperature import Temperature
 
 
 class TemperatureDensityHistogram(SnapFn):
-    def setArgs(self) -> None:
-        super().setArgs()
+    def __init__(self) -> None:
+        super().__init__()
         self.config.setDefault("only_ionized", False)
 
     def getName(self) -> str:

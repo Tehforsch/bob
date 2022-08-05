@@ -16,7 +16,7 @@ from bob.plotConfig import PlotConfig
 class PostprocessingFunction(ABC):
     name = ""
 
-    def setArgs(self) -> None:
+    def __init__(self) -> None:
         self.config = PlotConfig({})
 
     def getName(self) -> str:
@@ -75,6 +75,10 @@ class SnapFn(PostprocessingFunction):
 
 
 class SetFn(PostprocessingFunction):
+    def __init__(self) -> None:
+        super().__init__()
+        self.config.setDefault("labels", None)
+
     @abstractmethod
     def post(self, sims: SimulationSet) -> Result:
         pass
@@ -83,12 +87,12 @@ class SetFn(PostprocessingFunction):
     def plot(self, axes: plt.axes, result: Result) -> None:
         pass
 
-    def setArgs(self) -> None:
-        super().setArgs()
-        self.config.setDefault("labels", None)
-
 
 class MultiSetFn(PostprocessingFunction):
+    def __init__(self) -> None:
+        super().__init__()
+        self.config.setDefault("labels", None)
+
     @abstractmethod
     def post(self, sims: MultiSet) -> Result:
         pass
@@ -96,10 +100,6 @@ class MultiSetFn(PostprocessingFunction):
     @abstractmethod
     def plot(self, axes: plt.axes, result: Result) -> None:
         pass
-
-    def setArgs(self) -> None:
-        super().setArgs()
-        self.config.setDefault("labels", None)
 
     def getColors(self) -> Iterable[str]:
         return itertools.cycle(["b", "r", "g", "purple", "brown", "orange"])
@@ -112,8 +112,8 @@ class MultiSetFn(PostprocessingFunction):
 
 
 class SliceFn(PostprocessingFunction):
-    def setArgs(self) -> None:
-        super().setArgs()
+    def __init__(self) -> None:
+        super().__init__()
         self.config.setRequired("field")
 
     def getName(self) -> str:

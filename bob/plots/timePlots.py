@@ -42,6 +42,10 @@ def getTimeOrRedshift(sim: Simulation, snap: Snapshot) -> pq.Quantity:
 
 
 class TimePlot(MultiSetFn):
+    def __init__(self) -> None:
+        super().__init__()
+        addTimeArg(self)
+
     @abstractmethod
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> pq.Quantity:
         pass
@@ -76,10 +80,6 @@ class TimePlot(MultiSetFn):
         result.times = getArrayQuantity([x[0] for x in data])
         result.values = getArrayQuantity([x[1] for x in data])
         return result
-
-    def setArgs(self) -> None:
-        super().setArgs()
-        addTimeArg(self)
 
 
 def getTimeAndResultForSnap(plot: TimePlot, timeQuantity: str, snapSim: Tuple[Snapshot, Simulation]) -> Tuple[pq.Quantity, pq.Quantity]:

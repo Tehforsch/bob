@@ -57,7 +57,6 @@ def readPlotFile(filename: Path) -> List[PostprocessingFunction]:
     for fnName in config:
         function = getFunctionByName(fnName, postprocessingFunctions)
         config = config[fnName]
-        function.setArgs()
         function.setPlotConfig(PlotConfig(config))
         functions.append(function)
         print("still need to verify")

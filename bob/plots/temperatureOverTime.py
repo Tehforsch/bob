@@ -14,6 +14,10 @@ from bob.temperature import Temperature
 
 
 class TemperatureOverTime(TimePlot):
+    def __init__(self) -> None:
+        super().__init__()
+        self.config.setDefault("bins", False)
+
     def ylabel(self) -> str:
         return "$T [\\mathrm{K}]$"
 
@@ -60,10 +64,6 @@ class TemperatureOverTime(TimePlot):
         plt.legend(loc="lower left")
         if self.config["time"] == "t":
             self.addConstraints(plt)
-
-    def setArgs(self) -> None:
-        super().setArgs()
-        self.config.setDefault("bins", False)
 
     def addConstraints(self, ax: plt.axes) -> None:
         if self.config["time"] == "z":

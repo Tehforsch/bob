@@ -43,6 +43,11 @@ def getSlice(field: Field, snapshot: Snapshot, axisName: str) -> Tuple[Tuple[flo
 
 
 class VoronoiSlice(SnapFn):
+    def __init__(self) -> None:
+        super().__init__()
+        self.config.setRequired("axis", choices=["x", "y", "z"])
+        self.config.setRequired("field", choices=[f.niceName for f in allFields])
+
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         self.axis = self.config["axis"]
         self.field = getFieldByName(self.config["field"])
@@ -96,11 +101,6 @@ class VoronoiSlice(SnapFn):
             self.image(result.data, self.extent, vmin=vmin, vmax=vmax, origin="lower")
         if self.config["showTime"]:
             plt.text(0, 0, f"Redshift: {result.redshift:.01f}", fontsize=12)
-
-    def setArgs(self) -> None:
-        super().setArgs()
-        self.config.setRequired("axis", choices=["x", "y", "z"])
-        self.config.setRequired("field", choices=[f.niceName for f in allFields])
 
     def getName(self) -> str:
         axis = self.config["axis"]

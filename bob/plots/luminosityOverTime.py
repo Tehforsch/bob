@@ -9,6 +9,10 @@ from bob.util import getArrayQuantity
 
 
 class LuminosityOverTime(MultiSetFn):
+    def __init__(self) -> None:
+        super().__init__()
+        addTimeArg(self)
+
     def post(self, simSets: MultiSet) -> Result:
         result = Result()
         result.data = []
@@ -28,10 +32,6 @@ class LuminosityOverTime(MultiSetFn):
         for subresult in result.data:
             self.addLine(subresult.time, subresult.luminosity)
         plt.legend()
-
-    def setArgs(self) -> None:
-        super().setArgs()
-        addTimeArg(self)
 
 
 addToList("luminosityOverTime", LuminosityOverTime())
