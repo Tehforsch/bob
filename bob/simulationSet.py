@@ -2,7 +2,6 @@ from typing import Iterable, List, Any, Tuple, Dict
 import itertools
 import os
 from pathlib import Path
-import argparse
 from bob.simulation import Simulation
 
 
@@ -45,8 +44,8 @@ def joined(simSets: List[SimulationSet]) -> SimulationSet:
     return SimulationSet(itertools.chain(*simSets.__iter__()))
 
 
-def getSimsFromFolders(args: argparse.Namespace) -> SimulationSet:
-    sims = [getSimsFromFolder(folder) for folder in args.simFolders]
+def getSimsFromFolders(simFolders: List[Path]) -> SimulationSet:
+    sims = [getSimsFromFolder(folder) for folder in simFolders]
     return joined(sims)
 
 

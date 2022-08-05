@@ -6,6 +6,7 @@ import argparse
 from bob import postprocess
 from bob.simulationSet import getSimsFromFolders, SimulationSet
 from bob.util import getCommonParentFolder
+from bob.watch import watch
 
 
 def commaSeparatedList(s: str) -> List[str]:
@@ -48,6 +49,9 @@ def setupArgs() -> argparse.Namespace:
         help="Replot all plots that have new data or havent been generated yet but don't refresh old ones",
     )
 
+    replotParser = subparsers.add_parser("watch")
+    replotParser.add_argument("communicationFolder", type=Path, help="The folder to watch for new commands")
+    replotParser.add_argument("workFolder", type=Path, help="The work folder to execute the commands in")
     args = parser.parse_args()
     return args
 
@@ -61,12 +65,13 @@ def setupLogging(args: argparse.Namespace) -> None:
 
 def main() -> None:
     args = setupArgs()
-    if args.simFolders == []:
-        raise ValueError("No sim folders given")
     setupLogging(args)
-    if args.function != "replot":
-        sims = getSimsFromFolders(args)
-    else:
+    if args.function == "watch":
+        watch(args, args.communicationFolder, args.workFolder)
+        return
+    if args.function == "replot":
         sims = SimulationSet([])
+    else:
+        sims = getSimsFromFolders(args.simFolders)
     folder = getCommonParentFolder(args.simFolders)
     postprocess.main(args, folder, sims)
