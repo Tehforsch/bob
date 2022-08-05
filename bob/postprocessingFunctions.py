@@ -18,6 +18,7 @@ class PostprocessingFunction(ABC):
 
     def __init__(self, config: PlotConfig) -> None:
         self.config = config
+        self.config.setDefault("sims", None)
 
     def getName(self) -> str:
         return self.name
@@ -66,6 +67,10 @@ class PostprocessingFunction(ABC):
 
 
 class SnapFn(PostprocessingFunction):
+    def __init__(self, config: PlotConfig) -> None:
+        super().__init__(config)
+        self.config.setDefault("snapshots", None)
+
     @abstractmethod
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         pass
@@ -116,6 +121,7 @@ class SliceFn(PostprocessingFunction):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
         self.config.setRequired("field")
+        self.config.setDefault("snapshots", None)
 
     def getName(self) -> str:
         field = self.config["field"]
