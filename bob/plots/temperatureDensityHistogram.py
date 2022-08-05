@@ -19,14 +19,14 @@ class TemperatureDensityHistogram(SnapFn):
         self.config.setDefault("only_ionized", False)
 
     def getName(self, args: argparse.Namespace) -> str:
-        ionizedStr = "_only_ionized" if args.only_ionized else ""
+        ionizedStr = "_only_ionized" if self.config["only_ionized"] else ""
         return f"{self.name}{ionizedStr}"
 
     def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
         result = Result()
         result.temperature = Temperature().getData(snap) / pq.K
         result.density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)
-        if args.only_ionized:
+        if self.config["only_ionized"]:
             hpAbundance = BasicField("ChemicalAbundances", 1).getData(snap)
             indices = np.where(hpAbundance > 0.5)
             result.temperature = result.temperature[indices]

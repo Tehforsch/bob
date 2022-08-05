@@ -43,7 +43,7 @@ class Plotter:
         self,
         parent_folder: Path,
         sims: SimulationSet,
-        snapshotFilter: List[str],
+        snapshotFilter: Optional[List[str]],
         show: bool,
         select: Optional[List[str]],
         quotient_params: Optional[List[str]],
