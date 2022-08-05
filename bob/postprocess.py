@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Iterator
 from pathlib import Path
 import yaml
 import logging
@@ -45,17 +45,17 @@ def readPlotFile(filename: Path, safe: bool) -> List[PostprocessingFunction]:
     return functions
 
 
-def runFunctionsWithPlotter(plotter: Plotter, functions: List[PostprocessingFunction]) -> None:
+def runFunctionsWithPlotter(plotter: Plotter, functions: List[PostprocessingFunction]) -> Iterator[str]:
     logging.debug(functions)
     for function in functions:
         if isinstance(function, SnapFn):
-            plotter.runSnapFn(function)
+            yield from plotter.runSnapFn(function)
         elif isinstance(function, SetFn):
-            plotter.runSetFn(function)
+            yield from plotter.runSetFn(function)
         elif isinstance(function, MultiSetFn):
-            plotter.runMultiSetFn(function)
+            yield from plotter.runMultiSetFn(function)
         elif isinstance(function, SliceFn):
-            plotter.runSliceFn(function)
+            yield from plotter.runSliceFn(function)
         else:
             raise NotImplementedError
 

@@ -10,6 +10,8 @@ from bob.simulationSet import getSimsFromFolders
 
 def runPlots(commFolder: Path, workFolder: Path, files: Sequence[Path]) -> None:
     for f in files:
+        if f.suffix == ".done":
+            continue
         f = commFolder / f
         path = workFolder / Path(f.name.replace("##", "/"))  # amazing stuff
         if not path.is_dir():
@@ -22,6 +24,7 @@ def runPlots(commFolder: Path, workFolder: Path, files: Sequence[Path]) -> None:
         plotter = Plotter(path, sims, True, False)
         runFunctionsWithPlotter(plotter, functions)
         f.unlink()
+        (f.with_suffix(".done")).touch()  # expert file handling
 
 
 def watch(commFolder: Path, workFolder: Path) -> None:
