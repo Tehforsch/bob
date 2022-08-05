@@ -27,9 +27,7 @@ QuotientParams = Optional[Union[List[str], Single]]
 def walkfiles(path: Path) -> Iterator[Path]:
     for root, dirs, files in os.walk(path):
         for f in files:
-            yield path / f
-        for d in dirs:
-            walkfiles(path / d)
+            yield Path(root) / f
 
 
 def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
@@ -71,6 +69,9 @@ class Plotter:
             return True
         else:
             plotPath = self.dataFolder / plotName
+            print(plotPath)
+            for f in walkfiles(plotPath):
+                print(f)
             mtimePlot = max(os.path.getmtime(str(f)) for f in walkfiles(plotPath))
             mtimeImage = max(os.path.getmtime(image) for image in images)
             return mtimeImage < mtimePlot
