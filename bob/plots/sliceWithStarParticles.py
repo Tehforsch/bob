@@ -1,4 +1,3 @@
-import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
@@ -11,8 +10,8 @@ from bob.postprocessingFunctions import addToList
 
 
 class SliceWithStarParticles(VoronoiSlice):
-    def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
-        result = super().post(args, sim, snap)
+    def post(self, sim: Simulation, snap: Snapshot) -> Result:
+        result = super().post(sim, snap)
         f = snap.hdf5File
         centerZ = snap.center[2]
         extentZ = (snap.maxExtent - snap.minExtent)[2]

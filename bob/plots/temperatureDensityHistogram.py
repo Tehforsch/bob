@@ -1,5 +1,3 @@
-import argparse
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
@@ -18,11 +16,11 @@ class TemperatureDensityHistogram(SnapFn):
         super().setArgs()
         self.config.setDefault("only_ionized", False)
 
-    def getName(self, args: argparse.Namespace) -> str:
+    def getName(self) -> str:
         ionizedStr = "_only_ionized" if self.config["only_ionized"] else ""
         return f"{self.name}{ionizedStr}"
 
-    def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
+    def post(self, sim: Simulation, snap: Snapshot) -> Result:
         result = Result()
         result.temperature = Temperature().getData(snap) / pq.K
         result.density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)

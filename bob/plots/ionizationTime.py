@@ -1,5 +1,3 @@
-import argparse
-
 import matplotlib.pyplot as plt
 import numpy as np
 import astropy.units as pq
@@ -13,7 +11,7 @@ from bob.plots.ionization import translateTime
 
 
 class IonizationTime(SetFn):
-    def post(self, args: argparse.Namespace, simSet: SimulationSet) -> Result:
+    def post(self, simSet: SimulationSet) -> Result:
         data = self.getIonizationTimeData(simSet)
         result = Result()
         result.data = data

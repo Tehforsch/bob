@@ -1,5 +1,3 @@
-import argparse
-
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -27,7 +25,7 @@ class MeanFieldOverTime(TimePlot):
         super().setArgs()
         self.config.setRequired("field", choices=[f.niceName for f in allFields])
 
-    def getName(self, args: argparse.Namespace) -> str:
+    def getName(self) -> str:
         field = self.config["field"]
         timeQuantity = self.config["time"]
         return f"{self.name}_{field}_{timeQuantity}"

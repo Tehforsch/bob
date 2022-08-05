@@ -1,4 +1,3 @@
-import argparse
 import re
 import itertools
 from typing import List, Tuple, Dict
@@ -91,7 +90,7 @@ class IonizationData(Result):
 
 
 class Ionization(MultiSetFn):
-    def post(self, args: argparse.Namespace, simSets: MultiSet) -> Result:
+    def post(self, simSets: MultiSet) -> Result:
         result = IonizationData(simSets)
         return result
 

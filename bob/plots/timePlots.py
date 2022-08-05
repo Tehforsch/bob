@@ -1,6 +1,5 @@
 from typing import Tuple
 from abc import abstractmethod
-import argparse
 
 import matplotlib.pyplot as plt
 import astropy.units as pq
@@ -54,7 +53,7 @@ class TimePlot(MultiSetFn):
     def ylabel(self) -> str:
         pass
 
-    def post(self, args: argparse.Namespace, simSets: MultiSet) -> Result:
+    def post(self, simSets: MultiSet) -> Result:
         results = Result()
         results.data = [self.getQuantityOverTime(self.config["time"], simSet) for simSet in simSets]
         return results

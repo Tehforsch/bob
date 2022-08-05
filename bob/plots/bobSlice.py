@@ -1,5 +1,3 @@
-import argparse
-
 from typing import Tuple
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
@@ -45,7 +43,7 @@ def getSlice(field: Field, snapshot: Snapshot, axisName: str) -> Tuple[Tuple[flo
 
 
 class VoronoiSlice(SnapFn):
-    def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
+    def post(self, sim: Simulation, snap: Snapshot) -> Result:
         self.axis = self.config["axis"]
         self.field = getFieldByName(self.config["field"])
         result = Result()
@@ -104,7 +102,7 @@ class VoronoiSlice(SnapFn):
         self.config.setRequired("axis", choices=["x", "y", "z"])
         self.config.setRequired("field", choices=[f.niceName for f in allFields])
 
-    def getName(self, args: argparse.Namespace) -> str:
+    def getName(self) -> str:
         axis = self.config["axis"]
         field = self.config["field"]
         return f"{self.name}_{axis}_{field}"

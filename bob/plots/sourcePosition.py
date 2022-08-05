@@ -1,5 +1,3 @@
-import argparse
-
 import astropy.units as pq
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,7 +8,7 @@ from bob.simulationSet import SimulationSet
 
 
 class SourcePosition(SetFn):
-    def post(self, args: argparse.Namespace, sims: SimulationSet) -> Result:
+    def post(self, sims: SimulationSet) -> Result:
         result = Result()
         result.coords = [sim.sources().coord * sim.snapshots[0].lengthUnit for sim in sims]
         return result

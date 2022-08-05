@@ -1,5 +1,3 @@
-import argparse
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
@@ -14,7 +12,7 @@ from bob.temperature import Temperature
 
 
 class TemperatureIonizationHistogram(SnapFn):
-    def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
+    def post(self, sim: Simulation, snap: Snapshot) -> Result:
         result = Result()
         result.temperature = Temperature().getData(snap)
         result.ionization = BasicField("ChemicalAbundances", 1).getData(snap)

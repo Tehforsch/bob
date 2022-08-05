@@ -1,4 +1,3 @@
-import argparse
 from pathlib import Path
 
 import numpy as np
@@ -21,7 +20,7 @@ class ArepoSlice:
 
 class ArepoSlicePlot(SliceFn):
     # Taken from arepy
-    def post(self, args: argparse.Namespace, sim: Simulation, slice_: ArepoSlice) -> Result:
+    def post(self, sim: Simulation, slice_: ArepoSlice) -> Result:
         f = open(slice_.path, mode="rb")
         result = Result()
         npix_x = np.fromfile(f, np.uint32, 1)[0]

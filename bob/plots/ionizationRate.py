@@ -1,4 +1,3 @@
-import argparse
 import matplotlib.pyplot as plt
 import astropy.units as pq
 
@@ -12,7 +11,7 @@ from astropy.io import ascii
 
 
 class IonizationRate(MultiSetFn):
-    def post(self, args: argparse.Namespace, simSets: MultiSet) -> Result:
+    def post(self, simSets: MultiSet) -> Result:
         result = IonizationData(simSets)
         return result
 

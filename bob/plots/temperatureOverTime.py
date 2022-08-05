@@ -1,5 +1,4 @@
 from typing import List
-import argparse
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,9 +17,10 @@ class TemperatureOverTime(TimePlot):
     def ylabel(self) -> str:
         return "$T [\\mathrm{K}]$"
 
-    def getName(self, args: argparse.Namespace) -> str:
+    def getName(self) -> str:
         binString = "_binned" if self.config["bins"] else ""
-        return f"{self.name}_{args.time}{binString}"
+        time = self.config["time"]
+        return f"{self.name}_{time}{binString}"
 
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> List[float]:
         density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)

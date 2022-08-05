@@ -118,14 +118,14 @@ class Plotter:
     def runMultiSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
         quotient = self.getQuotient(function.config["labels"])
         logging.info("Running {}".format(function.name))
-        self.runPostAndPlot(args, function, function.getName(args), lambda: function.post(args, quotient), function.plot)
+        self.runPostAndPlot(args, function, function.getName(), lambda: function.post(quotient), function.plot)
 
     def runSetFn(self, args: argparse.Namespace, function: SetFn) -> None:
         quotient = self.getQuotient(function.config["labels"])
         logging.info("Running {}".format(function.name))
         for (i, (config, sims)) in enumerate(quotient.iterWithConfigs()):
             logging.info("For set {}".format(i))
-            self.runPostAndPlot(args, function, f"{i}_{function.getName(args)}", lambda: function.post(args, sims), function.plot)
+            self.runPostAndPlot(args, function, f"{i}_{function.getName()}", lambda: function.post(sims), function.plot)
 
     def runSnapFn(self, args: argparse.Namespace, function: SnapFn) -> None:
         logging.info("Running {}".format(function.name))
@@ -133,8 +133,8 @@ class Plotter:
             logging.info("For sim {}".format(sim.name))
             for snap in self.get_snapshots(sim):
                 logging.info("For snap {}".format(snap.name))
-                name = "{}_{}_{}".format(function.getName(args), sim.name, snap.name)
-                self.runPostAndPlot(args, function, name, lambda: function.post(args, sim, snap), function.plot)
+                name = "{}_{}_{}".format(function.getName(), sim.name, snap.name)
+                self.runPostAndPlot(args, function, name, lambda: function.post(sim, snap), function.plot)
 
     def runSliceFn(self, args: argparse.Namespace, function: SliceFn) -> None:
         logging.info("Running {}".format(function.name))
@@ -143,8 +143,8 @@ class Plotter:
             for slice_ in sim.getSlices(args.slice_field):
                 if self.snapshotFilter is None or any(arg_snap == slice_.name for arg_snap in self.snapshotFilter):
                     logging.info("For slice {}".format(slice_.name))
-                    name = "{}_{}_{}".format(function.getName(args), sim.name, slice_.name)
-                    self.runPostAndPlot(args, function, name, lambda: function.post(args, sim, slice_), function.plot)
+                    name = "{}_{}_{}".format(function.getName(), sim.name, slice_.name)
+                    self.runPostAndPlot(args, function, name, lambda: function.post(sim, slice_), function.plot)
 
     def isInSnapshotArgs(self, snap: Snapshot) -> bool:
         return self.snapshotFilter is None or any(isSameSnapshot(arg_snap, snap) for arg_snap in self.snapshotFilter)

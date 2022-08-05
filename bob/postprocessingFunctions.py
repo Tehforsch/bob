@@ -1,4 +1,3 @@
-import argparse
 import itertools
 
 import astropy.units as pq
@@ -20,7 +19,7 @@ class PostprocessingFunction(ABC):
     def setArgs(self) -> None:
         self.config = PlotConfig({})
 
-    def getName(self, args: argparse.Namespace) -> str:
+    def getName(self) -> str:
         return self.name
 
     def setPlotConfig(self, plotConfig: PlotConfig) -> None:
@@ -67,7 +66,7 @@ class PostprocessingFunction(ABC):
 
 class SnapFn(PostprocessingFunction):
     @abstractmethod
-    def post(self, args: argparse.Namespace, sim: Simulation, snap: Snapshot) -> Result:
+    def post(self, sim: Simulation, snap: Snapshot) -> Result:
         pass
 
     @abstractmethod
@@ -77,7 +76,7 @@ class SnapFn(PostprocessingFunction):
 
 class SetFn(PostprocessingFunction):
     @abstractmethod
-    def post(self, args: argparse.Namespace, sims: SimulationSet) -> Result:
+    def post(self, sims: SimulationSet) -> Result:
         pass
 
     @abstractmethod
@@ -91,7 +90,7 @@ class SetFn(PostprocessingFunction):
 
 class MultiSetFn(PostprocessingFunction):
     @abstractmethod
-    def post(self, args: argparse.Namespace, sims: MultiSet) -> Result:
+    def post(self, sims: MultiSet) -> Result:
         pass
 
     @abstractmethod
@@ -117,12 +116,12 @@ class SliceFn(PostprocessingFunction):
         super().setArgs()
         self.config.setRequired("field")
 
-    def getName(self, args: argparse.Namespace) -> str:
+    def getName(self) -> str:
         field = self.config["field"]
         return f"{self.name}_{field}"
 
     @abstractmethod
-    def post(self, args: argparse.Namespace, sim: Simulation, slice_: Any) -> Result:
+    def post(self, sim: Simulation, slice_: Any) -> Result:
         pass
 
     @abstractmethod
