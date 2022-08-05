@@ -84,6 +84,7 @@ class SetFn(PostprocessingFunction):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
         self.config.setDefault("labels", None)
+        self.config.setDefault("quotient", None)
 
     @abstractmethod
     def post(self, sims: SimulationSet) -> Result:
@@ -98,6 +99,7 @@ class MultiSetFn(PostprocessingFunction):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
         self.config.setDefault("labels", None)
+        self.config.setDefault("quotient", None)
 
     @abstractmethod
     def post(self, sims: MultiSet) -> Result:

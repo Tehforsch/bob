@@ -23,8 +23,6 @@ def setupArgs() -> argparse.Namespace:
     plotParser = subparsers.add_parser("plot")
     plotParser.add_argument("simFolders", type=Path, nargs="+", help="Path to simulation directories")
     plotParser.add_argument("plot", type=Path, help="The plot configuration")
-    plotParser.add_argument("-q", "--quotient", nargs="*", help="Parameters by which to divide the simulations into sets")
-    plotParser.add_argument("--single", action="store_true", help="Create simulation set for each simulation")
     parser.add_argument("--post", action="store_true", help="Only postprocess the data, do not run the corresponding plot scripts (for cluster)")
 
     replotParser = subparsers.add_parser("replot")

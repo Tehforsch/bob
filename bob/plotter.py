@@ -1,6 +1,6 @@
 import os
 import yaml
-from typing import Iterator, List, Optional, Callable
+from typing import Iterator, List, Optional, Callable, Union
 from pathlib import Path
 import argparse
 import matplotlib.pyplot as plt
@@ -12,7 +12,7 @@ from bob.postprocessingFunctions import (
     SnapFn,
     SliceFn,
 )
-from bob.simulationSet import SimulationSet
+from bob.simulationSet import SimulationSet, Single
 from bob.snapshot import Snapshot
 import bob.config
 from bob.simulation import Simulation
@@ -20,6 +20,8 @@ from bob.result import Result
 from bob.postprocessingFunctions import PostprocessingFunction
 from bob.multiSet import MultiSet
 from bob.pool import runInPool
+
+QuotientParams = Optional[Union[List[str], Single]]
 
 
 def walkfiles(path: Path) -> Iterator[Path]:
@@ -44,16 +46,12 @@ class Plotter:
         parent_folder: Path,
         sims: SimulationSet,
         show: bool,
-        quotient_params: Optional[List[str]],
-        single: bool,
         outputFileType: str,
     ) -> None:
         self.picFolder = parent_folder / bob.config.picFolder
         self.sims = sims
         self.dataFolder = self.picFolder / "plots"
         self.show = show
-        self.quotient_params = quotient_params
-        self.single = single
         self.outputFileType = outputFileType
 
     def filterSims(self, select: Optional[List[str]]) -> SimulationSet:
@@ -106,21 +104,19 @@ class Plotter:
     def saveResult(self, result: Result, plotDataFolder: Path) -> None:
         result.save(plotDataFolder)
 
-    def getQuotient(self, sims_filter: Optional[List[str]], labels: Optional[List[str]]) -> MultiSet:
-        quotient_params = self.quotient_params
+    def getQuotient(self, quotient_params: QuotientParams, sims_filter: Optional[List[str]], labels: Optional[List[str]]) -> MultiSet:
         if quotient_params is None:
             quotient_params = []
-
         sims = self.filterSims(sims_filter)
-        return MultiSet(sims.quotient(quotient_params, self.single), labels)
+        return MultiSet(sims.quotient(quotient_params), labels)
 
     def runMultiSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
-        quotient = self.getQuotient(function.config["sims"], function.config["labels"])
+        quotient = self.getQuotient(function.config["quotient"], function.config["sims"], function.config["labels"])
         logging.info("Running {}".format(function.name))
         self.runPostAndPlot(args, function, function.getName(), lambda: function.post(quotient), function.plot)
 
     def runSetFn(self, args: argparse.Namespace, function: SetFn) -> None:
-        quotient = self.getQuotient(function.config["sims"], function.config["labels"])
+        quotient = self.getQuotient(function.config["quotient"], function.config["sims"], function.config["labels"])
         logging.info("Running {}".format(function.name))
         for (i, (config, sims)) in enumerate(quotient.iterWithConfigs()):
             logging.info("For set {}".format(i))

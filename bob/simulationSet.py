@@ -1,16 +1,20 @@
-from typing import Iterable, List, Any, Tuple, Dict
+from typing import Iterable, List, Any, Tuple, Dict, Union
 import itertools
 import os
 from pathlib import Path
 from bob.simulation import Simulation
 
 
+class Single:
+    pass
+
+
 class SimulationSet(list):
     def __init__(self, sims: Iterable[Simulation]) -> None:
         super().__init__(sims)
 
-    def quotient(self, parameters: List[str], single: bool) -> List[Tuple[Dict[str, Any], "SimulationSet"]]:
-        def getConfiguration(sim: Simulation) -> Tuple[Tuple[Any, Any], ...]:
+    def quotient(self, parameters: Union[List[str], Single]) -> List[Tuple[Dict[str, Any], "SimulationSet"]]:
+        def getConfiguration(sim: Simulation, parameters: List[str]) -> Tuple[Tuple[Any, Any], ...]:
             def getValue(k: str) -> Any:
                 if k == "name":  # For cases where sim sets are indistuingishable by actual sim parameters
                     return sim.folder.parent
@@ -18,20 +22,21 @@ class SimulationSet(list):
 
             return tuple((k, getValue(k)) for k in parameters)
 
-        configurations = list(set(getConfiguration(sim) for sim in self))
-        configurations.sort()
-        if single:
+        if isinstance(parameters, Single):
             # Return one SimSet per simulation
-            return [(dict(getConfiguration(sim)), SimulationSet([sim])) for sim in self]
-        return [
-            (
-                dict(configuration),
-                SimulationSet(
-                    [sim for sim in self if getConfiguration(sim) == configuration],
-                ),
-            )
-            for configuration in configurations
-        ]
+            return [(dict(getConfiguration(sim, [])), SimulationSet([sim])) for sim in self]
+        else:
+            configurations = list(set(getConfiguration(sim, parameters) for sim in self))
+            configurations.sort()
+            return [
+                (
+                    dict(configuration),
+                    SimulationSet(
+                        [sim for sim in self if getConfiguration(sim, parameters) == configuration],
+                    ),
+                )
+                for configuration in configurations
+            ]
 
 
 def getSimsFromFolder(sim_set_folder: Path) -> SimulationSet:
