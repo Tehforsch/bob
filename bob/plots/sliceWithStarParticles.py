@@ -31,7 +31,7 @@ class SliceWithStarParticles(VoronoiSlice):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        if self.axis != "z":
+        if self.config["axis"] != "z":
             raise NotImplementedError("Implement other axes by adjusting the coordinates below")
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)

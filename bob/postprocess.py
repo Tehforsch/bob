@@ -51,8 +51,12 @@ def setMatplotlibStyle() -> None:
     plt.style.use(Path(file_path).parent / "../styles/plot.mlpstyle")
 
 
-def readPlotFile(filename: Path) -> List[PostprocessingFunction]:
-    config = yaml.load(filename.open("r"), Loader=yaml.SafeLoader)
+def readPlotFile(filename: Path, safe: bool) -> List[PostprocessingFunction]:
+    if safe:
+        loader = yaml.SafeLoader
+    else:
+        loader = yaml.Loader
+    config = yaml.load(filename.open("r"), Loader=loader)
     functions: List[PostprocessingFunction] = []
     for fnName in config:
         config = config[fnName]
@@ -74,7 +78,7 @@ def main(args: argparse.Namespace, parent_folder: Path, sims: SimulationSet) -> 
         plotter.replot(args)
     else:
         plotter = bob.plotter.Plotter(parent_folder, sims, args.snapshots, args.show, args.select, args.quotient, args.single, outputFileType)
-        functions = readPlotFile(args.plot)
+        functions = readPlotFile(args.plot, True)
         logging.debug(functions)
         for function in functions:
             if isinstance(function, SnapFn):

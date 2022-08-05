@@ -48,7 +48,6 @@ class VoronoiSlice(SnapFn):
         super().__init__(config)
         self.config.setRequired("axis", choices=["x", "y", "z"])
         self.config.setRequired("field", choices=[f.niceName for f in allFields])
-        self.field = getFieldByName(self.config["field"])
         xAxis, yAxis = getOtherAxes(config["axis"])
         self.config.setDefault("xLabel", f"${xAxis} [UNIT]$")
         self.config.setDefault("yLabel", f"${yAxis} [UNIT]$")
@@ -66,11 +65,15 @@ class VoronoiSlice(SnapFn):
         self.config.setDefault("logmax2", 0)
         self.config.setDefault("showTime", True)
 
+    @property
+    def field(self) -> Field:
+        return getFieldByName(self.config["field"])
+
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
-        self.axis = self.config["axis"]
         result = Result()
         result.redshift = getTimeOrRedshift(sim, snap)
-        (self.extent, result.data) = getSlice(self.field, snap, self.config["axis"])
+        (extent, result.data) = getSlice(self.field, snap, self.config["axis"])
+        result.extent = list(extent)
         print(f"Field: {self.field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
         return result
 
@@ -89,7 +92,7 @@ class VoronoiSlice(SnapFn):
         print(np.max(data[:, :, 1]))
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        xAxis, yAxis = getOtherAxes(self.axis)
+        xAxis, yAxis = getOtherAxes(self.config["axis"])
         self.setupLabels()
         vmin, vmax = self.config["vLim"]
         if result.data.ndim == 3:
@@ -98,9 +101,9 @@ class VoronoiSlice(SnapFn):
                 self.transformLog(result.data)
         print(f"min: {np.min(result.data)}, max: {np.max(result.data)}")
         if self.config["log"]:
-            self.image(result.data, self.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
+            self.image(result.data, result.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
         else:
-            self.image(result.data, self.extent, vmin=vmin, vmax=vmax, origin="lower")
+            self.image(result.data, result.extent, vmin=vmin, vmax=vmax, origin="lower")
         if self.config["showTime"]:
             plt.text(0, 0, f"Redshift: {result.redshift:.01f}", fontsize=12)
 

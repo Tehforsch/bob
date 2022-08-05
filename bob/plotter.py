@@ -1,5 +1,5 @@
 import os
-import pickle
+import yaml
 from typing import Iterator, List, Optional, Callable
 from pathlib import Path
 import argparse
@@ -104,7 +104,7 @@ class Plotter:
 
     def savePlotInfo(self, fn: PostprocessingFunction, plotDataFolder: Path) -> None:
         filename = plotDataFolder / bob.config.plotSerializationFileName
-        pickle.dump(fn, open(filename, "wb"))
+        yaml.dump({fn.name: dict(fn.config.items())}, open(filename, "w"))
 
     def saveResult(self, result: Result, plotDataFolder: Path) -> None:
         result.save(plotDataFolder)
@@ -171,11 +171,14 @@ def getBaseName(plotName: str) -> str:
 
 # Needs to be a top-level function so it can be used by multiprocessing
 def runPlot(plotter: Plotter, args: argparse.Namespace, plotName: str) -> None:
+    from bob.postprocess import readPlotFile
+
     baseName = getBaseName(plotName)
     if (args.plots is None or plotName in args.plots) and (args.types is None or baseName in args.types):
         print("Replotting", plotName)
         plotFolder = plotter.dataFolder / plotName
-        plot = pickle.load(open(plotFolder / bob.config.plotSerializationFileName, "rb"))
+        functions = readPlotFile(plotFolder / bob.config.plotSerializationFileName, False)
+        assert len(functions) == 1, "More than one plot in replot information."
         result = Result.readFromFolder(plotFolder)
-        plot.plot(plt, result)
+        functions[0].plot(plt, result)
         plotter.saveAndShow(plotFolder.name)

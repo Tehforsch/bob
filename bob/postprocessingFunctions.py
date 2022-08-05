@@ -60,6 +60,10 @@ class PostprocessingFunction(ABC):
     def __repr__(self) -> str:
         return f"{self.name}: {self.config}"
 
+    @abstractmethod
+    def plot(self, axes: plt.axes, result: Result) -> None:
+        pass
+
 
 class SnapFn(PostprocessingFunction):
     @abstractmethod
