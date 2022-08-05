@@ -2,7 +2,7 @@ import astropy.units as pq
 import matplotlib.pyplot as plt
 import numpy as np
 
-from bob.postprocessingFunctions import SetFn, addToList
+from bob.postprocessingFunctions import SetFn
 from bob.result import Result
 from bob.simulationSet import SimulationSet
 from bob.plotConfig import PlotConfig
@@ -31,6 +31,3 @@ class SourcePosition(SetFn):
             xCoords = coords[np.where(coords[:, 2] < 0.1 * maxZ)][:, 0]
             yCoords = coords[np.where(coords[:, 2] < 0.1 * maxZ)][:, 1]
             self.scatter(xCoords, yCoords)
-
-
-addToList("sourcePosition", SourcePosition)

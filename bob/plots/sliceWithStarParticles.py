@@ -5,12 +5,11 @@ from matplotlib.patches import Circle
 from bob.simulation import Simulation
 from bob.snapshot import Snapshot
 from bob.result import Result
-from bob.plots.bobSlice import VoronoiSlice
-from bob.postprocessingFunctions import addToList
+from bob.plots.bobSlice import Slice
 from bob.plotConfig import PlotConfig
 
 
-class SliceWithStarParticles(VoronoiSlice):
+class SliceWithStarParticles(Slice):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
         self.config.setDefault("circleSize", 0.05)
@@ -42,6 +41,3 @@ class SliceWithStarParticles(VoronoiSlice):
                 coord = (result.coords[i, 0].to_value(self.config["xUnit"]), result.coords[i, 1].to_value(self.config["yUnit"]))
                 circ = Circle((coord[0], coord[1]), self.config["circleSize"])
                 ax.add_patch(circ)
-
-
-addToList("sliceWithStarParticles", SliceWithStarParticles)

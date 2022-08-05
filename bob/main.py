@@ -3,10 +3,12 @@ from pathlib import Path
 import logging
 import argparse
 
-from bob import postprocess
+import bob.postprocess
 from bob.simulationSet import getSimsFromFolders, SimulationSet
 from bob.util import getCommonParentFolder
 from bob.watch import watch
+from bob.plotter import Plotter
+from bob.postprocess import readPlotFile, setMatplotlibStyle
 
 
 def commaSeparatedList(s: str) -> List[str]:
@@ -55,9 +57,15 @@ def main() -> None:
     if args.function == "watch":
         watch(args, args.communicationFolder, args.workFolder)
         return
+    if not args.post:
+        setMatplotlibStyle()
     if args.function == "replot":
-        sims = SimulationSet([])
+        plotter = Plotter(Path("."), SimulationSet([]), args.post, args.show)
+        plotter.replot(args)
     else:
         sims = getSimsFromFolders(args.simFolders)
-    folder = getCommonParentFolder(args.simFolders)
-    postprocess.main(args, folder, sims)
+        parent_folder = getCommonParentFolder(args.simFolders)
+        bob.postprocess.create_pic_folder(parent_folder)
+        plotter = Plotter(parent_folder, sims, args.post, args.show)
+        functions = readPlotFile(args.plot, True)
+        bob.postprocess.runFunctionsWithPlotter(plotter, functions)

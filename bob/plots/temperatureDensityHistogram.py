@@ -5,7 +5,7 @@ import astropy.units as pq
 
 from bob.simulation import Simulation
 from bob.snapshot import Snapshot
-from bob.postprocessingFunctions import SnapFn, addToList
+from bob.postprocessingFunctions import SnapFn
 from bob.result import Result
 from bob.basicField import BasicField
 from bob.temperature import Temperature
@@ -55,6 +55,3 @@ class TemperatureDensityHistogram(SnapFn):
         plt.hist2d(result.density, result.temperature, [binsX, binsY], density=True, norm=colors.LogNorm())
         colorbar = plt.colorbar()
         colorbar.set_ticks([1e17, 1e22, 1e27])
-
-
-addToList("temperatureDensityHistogram", TemperatureDensityHistogram)

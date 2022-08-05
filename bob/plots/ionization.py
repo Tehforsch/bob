@@ -11,7 +11,7 @@ import astropy.units as pq
 
 from bob.util import getArrayQuantity
 from bob.simulation import Simulation
-from bob.postprocessingFunctions import MultiSetFn, addToList
+from bob.postprocessingFunctions import MultiSetFn
 from bob.result import Result
 from bob.multiSet import MultiSet
 
@@ -398,6 +398,3 @@ def getBeckerData2015() -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     becker_2015_low = becker_2015_raw[10:20, 1]
     becker_2015_high = becker_2015_raw[20:, 1]
     return becker_2015_xHI, becker_2015_low, becker_2015_high
-
-
-addToList("ionization", Ionization)

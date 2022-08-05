@@ -5,7 +5,7 @@ import astropy.units as pq
 from bob.simulationSet import SimulationSet
 from bob.basicField import BasicField
 from bob.result import Result
-from bob.postprocessingFunctions import SetFn, addToList
+from bob.postprocessingFunctions import SetFn
 from bob.plots.bobSlice import getSlice
 from bob.plots.ionization import translateTime
 
@@ -51,6 +51,3 @@ class IonizationTime(SetFn):
             return ionizationTime
         else:
             raise ValueError("No sims/snaps")
-
-
-addToList("ionizationTime", IonizationTime)

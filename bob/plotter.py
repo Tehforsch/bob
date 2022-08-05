@@ -49,11 +49,13 @@ class Plotter:
         self,
         parent_folder: Path,
         sims: SimulationSet,
+        postprocess_only: bool,
         show: bool,
     ) -> None:
         self.picFolder = parent_folder / bob.config.picFolder
         self.sims = sims
         self.dataFolder = self.picFolder / "plots"
+        self.postprocess_only = postprocess_only
         self.show = show
 
     def filterSims(self, select: Optional[List[str]]) -> SimulationSet:
@@ -85,13 +87,11 @@ class Plotter:
         plots.sort()
         runInPool(runPlot, plots, self, args)
 
-    def runPostAndPlot(
-        self, args: argparse.Namespace, fn: PostprocessingFunction, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]
-    ) -> None:
+    def runPostAndPlot(self, fn: PostprocessingFunction, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]) -> None:
         logging.info("Running {}".format(name))
         result = post()
         self.save(fn, name, result)
-        if not args.post:
+        if not self.postprocess_only:
             plot(plt, result)
             self.saveAndShow(name, fn)
 
@@ -114,36 +114,36 @@ class Plotter:
         sims = self.filterSims(sims_filter)
         return MultiSet(sims.quotient(quotient_params), labels)
 
-    def runMultiSetFn(self, args: argparse.Namespace, function: MultiSetFn) -> None:
+    def runMultiSetFn(self, function: MultiSetFn) -> None:
         quotient = self.getQuotient(function.config["quotient"], function.config["sims"], function.config["labels"])
         logging.info("Running {}".format(function.name))
-        self.runPostAndPlot(args, function, function.getName(), lambda: function.post(quotient), function.plot)
+        self.runPostAndPlot(function, function.getName(), lambda: function.post(quotient), function.plot)
 
-    def runSetFn(self, args: argparse.Namespace, function: SetFn) -> None:
+    def runSetFn(self, function: SetFn) -> None:
         quotient = self.getQuotient(function.config["quotient"], function.config["sims"], function.config["labels"])
         logging.info("Running {}".format(function.name))
         for (i, (config, sims)) in enumerate(quotient.iterWithConfigs()):
             logging.info("For set {}".format(i))
-            self.runPostAndPlot(args, function, f"{i}_{function.getName()}", lambda: function.post(sims), function.plot)
+            self.runPostAndPlot(function, f"{i}_{function.getName()}", lambda: function.post(sims), function.plot)
 
-    def runSnapFn(self, args: argparse.Namespace, function: SnapFn) -> None:
+    def runSnapFn(self, function: SnapFn) -> None:
         logging.info("Running {}".format(function.name))
         for sim in self.filterSims(function.config["sims"]):
             logging.info("For sim {}".format(sim.name))
             for snap in self.get_snapshots(sim, function.config["snapshots"]):
                 logging.info("For snap {}".format(snap.name))
                 name = "{}_{}_{}".format(function.getName(), sim.name, snap.name)
-                self.runPostAndPlot(args, function, name, lambda: function.post(sim, snap), function.plot)
+                self.runPostAndPlot(function, name, lambda: function.post(sim, snap), function.plot)
 
-    def runSliceFn(self, args: argparse.Namespace, function: SliceFn) -> None:
+    def runSliceFn(self, function: SliceFn) -> None:
         logging.info("Running {}".format(function.name))
         for sim in self.filterSims(function.config["sims"]):
             logging.info("For sim {}".format(sim.name))
-            for slice_ in sim.getSlices(args.slice_field):
+            for slice_ in sim.getSlices(function.config["field"]):
                 if function.config["snapshots"] is None or any(arg_snap == slice_.name for arg_snap in function.config["snapshots"]):
                     logging.info("For slice {}".format(slice_.name))
                     name = "{}_{}_{}".format(function.getName(), sim.name, slice_.name)
-                    self.runPostAndPlot(args, function, name, lambda: function.post(sim, slice_), function.plot)
+                    self.runPostAndPlot(function, name, lambda: function.post(sim, slice_), function.plot)
 
     def isInSnapshotArgs(self, snapshotFilter: Optional[List[str]], snap: Snapshot) -> bool:
         return snapshotFilter is None or any(isSameSnapshot(arg_snap, snap) for arg_snap in snapshotFilter)

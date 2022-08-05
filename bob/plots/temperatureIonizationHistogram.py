@@ -5,7 +5,7 @@ import astropy.units as pq
 
 from bob.simulation import Simulation
 from bob.snapshot import Snapshot
-from bob.postprocessingFunctions import SnapFn, addToList
+from bob.postprocessingFunctions import SnapFn
 from bob.result import Result
 from bob.basicField import BasicField
 from bob.temperature import Temperature
@@ -45,6 +45,3 @@ class TemperatureIonizationHistogram(SnapFn):
         self.histogram(result.ionization, result.temperature, [binsX, binsY], density=True, norm=colors.LogNorm())
         colorbar = plt.colorbar()
         colorbar.set_ticks([1e-9, 1e-6, 1e-3, 1e0, 1e3])
-
-
-addToList("temperatureIonizationHistogram", TemperatureIonizationHistogram)

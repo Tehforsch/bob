@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import astropy.units as pq
 
 from bob.result import Result
-from bob.postprocessingFunctions import addToList
 from bob.plots.timePlots import TimePlot
 from bob.snapshot import Snapshot
 from bob.basicField import BasicField
@@ -95,6 +94,3 @@ class TemperatureOverTime(TimePlot):
                 capsize=3,
                 elinewidth=1,
             )
-
-
-addToList("temperatureOverTime", TemperatureOverTime)

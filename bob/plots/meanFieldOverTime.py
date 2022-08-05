@@ -2,7 +2,6 @@ import numpy as np
 
 from bob.field import Field
 from bob.snapshot import Snapshot
-from bob.postprocessingFunctions import addToList
 from bob.simulation import Simulation
 from bob.allFields import allFields, getFieldByName
 from bob.basicField import BasicField
@@ -35,6 +34,3 @@ class MeanFieldOverTime(TimePlot):
         masses = BasicField("Masses").getData(snap)
         data = self.field().getData(snap)
         return np.mean(data * masses) / np.mean(masses)
-
-
-addToList("meanFieldOverTime", MeanFieldOverTime)

@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 from bob.simulation import Simulation
-from bob.postprocessingFunctions import addToList, SliceFn
+from bob.postprocessingFunctions import SliceFn
 from bob.result import Result
 
 
@@ -49,6 +49,3 @@ class ArepoSlicePlot(SliceFn):
             plt.imshow(result.image, cmap="Reds", norm=colors.LogNorm(), extent=(-17.5, 17.5, -17.5, 17.5))
             cbar = plt.colorbar()
             cbar.set_label("$\\rho$")
-
-
-addToList("arepoSlice", ArepoSlicePlot)

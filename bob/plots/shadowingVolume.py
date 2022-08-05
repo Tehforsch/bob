@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import astropy.units as pq
 
 from bob.result import Result
-from bob.postprocessingFunctions import addToList
 from bob.plots.timePlots import TimePlot
 from bob.snapshot import Snapshot
 from bob.basicField import BasicField
@@ -85,6 +84,3 @@ class ShadowingVolumePlot(TimePlot):
         plt.plot([], [], label="$64^3$", linestyle="--", color="black")
         plt.plot([], [], label="$32^3$", linestyle=":", color="black")
         plt.legend(loc="upper left")
-
-
-addToList("shadowingVolume", ShadowingVolumePlot)

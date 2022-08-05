@@ -4,7 +4,6 @@ from bob.postprocessingFunctions import MultiSetFn
 from bob.result import Result
 from bob.multiSet import MultiSet
 from bob.plots.timePlots import getTimeQuantityForSnap, addTimeArg
-from bob.postprocessingFunctions import addToList
 from bob.util import getArrayQuantity
 
 from bob.plotConfig import PlotConfig
@@ -34,6 +33,3 @@ class LuminosityOverTime(MultiSetFn):
         for subresult in result.data:
             self.addLine(subresult.time, subresult.luminosity)
         plt.legend()
-
-
-addToList("luminosityOverTime", LuminosityOverTime)

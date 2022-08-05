@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import astropy.units as pq
 from astropy.io import ascii
 
-from bob.postprocessingFunctions import MultiSetFn, addToList
+from bob.postprocessingFunctions import MultiSetFn
 from bob.result import Result
 from bob.multiSet import MultiSet
 from bob.plots.ionization import IonizationData
@@ -66,6 +66,3 @@ class IonizationRate(MultiSetFn):
         #             label=r"Becker-Bolton+13",capsize=5)
         # ax.errorbar(zdal18,lgamdal18-12.,yerr=[erpldal18,-ermldal18],fmt='*',color='m',mec='m',
         #             label=r"D'Aloisio+18",capsize=5)
-
-
-addToList("ionizationRate", IonizationRate)

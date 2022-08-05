@@ -4,9 +4,9 @@ from pathlib import Path
 import os
 from time import sleep
 
-import bob.postprocess
+from bob.plotter import Plotter
+from bob.postprocess import runFunctionsWithPlotter, readPlotFile, create_pic_folder
 from bob.simulationSet import getSimsFromFolders
-from bob.util import getCommonParentFolder
 
 
 def runPlots(args: argparse.Namespace, files: Sequence[Path]) -> None:
@@ -17,8 +17,10 @@ def runPlots(args: argparse.Namespace, files: Sequence[Path]) -> None:
             continue
         simFolders = [path]
         sims = getSimsFromFolders(simFolders)
-        folder = getCommonParentFolder(simFolders)
-        bob.postprocess.main(args, folder, sims)
+        create_pic_folder(f)
+        functions = readPlotFile(f, True)
+        plotter = Plotter(path, sims, True, args.show)
+        runFunctionsWithPlotter(plotter, functions)
 
 
 def watch(args: argparse.Namespace, commFolder: Path, workFolder: Path) -> None:

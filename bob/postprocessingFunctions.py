@@ -4,7 +4,7 @@ import astropy.units as pq
 import matplotlib.pyplot as plt
 
 from abc import ABC, abstractmethod
-from typing import Any, List, Tuple, Iterable, Type
+from typing import Any, Tuple, Iterable
 from bob.simulation import Simulation
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
@@ -137,11 +137,3 @@ class SliceFn(PostprocessingFunction):
     @abstractmethod
     def plot(self, axes: plt.axes, result: Result) -> None:
         pass
-
-
-def addToList(name: str, fn: Type[PostprocessingFunction]) -> Any:
-    fn.name = name
-    postprocessingFunctions.append(fn)
-
-
-postprocessingFunctions: List[Type[PostprocessingFunction]] = []

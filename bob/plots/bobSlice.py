@@ -8,7 +8,7 @@ import astropy.units as pq
 from bob.simulation import Simulation
 from bob.snapshot import Snapshot
 from bob import config
-from bob.postprocessingFunctions import SnapFn, addToList
+from bob.postprocessingFunctions import SnapFn
 from bob.result import Result
 from bob.allFields import allFields, getFieldByName
 from bob.field import Field
@@ -43,7 +43,7 @@ def getSlice(field: Field, snapshot: Snapshot, axisName: str) -> Tuple[Tuple[flo
         return (min1, max1, min2, max2), data.reshape((n1, n2, 3))
 
 
-class VoronoiSlice(SnapFn):
+class Slice(SnapFn):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
         self.config.setRequired("axis", choices=["x", "y", "z"])
@@ -157,6 +157,3 @@ def findOrthogonalAxes(axis: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     axes = [axis1, axis2]
     axes.sort(key=lambda coord: (-coord[0], -coord[1], -coord[2]))
     return axes[0], axes[1]
-
-
-addToList("slice", VoronoiSlice)

@@ -5,7 +5,6 @@ import numpy as np
 
 from bob.simulation import Simulation
 from bob.snapshot import Snapshot
-from bob.postprocessingFunctions import addToList
 from bob.basicField import BasicField
 from bob.constants import speedOfLight, protonMass
 from bob.plots.timePlots import TimePlot
@@ -43,6 +42,3 @@ class ThomsonScattering(TimePlot):
 
     def ylabel(self) -> str:
         return "$\tau$"
-
-
-addToList("thomsonScattering", ThomsonScattering)
