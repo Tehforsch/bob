@@ -27,25 +27,32 @@ def getReplotCommand(simFolder: Path, finishedPlotName: str) -> Command:
     return Command({"simFolder": simFolder, "finishedPlotName": finishedPlotName, "type": "replot"})
 
 
+def getPostCommand(simFolder: Path, config: dict) -> Command:
+    return Command({"simFolder": simFolder, "config": config, "type": "post"})
+
+
 def runPostCommand(command: Command, commFolder: Path, workFolder: Path) -> None:
-    if not command.simFolder.is_dir():
-        raise ValueError(f"No folder at {command.simFolder}")
-    simFolders = [command.simFolder]
+    relativePath = command.simFolder
+    absolutePath = workFolder / relativePath
+    if not absolutePath.is_dir():
+        raise ValueError(f"No folder at {absolutePath}")
+    simFolders = [absolutePath]
     sims = getSimsFromFolders(simFolders)
-    create_pic_folder(command.simFolder)
+    create_pic_folder(absolutePath)
     functions = getFunctionsFromPlotConfigs(command["config"])
-    plotter = Plotter(command.simFolder, sims, True, False)
+    plotter = Plotter(absolutePath, sims, True, False)
     for finishedPlotName in runFunctionsWithPlotter(plotter, functions):
-        replotCommand = getReplotCommand(command.simFolder, finishedPlotName)
+        replotCommand = getReplotCommand(relativePath, finishedPlotName)
         replotCommand.write(commFolder)
 
 
 def runReplotCommand(command: Command, commFolder: Path, localWorkFolder: Path, remoteWorkFolder: Path) -> None:
     sourceFolder = remoteWorkFolder / command["simFolder"] / picFolder / "plots" / command["finishedPlotName"]
-    targetFolder = localWorkFolder / command["simFolder"] / command["finishedPlotName"]
+    targetFolder = localWorkFolder / command["simFolder"] / picFolder / "plots" / command["finishedPlotName"]
+    targetSimFolder = localWorkFolder / command["simFolder"]
     targetFolder.mkdir(parents=True, exist_ok=True)
     shutil.copytree(sourceFolder, targetFolder, dirs_exist_ok=True)
-    plotter = Plotter(command["simFolder"], SimulationSet([]), True, False)
+    plotter = Plotter(targetSimFolder, SimulationSet([]), True, False)
     plotter.replot([command["finishedPlotName"]], False)
 
 

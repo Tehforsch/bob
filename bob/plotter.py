@@ -171,12 +171,12 @@ def getBaseName(plotName: str) -> str:
 
 # Needs to be a top-level function so it can be used by multiprocessing
 def runPlot(plotter: Plotter, plotFilter: Optional[List[str]], plotName: str) -> None:
-    from bob.postprocess import readPlotFile
+    from bob.postprocess import getFunctionsFromPlotFile
 
     if plotFilter is None or plotName in plotFilter:
         print("Replotting", plotName)
         plotFolder = plotter.dataFolder / plotName
-        functions = readPlotFile(plotFolder / bob.config.plotSerializationFileName, False)
+        functions = getFunctionsFromPlotFile(plotFolder / bob.config.plotSerializationFileName, False)
         assert len(functions) == 1, "More than one plot in replot information."
         result = Result.readFromFolder(plotFolder)
         functions[0].plot(plt, result)

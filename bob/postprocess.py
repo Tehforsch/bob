@@ -30,13 +30,16 @@ def setMatplotlibStyle() -> None:
     plt.style.use(Path(file_path).parent / "../styles/plot.mlpstyle")
 
 
-def readPlotFile(filename: Path, safe: bool) -> List[PostprocessingFunction]:
+def readPlotFile(filename: Path, safe: bool) -> dict:
     if safe:
         loader = yaml.SafeLoader
     else:
         loader = yaml.Loader
-    config = yaml.load(filename.open("r"), Loader=loader)
-    return getFunctionsFromPlotConfigs(config)
+    return yaml.load(filename.open("r"), Loader=loader)
+
+
+def getFunctionsFromPlotFile(filename: Path, safe: bool) -> List[PostprocessingFunction]:
+    return getFunctionsFromPlotConfigs(readPlotFile(filename, safe))
 
 
 def getFunctionsFromPlotConfigs(config: dict) -> List[PostprocessingFunction]:
