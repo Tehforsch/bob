@@ -55,7 +55,7 @@ def main() -> None:
     args = setupArgs()
     setupLogging(args)
     if args.function == "watch":
-        watch(args, args.communicationFolder, args.workFolder)
+        watch(args.communicationFolder, args.workFolder)
         return
     if not args.post:
         setMatplotlibStyle()

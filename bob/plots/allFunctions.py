@@ -34,6 +34,10 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     SourcePosition,
 ]
 
+for function in postprocessingFunctions:
+    function.name = function.__name__
+    function.name = function.name[0].lower() + function.name[1:]
+
 
 def getFunctionByName(name: str) -> Type[PostprocessingFunction]:
     print(name)
