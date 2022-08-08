@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import logging
 
 from bob.simulation import Simulation
 from bob.snapshot import Snapshot
@@ -22,7 +23,6 @@ class SliceWithStarParticles(Slice):
         extentZ = (snap.maxExtent - snap.minExtent)[2]
         if self.config["testSources"]:
             sources = sim.sources()
-            print(sources)
             coords = sources.coord * sim.snapshots[0].lengthUnit
             rates = sources.get136IonisationRate(sim)
         else:
@@ -39,6 +39,8 @@ class SliceWithStarParticles(Slice):
         result.coords = coords[np.where(zRelativeDist < 0.02)]
         if self.config["colorByLuminosity"]:
             result.rates = rates[np.where(zRelativeDist < 0.02)]
+        logging.debug("Coords", result.coords)
+        logging.debug("Rates", result.rates)
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
@@ -48,9 +50,8 @@ class SliceWithStarParticles(Slice):
         ax = fig.add_subplot(1, 1, 1)
         super().plot(ax, result)
         if len(result.coords.shape) > 0:
-            print(f"num stars: {result.coords.shape[0]}")
+            logging.debug(f"num stars: {result.coords.shape[0]}")
             params = {}
             if self.config["colorByLuminosity"]:
-                print(result.rates)
                 params["c"] = result.rates
             self.scatter(result.coords[:, 0], result.coords[:, 1], **params)
