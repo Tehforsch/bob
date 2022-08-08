@@ -42,10 +42,27 @@ def getFunctionsFromPlotFile(filename: Path, safe: bool) -> List[PostprocessingF
     return getFunctionsFromPlotConfigs(readPlotFile(filename, safe))
 
 
+def replaceParams(fn: str, config: dict, substitutions: dict) -> List[dict]:
+    print(substitutions)
+    numParams = len(substitutions[list(substitutions.keys())[0]])
+    for (k, v) in substitutions.items():
+        assert len(v) == numParams
+    print(config)
+    configs = [config for _ in range(numParams)]
+    for (i, (k, v)) in enumerate(substitutions.items()):
+        configs[i][k] = v[i]
+    return [{fn: config} for config in configs]
+
+
 def getFunctionsFromPlotConfigs(config: Union[dict, List[dict]]) -> List[PostprocessingFunction]:
     functions: List[PostprocessingFunction] = []
     if type(config) == dict:
-        config = [config]
+        if "substitutions" in config:
+            assert len(config.keys()) == 2
+            fn = [key for key in config.keys() if key != "substitutions"][0]
+            config = replaceParams(fn, config[fn], config["substitutions"])
+        else:
+            config = [config]
     for item in config:
         assert type(item) == dict
         assert len(item) == 1

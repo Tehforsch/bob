@@ -1,0 +1,8 @@
+slice:
+    field: Temperature
+    axis: z
+    name: "{name}_{relativePosition}"
+substitutions:
+    relativePosition:
+      - 0.4
+      - 0.6
