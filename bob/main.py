@@ -77,8 +77,9 @@ def main() -> None:
     if not args.post:
         setMatplotlibStyle()
     if args.function == "replot":
-        plotter = Plotter(Path("."), SimulationSet([]), args.post, args.show)
-        plotter.replot(args.plots, args.onlyNew, args.config)
+        for simFolder in args.simFolders:
+            plotter = Plotter(simFolder, SimulationSet([]), args.post, args.show)
+            plotter.replot(args.plots, args.onlyNew, args.config)
     else:
         sims = getSimsFromFolders(args.simFolders)
         parent_folder = getCommonParentFolder(args.simFolders)

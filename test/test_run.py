@@ -26,7 +26,7 @@ def runTest(folder: Path, pybobPath: Path) -> None:
     if (folder / "plot.bob").is_file():
         args = ["python", str(pybobPath), "plot", ".", "plot.bob"]
     else:
-        args = ["python", str(pybobPath), "replot", ".", "replot.bob"]
+        args = ["python", str(pybobPath), "replot", "."]
     try:
         subprocess.check_call(args, cwd=folder, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except:
