@@ -1,3 +1,5 @@
+from typing import Any, Tuple
+import numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as pq
 from astropy.io import ascii
@@ -32,6 +34,7 @@ class IonizationRate(MultiSetFn):
         labels = self.getLabels()
         colors = self.getColors()
         for (redshift, volumeRate, massRate, color, label) in zip(result.redshift, result.volumeAvRate, result.massAvRate, colors, labels):
+            print(label)
             self.addLine(redshift, volumeRate, color=color, linestyle="-", label=label)
             self.addLine(redshift, massRate, color=color, linestyle="--", label="")
         plt.plot([], [], color="black", linestyle="-", label="volume av.")
@@ -40,30 +43,38 @@ class IonizationRate(MultiSetFn):
         plt.legend(loc=self.config["legend_loc"])
 
     def addConstraints(self) -> None:
-        data = ascii.read(getDataFile("ionizationRate/faucher-giguere2008/table1"))
-        [zfc08, tauafc08, taubfc08, gamfc08, e_gamfc08] = data.to_pandas().values.T
-        print(zfc08)
-        # lgamfc08 = gamfc08 * 1e-12
-        print(e_gamfc08)
-        print(gamfc08)
+        data = readAscii("faucher-giguere2008/table1")
+        [zfc08, tauafc08, taubfc08, gamfc08, e_gamfc08] = data.T
 
-        # data = ascii.read("./obs/becker_bolton2013/table1")
-        # d=data.to_pandas()
-        # d=d.values
-        # [zbb13,lgambb13,erplgbb13,ermlgbb13]=d
+        data = readAscii("becker_bolton2013/table1")
+        [zbb13, lgambb13, erplgbb13, ermlgbb13] = data
+        (gambb13, erpgbb13, ermgbb13) = logToLin(lgambb13, ermlgbb13, erplgbb13)
 
-        # data = ascii.read("./obs/daloisio2018/table2")
-        # d=data.to_pandas()
-        # d=d.values
-        # [zdal18,gamdal18,erpdal18,ermdal18]=d
-        # lgamdal18=np.log10(gamdal18)
-        # erpldal18=np.log10(gamdal18+erpdal18)-np.log10(gamdal18)
-        # ermldal18=(np.log10(gamdal18-ermdal18)-np.log10(gamdal18))
+        data = readAscii("daloisio2018/table2")
+        [zdal18, gamdal18, erpdal18, ermdal18] = data
 
-        # ax.errorbar(zcal11,lgammacal11,yerr=erlgammacal11,fmt='o',color='r',mec='r',
-        #             label=r"Calverley+11",capsize=5)
-        plt.errorbar(zfc08, 1e-12 * gamfc08, yerr=1e-12 * e_gamfc08, fmt="s", color="g", mec="g", label=r"Faucher-Giguere+08", capsize=5)
-        # ax.errorbar(zbb13,lgambb13-12.,yerr=[erplgbb13,-ermlgbb13],fmt='^',color='b',mec='b',
-        #             label=r"Becker-Bolton+13",capsize=5)
-        # ax.errorbar(zdal18,lgamdal18-12.,yerr=[erpldal18,-ermldal18],fmt='*',color='m',mec='m',
-        #             label=r"D'Aloisio+18",capsize=5)
+        zcal11 = [5.0, 6.0]
+        lgammacal11 = np.array([-12.15, -12.84])  # loggamma calverley 2011
+        erlgammacal11 = np.array([0.16, 0.18])  # log error
+        gammacal11, ermgammacal11, erpgammacal11 = logToLin(lgammacal11, erlgammacal11, erlgammacal11)
+
+        plt.errorbar(zcal11, gammacal11, yerr=[ermgammacal11, erpgammacal11], fmt="o", color="r", mec="r", label=r"Calverley+11", capsize=5)
+        plt.errorbar(zfc08, gamfc08 * 1e-12, yerr=e_gamfc08 * 1e-12, fmt="s", color="g", mec="g", label=r"Faucher-Giguere+08", capsize=5)
+        plt.errorbar(
+            zbb13, gambb13 * 1e-12, yerr=[erpgbb13 * 1e-12, -ermgbb13 * 1e-12], fmt="^", color="b", mec="b", label=r"Becker-Bolton+13", capsize=5
+        )
+        plt.errorbar(
+            zdal18, gamdal18 * 1e-12, yerr=[erpdal18 * 1e-12, -ermdal18 * 1e-12], fmt="*", color="m", mec="m", label=r"D'Aloisio+18", capsize=5
+        )
+
+
+def readAscii(filename: str) -> Any:
+    data = ascii.read(getDataFile("ionizationRate/" + filename))
+    return data.to_pandas().values
+
+
+def logToLin(logValues: np.ndarray, logErrorsLower: np.ndarray, logErrorsUpper: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    linValues = 10.0**logValues
+    minValues = 10.0 ** (logValues - logErrorsLower)
+    maxValues = 10.0 ** (logValues + logErrorsUpper)
+    return linValues, linValues - minValues, maxValues - linValues

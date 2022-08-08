@@ -117,7 +117,7 @@ class MultiSetFn(PostprocessingFunction):
         labels = self.config["labels"]
         if labels is None:
             labels = []
-        return itertools.chain(labels, itertools.cycle(""))
+        return itertools.chain(labels, itertools.repeat(""))
 
 
 class SliceFn(PostprocessingFunction):
