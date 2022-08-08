@@ -1,6 +1,6 @@
 import os
 import yaml
-from typing import Iterator, List, Optional, Callable, Union, Literal
+from typing import Iterator, List, Optional, Callable, Union
 from pathlib import Path
 import matplotlib.pyplot as plt
 import logging
@@ -113,7 +113,7 @@ class Plotter:
         result.save(plotDataFolder)
 
     def getQuotient(
-        self, quotient_params: Optional[Union[Literal["single"], List[str]]], sims_filter: Optional[List[str]], labels: Optional[List[str]]
+        self, quotient_params: Optional[Union[str, List[str]]], sims_filter: Optional[List[str]], labels: Optional[List[str]]
     ) -> MultiSet:
         if type(quotient_params) == str and quotient_params.lower() == "single":
             params: Union[Single, List[str]] = Single()

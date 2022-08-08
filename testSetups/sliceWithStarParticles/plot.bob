@@ -1,0 +1,5 @@
+sliceWithStarParticles:
+  field: Temperature
+  axis: z
+  testSources: True
+  colorByLuminosity: True

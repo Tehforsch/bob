@@ -64,6 +64,7 @@ class Slice(SnapFn):
         self.config.setDefault("logmax1", 0)
         self.config.setDefault("logmax2", 0)
         self.config.setDefault("showTime", True)
+        self.config.setDefault("timeUnit", pq.Myr)
 
     @property
     def field(self) -> Field:
@@ -105,7 +106,12 @@ class Slice(SnapFn):
         else:
             self.image(result.data, result.extent, vmin=vmin, vmax=vmax, origin="lower")
         if self.config["showTime"]:
-            plt.text(0, 0, f"Redshift: {result.redshift:.01f}", fontsize=12)
+            if result.redshift.unit == pq.s:
+                time = result.redshift.to(self.config["timeUnit"]).value
+                timeUnit = str(self.config["timeUnit"])
+                plt.text(0, 0, f"Time: {time:.01f} {timeUnit}", fontsize=12)
+            else:
+                plt.text(0, 0, f"Redshift: {result.redshift:.01f}", fontsize=12)
 
     def getName(self) -> str:
         axis = self.config["axis"]

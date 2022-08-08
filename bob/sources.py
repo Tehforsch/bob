@@ -28,18 +28,23 @@ class Sources:
     def __exit__(self, type: Any, value: Any, _tb: Any) -> None:
         return
 
+    def get136IonisationRate(self, sim: Any) -> np.ndarray:
+        import astropy.units as pq
+
+        return self.sed[:, 2] * sim.params["UnitPhotons_per_s"] / pq.s
+
     def addSource(self, coord: np.ndarray, sed: np.ndarray, time: Union[List[float], float] = None) -> None:
         timeArray = np.zeros(len(coord)) if time is None else time
         if self.nSources == 0:
-            self.coord = np.array(coord)
-            self.sed = np.array(sed)
-            self.time = np.array(timeArray)
+            self.coord = np.array([coord])
+            self.sed = np.array([sed])
+            self.time = np.array([timeArray])
             self.nFreq = sed.shape[0]
         else:
             self.coord = np.append(self.coord, coord, axis=0)
             self.sed = np.append(self.sed, sed, axis=0)
             self.time = np.append(self.time, timeArray)
-        self.nSources = self.sed.shape[0] // self.nFreq
+        self.nSources += 1
 
     def read(self, fileName: Path) -> None:
         with open(fileName, "r") as f:
@@ -48,7 +53,6 @@ class Sources:
             self.nFreq = nFreq
             self.nSigma = nSigma
             self.nEnergy = nEnergy
-            print(self.nSources, self.nFreq)
             self.sigma = np.fromfile(f, dtype="f8", count=nSigma) if nSigma > 0 else None
             self.energy = np.fromfile(f, dtype="f8", count=nEnergy) if nEnergy > 0 else None
             self.coord = np.fromfile(f, dtype="f8", count=nSources * 3).reshape((nSources, 3))
@@ -100,5 +104,4 @@ if __name__ == "__main__":
             coord = np.array([x, y, z])
             sed = np.array([s1, s2, s3, s4, s5])
             s.addSource(coord, sed, [0.0])
-        print(s)
         s.write(out)
