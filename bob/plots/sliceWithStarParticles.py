@@ -54,4 +54,5 @@ class SliceWithStarParticles(Slice):
             params = {}
             if self.config["colorByLuminosity"]:
                 params["c"] = result.rates
+                params["cmap"] = "Blues"
             self.scatter(result.coords1, result.coords2, **params)
