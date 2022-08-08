@@ -109,7 +109,9 @@ class Plotter:
     def saveResult(self, result: Result, plotDataFolder: Path) -> None:
         result.save(plotDataFolder)
 
-    def getQuotient(self, quotient_params: QuotientParams, sims_filter: Optional[List[str]], labels: Optional[List[str]]) -> MultiSet:
+    def getQuotient(self, quotient_params: Union[str, List[str]], sims_filter: Optional[List[str]], labels: Optional[List[str]]) -> MultiSet:
+        if quotient_params.lower() == "single":
+            quotient_params = Single()
         if quotient_params is None:
             quotient_params = []
         sims = self.filterSims(sims_filter)
