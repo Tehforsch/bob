@@ -1,5 +1,5 @@
 import os
-from typing import List, Iterator
+from typing import List, Iterator, Union
 from pathlib import Path
 import yaml
 import logging
@@ -42,11 +42,16 @@ def getFunctionsFromPlotFile(filename: Path, safe: bool) -> List[PostprocessingF
     return getFunctionsFromPlotConfigs(readPlotFile(filename, safe))
 
 
-def getFunctionsFromPlotConfigs(config: dict) -> List[PostprocessingFunction]:
+def getFunctionsFromPlotConfigs(config: Union[dict, List[dict]]) -> List[PostprocessingFunction]:
     functions: List[PostprocessingFunction] = []
-    for fnName in config:
-        config = config[fnName]
-        function = getFunctionByName(fnName)(PlotConfig(config))
+    if type(config) == dict:
+        config = [config]
+    for item in config:
+        assert type(item) == dict
+        assert len(item) == 1
+        fnName = list(item.keys())[0]
+        configItem = item[fnName]
+        function = getFunctionByName(fnName)(PlotConfig(configItem))
         function.config.verify()
         functions.append(function)
     return functions
