@@ -34,7 +34,6 @@ class IonizationRate(MultiSetFn):
         labels = self.getLabels()
         colors = self.getColors()
         for (redshift, volumeRate, massRate, color, label) in zip(result.redshift, result.volumeAvRate, result.massAvRate, colors, labels):
-            print(label)
             self.addLine(redshift, volumeRate, color=color, linestyle="-", label=label)
             self.addLine(redshift, massRate, color=color, linestyle="--", label="")
         plt.plot([], [], color="black", linestyle="-", label="volume av.")
