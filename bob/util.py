@@ -20,8 +20,8 @@ def getArrayQuantity(quantities: List[pq.Quantity]) -> pq.Quantity:
             raise ValueError("Different units in quantity array")
     return np.array([(y / unit).decompose().value for y in quantities]) * unit
 
+
 def getDataFile(relativePath: str) -> Path:
     thisFolder = Path(__file__).parent
     dataFolder = thisFolder.parent / "data"
     return dataFolder / relativePath
-

@@ -67,7 +67,7 @@ def main() -> None:
         watchPost(args.communicationFolder, args.workFolder)
     if args.function == "watchReplot":
         setMatplotlibStyle()
-        watchReplot(args.communicationFolder, args.localWorkFolder, args.remoteWorkFolder, args.config)
+        watchReplot(args.communicationFolder, args.localWorkFolder, args.remoteWorkFolder)
     if args.function == "remotePlot":
         if len(args.simFolders) > 1:
             raise NotImplementedError("No implementation for multiple sim folders currently (easy extension)")
