@@ -27,7 +27,6 @@ def getSlice(field: Field, snapshot: Snapshot, axisName: str, position: float) -
     axis = getAxisByName(axisName)
     axis = np.array(axis)
     center = (snapshot.maxExtent * axis) * position
-    print(center)
     ortho1, ortho2 = findOrthogonalAxes(axis)
     min1 = np.dot(ortho1, snapshot.minExtent)
     min2 = np.dot(ortho2, snapshot.minExtent)
@@ -67,6 +66,9 @@ class Slice(SnapFn):
         self.config.setDefault("showTime", True)
         self.config.setDefault("timeUnit", pq.Myr)
         self.config.setDefault("relativePosition", 0.5)
+        axis = self.config["axis"]
+        field = self.config["field"]
+        self.config.setDefault("name", f"{self.name}_{axis}_{field}")
 
     @property
     def field(self) -> Field:
@@ -114,11 +116,6 @@ class Slice(SnapFn):
                 plt.text(0, 0, f"Time: {time:.01f} {timeUnit}", fontsize=12)
             else:
                 plt.text(0, 0, f"Redshift: {result.redshift:.01f}", fontsize=12)
-
-    def getName(self) -> str:
-        axis = self.config["axis"]
-        field = self.config["field"]
-        return f"{self.name}_{axis}_{field}"
 
 
 def getAxisByName(name: str) -> np.ndarray:

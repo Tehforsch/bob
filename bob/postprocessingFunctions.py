@@ -20,9 +20,10 @@ class PostprocessingFunction(ABC):
         self.config = config
         self.config.setDefault("sims", None)
         self.config.setDefault("outputFileType", "png")
+        self.config.setDefault("name", self.name)
 
     def getName(self) -> str:
-        return self.name
+        return self.config["name"]
 
     def setupLinePlot(self) -> None:
         self.setupLabels()
@@ -125,10 +126,8 @@ class SliceFn(PostprocessingFunction):
         super().__init__(config)
         self.config.setRequired("field")
         self.config.setDefault("snapshots", None)
-
-    def getName(self) -> str:
         field = self.config["field"]
-        return f"{self.name}_{field}"
+        self.config.setDefault("name", f"{self.name}_{field}")
 
     @abstractmethod
     def post(self, sim: Simulation, slice_: Any) -> Result:

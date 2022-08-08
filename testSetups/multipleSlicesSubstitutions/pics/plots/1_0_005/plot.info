@@ -9,8 +9,9 @@ slice:
   logmin0: -9
   logmin1: -9
   logmin2: -9
+  name: 1
   outputFileType: png
-  relativePosition: 0.4
+  relativePosition: 0.6
   showTime: true
   sims: null
   snapshots: null

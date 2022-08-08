@@ -20,10 +20,8 @@ class TemperatureDensityHistogram(SnapFn):
         self.config.setDefault("yUnit", "K")
         self.config.setDefault("xLabel", "$\\rho [UNIT]$")
         self.config.setDefault("yLabel", "T [UNIT]")
-
-    def getName(self) -> str:
         ionizedStr = "_only_ionized" if self.config["only_ionized"] else ""
-        return f"{self.name}{ionizedStr}"
+        self.config.setDefault("name", f"{self.name}{ionizedStr}")
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         result = Result()

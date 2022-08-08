@@ -43,14 +43,13 @@ def getFunctionsFromPlotFile(filename: Path, safe: bool) -> List[PostprocessingF
 
 
 def replaceParams(fn: str, config: dict, substitutions: dict) -> List[dict]:
-    print(substitutions)
     numParams = len(substitutions[list(substitutions.keys())[0]])
     for (k, v) in substitutions.items():
         assert len(v) == numParams
-    print(config)
-    configs = [config for _ in range(numParams)]
-    for (i, (k, v)) in enumerate(substitutions.items()):
-        configs[i][k] = v[i]
+    configs = [config.copy() for _ in range(numParams)]
+    for (k, v) in substitutions.items():
+        for i in range(numParams):
+            configs[i][k] = v[i]
     return [{fn: config} for config in configs]
 
 

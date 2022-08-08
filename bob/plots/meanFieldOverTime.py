@@ -15,6 +15,10 @@ class MeanFieldOverTime(TimePlot):
         super().__init__(config)
         self.config.setRequired("field", choices=[f.niceName for f in allFields])
         self.config.setDefault("yUnit", self.field().unit)
+        field = self.config["field"]
+        timeQuantity = self.config["time"]
+        self.config.setDefault("name", f"{self.name}_{field}_{timeQuantity}")
+        return
 
     def xlabel(self) -> str:
         return self.config["time"]
@@ -24,11 +28,6 @@ class MeanFieldOverTime(TimePlot):
 
     def field(self) -> Field:
         return getFieldByName(self.config["field"])
-
-    def getName(self) -> str:
-        field = self.config["field"]
-        timeQuantity = self.config["time"]
-        return f"{self.name}_{field}_{timeQuantity}"
 
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> float:
         masses = BasicField("Masses").getData(snap)

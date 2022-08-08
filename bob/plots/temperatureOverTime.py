@@ -17,14 +17,12 @@ class TemperatureOverTime(TimePlot):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
         self.config.setDefault("bins", False)
+        binString = "_binned" if self.config["bins"] else ""
+        time = self.config["time"]
+        self.config.setDefault("name", f"{self.name}_{time}{binString}")
 
     def ylabel(self) -> str:
         return "$T [\\mathrm{K}]$"
-
-    def getName(self) -> str:
-        binString = "_binned" if self.config["bins"] else ""
-        time = self.config["time"]
-        return f"{self.name}_{time}{binString}"
 
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> List[float]:
         density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)
