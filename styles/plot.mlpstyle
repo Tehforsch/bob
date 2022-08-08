@@ -30,6 +30,6 @@ ytick.minor.visible: True
 
 axes.labelsize: 11
 axes.titlesize: 11
-legend.fontsize: 11
+legend.fontsize: 8
 xtick.labelsize:  11
 ytick.labelsize:  11
