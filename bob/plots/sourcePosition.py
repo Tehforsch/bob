@@ -22,7 +22,7 @@ class SourcePosition(SetFn):
         result = Result()
         allSources = [sim.sources() for sim in sims]
         result.coords = [sources.coord * sim.snapshots[0].lengthUnit for (sim, sources) in zip(sims, allSources)]
-        result.luminosities = [sources.sed[2] * sim.params["UnitPhotons_per_s"] / pq.s for (sim, sources) in zip(sims, allSources)]
+        result.luminosities = [sources.sed[:, 2] * sim.params["UnitPhotons_per_s"] / pq.s for (sim, sources) in zip(sims, allSources)]
         self.config.setDefault("xLim", (np.min(result.coords[-1][:, 0]), np.max(result.coords[-1][:, 0])))
         self.config.setDefault("yLim", (np.min(result.coords[-1][:, 1]), np.max(result.coords[-1][:, 1])))
         return result
