@@ -7,6 +7,7 @@ from bob.result import Result
 from bob.multiSet import MultiSet
 from bob.plots.ionization import IonizationData
 from bob.plotConfig import PlotConfig
+from bob.util import getDataFile
 
 
 class IonizationRate(MultiSetFn):
@@ -39,7 +40,7 @@ class IonizationRate(MultiSetFn):
         plt.legend(loc=self.config["legend_loc"])
 
     def addConstraints(self) -> None:
-        data = ascii.read(".obs/faucher-giguere2008/table1")
+        data = ascii.read(getDataFile("ionizationRate/faucher-giguere2008/table1"))
         [zfc08, tauafc08, taubfc08, gamfc08, e_gamfc08] = data.to_pandas().values.T
         print(zfc08)
         # lgamfc08 = gamfc08 * 1e-12
