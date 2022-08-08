@@ -32,7 +32,7 @@ def setupArgs() -> argparse.Namespace:
     replotParser = subparsers.add_parser("replot")
     replotParser.add_argument("simFolders", type=Path, nargs="+", help="Path to simulation directories")
     replotParser.add_argument("--plots", type=str, nargs="*", help="The plots to replot")
-    replotParser.add_argument("--types", type=str, nargs="*", help="The plot types to replot")
+    replotParser.add_argument("--config", type=Path, help="A custom plot config to overwrite the one created during postprocessing")
     replotParser.add_argument(
         "--only-new",
         dest="onlyNew",
@@ -67,7 +67,7 @@ def main() -> None:
         watchPost(args.communicationFolder, args.workFolder)
     if args.function == "watchReplot":
         setMatplotlibStyle()
-        watchReplot(args.communicationFolder, args.localWorkFolder, args.remoteWorkFolder)
+        watchReplot(args.communicationFolder, args.localWorkFolder, args.remoteWorkFolder, args.config)
     if args.function == "remotePlot":
         if len(args.simFolders) > 1:
             raise NotImplementedError("No implementation for multiple sim folders currently (easy extension)")
@@ -79,7 +79,7 @@ def main() -> None:
         setMatplotlibStyle()
     if args.function == "replot":
         plotter = Plotter(Path("."), SimulationSet([]), args.post, args.show)
-        plotter.replot(args.plots, args.onlyNew)
+        plotter.replot(args.plots, args.onlyNew, args.config)
     else:
         sims = getSimsFromFolders(args.simFolders)
         parent_folder = getCommonParentFolder(args.simFolders)

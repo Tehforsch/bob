@@ -40,5 +40,4 @@ for function in postprocessingFunctions:
 
 
 def getFunctionByName(name: str) -> Type[PostprocessingFunction]:
-    print(name)
     return next(function for function in postprocessingFunctions if function.__name__.lower() == name.lower())

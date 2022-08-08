@@ -48,14 +48,14 @@ def runPostCommand(command: Command, commFolder: Path, workFolder: Path) -> None
     logging.info("Done")
 
 
-def runReplotCommand(command: Command, commFolder: Path, localWorkFolder: Path, remoteWorkFolder: Path) -> None:
+def runReplotCommand(command: Command, commFolder: Path, localWorkFolder: Path, remoteWorkFolder: Path, customConfig: Path) -> None:
     sourceFolder = remoteWorkFolder / command["simFolder"] / picFolder / "plots" / command["finishedPlotName"]
     targetFolder = localWorkFolder / command["simFolder"] / picFolder / "plots" / command["finishedPlotName"]
     targetSimFolder = localWorkFolder / command["simFolder"]
     targetFolder.mkdir(parents=True, exist_ok=True)
     shutil.copytree(sourceFolder, targetFolder, dirs_exist_ok=True)
     plotter = Plotter(targetSimFolder, SimulationSet([]), True, False)
-    plotter.replot([command["finishedPlotName"]], False)
+    plotter.replot([command["finishedPlotName"]], False, customConfig)
 
 
 def watchPost(commFolder: Path, workFolder: Path) -> None:
@@ -65,9 +65,9 @@ def watchPost(commFolder: Path, workFolder: Path) -> None:
     watch(workFunction, commFolder, "post")
 
 
-def watchReplot(commFolder: Path, localWorkFolder: Path, remoteWorkFolder: Path) -> None:
+def watchReplot(commFolder: Path, localWorkFolder: Path, remoteWorkFolder: Path, customConfig: Path) -> None:
     def workFunction(command: Command) -> None:
-        runReplotCommand(command, commFolder, localWorkFolder, remoteWorkFolder)
+        runReplotCommand(command, commFolder, localWorkFolder, remoteWorkFolder, customConfig)
 
     watch(workFunction, commFolder, "replot")
 

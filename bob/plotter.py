@@ -1,6 +1,6 @@
 import os
 import yaml
-from typing import Iterator, List, Optional, Callable, Union
+from typing import Iterator, List, Optional, Callable, Union, Literal
 from pathlib import Path
 import matplotlib.pyplot as plt
 import logging
@@ -68,9 +68,6 @@ class Plotter:
             return True
         else:
             plotPath = self.dataFolder / plotName
-            print(plotPath)
-            for f in walkfiles(plotPath):
-                print(f)
             mtimePlot = max(os.path.getmtime(str(f)) for f in walkfiles(plotPath))
             mtimeImage = max(os.path.getmtime(image) for image in images)
             return mtimeImage < mtimePlot
@@ -79,13 +76,19 @@ class Plotter:
         plots = os.listdir(self.dataFolder)
         return [plot for plot in plots if self.isNew(plot)]
 
-    def replot(self, plotFilter: Optional[List[str]], onlyNew: bool) -> None:
+    def replot(self, plotFilter: Optional[List[str]], onlyNew: bool, customConfig: Optional[Path]) -> None:
         if onlyNew:
             plots = self.getNewPlots()
         else:
             plots = os.listdir(self.dataFolder)
+        from bob.postprocess import readPlotFile
+
+        if customConfig is not None:
+            config = readPlotFile(customConfig, safe=True)
+        else:
+            config = None
         plots.sort()
-        runInPool(runPlot, plots, self, plotFilter)
+        runInPool(runPlot, plots, self, plotFilter, config)
 
     def runPostAndPlot(self, fn: PostprocessingFunction, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]) -> str:
         logging.info("Running {}".format(name))
@@ -109,13 +112,19 @@ class Plotter:
     def saveResult(self, result: Result, plotDataFolder: Path) -> None:
         result.save(plotDataFolder)
 
-    def getQuotient(self, quotient_params: Union[str, List[str]], sims_filter: Optional[List[str]], labels: Optional[List[str]]) -> MultiSet:
-        if quotient_params.lower() == "single":
-            quotient_params = Single()
-        if quotient_params is None:
-            quotient_params = []
+    def getQuotient(
+        self, quotient_params: Optional[Union[Literal["single"], List[str]]], sims_filter: Optional[List[str]], labels: Optional[List[str]]
+    ) -> MultiSet:
+        if type(quotient_params) == str and quotient_params.lower() == "single":
+            params: Union[Single, List[str]] = Single()
+        elif quotient_params is None:
+            params = []
+        elif type(quotient_params) == list:
+            params = quotient_params
+        else:
+            raise NotImplementedError(f"Type: {type(quotient_params)}")
         sims = self.filterSims(sims_filter)
-        return MultiSet(sims.quotient(quotient_params), labels)
+        return MultiSet(sims.quotient(params), labels)
 
     def runMultiSetFn(self, function: MultiSetFn) -> Iterator[str]:
         quotient = self.getQuotient(function.config["quotient"], function.config["sims"], function.config["labels"])
@@ -163,14 +172,18 @@ def getBaseName(plotName: str) -> str:
 
 
 # Needs to be a top-level function so it can be used by multiprocessing
-def runPlot(plotter: Plotter, plotFilter: Optional[List[str]], plotName: str) -> None:
-    from bob.postprocess import getFunctionsFromPlotFile
+def runPlot(plotter: Plotter, plotFilter: Optional[List[str]], customConfig: Optional[dict], plotName: str) -> None:
+    from bob.postprocess import getFunctionsFromPlotFile, getFunctionsFromPlotConfigs
 
     if plotFilter is None or plotName in plotFilter:
         print("Replotting", plotName)
         plotFolder = plotter.dataFolder / plotName
-        functions = getFunctionsFromPlotFile(plotFolder / bob.config.plotSerializationFileName, False)
+        if customConfig is not None:
+            functions = getFunctionsFromPlotConfigs(customConfig)
+        else:
+            functions = getFunctionsFromPlotFile(plotFolder / bob.config.plotSerializationFileName, False)
         assert len(functions) == 1, "More than one plot in replot information."
+        fn = functions[0]
         result = Result.readFromFolder(plotFolder)
-        functions[0].plot(plt, result)
-        plotter.saveAndShow(plotFolder.name, functions[0])
+        fn.plot(plt, result)
+        plotter.saveAndShow(plotFolder.name, fn)
