@@ -1,4 +1,5 @@
 import yaml
+import logging
 from typing import Tuple, Iterator, Any
 from pathlib import Path
 import os
@@ -44,6 +45,7 @@ def runPostCommand(command: Command, commFolder: Path, workFolder: Path) -> None
     for finishedPlotName in runFunctionsWithPlotter(plotter, functions):
         replotCommand = getReplotCommand(relativePath, finishedPlotName)
         replotCommand.write(commFolder)
+    logging.info("Done")
 
 
 def runReplotCommand(command: Command, commFolder: Path, localWorkFolder: Path, remoteWorkFolder: Path) -> None:

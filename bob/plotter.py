@@ -117,32 +117,23 @@ class Plotter:
 
     def runMultiSetFn(self, function: MultiSetFn) -> Iterator[str]:
         quotient = self.getQuotient(function.config["quotient"], function.config["sims"], function.config["labels"])
-        logging.info("Running {}".format(function.name))
         yield self.runPostAndPlot(function, function.getName(), lambda: function.post(quotient), function.plot)
 
     def runSetFn(self, function: SetFn) -> Iterator[str]:
         quotient = self.getQuotient(function.config["quotient"], function.config["sims"], function.config["labels"])
-        logging.info("Running {}".format(function.name))
         for (i, (config, sims)) in enumerate(quotient.iterWithConfigs()):
-            logging.info("For set {}".format(i))
             yield self.runPostAndPlot(function, f"{i}_{function.getName()}", lambda: function.post(sims), function.plot)
 
     def runSnapFn(self, function: SnapFn) -> Iterator[str]:
-        logging.info("Running {}".format(function.name))
         for sim in self.filterSims(function.config["sims"]):
-            logging.info("For sim {}".format(sim.name))
             for snap in self.get_snapshots(sim, function.config["snapshots"]):
-                logging.info("For snap {}".format(snap.name))
                 name = "{}_{}_{}".format(function.getName(), sim.name, snap.name)
                 yield self.runPostAndPlot(function, name, lambda: function.post(sim, snap), function.plot)
 
     def runSliceFn(self, function: SliceFn) -> Iterator[str]:
-        logging.info("Running {}".format(function.name))
         for sim in self.filterSims(function.config["sims"]):
-            logging.info("For sim {}".format(sim.name))
             for slice_ in sim.getSlices(function.config["field"]):
                 if function.config["snapshots"] is None or any(arg_snap == slice_.name for arg_snap in function.config["snapshots"]):
-                    logging.info("For slice {}".format(slice_.name))
                     name = "{}_{}_{}".format(function.getName(), sim.name, slice_.name)
                     yield self.runPostAndPlot(function, name, lambda: function.post(sim, slice_), function.plot)
 
