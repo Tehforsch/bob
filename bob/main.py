@@ -3,12 +3,11 @@ import logging
 import argparse
 import os
 
-import bob.postprocess
 from bob.simulationSet import getSimsFromFolders, SimulationSet
 from bob.util import getCommonParentFolder
 from bob.watch import watchPost, watchReplot, getPostCommand
 from bob.plotter import Plotter
-from bob.postprocess import getFunctionsFromPlotFile, setMatplotlibStyle, readPlotFile
+from bob.postprocess import getFunctionsFromPlotFile, setMatplotlibStyle, readPlotFile, runFunctionsWithPlotter, create_pic_folder
 
 
 def setupArgs() -> argparse.Namespace:
@@ -83,7 +82,7 @@ def main() -> None:
     else:
         sims = getSimsFromFolders(args.simFolders)
         parent_folder = getCommonParentFolder(args.simFolders)
-        bob.postprocess.create_pic_folder(parent_folder)
+        create_pic_folder(parent_folder)
         plotter = Plotter(parent_folder, sims, args.post, args.show)
         functions = getFunctionsFromPlotFile(args.plot, True)
-        bob.postprocess.runFunctionsWithPlotter(plotter, functions)
+        _ = list(runFunctionsWithPlotter(plotter, functions))
