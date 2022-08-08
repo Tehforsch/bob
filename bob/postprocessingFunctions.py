@@ -111,7 +111,7 @@ class MultiSetFn(PostprocessingFunction):
         pass
 
     def getColors(self) -> Iterable[str]:
-        return itertools.cycle(["b", "r", "g", "purple", "brown", "orange"])
+        return itertools.cycle(["b", "r", "g", "purple", "brown", "orange", "pink", "teal"])
 
     def getLabels(self) -> Iterable[str]:
         labels = self.config["labels"]

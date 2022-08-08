@@ -1,3 +1,4 @@
 bob/localConfig.py
 *.dat
 *.bin
+*.png

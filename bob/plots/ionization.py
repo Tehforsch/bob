@@ -14,6 +14,7 @@ from bob.simulation import Simulation
 from bob.postprocessingFunctions import MultiSetFn
 from bob.result import Result
 from bob.multiSet import MultiSet
+from bob.plotConfig import PlotConfig
 
 
 def printOnce(s: str, previousRuns: Dict[str, bool] = {}) -> None:
@@ -90,14 +91,18 @@ class IonizationData(Result):
 
 
 class Ionization(MultiSetFn):
+    def __init__(self, config: PlotConfig):
+        super().__init__(config)
+        self.config.setDefault("xLim", [4.2, 10.0])
+
     def post(self, simSets: MultiSet) -> Result:
         result = IonizationData(simSets)
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.style.use("classic")
-        colors = ["b", "r", "g", "purple", "brown", "orange"]
-        linAx, logAx = setupIonizationPlot()
+        colors = self.getColors()
+        linAx, logAx = self.setupIonizationPlot()
 
         self.addConstraintsToAxis(linAx)
         self.addConstraintsToAxis(logAx)
@@ -275,57 +280,55 @@ class Ionization(MultiSetFn):
         ax.errorbar(mortlock11z, mortlock11, color="darkolivegreen", fmt="s", capsize=5)
         ax.errorbar(schroeder13z, schroeder13, color="darkolivegreen", fmt="s", capsize=5)
 
+    def setupIonizationPlot(self) -> Tuple[plt.axes, plt.axes]:
+        label_font_size = 17
+        tics_label_size = 15
+        n_split = 4
+        minXHI = 1e-7
+        maxXHI = 1
+        splitXHI = 1e-1
+        (minRedshift, maxRedshift) = self.config["xLim"]
 
-def setupIonizationPlot() -> Tuple[plt.axes, plt.axes]:
-    label_font_size = 17
-    tics_label_size = 15
-    n_split = 4
-    minXHI = 1e-7
-    maxXHI = 1
-    splitXHI = 1e-1
-    minRedshift = 4.2
-    maxRedshift = 10
+        fig = plt.figure(figsize=(10, 10), tight_layout=True)
+        grid_spec = gridspec.GridSpec(n_split, 1, hspace=0)
+        logAx = fig.add_subplot(grid_spec[-1, :])
+        linAx = fig.add_subplot(grid_spec[:-1, :])
 
-    fig = plt.figure(figsize=(10, 10), tight_layout=True)
-    grid_spec = gridspec.GridSpec(n_split, 1, hspace=0)
-    logAx = fig.add_subplot(grid_spec[-1, :])
-    linAx = fig.add_subplot(grid_spec[:-1, :])
+        linAx.set_xlim(minRedshift, maxRedshift)
+        linAx.set_ylim(splitXHI, 1.0)
 
-    linAx.set_xlim(minRedshift, maxRedshift)
-    linAx.set_ylim(splitXHI, 1.0)
+        logAx.set_xlim(minRedshift, maxRedshift)
+        logAx.set_ylim(minXHI, splitXHI)
 
-    logAx.set_xlim(minRedshift, maxRedshift)
-    logAx.set_ylim(minXHI, splitXHI)
+        linAx.invert_xaxis()
+        logAx.invert_xaxis()
 
-    linAx.invert_xaxis()
-    logAx.invert_xaxis()
+        linAx.grid("on")
+        logAx.grid("on")
+        logAx.set_yscale("log")
 
-    linAx.grid("on")
-    logAx.grid("on")
-    logAx.set_yscale("log")
+        linAx.tick_params(which="both", direction="in", top="on", right="on", bottom="off", labelbottom=False, labelsize=tics_label_size)
+        linAx.tick_params(axis="y", pad=+18, labelbottom="off")
+        logAx.tick_params(which="major", direction="in", top="off", right="on", bottom="on", labelsize=tics_label_size)
+        logAx.tick_params(which="minor", direction="in", top="off", right="off", bottom="off", left="off")
 
-    linAx.tick_params(which="both", direction="in", top="on", right="on", bottom="off", labelbottom=False, labelsize=tics_label_size)
-    linAx.tick_params(axis="y", pad=+18, labelbottom="off")
-    logAx.tick_params(which="major", direction="in", top="off", right="on", bottom="on", labelsize=tics_label_size)
-    logAx.tick_params(which="minor", direction="in", top="off", right="off", bottom="off", left="off")
+        yLabelPositionX = 4.0
+        yLabelPositionY = 2.0 / (n_split + 1)
+        plt.text(yLabelPositionX, yLabelPositionY, "xHI", rotation=90, ha="center", fontsize=label_font_size)
+        logAx.set_xlabel("z", fontsize=label_font_size)
 
-    yLabelPositionX = 4.0
-    yLabelPositionY = 2.0 / (n_split + 1)
-    plt.text(yLabelPositionX, yLabelPositionY, "xHI", rotation=90, ha="center", fontsize=label_font_size)
-    logAx.set_xlabel("z", fontsize=label_font_size)
+        step = 0.1
+        yticksLin = np.arange(splitXHI + step, maxXHI + step, step)
+        linAx.set_yticks(yticksLin)
+        linAx.set_yticklabels(["{:.1f}".format(x) for x in yticksLin])
 
-    step = 0.1
-    yticksLin = np.arange(splitXHI + step, maxXHI + step, step)
-    linAx.set_yticks(yticksLin)
-    linAx.set_yticklabels(["{:.1f}".format(x) for x in yticksLin])
+        locmaj = matplotlib.ticker.LogLocator(base=10, numticks=int(abs(np.log10(splitXHI) - np.log10(1e-5)) + 1))
+        logAx.yaxis.set_major_locator(locmaj)
 
-    locmaj = matplotlib.ticker.LogLocator(base=10, numticks=int(abs(np.log10(splitXHI) - np.log10(1e-5)) + 1))
-    logAx.yaxis.set_major_locator(locmaj)
+        linAx.spines["bottom"].set_visible(False)
+        logAx.spines["top"].set_visible(False)
 
-    linAx.spines["bottom"].set_visible(False)
-    logAx.spines["top"].set_visible(False)
-
-    return linAx, logAx
+        return linAx, logAx
 
 
 def getBeckerData2015() -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
