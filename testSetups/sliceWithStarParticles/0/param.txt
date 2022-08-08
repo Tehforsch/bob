@@ -109,3 +109,6 @@ UnitMass_in_g    1.989000e+33
 UnitPhotons_per_s    1.000e+48
 UnitVelocity_in_cm_per_s    3.129024e+09
 ZAtom    0.000000e+00
+
+SweepConvergenceThreshold 0.0
+SweepMaxNumIterations 2

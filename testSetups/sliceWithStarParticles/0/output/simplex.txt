@@ -20,14 +20,14 @@ Photon energies
 >--- Start SimpleX post-processing 
 NumRuns 10 TimeBegin 0.000e+00 TimeMax 1.464e+02 TimeInterval 1.464e+01 
 Time 14.640000: Volume Av. H ionization: 0.002306, Mass Av. H ionization: 0.002306, Volume av. Ionization rate: 1.24042e-17, Mass av. Ionization rate: 1.24042e-17
-Time 29.280000: Volume Av. H ionization: 0.003943, Mass Av. H ionization: 0.003943, Volume av. Ionization rate: 1.98209e-17, Mass av. Ionization rate: 1.98209e-17
-Time 43.920000: Volume Av. H ionization: 0.005649, Mass Av. H ionization: 0.005649, Volume av. Ionization rate: 2.64953e-17, Mass av. Ionization rate: 2.64953e-17
-Time 58.560000: Volume Av. H ionization: 0.007377, Mass Av. H ionization: 0.007377, Volume av. Ionization rate: 3.24654e-17, Mass av. Ionization rate: 3.24654e-17
-Time 73.200000: Volume Av. H ionization: 0.009065, Mass Av. H ionization: 0.009065, Volume av. Ionization rate: 3.89125e-17, Mass av. Ionization rate: 3.89125e-17
-Time 87.840000: Volume Av. H ionization: 0.010681, Mass Av. H ionization: 0.010681, Volume av. Ionization rate: 4.56176e-17, Mass av. Ionization rate: 4.56176e-17
-Time 102.480000: Volume Av. H ionization: 0.012245, Mass Av. H ionization: 0.012245, Volume av. Ionization rate: 5.24067e-17, Mass av. Ionization rate: 5.24067e-17
-Time 117.120000: Volume Av. H ionization: 0.013745, Mass Av. H ionization: 0.013745, Volume av. Ionization rate: 5.98371e-17, Mass av. Ionization rate: 5.98371e-17
-Time 131.760000: Volume Av. H ionization: 0.015182, Mass Av. H ionization: 0.015182, Volume av. Ionization rate: 6.63106e-17, Mass av. Ionization rate: 6.63106e-17
-Time 146.400000: Volume Av. H ionization: 0.016599, Mass Av. H ionization: 0.016599, Volume av. Ionization rate: 7.10725e-17, Mass av. Ionization rate: 7.10725e-17
+Time 29.280000: Volume Av. H ionization: 0.003907, Mass Av. H ionization: 0.003907, Volume av. Ionization rate: 2.05687e-17, Mass av. Ionization rate: 2.05687e-17
+Time 43.920000: Volume Av. H ionization: 0.005571, Mass Av. H ionization: 0.005571, Volume av. Ionization rate: 2.67736e-17, Mass av. Ionization rate: 2.67736e-17
+Time 58.560000: Volume Av. H ionization: 0.007334, Mass Av. H ionization: 0.007334, Volume av. Ionization rate: 3.18645e-17, Mass av. Ionization rate: 3.18645e-17
+Time 73.200000: Volume Av. H ionization: 0.009071, Mass Av. H ionization: 0.009071, Volume av. Ionization rate: 3.72852e-17, Mass av. Ionization rate: 3.72852e-17
+Time 87.840000: Volume Av. H ionization: 0.010728, Mass Av. H ionization: 0.010728, Volume av. Ionization rate: 4.41796e-17, Mass av. Ionization rate: 4.41796e-17
+Time 102.480000: Volume Av. H ionization: 0.012279, Mass Av. H ionization: 0.012279, Volume av. Ionization rate: 5.12371e-17, Mass av. Ionization rate: 5.12371e-17
+Time 117.120000: Volume Av. H ionization: 0.013772, Mass Av. H ionization: 0.013772, Volume av. Ionization rate: 5.8661e-17, Mass av. Ionization rate: 5.8661e-17
+Time 131.760000: Volume Av. H ionization: 0.015202, Mass Av. H ionization: 0.015202, Volume av. Ionization rate: 6.56984e-17, Mass av. Ionization rate: 6.56984e-17
+Time 146.400000: Volume Av. H ionization: 0.016591, Mass Av. H ionization: 0.016591, Volume av. Ionization rate: 7.17939e-17, Mass av. Ionization rate: 7.17939e-17
 
 >--- End SimpleX post-processing 

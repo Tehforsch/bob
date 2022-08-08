@@ -23,10 +23,11 @@ def getDataAtPoints(field: Field, snapshot: Snapshot, points: pq.Quantity) -> np
     return data[cellIndices]
 
 
-def getSlice(field: Field, snapshot: Snapshot, axisName: str) -> Tuple[Tuple[float, float, float, float], pq.Quantity]:
+def getSlice(field: Field, snapshot: Snapshot, axisName: str, position: float) -> Tuple[Tuple[float, float, float, float], pq.Quantity]:
     axis = getAxisByName(axisName)
     axis = np.array(axis)
-    center = snapshot.center
+    center = (snapshot.maxExtent * axis) * position
+    print(center)
     ortho1, ortho2 = findOrthogonalAxes(axis)
     min1 = np.dot(ortho1, snapshot.minExtent)
     min2 = np.dot(ortho2, snapshot.minExtent)
@@ -65,6 +66,7 @@ class Slice(SnapFn):
         self.config.setDefault("logmax2", 0)
         self.config.setDefault("showTime", True)
         self.config.setDefault("timeUnit", pq.Myr)
+        self.config.setDefault("relativePosition", 0.5)
 
     @property
     def field(self) -> Field:
@@ -73,7 +75,7 @@ class Slice(SnapFn):
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         result = Result()
         result.redshift = getTimeOrRedshift(sim, snap)
-        (extent, result.data) = getSlice(self.field, snap, self.config["axis"])
+        (extent, result.data) = getSlice(self.field, snap, self.config["axis"], self.config["relativePosition"])
         result.extent = list(extent)
         print(f"Field: {self.field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
         return result

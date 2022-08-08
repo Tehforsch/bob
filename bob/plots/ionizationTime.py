@@ -37,7 +37,7 @@ class IonizationTime(SetFn):
                 print("No snapshots in sim? Continuing.")
                 continue
             snap = sim.snapshots[-1]
-            (self.extent, newIonizationTime) = getSlice(BasicField("IonizationTime"), snap, "z")
+            (self.extent, newIonizationTime) = getSlice(BasicField("IonizationTime"), snap, "z", 0.5)
             redshift, scale_factor = translateTime(sim, newIonizationTime)
             print(redshift, scale_factor, ionizationTime)
             if ionizationTime is None:

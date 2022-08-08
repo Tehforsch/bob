@@ -1,5 +1,6 @@
 sliceWithStarParticles:
-  field: Temperature
-  axis: z
+  field: Abundance1
+  axis: y
   testSources: True
   colorByLuminosity: True
+  relativePosition: 0.481

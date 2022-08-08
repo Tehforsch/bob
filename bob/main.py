@@ -83,7 +83,7 @@ def main() -> None:
     else:
         sims = getSimsFromFolders(args.simFolders)
         parent_folder = getCommonParentFolder(args.simFolders)
-        create_pic_folder(parent_folder)
         plotter = Plotter(parent_folder, sims, args.post, args.show)
         functions = getFunctionsFromPlotFile(args.plot, True)
+        create_pic_folder(parent_folder)
         _ = list(runFunctionsWithPlotter(plotter, functions))
