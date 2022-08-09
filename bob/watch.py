@@ -1,5 +1,4 @@
 import yaml
-import logging
 from typing import Tuple, Iterator, Optional, Callable
 from pathlib import Path
 import os
@@ -12,6 +11,8 @@ from bob.postprocess import runFunctionsWithPlotter, create_pic_folder
 from bob.simulationSet import getSimsFromFolders, SimulationSet
 from bob.postprocess import getFunctionsFromPlotConfigs
 from bob.config import picFolder
+
+SLEEP_TIMEOUT = 0.1
 
 
 class PlotFailedException(BaseException):
@@ -77,11 +78,11 @@ def runReplotCommand(command: Command, commFolder: Path, remoteWorkFolder: Path,
 
 
 def watchPost(commFolder: Path, workFolder: Path) -> None:
-    command = getNextCommandOfType(commFolder, "post")
-    if command is not None:
-        runPostCommand(command, commFolder, workFolder)
-    else:
-        logging.debug("No commands - nothing to do")
+    while True:
+        command = getNextCommandOfType(commFolder, "post")
+        if command is not None:
+            return runPostCommand(command, commFolder, workFolder)
+        sleep(SLEEP_TIMEOUT)
 
 
 def watchReplot(commFolder: Path, remoteWorkFolder: Path, simFolder: Path, postCommandId: str, show: bool) -> None:
@@ -98,7 +99,7 @@ def watchReplot(commFolder: Path, remoteWorkFolder: Path, simFolder: Path, postC
             )
             if command is not None:
                 return
-        sleep(0.05)
+        sleep(SLEEP_TIMEOUT)
 
 
 def getCommandsAndFiles(commFolder: Path) -> Iterator[Tuple[Command, Path]]:
