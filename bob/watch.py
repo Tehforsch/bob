@@ -14,6 +14,10 @@ from bob.postprocess import getFunctionsFromPlotConfigs
 from bob.config import picFolder
 
 
+class PlotFailedException(BaseException):
+    pass
+
+
 class Command(dict):
     def write(self, commFolder: Path) -> None:
         self["id"] = str(uuid.uuid1())
@@ -29,6 +33,10 @@ def getFinishedCommand(postCommand: Command) -> Command:
     return Command({"postCommandId": postCommand["id"], "type": "finished"})
 
 
+def getErrorCommand(postCommand: Command, error: str) -> Command:
+    return Command({"postCommandId": postCommand["id"], "type": "error", "error": error})
+
+
 def getReplotCommand(postCommand: Command, simFolder: Path, finishedPlotName: str) -> Command:
     return Command({"simFolder": simFolder, "finishedPlotName": finishedPlotName, "type": "replot", "postCommandId": postCommand["id"]})
 
@@ -38,20 +46,25 @@ def getPostCommand(simFolder: Path, config: dict) -> Command:
 
 
 def runPostCommand(command: Command, commFolder: Path, workFolder: Path) -> None:
-    relativePath = command.simFolder
-    absolutePath = workFolder / relativePath
-    if not absolutePath.is_dir():
-        raise ValueError(f"No folder at {absolutePath}")
-    simFolders = [absolutePath]
-    sims = getSimsFromFolders(simFolders)
-    create_pic_folder(absolutePath)
-    functions = getFunctionsFromPlotConfigs(command["config"])
-    plotter = Plotter(absolutePath, sims, True, False)
-    for finishedPlotName in runFunctionsWithPlotter(plotter, functions):
-        replotCommand = getReplotCommand(command, relativePath, finishedPlotName)
-        replotCommand.write(commFolder)
-    finishedCommand = getFinishedCommand(command)
-    finishedCommand.write(commFolder)
+    try:
+        relativePath = command.simFolder
+        absolutePath = workFolder / relativePath
+        if not absolutePath.is_dir():
+            raise ValueError(f"No folder at {absolutePath}")
+        simFolders = [absolutePath]
+        sims = getSimsFromFolders(simFolders)
+        create_pic_folder(absolutePath)
+        functions = getFunctionsFromPlotConfigs(command["config"])
+        plotter = Plotter(absolutePath, sims, True, False)
+        for finishedPlotName in runFunctionsWithPlotter(plotter, functions):
+            replotCommand = getReplotCommand(command, relativePath, finishedPlotName)
+            replotCommand.write(commFolder)
+        finishedCommand = getFinishedCommand(command)
+        finishedCommand.write(commFolder)
+    except Exception as e:
+        errorCommand = getErrorCommand(command, str(e))
+        errorCommand.write(commFolder)
+        raise e
 
 
 def runReplotCommand(command: Command, commFolder: Path, remoteWorkFolder: Path, simFolder: Path) -> None:
@@ -73,6 +86,9 @@ def watchPost(commFolder: Path, workFolder: Path) -> None:
 
 def watchReplot(commFolder: Path, remoteWorkFolder: Path, simFolder: Path, postCommandId: str) -> None:
     while True:
+        error = getNextCommandWithPredicate(commFolder, lambda command: command["type"] == "error" and command["postCommandId"] == postCommandId)
+        if error is not None:
+            raise PlotFailedException(error["error"])
         command = getNextCommandWithPredicate(commFolder, lambda command: command["type"] == "replot" and command["postCommandId"] == postCommandId)
         if command is not None:
             runReplotCommand(command, commFolder, remoteWorkFolder, simFolder)
