@@ -13,6 +13,13 @@ from bob.multiSet import MultiSet
 from bob.plotConfig import PlotConfig
 
 
+def fillInUnit(label: str, unit: str) -> str:
+    if "UNIT" in label:
+        return label.replace("UNIT", str(unit))
+    else:
+        return label
+
+
 class PostprocessingFunction(ABC):
     name = ""
 
@@ -22,8 +29,10 @@ class PostprocessingFunction(ABC):
         self.config.setDefault("outputFileType", "png")
         self.config.setDefault("name", self.name)
 
-    def getName(self) -> str:
-        return self.config["name"]
+    def getName(self, **kwargs: Any) -> str:
+        combined = self.config.copy()
+        combined.update(kwargs)
+        return self.config["name"].format(**combined)
 
     def setupLinePlot(self) -> None:
         self.setupLabels()
@@ -33,8 +42,8 @@ class PostprocessingFunction(ABC):
             plt.ylim(*self.config["yLim"])
 
     def setupLabels(self) -> None:
-        plt.xlabel(self.config["xLabel"])
-        plt.ylabel(self.config["yLabel"])
+        plt.xlabel(fillInUnit(self.config["xLabel"], str(self.config["xUnit"])))
+        plt.ylabel(fillInUnit(self.config["yLabel"], str(self.config["yUnit"])))
 
     def addLine(self, xQuantity: pq.Quantity, yQuantity: pq.Quantity, *args: Any, **kwargs: Any) -> None:
         xUnit = pq.Unit(self.config["xUnit"])
@@ -72,6 +81,7 @@ class SnapFn(PostprocessingFunction):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
         self.config.setDefault("snapshots", None)
+        self.config.setDefault("name", self.name + "_{simName}_{snapName}")
 
     @abstractmethod
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
@@ -87,6 +97,7 @@ class SetFn(PostprocessingFunction):
         super().__init__(config)
         self.config.setDefault("labels", None)
         self.config.setDefault("quotient", None)
+        self.config.setDefault("name", self.name + "_{setNum}")
 
     @abstractmethod
     def post(self, sims: SimulationSet) -> Result:
@@ -126,8 +137,7 @@ class SliceFn(PostprocessingFunction):
         super().__init__(config)
         self.config.setRequired("field")
         self.config.setDefault("snapshots", None)
-        field = self.config["field"]
-        self.config.setDefault("name", f"{self.name}_{field}")
+        self.config.setDefault("name", self.name + "_{sliceName}_{simName}")
 
     @abstractmethod
     def post(self, sim: Simulation, slice_: Any) -> Result:

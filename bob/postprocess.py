@@ -75,17 +75,27 @@ def getFunctionsFromPlotConfigs(config: Union[dict, List[dict]]) -> List[Postpro
 
 def runFunctionsWithPlotter(plotter: Plotter, functions: List[PostprocessingFunction]) -> Iterator[str]:
     logging.debug(functions)
-    for function in functions:
-        if isinstance(function, SnapFn):
-            yield from plotter.runSnapFn(function)
-        elif isinstance(function, SetFn):
-            yield from plotter.runSetFn(function)
-        elif isinstance(function, MultiSetFn):
-            yield from plotter.runMultiSetFn(function)
-        elif isinstance(function, SliceFn):
-            yield from plotter.runSliceFn(function)
-        else:
-            raise NotImplementedError
+
+    def run() -> Iterator[str]:
+        for function in functions:
+            if isinstance(function, SnapFn):
+                yield from plotter.runSnapFn(function)
+            elif isinstance(function, SetFn):
+                yield from plotter.runSetFn(function)
+            elif isinstance(function, MultiSetFn):
+                yield from plotter.runMultiSetFn(function)
+            elif isinstance(function, SliceFn):
+                yield from plotter.runSliceFn(function)
+            else:
+                raise NotImplementedError
+
+    namesUsed = set()
+    for name in run():
+        print(name)
+        if name in namesUsed:
+            raise ValueError(f"Duplicate name: {name}")
+        namesUsed.add(name)
+        yield name
 
 
 def create_pic_folder(parent_folder: Path) -> None:

@@ -1,6 +1,7 @@
 from typing import List
 import itertools
 
+from math import log10
 from pathlib import Path
 import numpy as np
 import astropy.units as pq
@@ -25,3 +26,8 @@ def getDataFile(relativePath: str) -> Path:
     thisFolder = Path(__file__).parent
     dataFolder = thisFolder.parent / "data"
     return dataFolder / relativePath
+
+
+def zeroPadToLength(num: int, numSims: int) -> str:
+    padding = int(log10(int(numSims))) + 1
+    return "{:0{padding}}".format(num, padding=padding)

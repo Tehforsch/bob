@@ -66,9 +66,7 @@ class Slice(SnapFn):
         self.config.setDefault("showTime", True)
         self.config.setDefault("timeUnit", pq.Myr)
         self.config.setDefault("relativePosition", 0.5)
-        axis = self.config["axis"]
-        field = self.config["field"]
-        self.config.setDefault("name", f"{self.name}_{axis}_{field}")
+        self.config.setDefault("name", self.name + "_{simName}_{snapName}_{field}_{axis}")
 
     @property
     def field(self) -> Field:

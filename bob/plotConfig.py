@@ -7,10 +7,10 @@ class PlotConfig(dict):
         self.unmentioned_params = set(entries.keys())
         self.required: Set[str] = set()
         self.choices: Dict[str, List[Any]] = {}
+        self.defaults: Dict[str, Any] = {}
 
     def setDefault(self, param: str, value: Any, choices: Optional[List] = None) -> None:
-        if param not in self:
-            self[param] = value
+        self.defaults[param] = value
         self.paramMentioned(param)
         self.rememberChoices(param, choices)
 
@@ -28,11 +28,10 @@ class PlotConfig(dict):
             self.choices[param] = choices
 
     def __getitem__(self, k: str) -> Any:
-        if k == "xLabel":
-            return fillInUnit(super().__getitem__(k), self["xUnit"])
-        elif k == "yLabel":
-            return fillInUnit(super().__getitem__(k), self["yUnit"])
-        return super().__getitem__(k)
+        if k in self:
+            return super().__getitem__(k)
+        else:
+            return self.defaults[k]
 
     def verify(self) -> None:
         for param in self.unmentioned_params:
@@ -44,10 +43,3 @@ class PlotConfig(dict):
             if not self[param] in choices:
                 value = self[param]
                 raise ValueError(f"Wrong parameter value for {param}: {value}")
-
-
-def fillInUnit(label: str, unit: str) -> str:
-    if "UNIT" in label:
-        return label.replace("UNIT", str(unit))
-    else:
-        return label

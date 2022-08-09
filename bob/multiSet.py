@@ -23,3 +23,6 @@ class MultiSet:
 
     def __iter__(self) -> Iterator[SimulationSet]:
         return self.sims.__iter__()
+
+    def __len__(self) -> int:
+        return len(self.sims)

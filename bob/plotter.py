@@ -19,6 +19,7 @@ from bob.result import Result
 from bob.postprocessingFunctions import PostprocessingFunction
 from bob.multiSet import MultiSet
 from bob.pool import runInPool
+from bob.util import zeroPadToLength
 
 QuotientParams = Optional[Union[List[str], Single]]
 
@@ -132,20 +133,27 @@ class Plotter:
 
     def runSetFn(self, function: SetFn) -> Iterator[str]:
         quotient = self.getQuotient(function.config["quotient"], function.config["sims"], function.config["labels"])
+        numSims = len(quotient)
         for (i, (config, sims)) in enumerate(quotient.iterWithConfigs()):
-            yield self.runPostAndPlot(function, f"{i}_{function.getName()}", lambda: function.post(sims), function.plot)
+            yield self.runPostAndPlot(function, function.getName(setNum=zeroPadToLength(i, numSims)), lambda: function.post(sims), function.plot)
 
     def runSnapFn(self, function: SnapFn) -> Iterator[str]:
-        for sim in self.filterSims(function.config["sims"]):
-            for snap in self.get_snapshots(sim, function.config["snapshots"]):
-                name = "{}_{}_{}".format(function.getName(), sim.name, snap.name)
+        sims = self.filterSims(function.config["sims"])
+        for sim in sims:
+            snapshots = list(self.get_snapshots(sim, function.config["snapshots"]))
+            for snap in snapshots:
+                simName = zeroPadToLength(int(sim.name), len(sims))
+                snapName = zeroPadToLength(int(snap.name), len(snapshots))
+                name = function.getName(simName=simName, snapName=snapName)
                 yield self.runPostAndPlot(function, name, lambda: function.post(sim, snap), function.plot)
 
     def runSliceFn(self, function: SliceFn) -> Iterator[str]:
-        for sim in self.filterSims(function.config["sims"]):
+        sims = self.filterSims(function.config["sims"])
+        for sim in sims:
             for slice_ in sim.getSlices(function.config["field"]):
                 if function.config["snapshots"] is None or any(arg_snap == slice_.name for arg_snap in function.config["snapshots"]):
-                    name = "{}_{}_{}".format(function.getName(), sim.name, slice_.name)
+                    simName = zeroPadToLength(int(sim.name), len(sims))
+                    name = function.getName(simName=simName, sliceName=slice_.name)
                     yield self.runPostAndPlot(function, name, lambda: function.post(sim, slice_), function.plot)
 
     def isInSnapshotArgs(self, snapshotFilter: Optional[List[str]], snap: Snapshot) -> bool:
