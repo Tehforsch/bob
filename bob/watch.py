@@ -67,12 +67,12 @@ def runPostCommand(command: Command, commFolder: Path, workFolder: Path) -> None
         raise e
 
 
-def runReplotCommand(command: Command, commFolder: Path, remoteWorkFolder: Path, simFolder: Path) -> None:
+def runReplotCommand(command: Command, commFolder: Path, remoteWorkFolder: Path, simFolder: Path, show: bool) -> None:
     sourceFolder = remoteWorkFolder / command["simFolder"] / picFolder / "plots" / command["finishedPlotName"]
     targetFolder = simFolder / picFolder / "plots" / command["finishedPlotName"]
     targetFolder.mkdir(parents=True, exist_ok=True)
     shutil.copytree(sourceFolder, targetFolder, dirs_exist_ok=True)
-    plotter = Plotter(simFolder, SimulationSet([]), True, False)
+    plotter = Plotter(simFolder, SimulationSet([]), True, show)
     plotter.replot([command["finishedPlotName"]], False, None)
 
 
@@ -84,14 +84,14 @@ def watchPost(commFolder: Path, workFolder: Path) -> None:
         logging.debug("No commands - nothing to do")
 
 
-def watchReplot(commFolder: Path, remoteWorkFolder: Path, simFolder: Path, postCommandId: str) -> None:
+def watchReplot(commFolder: Path, remoteWorkFolder: Path, simFolder: Path, postCommandId: str, show: bool) -> None:
     while True:
         error = getNextCommandWithPredicate(commFolder, lambda command: command["type"] == "error" and command["postCommandId"] == postCommandId)
         if error is not None:
             raise PlotFailedException(error["error"])
         command = getNextCommandWithPredicate(commFolder, lambda command: command["type"] == "replot" and command["postCommandId"] == postCommandId)
         if command is not None:
-            runReplotCommand(command, commFolder, remoteWorkFolder, simFolder)
+            runReplotCommand(command, commFolder, remoteWorkFolder, simFolder, show)
         else:
             command = getNextCommandWithPredicate(
                 commFolder, lambda command: command["type"] == "finished" and command["postCommandId"] == postCommandId

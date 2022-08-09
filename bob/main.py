@@ -69,7 +69,7 @@ def main() -> None:
         relPath = Path(relpath(realpath(args.simFolders[0]), realpath(args.localWorkFolder)))
         command = getPostCommand(relPath, config)
         command.write(args.communicationFolder)
-        watchReplot(args.communicationFolder, args.remoteWorkFolder, args.simFolders[0], command["id"])
+        watchReplot(args.communicationFolder, args.remoteWorkFolder, args.simFolders[0], command["id"], not args.hide)
     elif args.function == "replot":
         for simFolder in args.simFolders:
             plotter = Plotter(simFolder, SimulationSet([]), args.post, not args.hide)
