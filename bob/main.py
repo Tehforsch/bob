@@ -13,7 +13,7 @@ from bob.postprocess import getFunctionsFromPlotFile, setMatplotlibStyle, readPl
 def setupArgs() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Postprocess arepo sims")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
-    parser.add_argument("--show", action="store_true", help="Show figures instead of saving them")
+    parser.add_argument("--hide", action="store_true", help="Do not show figures in terminal before saving them")
     parser.add_argument("--post", action="store_true", help="Only postprocess the data, do not run the corresponding plot scripts (for cluster)")
 
     subparsers = parser.add_subparsers(dest="function")
@@ -78,12 +78,12 @@ def main() -> None:
         setMatplotlibStyle()
     if args.function == "replot":
         for simFolder in args.simFolders:
-            plotter = Plotter(simFolder, SimulationSet([]), args.post, args.show)
+            plotter = Plotter(simFolder, SimulationSet([]), args.post, not args.hide)
             plotter.replot(args.plots, args.onlyNew, args.config)
     else:
         sims = getSimsFromFolders(args.simFolders)
         parent_folder = getCommonParentFolder(args.simFolders)
-        plotter = Plotter(parent_folder, sims, args.post, args.show)
+        plotter = Plotter(parent_folder, sims, args.post, not args.hide)
         functions = getFunctionsFromPlotFile(args.plot, True)
         create_pic_folder(parent_folder)
         _ = list(runFunctionsWithPlotter(plotter, functions))

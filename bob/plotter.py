@@ -19,7 +19,7 @@ from bob.result import Result
 from bob.postprocessingFunctions import PostprocessingFunction
 from bob.multiSet import MultiSet
 from bob.pool import runInPool
-from bob.util import zeroPadToLength
+from bob.util import zeroPadToLength, showImageInTerminal
 
 QuotientParams = Optional[Union[List[str], Single]]
 
@@ -89,7 +89,10 @@ class Plotter:
         else:
             config = None
         plots.sort()
-        runInPool(runPlot, plots, self, plotFilter, config)
+        plots = [plot for plot in plots if plotFilter is None or plot in plotFilter]
+        for path in runInPool(runPlot, plots, self, config):
+            if self.show:
+                showImageInTerminal(path)
 
     def runPostAndPlot(self, fn: PostprocessingFunction, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]) -> str:
         logging.info("Running {}".format(name))
@@ -97,7 +100,9 @@ class Plotter:
         self.save(fn, name, result)
         if not self.postprocess_only:
             plot(plt, result)
-            self.saveAndShow(name, fn)
+            path = self.saveAndShow(name, fn)
+            if self.show:
+                showImageInTerminal(path)
         return name
 
     def save(self, fn: PostprocessingFunction, plotName: str, result: Result) -> None:
@@ -164,34 +169,31 @@ class Plotter:
             if self.isInSnapshotArgs(snapshotFilter, snap):
                 yield snap
 
-    def saveAndShow(self, filename: str, fn: PostprocessingFunction) -> None:
+    def saveAndShow(self, filename: str, fn: PostprocessingFunction) -> Path:
         filepath = self.picFolder / getOutputFilename(filename, fn.config["outputFileType"])
         filepath.parent.mkdir(exist_ok=True)
         plt.savefig(str(filepath), dpi=bob.config.dpi)
-        if self.show:
-            plt.show()
-        plt.clf()
+        return filepath
 
 
 def getBaseName(plotName: str) -> str:
-    if not "_" in plotName:
+    if "_" not in plotName:
         return plotName
     return plotName[: plotName.index("_")]
 
 
 # Needs to be a top-level function so it can be used by multiprocessing
-def runPlot(plotter: Plotter, plotFilter: Optional[List[str]], customConfig: Optional[dict], plotName: str) -> None:
+def runPlot(plotter: Plotter, customConfig: Optional[dict], plotName: str) -> Path:
     from bob.postprocess import getFunctionsFromPlotFile, getFunctionsFromPlotConfigs
 
-    if plotFilter is None or plotName in plotFilter:
-        print("Replotting", plotName)
-        plotFolder = plotter.dataFolder / plotName
-        if customConfig is not None:
-            functions = getFunctionsFromPlotConfigs(customConfig)
-        else:
-            functions = getFunctionsFromPlotFile(plotFolder / bob.config.plotSerializationFileName, False)
-        assert len(functions) == 1, "More than one plot in replot information."
-        fn = functions[0]
-        result = Result.readFromFolder(plotFolder)
-        fn.plot(plt, result)
-        plotter.saveAndShow(plotFolder.name, fn)
+    logging.info(f"Replotting {plotName}")
+    plotFolder = plotter.dataFolder / plotName
+    if customConfig is not None:
+        functions = getFunctionsFromPlotConfigs(customConfig)
+    else:
+        functions = getFunctionsFromPlotFile(plotFolder / bob.config.plotSerializationFileName, False)
+    assert len(functions) == 1, "More than one plot in replot information."
+    fn = functions[0]
+    result = Result.readFromFolder(plotFolder)
+    fn.plot(plt, result)
+    return plotter.saveAndShow(plotFolder.name, fn)

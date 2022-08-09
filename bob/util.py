@@ -1,5 +1,7 @@
 from typing import List
 import itertools
+import subprocess
+import logging
 
 from math import log10
 from pathlib import Path
@@ -31,3 +33,14 @@ def getDataFile(relativePath: str) -> Path:
 def zeroPadToLength(num: int, numSims: int) -> str:
     padding = int(log10(int(numSims))) + 1
     return "{:0{padding}}".format(num, padding=padding)
+
+
+def showImageInTerminal(path: Path) -> None:
+    width = 600
+    height = 400
+    tmpfile = Path("/tmp/test.png")
+    args = ["convert", str(path), "-scale", f"{width}x{height}", str(tmpfile)]
+    subprocess.check_call(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    args = ["kitty", "+kitten", "icat", "--silent", "--transfer-mode", "file", str(tmpfile)]
+    logging.debug(path)
+    subprocess.check_call(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
