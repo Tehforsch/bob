@@ -1,0 +1,10 @@
+- slice:
+    field: Temperature
+    axis: z
+    relativePosition: 0.4
+    name: "slice_1"
+- slice:
+    field: Temperature
+    axis: z
+    relativePosition: 0.5
+    name: "slice_2"

@@ -1,6 +1,6 @@
 import yaml
 import logging
-from typing import Tuple, Iterator, Any
+from typing import Tuple, Iterator, Optional, Callable
 from pathlib import Path
 import os
 from time import sleep
@@ -16,7 +16,8 @@ from bob.config import picFolder
 
 class Command(dict):
     def write(self, commFolder: Path) -> None:
-        filename = commFolder / str(uuid.uuid1())
+        self["id"] = str(uuid.uuid1())
+        filename = commFolder / self["id"]
         yaml.dump(self, filename.open("w"))
 
     @property
@@ -24,8 +25,12 @@ class Command(dict):
         return self["simFolder"]
 
 
-def getReplotCommand(simFolder: Path, finishedPlotName: str) -> Command:
-    return Command({"simFolder": simFolder, "finishedPlotName": finishedPlotName, "type": "replot"})
+def getFinishedCommand(postCommand: Command) -> Command:
+    return Command({"postCommandId": postCommand["id"], "type": "finished"})
+
+
+def getReplotCommand(postCommand: Command, simFolder: Path, finishedPlotName: str) -> Command:
+    return Command({"simFolder": simFolder, "finishedPlotName": finishedPlotName, "type": "replot", "postCommandId": postCommand["id"]})
 
 
 def getPostCommand(simFolder: Path, config: dict) -> Command:
@@ -43,33 +48,41 @@ def runPostCommand(command: Command, commFolder: Path, workFolder: Path) -> None
     functions = getFunctionsFromPlotConfigs(command["config"])
     plotter = Plotter(absolutePath, sims, True, False)
     for finishedPlotName in runFunctionsWithPlotter(plotter, functions):
-        replotCommand = getReplotCommand(relativePath, finishedPlotName)
+        replotCommand = getReplotCommand(command, relativePath, finishedPlotName)
         replotCommand.write(commFolder)
-    logging.info("Done")
+    finishedCommand = getFinishedCommand(command)
+    finishedCommand.write(commFolder)
 
 
-def runReplotCommand(command: Command, commFolder: Path, localWorkFolder: Path, remoteWorkFolder: Path) -> None:
+def runReplotCommand(command: Command, commFolder: Path, remoteWorkFolder: Path, simFolder: Path) -> None:
     sourceFolder = remoteWorkFolder / command["simFolder"] / picFolder / "plots" / command["finishedPlotName"]
-    targetFolder = localWorkFolder / command["simFolder"] / picFolder / "plots" / command["finishedPlotName"]
-    targetSimFolder = localWorkFolder / command["simFolder"]
+    targetFolder = simFolder / picFolder / "plots" / command["finishedPlotName"]
     targetFolder.mkdir(parents=True, exist_ok=True)
     shutil.copytree(sourceFolder, targetFolder, dirs_exist_ok=True)
-    plotter = Plotter(targetSimFolder, SimulationSet([]), True, False)
+    plotter = Plotter(simFolder, SimulationSet([]), True, False)
     plotter.replot([command["finishedPlotName"]], False, None)
 
 
 def watchPost(commFolder: Path, workFolder: Path) -> None:
-    def workFunction(command: Command) -> None:
+    command = getNextCommandOfType(commFolder, "post")
+    if command is not None:
         runPostCommand(command, commFolder, workFolder)
+    else:
+        logging.debug("No commands - nothing to do")
 
-    watch(workFunction, commFolder, "post")
 
-
-def watchReplot(commFolder: Path, localWorkFolder: Path, remoteWorkFolder: Path) -> None:
-    def workFunction(command: Command) -> None:
-        runReplotCommand(command, commFolder, localWorkFolder, remoteWorkFolder)
-
-    watch(workFunction, commFolder, "replot")
+def watchReplot(commFolder: Path, remoteWorkFolder: Path, simFolder: Path, postCommandId: str) -> None:
+    while True:
+        command = getNextCommandWithPredicate(commFolder, lambda command: command["type"] == "replot" and command["postCommandId"] == postCommandId)
+        if command is not None:
+            runReplotCommand(command, commFolder, remoteWorkFolder, simFolder)
+        else:
+            command = getNextCommandWithPredicate(
+                commFolder, lambda command: command["type"] == "finished" and command["postCommandId"] == postCommandId
+            )
+            if command is not None:
+                return
+        sleep(0.05)
 
 
 def getCommandsAndFiles(commFolder: Path) -> Iterator[Tuple[Command, Path]]:
@@ -81,11 +94,14 @@ def getCommandsAndFiles(commFolder: Path) -> Iterator[Tuple[Command, Path]]:
             continue
 
 
-def watch(function: Any, commFolder: Path, commandType: str) -> None:
-    while True:
-        commandsAndFiles = getCommandsAndFiles(commFolder)
-        for (command, f) in commandsAndFiles:
-            if command["type"] == commandType:
-                function(command)
-                f.unlink()
-        sleep(1)
+def getNextCommandOfType(commFolder: Path, type_: str) -> Optional[Command]:
+    return getNextCommandWithPredicate(commFolder, lambda command: command["type"] == type_)
+
+
+def getNextCommandWithPredicate(commFolder: Path, predicate: Callable[[Command], bool]) -> Optional[Command]:
+    commandsAndFiles = getCommandsAndFiles(commFolder)
+    for (command, f) in commandsAndFiles:
+        if predicate(command):
+            f.unlink()
+            return command
+    return None

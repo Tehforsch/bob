@@ -36,8 +36,8 @@ def zeroPadToLength(num: int, numSims: int) -> str:
 
 
 def showImageInTerminal(path: Path) -> None:
-    width = 600
-    height = 400
+    width = 800
+    height = 600
     tmpfile = Path("/tmp/test.png")
     args = ["convert", str(path), "-scale", f"{width}x{height}", str(tmpfile)]
     subprocess.check_call(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

@@ -1,7 +1,7 @@
 from pathlib import Path
 import logging
 import argparse
-import os
+from os.path import relpath, realpath
 
 from bob.simulationSet import getSimsFromFolders, SimulationSet
 from bob.util import getCommonParentFolder
@@ -24,7 +24,8 @@ def setupArgs() -> argparse.Namespace:
 
     remotePlotParser = subparsers.add_parser("remotePlot")
     remotePlotParser.add_argument("communicationFolder", type=Path, help="The folder to write the new commands to")
-    remotePlotParser.add_argument("localWorkFolder", type=Path, help="The local work folder (needed to make relative paths meaningful)")
+    remotePlotParser.add_argument("remoteWorkFolder", type=Path, help="The folder from which the plots should be copied")
+    remotePlotParser.add_argument("localWorkFolder", type=Path, help="The folder into which the plots should be copied")
     remotePlotParser.add_argument("simFolders", type=Path, nargs="+", help="Path to simulation directories")
     remotePlotParser.add_argument("plot", type=Path, help="The plot configuration")
 
@@ -43,11 +44,6 @@ def setupArgs() -> argparse.Namespace:
     watchPostParser.add_argument("communicationFolder", type=Path, help="The folder to watch for new commands")
     watchPostParser.add_argument("workFolder", type=Path, help="The work folder to execute the commands in")
 
-    watchReplotParser = subparsers.add_parser("watchReplot")
-    watchReplotParser.add_argument("communicationFolder", type=Path, help="The folder to watch for new replot commands (.done files)")
-    watchReplotParser.add_argument("remoteWorkFolder", type=Path, help="The folder from which the plots should be copied")
-    watchReplotParser.add_argument("localWorkFolder", type=Path, help="The folder to which the plots should be copied and replotted")
-
     args = parser.parse_args()
     return args
 
@@ -62,28 +58,28 @@ def setupLogging(args: argparse.Namespace) -> None:
 def main() -> None:
     args = setupArgs()
     setupLogging(args)
+    if args.function in ["remotePlot", "replot", "plot"] and not args.post:
+        setMatplotlibStyle()
     if args.function == "watchPost":
         watchPost(args.communicationFolder, args.workFolder)
-    if args.function == "watchReplot":
-        setMatplotlibStyle()
-        watchReplot(args.communicationFolder, args.localWorkFolder, args.remoteWorkFolder)
-    if args.function == "remotePlot":
+    elif args.function == "remotePlot":
         if len(args.simFolders) > 1:
             raise NotImplementedError("No implementation for multiple sim folders currently (easy extension)")
         config = readPlotFile(args.plot, False)
-        relPath = Path(os.path.relpath(os.path.realpath(args.simFolders[0]), os.path.realpath(args.localWorkFolder)))
+        relPath = Path(relpath(realpath(args.simFolders[0]), realpath(args.localWorkFolder)))
         command = getPostCommand(relPath, config)
         command.write(args.communicationFolder)
-    if not args.post:
-        setMatplotlibStyle()
-    if args.function == "replot":
+        watchReplot(args.communicationFolder, args.remoteWorkFolder, args.simFolders[0], command["id"])
+    elif args.function == "replot":
         for simFolder in args.simFolders:
             plotter = Plotter(simFolder, SimulationSet([]), args.post, not args.hide)
             plotter.replot(args.plots, args.onlyNew, args.config)
-    else:
+    elif args.function == "plot":
         sims = getSimsFromFolders(args.simFolders)
         parent_folder = getCommonParentFolder(args.simFolders)
         plotter = Plotter(parent_folder, sims, args.post, not args.hide)
         functions = getFunctionsFromPlotFile(args.plot, True)
         create_pic_folder(parent_folder)
         _ = list(runFunctionsWithPlotter(plotter, functions))
+    else:
+        raise ValueError(f"Wrong function type: {args.function}")

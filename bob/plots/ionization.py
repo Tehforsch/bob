@@ -111,7 +111,7 @@ class Ionization(MultiSetFn):
             self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, linAx, color)
             self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, logAx, color)
         # add legend labels
-        for (label, color) in zip(self.getLabels(), self.getColors()):
+        for (_, label, color) in zip(result.redshift, self.getLabels(), self.getColors()):
             linAx.plot([], [], color=color, label=label, linewidth=3)
         linAx.plot([], [], label="Volume av.", linestyle="-", linewidth=3, color="black")
         linAx.plot([], [], label="Mass av.", linestyle="--", linewidth=3, color="black")
