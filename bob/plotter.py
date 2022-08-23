@@ -173,6 +173,7 @@ class Plotter:
         filepath = self.picFolder / getOutputFilename(filename, fn.config["outputFileType"])
         filepath.parent.mkdir(exist_ok=True)
         plt.savefig(str(filepath), dpi=bob.config.dpi)
+        plt.clf()
         return filepath
 
 
