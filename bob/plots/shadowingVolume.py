@@ -1,5 +1,4 @@
 from typing import List
-import argparse
 import itertools
 
 import numpy as np
@@ -41,12 +40,6 @@ class ShadowingVolume(TimePlot):
 
     def plotToBox(self, x: np.ndarray) -> np.ndarray:
         return x + self.center
-
-    def xlabel(self) -> str:
-        return "$t \; [\mathrm{kyr}]$"
-
-    def ylabel(self) -> str:
-        return
 
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> List[float]:
         lengthUnit = snap.lengthUnit

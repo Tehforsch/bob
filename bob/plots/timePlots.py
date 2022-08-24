@@ -57,9 +57,8 @@ class TimePlot(MultiSetFn):
     def xlabel(self) -> str:
         return self.config["time"]
 
-    @abstractmethod
     def ylabel(self) -> str:
-        pass
+        return ""
 
     def post(self, simSets: MultiSet) -> Result:
         results = Result()

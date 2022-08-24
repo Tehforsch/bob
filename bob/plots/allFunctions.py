@@ -16,7 +16,6 @@ from bob.plots.meanFieldOverTime import MeanFieldOverTime
 from bob.plots.luminosityOverTime import LuminosityOverTime
 from bob.plots.sourcePosition import SourcePosition
 
-
 postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     SliceWithStarParticles,
     Ionization,
