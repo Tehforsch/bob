@@ -16,6 +16,11 @@ SLEEP_TIMEOUT = 0.1
 
 
 class PlotFailedException(BaseException):
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __repr__(self):
+        return self.msg
     pass
 
 

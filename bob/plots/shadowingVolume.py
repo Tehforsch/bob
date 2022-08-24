@@ -31,36 +31,38 @@ class InfiniteCone:
         return coneRadiusAtPoint >= orthogonalDistance
 
 
-class ShadowingVolumePlot(TimePlot):
+class ShadowingVolume(TimePlot):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
-        self.L = 32
-        self.boxSize = 1.0
-        self.center = np.array([self.boxSize / 2.0, self.boxSize / 2.0, self.boxSize / 2.0])
+        self.config.setDefault("xUnit", pq.kyr)
+        self.config.setDefault("yUnit", 1.0)
+        self.config.setDefault("xLabel", "$t \; [\mathrm{kyr}]$")
+        self.config.setDefault("yLabel", "$\overline{x_{\mathrm{H}}}$")
 
     def plotToBox(self, x: np.ndarray) -> np.ndarray:
-        return x / self.L + self.center
-
-    def init(self, args: argparse.Namespace) -> None:
-        distanceFromCenter = 14.0
-        radiusBlob = 4.0
-        self.cone1 = InfiniteCone(
-            self.plotToBox(np.array([-distanceFromCenter, 0.0, 0.0])), np.array([1.0, 0.0, 0.0]), radiusBlob / distanceFromCenter, self.center
-        )
-        self.cone2 = InfiniteCone(
-            self.plotToBox(np.array([0.0, -distanceFromCenter, 0.0])), np.array([0.0, 1.0, 0.0]), radiusBlob / distanceFromCenter, self.center
-        )
+        return x + self.center
 
     def xlabel(self) -> str:
         return "$t \; [\mathrm{kyr}]$"
 
     def ylabel(self) -> str:
-        return "$\overline{x_{\mathrm{H}}}$"
+        return
 
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> List[float]:
-        print("At", sim.name, snap.time.to(pq.kyr))
+        lengthUnit = snap.lengthUnit
+        self.L = 1.0 * lengthUnit
+        self.center = self.L * np.array([0.5, 0.5, 0.5])
+        self.plotCenter = np.array([0.5, 0.5, 0.5])
+        distanceFromCenter = 14.0 / 32.0 * self.L
+        radiusBlob = 4.0 / 32.0 * self.L
+        self.cone1 = InfiniteCone(
+            self.plotToBox(distanceFromCenter * np.array([-1.0, 0.0, 0.0])), np.array([1.0, 0.0, 0.0]), radiusBlob / distanceFromCenter, self.center
+        )
+        self.cone2 = InfiniteCone(
+            self.plotToBox(distanceFromCenter * np.array([0.0, -1.0, 0.0])), np.array([0.0, 1.0, 0.0]), radiusBlob / distanceFromCenter, self.center
+        )
         densities = BasicField("Density").getData(snap)
-        densityThreshold = 1500
+        densityThreshold = 1500 * snap.massUnit / (snap.lengthUnit**3)
         selection = np.array(
             [
                 i
@@ -70,7 +72,7 @@ class ShadowingVolumePlot(TimePlot):
         )
         data = BasicField("ChemicalAbundances", 1).getData(snap)[selection]
         masses = BasicField("Masses").getData(snap)[selection]
-        return [np.sum(data * masses) / np.sum(masses)]
+        return np.sum(data * masses) / np.sum(masses)
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         self.styles = [{"color": s[0], "linestyle": s[1]} for s in itertools.product(["r", "b"], ["-", "--", ":"])]
