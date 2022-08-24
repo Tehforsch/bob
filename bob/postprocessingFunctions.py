@@ -113,6 +113,8 @@ class MultiSetFn(PostprocessingFunction):
         super().__init__(config)
         self.config.setDefault("labels", None)
         self.config.setDefault("quotient", None)
+        self.config.setDefault("colors", ["b", "r", "g", "purple", "brown", "orange", "pink", "teal"] * 5)
+        self.config.setDefault("styles", [{}] * 20)
 
     @abstractmethod
     def post(self, sims: MultiSet) -> Result:
@@ -123,7 +125,7 @@ class MultiSetFn(PostprocessingFunction):
         pass
 
     def getColors(self) -> Iterable[str]:
-        return itertools.cycle(["b", "r", "g", "purple", "brown", "orange", "pink", "teal"])
+        return self.config["colors"]
 
     def getLabels(self) -> Iterable[str]:
         labels = self.config["labels"]

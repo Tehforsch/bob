@@ -1,5 +1,4 @@
 from typing import List
-import itertools
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -37,6 +36,7 @@ class ShadowingVolume(TimePlot):
         self.config.setDefault("yUnit", 1.0)
         self.config.setDefault("xLabel", "$t \; [\mathrm{kyr}]$")
         self.config.setDefault("yLabel", "$\overline{x_{\mathrm{H}}}$")
+        self.config.setDefault("colors", ["b", "b", "b", "r", "r", "r"])
 
     def plotToBox(self, x: np.ndarray) -> np.ndarray:
         return x + self.center
@@ -68,8 +68,6 @@ class ShadowingVolume(TimePlot):
         return np.sum(data * masses) / np.sum(masses)
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        self.styles = [{"color": s[0], "linestyle": s[1]} for s in itertools.product(["r", "b"], ["-", "--", ":"])]
-
         super().plot(plt, result)
         plt.xlim(0, 60)
         plt.ylim(0, 1.0)
