@@ -28,9 +28,9 @@ class BasicField(Field):
             "SGCHEM_HeatCoolRates": "SGCHEM_HeatCoolRates",
             "InternalEnergy": "InternalEnergy",
             "ChemicalAbundances": "Abundance",
-            "PhotonFlux": "Flux",
+            "PhotonFlux": "PhotonFlux",
             "Density": "Density",
-            "PhotonRates": "PhotonRate",
+            "PhotonRates": "PhotonRates",
             "Masses": "Mass",
             "Coordinates": "Coordinates",
         }
@@ -78,6 +78,10 @@ class BasicField(Field):
             unit = pq.dimensionless_unscaled
         elif self.name == "IonizationTime":
             unit = snapshot.timeUnit
+        elif self.name == "PhotonRates":
+            unit = 1 / snapshot.timeUnit
+        elif self.name == "PhotonFlux":
+            unit = 1 / snapshot.timeUnit
         else:
             raise ValueError("Fix units here")
         fieldData = readIntoNumpyArray(snapshot.hdf5File["PartType0"][self.name]) * unit

@@ -8,14 +8,13 @@ from bob.plots.ionizationTime import IonizationTime
 from bob.plots.thomsonScattering import ThomsonScattering
 from bob.plots.arepoSlice import ArepoSlicePlot
 from bob.plots.bobSlice import Slice
-from bob.plots.shadowingVolume import ShadowingVolumePlot
+from bob.plots.shadowingVolume import ShadowingVolume
 from bob.plots.temperatureDensityHistogram import TemperatureDensityHistogram
 from bob.plots.temperatureIonizationHistogram import TemperatureIonizationHistogram
 from bob.plots.temperatureOverTime import TemperatureOverTime
 from bob.plots.meanFieldOverTime import MeanFieldOverTime
 from bob.plots.luminosityOverTime import LuminosityOverTime
 from bob.plots.sourcePosition import SourcePosition
-
 
 postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     SliceWithStarParticles,
@@ -26,7 +25,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     ThomsonScattering,
     ArepoSlicePlot,
     Slice,
-    ShadowingVolumePlot,
+    ShadowingVolume,
     TemperatureDensityHistogram,
     TemperatureIonizationHistogram,
     TemperatureOverTime,
