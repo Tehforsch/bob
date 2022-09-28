@@ -1,5 +1,6 @@
 from typing import Optional, Dict
 import astropy.units as pq
+import astropy.cosmology.units as cu
 import h5py
 import numpy as np
 
@@ -70,12 +71,13 @@ class BasicField(Field):
         unit *= pq.g ** attrs["mass_scaling"]
         unit *= (pq.cm / pq.s) ** attrs["velocity_scaling"]
         if not self.comoving:
-            unit *= snapshot.h ** attrs["h_scaling"]
-            unit *= snapshot.scale_factor ** attrs["a_scaling"]
+            unit *= cu.littleh ** attrs["h_scaling"]
+        else:
+            unit *= cu.littleh ** attrs["h_scaling"]
         unit *= attrs["to_cgs"]
         return unit
 
-    def getData(self, snapshot: "Snapshot") -> np.ndarray:
+    def getData(self, snapshot: "Snapshot") -> pq.Quantity:
         try:
             unit = self.getArbitraryUnit(snapshot, snapshot.hdf5File["PartType0"][self.name])
         except KeyError:

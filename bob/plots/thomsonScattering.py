@@ -1,4 +1,5 @@
 import astropy.units as pq
+import astropy.cosmology.units as cu
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -17,9 +18,8 @@ from bob.plotConfig import PlotConfig
 def getRateForSnap(snap: Snapshot) -> pq.Quantity:
     sig = 6.65e-29 * pq.m**2  # Thomson scattering cross-section
     xe = ElectronAbundance().getData(snap)
-    density = BasicField("Density").getData(snap)
+    density = BasicField("Density").getData(snap).to(pq.g / pq.cm**3, cu.with_H0(snap.H0))
     ne = xe * density / protonMass
-    print("mean coord", np.mean(BasicField("Coordinates", comoving=True).getData(snap)))
     return speedOfLight * sig * np.mean(ne)
 
 

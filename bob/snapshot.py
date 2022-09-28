@@ -56,6 +56,10 @@ class Snapshot:
         return self.hdf5File["Header"].attrs["HubbleParam"]
 
     @property
+    def H0(self) -> pq.Quantity:
+        return self.hdf5File["Header"].attrs["HubbleParam"] * 100 * pq.km / pq.s / pq.Mpc
+
+    @property
     def lengthUnit(self) -> pq.Quantity:
         return self.hdf5File["Header"].attrs["UnitLength_in_cm"] * pq.cm
 
