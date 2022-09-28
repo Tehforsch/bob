@@ -10,7 +10,8 @@ class ElectronAbundance(Field):
         try:
             xHP = BasicField("ChemicalAbundances", 1).getData(snapshot)
             electronAbundance = xHP
-        except:
+        except ValueError as e:
+            print(e)
             print("TNG style snapshot, using ElectronAbundance")
             electronAbundance = BasicField("ElectronAbundance").getData(snapshot)
         return electronAbundance

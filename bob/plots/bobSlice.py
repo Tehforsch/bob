@@ -17,7 +17,8 @@ from bob.plotConfig import PlotConfig
 
 
 def getDataAtPoints(field: Field, snapshot: Snapshot, points: pq.Quantity) -> np.ndarray:
-    tree = cKDTree(snapshot.coordinates.to(snapshot.lengthUnit).value)
+    coords = snapshot.coordinates.to(snapshot.lengthUnit).value
+    tree = cKDTree(coords)
     cellIndices = tree.query(points.to(snapshot.lengthUnit))[1]
     data = field.getData(snapshot)
     return data[cellIndices]

@@ -12,9 +12,10 @@ from bob.field import Field
 
 
 class BasicField(Field):
-    def __init__(self, name: str, index: Optional[int] = None) -> None:
+    def __init__(self, name: str, index: Optional[int] = None, comoving: bool = False) -> None:
         self.name = name
         self.index = index
+        self.comoving = comoving
 
     def __repr__(self) -> str:
         if self.index is not None:
@@ -63,27 +64,31 @@ class BasicField(Field):
         else:
             return 1
 
+    def getArbitraryUnit(self, snapshot: "Snapshot", dataset: h5py.Dataset) -> pq.Quantity:
+        attrs = dataset.attrs
+        unit = pq.cm ** attrs["length_scaling"]
+        unit *= pq.g ** attrs["mass_scaling"]
+        unit *= (pq.cm / pq.s) ** attrs["velocity_scaling"]
+        if not self.comoving:
+            unit *= snapshot.h ** attrs["h_scaling"]
+            unit *= snapshot.scale_factor ** attrs["a_scaling"]
+        unit *= attrs["to_cgs"]
+        return unit
+
     def getData(self, snapshot: "Snapshot") -> np.ndarray:
-        if self.name == "Density":
-            unit = snapshot.massUnit / (snapshot.lengthUnit**3)
-        elif self.name == "Coordinates":
-            unit = snapshot.lengthUnit
-        elif self.name == "InternalEnergy":
-            unit = snapshot.velocityUnit**2  # This isnt even a energy but it says so in the documentation.
-        elif self.name == "Masses":
-            unit = snapshot.massUnit
-        elif self.name == "ChemicalAbundances":
-            unit = pq.dimensionless_unscaled
-        elif self.name == "ElectronAbundance":
-            unit = pq.dimensionless_unscaled
-        elif self.name == "IonizationTime":
-            unit = snapshot.timeUnit
-        elif self.name == "PhotonRates":
-            unit = 1 / snapshot.timeUnit
-        elif self.name == "PhotonFlux":
-            unit = 1 / snapshot.timeUnit
-        else:
-            raise ValueError("Fix units here")
+        try:
+            unit = self.getArbitraryUnit(snapshot, snapshot.hdf5File["PartType0"][self.name])
+        except KeyError:
+            if self.name == "ChemicalAbundances":
+                unit = pq.dimensionless_unscaled
+            elif self.name == "IonizationTime":
+                unit = snapshot.timeUnit
+            elif self.name == "PhotonRates":
+                unit = 1 / snapshot.timeUnit
+            elif self.name == "PhotonFlux":
+                unit = 1 / snapshot.timeUnit
+            else:
+                raise ValueError("Fix units here")
         fieldData = readIntoNumpyArray(snapshot.hdf5File["PartType0"][self.name]) * unit
         if self.index is None:
             return fieldData

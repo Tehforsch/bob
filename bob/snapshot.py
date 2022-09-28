@@ -46,7 +46,7 @@ class Snapshot:
 
     @property  # type: ignore
     def coordinates(self) -> pq.Quantity:
-        return BasicField("Coordinates").getData(self)
+        return BasicField("Coordinates", comoving=True).getData(self)
 
     def __repr__(self) -> str:
         return str(self.filename)

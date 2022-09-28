@@ -12,6 +12,6 @@ plotSerializationFileName = "plot.info"
 
 defaultTimeUnit = pq.yr
 
-numProcesses = 16
+numProcesses = 6
 
 possibleImageSuffixes = [".png", ".pdf"]

@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, List
 from abc import abstractmethod
 
 import matplotlib.pyplot as plt
@@ -80,6 +80,13 @@ class TimePlot(MultiSetFn):
         result.times = getArrayQuantity([x[0] for x in data])
         result.values = getArrayQuantity([x[1] for x in data])
         return result
+
+
+def getAllSnapshotsWithTime(timeQuantity: str, simSet: SimulationSet) -> List[Tuple[Snapshot, Simulation, pq.Quantity]]:
+    snapshots = [(snap, sim) for sim in simSet for snap in sim.snapshots]
+    snapshotsWithTime = [(snap, sim, getTimeQuantityForSnap(timeQuantity, sim, snap)) for (snap, sim) in snapshots]
+    snapshotsWithTime.sort(key=lambda x: x[2])
+    return snapshotsWithTime
 
 
 def getTimeAndResultForSnap(plot: TimePlot, timeQuantity: str, snapSim: Tuple[Snapshot, Simulation]) -> Tuple[pq.Quantity, pq.Quantity]:
