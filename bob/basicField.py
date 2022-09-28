@@ -88,7 +88,7 @@ class BasicField(Field):
             elif self.name == "PhotonFlux":
                 unit = 1 / snapshot.timeUnit
             else:
-                raise ValueError("Fix units here")
+                raise ValueError("Fix units for field: {}".format(self.name))
         fieldData = readIntoNumpyArray(snapshot.hdf5File["PartType0"][self.name]) * unit
         if self.index is None:
             return fieldData

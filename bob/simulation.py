@@ -106,7 +106,7 @@ class Simulation:
         H0 = self.params["HubbleParam"] * 100.0
         return FlatLambdaCDM(H0=H0, Om0=Om0, Ob0=Ob0)
 
-    def getRedshift(self, scale_factor: float, doAssert: bool = True) -> float:
+    def getRedshift(self, scale_factor: float, doAssert: bool = True) -> pq.Quantity:
         cosmology = self.getCosmology()
         if doAssert:
             assert self.params["ComovingIntegrationOn"]
