@@ -46,7 +46,7 @@ class Snapshot:
 
     @property  # type: ignore
     def coordinates(self) -> pq.Quantity:
-        return BasicField("Coordinates").getData(self)
+        return BasicField("Coordinates", comoving=True).getData(self)
 
     def __repr__(self) -> str:
         return str(self.filename)
@@ -54,6 +54,10 @@ class Snapshot:
     @property
     def h(self) -> pq.Quantity:
         return self.hdf5File["Header"].attrs["HubbleParam"]
+
+    @property
+    def H0(self) -> pq.Quantity:
+        return self.hdf5File["Header"].attrs["HubbleParam"] * 100 * pq.km / pq.s / pq.Mpc
 
     @property
     def lengthUnit(self) -> pq.Quantity:

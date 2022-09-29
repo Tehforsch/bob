@@ -5,6 +5,7 @@ import os
 from time import sleep
 import uuid
 import shutil
+import traceback
 
 from bob.plotter import Plotter
 from bob.postprocess import runFunctionsWithPlotter, create_pic_folder
@@ -69,7 +70,8 @@ def runPostCommand(command: Command, commFolder: Path, workFolder: Path) -> None
         finishedCommand = getFinishedCommand(command)
         finishedCommand.write(commFolder)
     except Exception as e:
-        errorCommand = getErrorCommand(command, str(e))
+        errorMessage = traceback.format_exc()
+        errorCommand = getErrorCommand(command, str(errorMessage))
         errorCommand.write(commFolder)
         raise e
 

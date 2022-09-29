@@ -5,6 +5,7 @@ from bob.plots.sliceWithStarParticles import SliceWithStarParticles
 from bob.plots.ionization import Ionization
 from bob.plots.ionizationRate import IonizationRate
 from bob.plots.ionizationTime import IonizationTime
+from bob.plots.ionizationBinned import IonizationBinned
 from bob.plots.thomsonScattering import ThomsonScattering
 from bob.plots.arepoSlice import ArepoSlicePlot
 from bob.plots.bobSlice import Slice
@@ -21,6 +22,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     Ionization,
     IonizationRate,
     IonizationTime,
+    IonizationBinned,
     MeanFieldOverTime,
     ThomsonScattering,
     ArepoSlicePlot,

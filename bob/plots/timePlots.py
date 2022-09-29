@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, List
 from abc import abstractmethod
 
 import matplotlib.pyplot as plt
@@ -25,7 +25,8 @@ def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot) -> fl
 
 def getTimeQuantityFromTimeOrScaleFactor(quantity: str, sim: Simulation, snap: Snapshot, time_or_scale_factor: pq.Quantity) -> pq.Quantity:
     if quantity == "z":
-        return sim.getRedshift(time_or_scale_factor) * pq.dimensionless_unscaled
+        # I am completely lost on why but I get two different "redshift" units here that are incopatible and are causing problems, so I'll just take the value and multiply by dimensionless. I find this horrible but I dont know what else to do
+        return sim.getRedshift(time_or_scale_factor).value * pq.dimensionless_unscaled
     elif quantity == "t":
         if sim.params["ComovingIntegrationOn"]:
             return sim.getLookbackTime(time_or_scale_factor)
@@ -80,6 +81,13 @@ class TimePlot(MultiSetFn):
         result.times = getArrayQuantity([x[0] for x in data])
         result.values = getArrayQuantity([x[1] for x in data])
         return result
+
+
+def getAllSnapshotsWithTime(timeQuantity: str, simSet: SimulationSet) -> List[Tuple[Snapshot, Simulation, pq.Quantity]]:
+    snapshots = [(snap, sim) for sim in simSet for snap in sim.snapshots]
+    snapshotsWithTime = [(snap, sim, getTimeQuantityForSnap(timeQuantity, sim, snap)) for (snap, sim) in snapshots]
+    snapshotsWithTime.sort(key=lambda x: x[2])
+    return snapshotsWithTime
 
 
 def getTimeAndResultForSnap(plot: TimePlot, timeQuantity: str, snapSim: Tuple[Snapshot, Simulation]) -> Tuple[pq.Quantity, pq.Quantity]:

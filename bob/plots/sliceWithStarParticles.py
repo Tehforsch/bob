@@ -26,8 +26,8 @@ class SliceWithStarParticles(Slice):
         else:
             if "PartType4" in f:
                 coords = snap.hdf5File["PartType4"]["Coordinates"] * snap.lengthUnit
-                times = np.array(f["PartType4"]["GFM_StellarFormationTime"])
-                coords = coords[np.where(times >= 0)]  # Filter out wind particles
+                # times = np.array(f["PartType4"]["GFM_StellarFormationTime"])
+                # coords = coords[np.where(times >= 0)]  # Filter out wind particles
                 if self.config["colorByLuminosity"]:
                     raise NotImplementedError("Luminosity calculation not implemented for star particles yet")
             else:

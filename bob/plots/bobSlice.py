@@ -4,6 +4,7 @@ import matplotlib.colors as colors
 from scipy.spatial import cKDTree
 import numpy as np
 import astropy.units as pq
+import astropy.cosmology.units as cu
 
 from bob.simulation import Simulation
 from bob.snapshot import Snapshot
@@ -17,7 +18,8 @@ from bob.plotConfig import PlotConfig
 
 
 def getDataAtPoints(field: Field, snapshot: Snapshot, points: pq.Quantity) -> np.ndarray:
-    tree = cKDTree(snapshot.coordinates.to(snapshot.lengthUnit).value)
+    coords = snapshot.coordinates.to(snapshot.lengthUnit / cu.littleh, cu.with_H0(snapshot.H0)).value
+    tree = cKDTree(coords)
     cellIndices = tree.query(points.to(snapshot.lengthUnit))[1]
     data = field.getData(snapshot)
     return data[cellIndices]
