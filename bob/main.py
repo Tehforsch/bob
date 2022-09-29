@@ -29,6 +29,12 @@ def setupArgs() -> argparse.Namespace:
     remotePlotParser.add_argument("simFolders", type=Path, nargs="+", help="Path to simulation directories")
     remotePlotParser.add_argument("plot", type=Path, help="The plot configuration")
 
+    watchReplotParser = subparsers.add_parser("watchReplot")
+    watchReplotParser.add_argument("communicationFolder", type=Path, help="The folder to write the new commands to")
+    watchReplotParser.add_argument("remoteWorkFolder", type=Path, help="The folder from which the plots should be copied")
+    watchReplotParser.add_argument("localWorkFolder", type=Path, help="The folder into which the plots should be copied")
+    watchReplotParser.add_argument("simFolders", type=Path, nargs="+", help="Path to simulation directories")
+
     replotParser = subparsers.add_parser("replot")
     replotParser.add_argument("simFolders", type=Path, nargs="+", help="Path to simulation directories")
     replotParser.add_argument("--plots", type=str, nargs="*", help="The plots to replot")
@@ -70,6 +76,8 @@ def main() -> None:
         command = getPostCommand(relPath, config)
         command.write(args.communicationFolder)
         watchReplot(args.communicationFolder, args.remoteWorkFolder, args.simFolders[0], command["id"], not args.hide)
+    elif args.function == "watchReplot":
+        watchReplot(args.communicationFolder, args.remoteWorkFolder, args.simFolders[0], None, not args.hide)
     elif args.function == "replot":
         for simFolder in args.simFolders:
             plotter = Plotter(simFolder, SimulationSet([]), args.post, not args.hide)

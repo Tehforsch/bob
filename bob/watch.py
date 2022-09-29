@@ -91,18 +91,17 @@ def watchPost(commFolder: Path, workFolder: Path) -> None:
         sleep(SLEEP_TIMEOUT)
 
 
-def watchReplot(commFolder: Path, remoteWorkFolder: Path, simFolder: Path, postCommandId: str, show: bool) -> None:
+def watchReplot(commFolder: Path, remoteWorkFolder: Path, simFolder: Path, postCommandId: Optional[str], show: bool) -> None:
+    checkCommandId = lambda type_, command: command["type"] == type_ and (postCommandId is None or command["postCommandId"] == postCommandId)
     while True:
-        error = getNextCommandWithPredicate(commFolder, lambda command: command["type"] == "error" and command["postCommandId"] == postCommandId)
+        error = getNextCommandWithPredicate(commFolder, lambda command: checkCommandId("error", command))
         if error is not None:
             raise PlotFailedException(error["error"])
-        command = getNextCommandWithPredicate(commFolder, lambda command: command["type"] == "replot" and command["postCommandId"] == postCommandId)
+        command = getNextCommandWithPredicate(commFolder, lambda command: checkCommandId("replot", command))
         if command is not None:
             runReplotCommand(command, commFolder, remoteWorkFolder, simFolder, show)
         else:
-            command = getNextCommandWithPredicate(
-                commFolder, lambda command: command["type"] == "finished" and command["postCommandId"] == postCommandId
-            )
+            command = getNextCommandWithPredicate(commFolder, lambda command: checkCommandId("finished", command))
             if command is not None:
                 return
         sleep(SLEEP_TIMEOUT)
