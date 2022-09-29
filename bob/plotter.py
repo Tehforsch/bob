@@ -157,7 +157,7 @@ class Plotter:
         sims = self.filterSims(function.config["sims"])
         for sim in sims:
             for slice_ in sim.getSlices(function.config["field"]):
-                if function.config["snapshots"] is None or any(arg_snap == slice_.name for arg_snap in function.config["snapshots"]):
+                if function.config["snapshots"] is None or any(str(arg_snap) == slice_.name for arg_snap in function.config["snapshots"]):
                     simName = zeroPadToLength(int(sim.name), len(sims))
                     name = function.getName(simName=simName, sliceName=slice_.name)
                     yield self.runPostAndPlot(function, name, lambda: function.post(sim, slice_), function.plot)
