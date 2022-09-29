@@ -60,6 +60,7 @@ class Plotter:
         if select is None:
             return self.sims
         else:
+            select = [str(x) for x in select]
             return SimulationSet(sim for sim in self.sims if sim.name in select)
 
     def isNew(self, plotName: str) -> bool:
