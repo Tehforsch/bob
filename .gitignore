@@ -1,3 +1,5 @@
 bob/localConfig.py
 *.dat
 *.png
+bob/plots/__pycache__/
+requestCopy

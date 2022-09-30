@@ -51,6 +51,7 @@ class Plotter:
         if select is None:
             return self.sims
         else:
+            select = [str(x) for x in select]
             return SimulationSet(sim for sim in self.sims if sim.name in select)
 
     def isNew(self, plotName: str) -> bool:
@@ -147,7 +148,7 @@ class Plotter:
         sims = self.filterSims(function.config["sims"])
         for sim in sims:
             for slice_ in sim.getSlices(function.config["field"]):
-                if function.config["snapshots"] is None or any(arg_snap == slice_.name for arg_snap in function.config["snapshots"]):
+                if function.config["snapshots"] is None or any(str(arg_snap) == slice_.name for arg_snap in function.config["snapshots"]):
                     simName = zeroPadToLength(int(sim.name), len(sims))
                     name = function.getName(simName=simName, sliceName=slice_.name)
                     yield self.runPostAndPlot(function, name, lambda: function.post(sim, slice_), function.plot)
