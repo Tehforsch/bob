@@ -12,14 +12,13 @@ from bob.postprocessingFunctions import (
     SliceFn,
 )
 from bob.simulationSet import SimulationSet, Single
-from bob.snapshot import Snapshot
 import bob.config
-from bob.simulation import Simulation
 from bob.result import Result
 from bob.postprocessingFunctions import PostprocessingFunction
 from bob.multiSet import MultiSet
 from bob.pool import runInPool
 from bob.util import zeroPadToLength, showImageInTerminal
+from bob.snapshotFilter import SnapshotFilter
 
 QuotientParams = Optional[Union[List[str], Single]]
 
@@ -28,14 +27,6 @@ def walkfiles(path: Path) -> Iterator[Path]:
     for root, dirs, files in os.walk(path):
         for f in files:
             yield Path(root) / f
-
-
-def isSameSnapshot(arg_snap: str, snap: Snapshot) -> bool:
-    try:
-        arg_num = int(arg_snap)
-        return snap.number.value == arg_num
-    except ValueError:
-        raise ValueError("WRONG type of snapshot argument. Need an integer")
 
 
 def getOutputFilename(filename: str, outputFileType: str) -> Path:
@@ -145,7 +136,7 @@ class Plotter:
     def runSnapFn(self, function: SnapFn) -> Iterator[str]:
         sims = self.filterSims(function.config["sims"])
         for sim in sims:
-            snapshots = list(self.get_snapshots(sim, function.config["snapshots"]))
+            snapshots = SnapshotFilter(function.config["snapshots"]).get_snapshots(sim)
             for snap in snapshots:
                 simName = zeroPadToLength(int(sim.name), len(sims))
                 snapName = zeroPadToLength(int(snap.name), len(snapshots))
@@ -160,14 +151,6 @@ class Plotter:
                     simName = zeroPadToLength(int(sim.name), len(sims))
                     name = function.getName(simName=simName, sliceName=slice_.name)
                     yield self.runPostAndPlot(function, name, lambda: function.post(sim, slice_), function.plot)
-
-    def isInSnapshotArgs(self, snapshotFilter: Optional[List[str]], snap: Snapshot) -> bool:
-        return snapshotFilter is None or any(isSameSnapshot(arg_snap, snap) for arg_snap in snapshotFilter)
-
-    def get_snapshots(self, sim: Simulation, snapshotFilter: Optional[List[str]]) -> Iterator[Snapshot]:
-        for snap in sim.snapshots:
-            if self.isInSnapshotArgs(snapshotFilter, snap):
-                yield snap
 
     def saveAndShow(self, filename: str, fn: PostprocessingFunction) -> Path:
         filepath = self.picFolder / getOutputFilename(filename, fn.config["outputFileType"])

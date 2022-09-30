@@ -95,7 +95,7 @@ class Result:
                 elif isinstance(quantity[0], Result):
                     saveResultList(filenameBase(folder, name), quantity)
                 else:
-                    raise ValueError("List of unknown unsupported type: {}".format(type(quantity[0])))
+                    raise ValueError("'{}' is list of unknown unsupported type: {}".format(name, type(quantity[0])))
             elif type(quantity) == np.ndarray:
                 raise ValueError("Refusing to save array without units")
             else:

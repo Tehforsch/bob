@@ -6,6 +6,7 @@ from bob.plots.ionization import Ionization
 from bob.plots.ionizationRate import IonizationRate
 from bob.plots.ionizationTime import IonizationTime
 from bob.plots.ionizationBinned import IonizationBinned
+from bob.plots.ionizationLevel import IonizationLevel
 from bob.plots.thomsonScattering import ThomsonScattering
 from bob.plots.arepoSlice import ArepoSlicePlot
 from bob.plots.bobSlice import Slice
@@ -23,6 +24,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     IonizationRate,
     IonizationTime,
     IonizationBinned,
+    IonizationLevel,
     MeanFieldOverTime,
     ThomsonScattering,
     ArepoSlicePlot,
