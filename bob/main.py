@@ -61,9 +61,20 @@ def setupLogging(args: argparse.Namespace) -> None:
         logging.basicConfig(level=logging.INFO)
 
 
+def setupAstropy() -> None:
+    # Make the parser recognize these
+    import astropy.units as pq
+    import astropy.cosmology.units as cu
+
+    redshift = pq.def_unit("redshift", cu.redshift)
+    littleh = pq.def_unit("littleh", cu.littleh)
+    pq.add_enabled_units([redshift, littleh])
+
+
 def main() -> None:
     args = setupArgs()
     setupLogging(args)
+    setupAstropy()
     if args.function in ["remotePlot", "replot", "plot"] and not args.post:
         setMatplotlibStyle()
     if args.function == "watchPost":

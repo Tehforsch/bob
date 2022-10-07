@@ -8,6 +8,7 @@ import matplotlib.ticker
 
 from astropy.cosmology import z_at_value
 import astropy.units as pq
+import astropy.cosmology.units as cu
 
 from bob.util import getArrayQuantity
 from bob.simulation import Simulation
@@ -28,7 +29,10 @@ def printOnce(s: str, previousRuns: Dict[str, bool] = {}) -> None:
 def translateTime(sim: Simulation, time: pq.Quantity) -> Tuple[pq.Quantity, pq.Quantity]:
     cosmology = sim.getCosmology()
     if sim.params["ComovingIntegrationOn"] == 1:
-        redshift = z_at_value(cosmology.scale_factor, time) * pq.dimensionless_unscaled
+        if abs(time - 1.0) < 1e-5:
+            redshift = 0 * cu.redshift
+        else:
+            redshift = z_at_value(cosmology.scale_factor, time)
         return time * pq.dimensionless_unscaled, redshift * pq.dimensionless_unscaled
     else:
         # In the noCascade runs, we have the initial scale_factor

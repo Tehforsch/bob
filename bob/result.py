@@ -5,7 +5,6 @@ from pathlib import Path
 
 import numpy as np
 import astropy.units as pq
-import astropy.cosmology.units as cu
 
 from bob.util import getFolders, getFilesWithSuffix
 
@@ -20,9 +19,6 @@ def getNpyFiles(folder: Path) -> Iterator[Path]:
 def readUnit(filename: Path) -> pq.Unit:
     with open(filename, "r") as f:
         content = f.readline().replace("\n", "")
-        # This doesn't work automatically, probably because its a cosmology unit and not a base astropy unit.. kinda annoying
-        if content == "redshift":
-            return cu.redshift
         return pq.Unit(content)
 
 
