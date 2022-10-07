@@ -12,7 +12,7 @@ from bob.postprocess import runFunctionsWithPlotter, create_pic_folder
 from bob.simulationSet import getSimsFromFolders, SimulationSet
 from bob.postprocess import getFunctionsFromPlotConfigs
 from bob.config import picFolder
-from bob.plotter import PlotName
+from bob.plotter import PlotName, PlotFilter, PlotFilters
 
 SLEEP_TIMEOUT = 0.1
 
@@ -88,7 +88,8 @@ def runReplotCommand(command: Command, commFolder: Path, remoteWorkFolder: Path,
     targetFolder.mkdir(parents=True, exist_ok=True)
     shutil.copytree(sourceFolder, targetFolder, dirs_exist_ok=True)
     plotter = Plotter(simFolder, SimulationSet([]), True, show)
-    plotter.replot([plotName.qualifiedName], False, None)
+    print(plotName.qualifiedName)
+    plotter.replot(PlotFilters([PlotFilter(qualifiedName=plotName.qualifiedName)]), False, None)
 
 
 def watchPost(commFolder: Path, workFolder: Path) -> None:

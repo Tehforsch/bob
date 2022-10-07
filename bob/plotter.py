@@ -46,6 +46,30 @@ class PlotName:
         return "{} {} {} {}".format(self.picFolder, self.baseName, self.qualifiedName, self.subName)
 
 
+class PlotFilter:
+    def __init__(self, baseName: Optional[str] = None, qualifiedName: Optional[str] = None) -> None:
+        self.baseName = baseName
+        self.qualifiedName = qualifiedName
+
+    def contains(self, plot: PlotName) -> bool:
+        if self.baseName is not None and plot.baseName == self.baseName:
+            return True
+        if self.qualifiedName is not None and plot.qualifiedName == self.qualifiedName:
+            return True
+        return False
+
+
+class PlotFilters:
+    def __init__(self, filters: Optional[List[PlotFilter]]) -> None:
+        self.filters = filters
+
+    def contains(self, plot: PlotName) -> bool:
+        if self.filters is None:
+            return True
+        else:
+            return any(f.contains(plot) for f in self.filters)
+
+
 class Plotter:
     def __init__(
         self,
@@ -90,7 +114,7 @@ class Plotter:
                 if suffix is None or self.isNew(name, suffix):
                     yield name
 
-    def replot(self, plotFilter: Optional[List[str]], onlyNew: bool, customConfig: Optional[Path]) -> None:
+    def replot(self, plotFilters: PlotFilters, onlyNew: bool, customConfig: Optional[Path]) -> None:
         if onlyNew:
             plots = list(self.getNewPlots())
         else:
@@ -107,7 +131,7 @@ class Plotter:
         else:
             config = None
         plots.sort(key=lambda plot: plot.qualifiedName)
-        plots = [plot for plot in plots if plotFilter is None or plot in plotFilter]
+        plots = [plot for plot in plots if plotFilters.contains(plot)]
         for path in runInPool(runPlot, plots, self, config):
             if self.show:
                 showImageInTerminal(path)

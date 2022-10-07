@@ -6,7 +6,7 @@ from os.path import relpath, realpath
 from bob.simulationSet import getSimsFromFolders, SimulationSet
 from bob.util import getCommonParentFolder
 from bob.watch import watchPost, watchReplot, getPostCommand
-from bob.plotter import Plotter
+from bob.plotter import Plotter, PlotFilters, PlotFilter
 from bob.postprocess import getFunctionsFromPlotFile, setMatplotlibStyle, readPlotFile, runFunctionsWithPlotter, create_pic_folder
 
 
@@ -81,7 +81,8 @@ def main() -> None:
     elif args.function == "replot":
         for simFolder in args.simFolders:
             plotter = Plotter(simFolder, SimulationSet([]), args.post, not args.hide)
-            plotter.replot(args.plots, args.onlyNew, args.config)
+            filters = PlotFilters(None if args.plots is None else [PlotFilter(baseName=plot) for plot in args.plots])
+            plotter.replot(filters, args.onlyNew, args.config)
     elif args.function == "plot":
         sims = getSimsFromFolders(args.simFolders)
         parent_folder = getCommonParentFolder(args.simFolders)
