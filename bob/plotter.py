@@ -198,7 +198,6 @@ def getBaseName(plotName: str) -> str:
 
 # Needs to be a top-level function so it can be used by multiprocessing
 def runPlot(plotter: Plotter, customConfig: Optional[dict], plot: PlotName) -> Path:
-    print(plot)
     from bob.postprocess import getFunctionsFromPlotFile, getFunctionsFromPlotConfigs
 
     logging.info(f"Replotting {plot.qualifiedName}")
