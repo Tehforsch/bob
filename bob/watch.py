@@ -12,6 +12,7 @@ from bob.postprocess import runFunctionsWithPlotter, create_pic_folder
 from bob.simulationSet import getSimsFromFolders, SimulationSet
 from bob.postprocess import getFunctionsFromPlotConfigs
 from bob.config import picFolder
+from bob.plotter import PlotName
 
 SLEEP_TIMEOUT = 0.1
 
@@ -45,7 +46,7 @@ def getErrorCommand(postCommand: Command, error: str) -> Command:
     return Command({"postCommandId": postCommand["id"], "type": "error", "error": error})
 
 
-def getReplotCommand(postCommand: Command, simFolder: Path, finishedPlotName: str) -> Command:
+def getReplotCommand(postCommand: Command, simFolder: Path, finishedPlotName: PlotName) -> Command:
     return Command({"simFolder": simFolder, "finishedPlotName": finishedPlotName, "type": "replot", "postCommandId": postCommand["id"]})
 
 
@@ -77,12 +78,15 @@ def runPostCommand(command: Command, commFolder: Path, workFolder: Path) -> None
 
 
 def runReplotCommand(command: Command, commFolder: Path, remoteWorkFolder: Path, simFolder: Path, show: bool) -> None:
-    sourceFolder = remoteWorkFolder / command["simFolder"] / picFolder / "plots" / command["finishedPlotName"]
-    targetFolder = simFolder / picFolder / "plots" / command["finishedPlotName"]
+    plotName = command["finishedPlotName"]
+    sourceFolder = plotName.dataFolder()
+    targetPicFolder = simFolder / picFolder
+    plotName = plotName.withPicFolder(targetPicFolder)
+    targetFolder = plotName.dataFolder()
     targetFolder.mkdir(parents=True, exist_ok=True)
     shutil.copytree(sourceFolder, targetFolder, dirs_exist_ok=True)
     plotter = Plotter(simFolder, SimulationSet([]), True, show)
-    plotter.replot([command["finishedPlotName"]], False, None)
+    plotter.replot([plotName.qualifiedName], False, None)
 
 
 def watchPost(commFolder: Path, workFolder: Path) -> None:

@@ -6,8 +6,13 @@ if [[ $? != 0 ]]; then
     exit 1
 fi
 
-pyflakes $(fd -e py)
+python -m unittest discover
+if [[ $? != 0 ]]; then
+    echo "There are failing tests, fix?"
+    exit 1
+fi
 
+pyflakes $(fd -e py)
 if [[ $? != 0 ]]; then
     echo "There are pyflakes errors, fix them before committing"
     exit 1
@@ -16,12 +21,6 @@ fi
 black --check $(fd -e py)
 if [[ $? != 0 ]]; then
     echo "There are formatting errors, run black"
-    exit 1
-fi
-
-python -m unittest discover
-if [[ $? != 0 ]]; then
-    echo "There are failing tests, fix?"
     exit 1
 fi
 

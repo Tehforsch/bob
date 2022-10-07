@@ -1,10 +1,11 @@
-from typing import List
+from pathlib import Path
+from typing import List, Iterator
+import os
 import itertools
 import subprocess
 import logging
 
 from math import log10
-from pathlib import Path
 import numpy as np
 import astropy.units as pq
 
@@ -44,3 +45,25 @@ def showImageInTerminal(path: Path) -> None:
     args = ["kitty", "+kitten", "icat", "--silent", "--transfer-mode", "file", str(tmpfile)]
     logging.debug(path)
     subprocess.check_call(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def listdir(folder: Path) -> Iterator[Path]:
+    return (folder / f for f in os.listdir(folder))
+
+
+def getFolders(folder: Path) -> Iterator[Path]:
+    return (f for f in listdir(folder) if f.is_dir())
+
+
+def getFolderNames(folder: Path) -> Iterator[str]:
+    return (f.name for f in listdir(folder) if f.is_dir())
+
+
+def getFilesWithSuffix(folder: Path, suffix: str) -> Iterator[Path]:
+    return (folder / f for f in os.listdir(folder) if Path(f).suffix == suffix)
+
+
+def walkfiles(path: Path) -> Iterator[Path]:
+    for root, dirs, files in os.walk(path):
+        for f in files:
+            yield Path(root) / f

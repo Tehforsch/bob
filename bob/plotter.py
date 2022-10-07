@@ -17,20 +17,33 @@ from bob.result import Result
 from bob.postprocessingFunctions import PostprocessingFunction
 from bob.multiSet import MultiSet
 from bob.pool import runInPool
-from bob.util import zeroPadToLength, showImageInTerminal
+from bob.util import zeroPadToLength, showImageInTerminal, walkfiles, getFolderNames
 from bob.snapshotFilter import SnapshotFilter
 
 QuotientParams = Optional[Union[List[str], Single]]
 
 
-def walkfiles(path: Path) -> Iterator[Path]:
-    for root, dirs, files in os.walk(path):
-        for f in files:
-            yield Path(root) / f
+class PlotName:
+    def __init__(self, picFolder: Path, baseName: str, qualifiedName: str) -> None:
+        self.picFolder = picFolder
+        self.baseName = baseName
+        self.qualifiedName = qualifiedName
+        self.subName = qualifiedName.replace("{}_".format(baseName), "")
 
+    def folder(self) -> Path:
+        return self.picFolder / self.baseName
 
-def getOutputFilename(filename: str, outputFileType: str) -> Path:
-    return Path("{}.{}".format(filename, outputFileType))
+    def dataFolder(self) -> Path:
+        return self.folder() / self.subName
+
+    def getOutputFile(self, outputFileType: str) -> Path:
+        return self.folder() / "{}.{}".format(self.qualifiedName, outputFileType)
+
+    def withPicFolder(self, picFolder: Path) -> "PlotName":
+        return PlotName(picFolder, self.baseName, self.qualifiedName)
+
+    def __repr__(self) -> str:
+        return "{} {} {} {}".format(self.picFolder, self.baseName, self.qualifiedName, self.subName)
 
 
 class Plotter:
@@ -43,7 +56,6 @@ class Plotter:
     ) -> None:
         self.picFolder = parent_folder / bob.config.picFolder
         self.sims = sims
-        self.dataFolder = self.picFolder / "plots"
         self.postprocess_only = postprocess_only
         self.show = show
 
@@ -54,40 +66,57 @@ class Plotter:
             select = [str(x) for x in select]
             return SimulationSet(sim for sim in self.sims if sim.name in select)
 
-    def isNew(self, plotName: str) -> bool:
-        images = [(self.picFolder / plotName).with_suffix(suffix) for suffix in bob.config.possibleImageSuffixes]
-        images = [image for image in images if image.is_file()]
-        if len(images) == 0:
+    def isNew(self, plot: PlotName, fileType: str) -> bool:
+        imageFile = plot.getOutputFile(fileType)
+        if not imageFile.is_file():
             return True
         else:
-            plotPath = self.dataFolder / plotName
-            mtimePlot = max(os.path.getmtime(str(f)) for f in walkfiles(plotPath))
-            mtimeImage = max(os.path.getmtime(image) for image in images)
-            return mtimeImage < mtimePlot
+            mtimeData = max(os.path.getmtime(str(f)) for f in walkfiles(plot.dataFolder()))
+            mtimeImage = os.path.getmtime(imageFile)
+            return mtimeImage < mtimeData
 
-    def getNewPlots(self) -> List[str]:
-        plots = os.listdir(self.dataFolder)
-        return [plot for plot in plots if self.isNew(plot)]
+    def testAllSuffixes(self, name: PlotName) -> Optional[str]:
+        for suffix in bob.config.possibleImageSuffixes:
+            if name.getOutputFile(suffix).is_file():
+                return suffix
+        return None
+
+    def getNewPlots(self) -> Iterator[PlotName]:
+        basenames = getFolderNames(self.picFolder)
+        for baseName in basenames:
+            for qualifiedName in getFolderNames(self.picFolder / baseName):
+                name = PlotName(self.picFolder, baseName, qualifiedName)
+                suffix = self.testAllSuffixes(name)
+                if suffix is None or self.isNew(name, suffix):
+                    yield name
 
     def replot(self, plotFilter: Optional[List[str]], onlyNew: bool, customConfig: Optional[Path]) -> None:
         if onlyNew:
-            plots = self.getNewPlots()
+            plots = list(self.getNewPlots())
         else:
-            plots = os.listdir(self.dataFolder)
+            plotBaseNames = getFolderNames(self.picFolder)
+            plots = [
+                PlotName(self.picFolder, baseName, qualifiedName)
+                for baseName in plotBaseNames
+                for qualifiedName in getFolderNames(self.picFolder / baseName)
+            ]
         from bob.postprocess import readPlotFile
 
         if customConfig is not None:
             config = readPlotFile(customConfig, safe=True)
         else:
             config = None
-        plots.sort()
+        plots.sort(key=lambda plot: plot.qualifiedName)
         plots = [plot for plot in plots if plotFilter is None or plot in plotFilter]
         for path in runInPool(runPlot, plots, self, config):
             if self.show:
                 showImageInTerminal(path)
 
-    def runPostAndPlot(self, fn: PostprocessingFunction, name: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]) -> str:
-        logging.info("Running {}".format(name))
+    def runPostAndPlot(
+        self, fn: PostprocessingFunction, qualifiedName: str, post: Callable[[], Result], plot: Callable[[plt.axes, Result], None]
+    ) -> PlotName:
+        name = PlotName(self.picFolder, fn.name, qualifiedName)
+        logging.info("Running {}".format(name.qualifiedName))
         result = post()
         self.save(fn, name, result)
         if not self.postprocess_only:
@@ -97,8 +126,8 @@ class Plotter:
                 showImageInTerminal(path)
         return name
 
-    def save(self, fn: PostprocessingFunction, plotName: str, result: Result) -> None:
-        plotDataFolder = self.dataFolder / plotName
+    def save(self, fn: PostprocessingFunction, name: PlotName, result: Result) -> None:
+        plotDataFolder = name.dataFolder()
         plotDataFolder.mkdir(parents=True, exist_ok=True)
         self.savePlotInfo(fn, plotDataFolder)
         self.saveResult(result, plotDataFolder)
@@ -124,37 +153,37 @@ class Plotter:
         sims = self.filterSims(sims_filter)
         return MultiSet(sims.quotient(params), labels)
 
-    def runMultiSetFn(self, function: MultiSetFn) -> Iterator[str]:
+    def runMultiSetFn(self, function: MultiSetFn) -> Iterator[PlotName]:
         quotient = self.getQuotient(function.config["quotient"], function.config["sims"], function.config["labels"])
         yield self.runPostAndPlot(function, function.getName(), lambda: function.post(quotient), function.plot)
 
-    def runSetFn(self, function: SetFn) -> Iterator[str]:
+    def runSetFn(self, function: SetFn) -> Iterator[PlotName]:
         quotient = self.getQuotient(function.config["quotient"], function.config["sims"], function.config["labels"])
         numSims = len(quotient)
         for (i, (config, sims)) in enumerate(quotient.iterWithConfigs()):
             yield self.runPostAndPlot(function, function.getName(setNum=zeroPadToLength(i, numSims)), lambda: function.post(sims), function.plot)
 
-    def runSnapFn(self, function: SnapFn) -> Iterator[str]:
+    def runSnapFn(self, function: SnapFn) -> Iterator[PlotName]:
         sims = self.filterSims(function.config["sims"])
         for sim in sims:
             snapshots = SnapshotFilter(function.config["snapshots"]).get_snapshots(sim)
             for snap in snapshots:
                 simName = zeroPadToLength(int(sim.name), len(sims))
                 snapName = zeroPadToLength(int(snap.name), len(snapshots))
-                name = function.getName(simName=simName, snapName=snapName)
-                yield self.runPostAndPlot(function, name, lambda: function.post(sim, snap), function.plot)
+                qualifiedName = function.getName(simName=simName, snapName=snapName)
+                yield self.runPostAndPlot(function, qualifiedName, lambda: function.post(sim, snap), function.plot)
 
-    def runSliceFn(self, function: SliceFn) -> Iterator[str]:
+    def runSliceFn(self, function: SliceFn) -> Iterator[PlotName]:
         sims = self.filterSims(function.config["sims"])
         for sim in sims:
             for slice_ in sim.getSlices(function.config["field"]):
                 if function.config["snapshots"] is None or any(str(arg_snap) == slice_.name for arg_snap in function.config["snapshots"]):
                     simName = zeroPadToLength(int(sim.name), len(sims))
-                    name = function.getName(simName=simName, sliceName=slice_.name)
-                    yield self.runPostAndPlot(function, name, lambda: function.post(sim, slice_), function.plot)
+                    qualifiedName = function.getName(simName=simName, sliceName=slice_.name)
+                    yield self.runPostAndPlot(function, qualifiedName, lambda: function.post(sim, slice_), function.plot)
 
-    def saveAndShow(self, filename: str, fn: PostprocessingFunction) -> Path:
-        filepath = self.picFolder / getOutputFilename(filename, fn.config["outputFileType"])
+    def saveAndShow(self, name: PlotName, fn: PostprocessingFunction) -> Path:
+        filepath = name.getOutputFile(fn.config["outputFileType"])
         filepath.parent.mkdir(exist_ok=True)
         plt.savefig(str(filepath), dpi=bob.config.dpi)
         plt.clf()
@@ -168,17 +197,18 @@ def getBaseName(plotName: str) -> str:
 
 
 # Needs to be a top-level function so it can be used by multiprocessing
-def runPlot(plotter: Plotter, customConfig: Optional[dict], plotName: str) -> Path:
+def runPlot(plotter: Plotter, customConfig: Optional[dict], plot: PlotName) -> Path:
+    print(plot)
     from bob.postprocess import getFunctionsFromPlotFile, getFunctionsFromPlotConfigs
 
-    logging.info(f"Replotting {plotName}")
-    plotFolder = plotter.dataFolder / plotName
+    logging.info(f"Replotting {plot.qualifiedName}")
+    dataFolder = plot.dataFolder()
     if customConfig is not None:
         functions = getFunctionsFromPlotConfigs(customConfig)
     else:
-        functions = getFunctionsFromPlotFile(plotFolder / bob.config.plotSerializationFileName, False)
+        functions = getFunctionsFromPlotFile(dataFolder / bob.config.plotSerializationFileName, False)
     assert len(functions) == 1, "More than one plot in replot information."
     fn = functions[0]
-    result = Result.readFromFolder(plotFolder)
+    result = Result.readFromFolder(dataFolder)
     fn.plot(plt, result)
-    return plotter.saveAndShow(plotFolder.name, fn)
+    return plotter.saveAndShow(plot, fn)

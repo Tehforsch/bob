@@ -6,20 +6,10 @@ from pathlib import Path
 import numpy as np
 import astropy.units as pq
 
+from bob.util import getFolders, getFilesWithSuffix
+
 numpyFileEnding = ".npy"
 unitFileEnding = ".unit"
-
-
-def listdir(folder: Path) -> Iterator[Path]:
-    return (folder / f for f in os.listdir(folder))
-
-
-def getFolders(folder: Path) -> Iterator[Path]:
-    return (f for f in listdir(folder) if f.is_dir())
-
-
-def getFilesWithSuffix(folder: Path, suffix: str) -> Iterator[Path]:
-    return (folder / f for f in os.listdir(folder) if Path(f).suffix == suffix)
 
 
 def getNpyFiles(folder: Path) -> Iterator[Path]:

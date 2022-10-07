@@ -16,6 +16,7 @@ from bob.plotter import Plotter
 from bob.postprocessingFunctions import PostprocessingFunction
 from bob.plotConfig import PlotConfig
 from bob.plots.allFunctions import getFunctionByName
+from bob.plotter import PlotName
 
 from bob.postprocessingFunctions import (
     SnapFn,
@@ -73,10 +74,10 @@ def getFunctionsFromPlotConfigs(config: Union[dict, List[dict]]) -> List[Postpro
     return functions
 
 
-def runFunctionsWithPlotter(plotter: Plotter, functions: List[PostprocessingFunction]) -> Iterator[str]:
+def runFunctionsWithPlotter(plotter: Plotter, functions: List[PostprocessingFunction]) -> Iterator[PlotName]:
     logging.debug(functions)
 
-    def run() -> Iterator[str]:
+    def run() -> Iterator[PlotName]:
         for function in functions:
             if isinstance(function, SnapFn):
                 yield from plotter.runSnapFn(function)
@@ -91,7 +92,6 @@ def runFunctionsWithPlotter(plotter: Plotter, functions: List[PostprocessingFunc
 
     namesUsed = set()
     for name in run():
-        print(name)
         if name in namesUsed:
             raise ValueError(f"Duplicate name: {name}")
         namesUsed.add(name)
