@@ -73,7 +73,7 @@ class IonizationData(Result):
         data = []
         for sim in sims:
             regex = re.compile(
-                "Time ([0-9.+]+): Volume Av. H ionization: ([0-9.+]+), Mass Av. H ionization: ([0-9.+]+), Volume av. Ionization rate: ([0-9.+-e]+), Mass av. Ionization rate: ([0-9.+-e]+)"
+                "SWEEP: Time ([0-9.+]+): Volume Av. H ionization: ([0-9.+]+), Mass Av. H ionization: ([0-9.+]+), Volume av. Ionization rate: ([0-9.+-e]+), Mass av. Ionization rate: ([0-9.+-e]+)"
             )
             for line in sim.log:
                 match = regex.match(line)
