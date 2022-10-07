@@ -12,7 +12,7 @@ from bob.plotConfig import PlotConfig
 class SliceWithStarParticles(Slice):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
-        self.config.setDefault("testSources", True)
+        self.config.setDefault("testSources", False)
         self.config.setDefault("colorByLuminosity", False)
         self.config.setDefault("sliceThickness", 0.02)
 
