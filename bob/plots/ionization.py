@@ -79,7 +79,7 @@ class IonizationData(Result):
                 match = regex.match(line)
                 if match is not None:
                     (time, *remainder) = [float(x) for x in match.groups()]
-                    time, redshift = translateTime(sim, time * sim.snapshots[0].timeUnit)
+                    time, redshift = translateTime(sim, time)
                     data.append((time, redshift, *remainder))
 
         self.time.append(getArrayQuantity([d[0] for d in data]))
