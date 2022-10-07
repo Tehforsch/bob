@@ -79,7 +79,9 @@ def runPostCommand(command: Command, commFolder: Path, workFolder: Path) -> None
 
 def runReplotCommand(command: Command, commFolder: Path, remoteWorkFolder: Path, simFolder: Path, show: bool) -> None:
     plotName = command["finishedPlotName"]
-    sourceFolder = plotName.dataFolder()
+    sourcePicFolder = remoteWorkFolder / command["simFolder"] / picFolder
+    sourcePlotName = plotName.withPicFolder(sourcePicFolder)
+    sourceFolder = sourcePlotName.dataFolder()
     targetPicFolder = simFolder / picFolder
     plotName = plotName.withPicFolder(targetPicFolder)
     targetFolder = plotName.dataFolder()
