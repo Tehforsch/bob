@@ -21,6 +21,7 @@ class IonizationRate(MultiSetFn):
         self.config.setDefault("yUnit", 1 / pq.s)
         self.config.setDefault("legend_loc", "upper right")
         self.config.setDefault("yLim", [1e-18, 1e-12])
+        self.config.setDefault("xLim", [20, 0])
 
     def post(self, simSets: MultiSet) -> Result:
         result = IonizationData(simSets)
