@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Iterator
+from typing import List, Iterator, Optional
 import os
 import itertools
 import subprocess
@@ -23,6 +23,10 @@ def getArrayQuantity(quantities: List[pq.Quantity]) -> pq.Quantity:
         if not (y / unit).decompose().unit == "":
             raise ValueError("Different units in quantity array")
     return np.array([(y / unit).decompose().value for y in quantities]) * unit
+
+
+def isclose(a: pq.Quantity, b: pq.Quantity, epsilon: Optional[float] = 1e-10) -> bool:
+    return abs(a - b) / (a + b) < epsilon
 
 
 def getDataFile(relativePath: str) -> Path:
@@ -53,6 +57,10 @@ def listdir(folder: Path) -> Iterator[Path]:
 
 def getFolders(folder: Path) -> Iterator[Path]:
     return (f for f in listdir(folder) if f.is_dir())
+
+
+def getFiles(folder: Path) -> Iterator[Path]:
+    return (f for f in listdir(folder) if f.is_file())
 
 
 def getFolderNames(folder: Path) -> Iterator[str]:

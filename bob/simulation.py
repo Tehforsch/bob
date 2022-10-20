@@ -75,6 +75,10 @@ class Simulation:
         snapshotFiles.sort(key=getNumber)
         return [Snapshot(self, s) for s in snapshotFiles]
 
+    def getSnapshotAtRedshift(self, redshift: pq.dimensionless_unscaled) -> Snapshot:
+        snapshots = self.snapshots
+        return min(snapshots, key=lambda snap: abs(redshift - self.getRedshift(snap.scale_factor)))
+
     def icsFile(self) -> Snapshot:
         return Snapshot(self, self.folder / "{}.hdf5".format(self.params["InitCondFile"]))
 
