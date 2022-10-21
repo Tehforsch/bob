@@ -32,6 +32,11 @@ class PostprocessingFunction(ABC):
     def getName(self, **kwargs: Any) -> str:
         combined = self.config.copy()
         combined.update(kwargs)
+        if "snap" in kwargs and "sim" in kwargs:
+            snap: Snapshot = kwargs["snap"]
+            sim: Simulation = kwargs["sim"]
+            if sim.params["runParams"] == "0":
+                combined["redshift"] = sim.getRedshift(snap.scale_factor)
         return self.config["name"].format(**combined)
 
     def setupLinePlot(self) -> None:

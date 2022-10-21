@@ -194,7 +194,7 @@ class Plotter:
             for snap in snapshots:
                 simName = zeroPadToLength(int(sim.name), len(sims))
                 snapName = zeroPadToLength(int(snap.name), len(snapshots))
-                qualifiedName = function.getName(simName=simName, snapName=snapName)
+                qualifiedName = function.getName(sim=sim, snap=snap, simName=simName, snapName=snapName)
                 yield self.runPostAndPlot(function, qualifiedName, lambda: function.post(sim, snap), function.plot)
 
     def runSliceFn(self, function: SliceFn) -> Iterator[PlotName]:
