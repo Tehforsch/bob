@@ -45,6 +45,7 @@ class Histogram(SnapFn):
         self.setupLabels()
         ax.set_xscale("log")
         ax.set_yscale("log")
+        super().showTimeIfDesired(fig, result)
         X, Y = np.meshgrid(result.x_edges, result.y_edges)
         plt.pcolormesh(X, Y, result.H, norm=colors.LogNorm())
         plt.colorbar()
