@@ -34,13 +34,12 @@ class Histogram(SnapFn):
         print(np.min(dataX), np.mean(dataX), np.max(dataX))
         print(np.min(dataY), np.mean(dataY), np.max(dataY))
         result.H, result.x_edges, result.y_edges = np.histogram2d(dataX, dataY, bins=(binsX, binsY), density=True)
-        result.H = result.H * pq.dimensionless_unscaled
+        result.H = result.H.T * pq.dimensionless_unscaled
         result.x_edges = result.x_edges * pq.dimensionless_unscaled
         result.y_edges = result.y_edges * pq.dimensionless_unscaled
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        super().plot(plt, result)
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         self.setupLabels()
@@ -49,3 +48,4 @@ class Histogram(SnapFn):
         X, Y = np.meshgrid(result.x_edges, result.y_edges)
         plt.pcolormesh(X, Y, result.H, norm=colors.LogNorm())
         plt.colorbar()
+        super().plot(plt, result)

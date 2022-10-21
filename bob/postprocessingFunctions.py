@@ -15,7 +15,7 @@ from bob.plotConfig import PlotConfig
 
 def fillInUnit(label: str, unit: str) -> str:
     if "UNIT" in label:
-        return label.replace("UNIT", str(unit))
+        return label.replace("UNIT", str(unit).replace("littleh", "h").replace("**", "^").replace("*", "\\cdot"))
     else:
         return label
 
@@ -90,13 +90,13 @@ class SnapFn(PostprocessingFunction):
         self.config.setDefault("showTime", True)
         self.config.setDefault("timeUnit", pq.Myr)
 
-    def showTime(self, ax: plt.axes, result: Result) -> None:
+    def showTime(self, fig: plt.Figure, result: Result) -> None:
         if result.time.unit == pq.s:
             time = result.time.to(self.config["timeUnit"]).value
             timeUnit = str(self.config["timeUnit"])
-            ax.text(0, 0, f"Time: {time:.01f} {timeUnit}", fontsize=12)
+            fig.suptitle(f"Time: {time:.01f} {timeUnit}", fontsize=12)
         else:
-            ax.text(0, 0, f"Redshift: {result.time:.01f}", fontsize=12)
+            fig.suptitle(f"Redshift: {result.time:.01f}", fontsize=12)
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         from bob.plots.timePlots import getTimeOrRedshift
@@ -105,9 +105,9 @@ class SnapFn(PostprocessingFunction):
         result.time = getTimeOrRedshift(sim, snap)
         return result
 
-    def plot(self, axes: plt.axes, result: Result) -> None:
+    def showTimeIfDesired(self, fig: plt.Figure, result: Result) -> None:
         if self.config["showTime"]:
-            self.showTime(axes, result)
+            self.showTime(fig, result)
 
 
 class SetFn(PostprocessingFunction):

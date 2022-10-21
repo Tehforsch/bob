@@ -93,7 +93,8 @@ class Slice(SnapFn):
         print(np.max(data[:, :, 1]))
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        super().plot(plt, result)
+        fig = plt.figure()
+        super().showTimeIfDesired(fig, result)
         xAxis, yAxis = getOtherAxes(self.config["axis"])
         self.setupLabels()
         vmin, vmax = self.config["vLim"]
