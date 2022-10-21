@@ -21,7 +21,6 @@ def runCommand(args: List[str], message: str, **kwargs: Any) -> bool:
     except:
         # Welcome to the worlds laziest error handling but I can't be bothered to find out
         # how to properly handle stdout/stderr in subprocess
-        print(message)
         subprocess.check_call(args, **kwargs)
         return False
 
@@ -79,10 +78,9 @@ def runTestInTemporaryDirectory(pybobPath: Path, folder: Path) -> None:
 
 
 def runTest(folder: Path, pybobPath: Path, testName: str) -> None:
-    print(folder, testName)
+    print("running", testName)
     if (folder / "plot.bob").is_file():
         args = ["python", str(pybobPath), "--hide", "plot", ".", "plot.bob"]
     else:
         args = ["python", str(pybobPath), "--hide", "replot", "."]
     assert runCommand(args, f"Test {testName} failed", cwd=folder)
-    print("{} done", testName)

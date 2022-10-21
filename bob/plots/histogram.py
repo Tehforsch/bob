@@ -1,0 +1,51 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.colors as colors
+import astropy.units as pq
+
+from bob.simulation import Simulation
+from bob.snapshot import Snapshot
+from bob.postprocessingFunctions import SnapFn
+from bob.result import Result
+from bob.basicField import BasicField
+from bob.plotConfig import PlotConfig
+from bob.field import Field
+
+
+class Histogram(SnapFn):
+    def __init__(self, config: PlotConfig) -> None:
+        super().__init__(config)
+        self.config.setDefault("only_ionized", False)
+        ionizedStr = "_only_ionized" if self.config["only_ionized"] else ""
+        self.config.setDefault("name", self.config["name"] + f"{ionizedStr}")
+
+    def postHistogram(self, sim: Simulation, snap: Snapshot, fieldX: Field, fieldY: Field) -> Result:
+        result = super().post(sim, snap)
+        dataX = fieldX.getData(snap) / self.config["xUnit"]
+        dataY = fieldY.getData(snap) / self.config["yUnit"]
+        if self.config["only_ionized"]:
+            hpAbundance = BasicField("ChemicalAbundances", 1).getData(snap)
+            indices = np.where(hpAbundance > 0.5)
+            dataX = dataX[indices]
+            dataY = dataY[indices]
+        minX, minY, maxX, maxY = self.config["minX"], self.config["minY"], self.config["maxX"], self.config["maxY"]
+        binsX = np.logspace(np.log10(minX), np.log10(maxX), num=104)
+        binsY = np.logspace(np.log10(minY), np.log10(maxY), num=104)
+        print(np.min(dataX), np.mean(dataX), np.max(dataX))
+        print(np.min(dataY), np.mean(dataY), np.max(dataY))
+        result.H, result.x_edges, result.y_edges = np.histogram2d(dataX, dataY, bins=(binsX, binsY), density=True)
+        result.H = result.H * pq.dimensionless_unscaled
+        result.x_edges = result.x_edges * pq.dimensionless_unscaled
+        result.y_edges = result.y_edges * pq.dimensionless_unscaled
+        return result
+
+    def plot(self, plt: plt.axes, result: Result) -> None:
+        super().plot(plt, result)
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        self.setupLabels()
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+        X, Y = np.meshgrid(result.x_edges, result.y_edges)
+        plt.pcolormesh(X, Y, result.H, norm=colors.LogNorm())
+        plt.colorbar()
