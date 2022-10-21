@@ -22,18 +22,30 @@ class TemperatureDensityHistogram(SnapFn):
         self.config.setDefault("yLabel", "T [UNIT]")
         ionizedStr = "_only_ionized" if self.config["only_ionized"] else ""
         self.config.setDefault("name", self.config["name"] + f"{ionizedStr}")
+        self.config.setDefault("minX", 1e-31)
+        self.config.setDefault("maxX", 5e-26)
+        self.config.setDefault("minY", 5e0)
+        self.config.setDefault("maxY", 2e6)
+        self.config.setDefault("densityUnit", pq.g / pq.cm**3)
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         result = super().post(sim, snap)
-        result.temperature = Temperature().getData(snap) / pq.K
-        result.density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)
+        temperature = Temperature().getData(snap) / pq.K
+        density = BasicField("Density").getData(snap) / self.config["densityUnit"]
         if self.config["only_ionized"]:
             hpAbundance = BasicField("ChemicalAbundances", 1).getData(snap)
             indices = np.where(hpAbundance > 0.5)
-            result.temperature = result.temperature[indices]
-            result.density = result.density[indices]
-        print(np.min(result.temperature), np.mean(result.temperature), np.max(result.temperature))
-        print(np.min(result.density), np.mean(result.density), np.max(result.density))
+            temperature = temperature[indices]
+            density = density[indices]
+        minX, minY, maxX, maxY = self.config["minX"], self.config["minY"], self.config["maxX"], self.config["maxY"]
+        binsX = np.logspace(np.log10(minX), np.log10(maxX), num=104)
+        binsY = np.logspace(np.log10(minY), np.log10(maxY), num=104)
+        print(np.min(temperature), np.mean(temperature), np.max(temperature))
+        print(np.min(density), np.mean(density), np.max(density))
+        result.H, result.x_edges, result.y_edges = np.histogram2d(density, temperature, bins=(binsX, binsY), density=True)
+        result.H = result.H * pq.dimensionless_unscaled
+        result.x_edges = result.x_edges * pq.dimensionless_unscaled
+        result.y_edges = result.y_edges * pq.dimensionless_unscaled
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
@@ -43,14 +55,9 @@ class TemperatureDensityHistogram(SnapFn):
         self.setupLabels()
         ax.set_xscale("log")
         ax.set_yscale("log")
-        minX = 1e-31
-        maxX = 5e-26
-        minY = 5e0
-        maxY = 2e6
-        binsX = np.logspace(np.log10(minX), np.log10(maxX), num=104)
-        binsY = np.logspace(np.log10(minY), np.log10(maxY), num=104)
         plt.xticks([1e-31, 1e-30, 1e-29, 1e-28, 1e-27, 1e-26])
         plt.yticks([1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7])
-        plt.hist2d(result.density, result.temperature, [binsX, binsY], density=True, norm=colors.LogNorm())
-        colorbar = plt.colorbar()
-        colorbar.set_ticks([1e17, 1e22, 1e27])
+        X, Y = np.meshgrid(result.x_edges, result.y_edges)
+        plt.pcolormesh(X, Y, result.H)
+        plt.colorbar()
+        # colorbar.set_ticks([1e17, 1e22, 1e27])
