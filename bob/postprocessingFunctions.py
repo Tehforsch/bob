@@ -36,8 +36,9 @@ class PostprocessingFunction(ABC):
             snap: Snapshot = kwargs["snap"]
             sim: Simulation = kwargs["sim"]
             if sim.params["runParams"] == "0":
-                combined["redshift"] = sim.getRedshift(snap.scale_factor)
+                combined["redshift"] = sim.getRedshift(snap.scale_factor).to_value(pq.dimensionless_unscaled)
         return self.config["name"].format(**combined)
+
 
     def setupLinePlot(self) -> None:
         self.setupLabels()
@@ -87,14 +88,25 @@ class SnapFn(PostprocessingFunction):
         super().__init__(config)
         self.config.setDefault("snapshots", None)
         self.config.setDefault("name", self.name + "_{simName}_{snapName}")
+        self.config.setDefault("showTime", True)
 
-    @abstractmethod
+    def showTime(self, ax: plt.axes, result: Result) -> None:
+        if result.time.unit == pq.s:
+            time = result.time.to(self.config["timeUnit"]).value
+            timeUnit = str(self.config["timeUnit"])
+            ax.text(0, 0, f"Time: {time:.01f} {timeUnit}", fontsize=12)
+        else:
+            ax.text(0, 0, f"Redshift: {result.time:.01f}", fontsize=12)
+
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
-        pass
+        from bob.plots.timePlots import getTimeOrRedshift
+        result = Result()
+        result.time = getTimeOrRedshift(sim, snap)
+        return result
 
-    @abstractmethod
     def plot(self, axes: plt.axes, result: Result) -> None:
-        pass
+        if self.config["showTime"]:
+            self.showTime(ax, result)
 
 
 class SetFn(PostprocessingFunction):

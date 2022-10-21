@@ -24,7 +24,7 @@ class TemperatureDensityHistogram(SnapFn):
         self.config.setDefault("name", self.config["name"] + f"{ionizedStr}")
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
-        result = Result()
+        result = super().post(sim, snap)
         result.temperature = Temperature().getData(snap) / pq.K
         result.density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)
         if self.config["only_ionized"]:
@@ -37,6 +37,7 @@ class TemperatureDensityHistogram(SnapFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
+        super().plot(plt, result)
         fig = plt.figure()
         ax = fig.add_subplot(2, 1, 1)
         self.setupLabels()

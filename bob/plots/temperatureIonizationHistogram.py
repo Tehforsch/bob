@@ -21,7 +21,7 @@ class TemperatureIonizationHistogram(SnapFn):
         self.config.setDefault("yLabel", "T [UNIT]")
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
-        result = Result()
+        result = super().post(sim, snap)
         result.temperature = Temperature().getData(snap)
         result.ionization = BasicField("ChemicalAbundances", 1).getData(snap)
         print(np.min(result.temperature), np.mean(result.temperature), np.max(result.temperature))
@@ -29,6 +29,7 @@ class TemperatureIonizationHistogram(SnapFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
+        super().plot(plt, result)
         fig = plt.figure()
         ax = fig.add_subplot(2, 1, 1)
         self.setupLabels()

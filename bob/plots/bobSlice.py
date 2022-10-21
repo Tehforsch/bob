@@ -13,7 +13,6 @@ from bob.postprocessingFunctions import SnapFn
 from bob.result import Result
 from bob.allFields import allFields, getFieldByName
 from bob.field import Field
-from bob.plots.timePlots import getTimeOrRedshift
 from bob.plotConfig import PlotConfig
 
 
@@ -65,7 +64,6 @@ class Slice(SnapFn):
         self.config.setDefault("logmax0", 0)
         self.config.setDefault("logmax1", 0)
         self.config.setDefault("logmax2", 0)
-        self.config.setDefault("showTime", True)
         self.config.setDefault("timeUnit", pq.Myr)
         self.config.setDefault("relativePosition", 0.5)
         self.config.setDefault("name", self.name + "_{simName}_{snapName}_{field}_{axis}")
@@ -75,8 +73,7 @@ class Slice(SnapFn):
         return getFieldByName(self.config["field"])
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
-        result = Result()
-        result.redshift = getTimeOrRedshift(sim, snap)
+        result = super().post(sim, snap)
         (extent, result.data) = getSlice(self.field, snap, self.config["axis"], self.config["relativePosition"])
         result.extent = list(extent)
         print(f"Field: {self.field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
@@ -97,6 +94,7 @@ class Slice(SnapFn):
         print(np.max(data[:, :, 1]))
 
     def plot(self, plt: plt.axes, result: Result) -> None:
+        super().plot(plt, result)
         xAxis, yAxis = getOtherAxes(self.config["axis"])
         self.setupLabels()
         vmin, vmax = self.config["vLim"]
@@ -109,13 +107,6 @@ class Slice(SnapFn):
             self.image(result.data, result.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
         else:
             self.image(result.data, result.extent, vmin=vmin, vmax=vmax, origin="lower")
-        if self.config["showTime"]:
-            if result.redshift.unit == pq.s:
-                time = result.redshift.to(self.config["timeUnit"]).value
-                timeUnit = str(self.config["timeUnit"])
-                plt.text(0, 0, f"Time: {time:.01f} {timeUnit}", fontsize=12)
-            else:
-                plt.text(0, 0, f"Redshift: {result.redshift:.01f}", fontsize=12)
 
 
 def getAxisByName(name: str) -> np.ndarray:
