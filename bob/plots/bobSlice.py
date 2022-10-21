@@ -64,7 +64,6 @@ class Slice(SnapFn):
         self.config.setDefault("logmax0", 0)
         self.config.setDefault("logmax1", 0)
         self.config.setDefault("logmax2", 0)
-        self.config.setDefault("timeUnit", pq.Myr)
         self.config.setDefault("relativePosition", 0.5)
         self.config.setDefault("name", self.name + "_{simName}_{snapName}_{field}_{axis}")
 

@@ -39,7 +39,6 @@ class PostprocessingFunction(ABC):
                 combined["redshift"] = sim.getRedshift(snap.scale_factor).to_value(pq.dimensionless_unscaled)
         return self.config["name"].format(**combined)
 
-
     def setupLinePlot(self) -> None:
         self.setupLabels()
         if "xLim" in self.config:
@@ -89,6 +88,7 @@ class SnapFn(PostprocessingFunction):
         self.config.setDefault("snapshots", None)
         self.config.setDefault("name", self.name + "_{simName}_{snapName}")
         self.config.setDefault("showTime", True)
+        self.config.setDefault("timeUnit", pq.Myr)
 
     def showTime(self, ax: plt.axes, result: Result) -> None:
         if result.time.unit == pq.s:
@@ -100,13 +100,14 @@ class SnapFn(PostprocessingFunction):
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         from bob.plots.timePlots import getTimeOrRedshift
+
         result = Result()
         result.time = getTimeOrRedshift(sim, snap)
         return result
 
     def plot(self, axes: plt.axes, result: Result) -> None:
         if self.config["showTime"]:
-            self.showTime(ax, result)
+            self.showTime(axes, result)
 
 
 class SetFn(PostprocessingFunction):

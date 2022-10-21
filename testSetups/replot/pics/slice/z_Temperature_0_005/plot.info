@@ -9,7 +9,7 @@ slice:
   logmin0: -9
   logmin1: -9
   logmin2: -9
-  showTime: true
+  showTime: false
   vLim: !!python/tuple
   - 1.0e-06
   - 1.0
