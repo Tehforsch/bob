@@ -111,6 +111,9 @@ class Simulation:
         return FlatLambdaCDM(H0=H0, Om0=Om0, Ob0=Ob0)
 
     def getRedshift(self, scale_factor: float, doAssert: bool = True) -> pq.Quantity:
+        if abs(1.0 - scale_factor) < 1e-4:
+            print("Found scale factor ~= 1, returning redshift 0")
+            return 0.0 * pq.dimensionless_unscaled
         cosmology = self.getCosmology()
         if doAssert:
             assert self.params["ComovingIntegrationOn"]
