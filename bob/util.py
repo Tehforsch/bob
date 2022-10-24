@@ -81,13 +81,16 @@ def walkfiles(path: Path) -> Iterator[Path]:
         for f in files:
             yield Path(root) / f
 
-def display_top_lines_by_memory_usage(snapshot: Any, key_type: Any='lineno', limit: int=3) -> None:
+
+def display_top_lines_by_memory_usage(snapshot: Any, key_type: Any = "lineno", limit: int = 3) -> None:
     # requires calling tracemalloc.start() at the beginning
     # taken from https://stackoverflow.com/questions/552744/how-do-i-profile-memory-usage-in-python
-    snapshot = snapshot.filter_traces((
-        tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
-        tracemalloc.Filter(False, "<unknown>"),
-    ))
+    snapshot = snapshot.filter_traces(
+        (
+            tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+            tracemalloc.Filter(False, "<unknown>"),
+        )
+    )
     top_stats = snapshot.statistics(key_type)
 
     print("Top %s lines" % limit)
@@ -95,11 +98,10 @@ def display_top_lines_by_memory_usage(snapshot: Any, key_type: Any='lineno', lim
         frame = stat.traceback[0]
         # replace "/path/to/module/file.py" with "module/file.py"
         filename = os.sep.join(frame.filename.split(os.sep)[-2:])
-        print("#%s: %s:%s: %.1f KiB"
-              % (index, filename, frame.lineno, stat.size / 1024))
+        print("#%s: %s:%s: %.1f KiB" % (index, filename, frame.lineno, stat.size / 1024))
         line = linecache.getline(frame.filename, frame.lineno).strip()
         if line:
-            print('    %s' % line)
+            print("    %s" % line)
 
     other = top_stats[limit:]
     if other:

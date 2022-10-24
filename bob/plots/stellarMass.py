@@ -12,7 +12,7 @@ from bob.result import Result
 from bob.postprocessingFunctions import SetFn
 from bob.plotConfig import PlotConfig
 from bob.util import getFiles, isclose
-from bob.haloCatalog import GroupFile, getGroupFiles, joinDatasets
+from bob.haloCatalog import GroupFile, GroupFiles
 
 
 class StellarMass(SetFn):
@@ -27,11 +27,10 @@ class StellarMass(SetFn):
 
     def post(self, sims: SimulationSet) -> Result:
         # snaps = [sim.getSnapshotAtRedshift(self.config["redshift"]) for sim in sims]
-        files = getGroupFiles(sims, Path(self.config["groupCatalogFolder"]))
+        files = GroupFiles(sims, Path(self.config["groupCatalogFolder"]))
+        haloMasses = files.haloMasses()
+        stellarMasses = files.stellarMasses()
         result = Result()
-        massUnit = 1e10 * pq.Msun / cu.littleh
-        haloMasses = joinDatasets(files, lambda f: f["Group"]["GroupMassType"][...][:, 0], massUnit)
-        stellarMasses = joinDatasets(files, lambda f: f["Group"]["GroupMassType"][...][:, 4], massUnit)
         _, bins = np.histogram(haloMasses, bins=40)
         print(bins)
 

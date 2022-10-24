@@ -13,6 +13,7 @@ from bob.postprocessingFunctions import SetFn
 from bob.plotConfig import PlotConfig
 from bob.util import getFiles, isclose
 
+
 class GroupFile:
     def __init__(self, path: Path) -> None:
         self.path = path
@@ -28,23 +29,32 @@ class GroupFile:
         return str(self.path.name)
 
 
-def getGroupFiles(sims: SimulationSet, groupFolder: Path) -> List[GroupFile]:
-    timeEpsilon = 9e-3  # for testing. increase this eventually
-    print("STILL USING VERY LARGE EPSILON, DISABLE")
-    originalScaleFactors = [sim.icsFile().attrs["Time"] for sim in sims]
-    assert len(originalScaleFactors) > 0
-    originalScaleFactor = originalScaleFactors[0]
-    assert all(isclose(s, originalScaleFactor) for s in originalScaleFactors)
-    groupCatalogs = [GroupFile(f) for f in getFiles(groupFolder) if "fof_subhalo_tab" in f.name]
-    return [c for c in groupCatalogs if isclose(c.f["Header"].attrs["Time"], originalScaleFactor, epsilon=timeEpsilon)]
+class GroupFiles:
+    def __init__(self, sims: SimulationSet, groupFolder: Path) -> None:
+        timeEpsilon = 9e-3  # for testing. increase this eventually
+        print("STILL USING VERY LARGE EPSILON, DISABLE")
+        originalScaleFactors = [sim.icsFile().attrs["Time"] for sim in sims]
+        assert len(originalScaleFactors) > 0
+        originalScaleFactor = originalScaleFactors[0]
+        assert all(isclose(s, originalScaleFactor) for s in originalScaleFactors)
+        groupCatalogs = [GroupFile(f) for f in getFiles(groupFolder) if "fof_subhalo_tab" in f.name]
+        self.files = [c for c in groupCatalogs if isclose(c.f["Header"].attrs["Time"], originalScaleFactor, epsilon=timeEpsilon)]
 
+    def joinDatasets(self, getDataset: Any, unit: pq.Quantity) -> pq.Quantity:
+        result = None
+        for f in self.files:
+            q = getDataset(f.f)
+            if result is None:
+                result = q
+            else:
+                result = np.concatenate((result, q))
+        return result * unit
 
-def joinDatasets(files: List[GroupFile], getDataset: Any, unit: pq.Quantity) -> pq.Quantity:
-    result = None
-    for f in files:
-        q = getDataset(f.f)
-        if result is None:
-            result = q
-        else:
-            result = np.concatenate((result, q))
-    return result * unit
+    def haloMasses(self) -> pq.Quantity:
+        print("Shouldn't this be part type = 1? see haloCatalog.py")
+        massUnit = 1e10 * pq.Msun / cu.littleh
+        return self.joinDatasets(lambda f: f["Group"]["GroupMassType"][...][:, 0], massUnit)
+
+    def stellarMasses(self) -> pq.Quantity:
+        massUnit = 1e10 * pq.Msun / cu.littleh
+        return self.joinDatasets(lambda f: f["Group"]["GroupMassType"][...][:, 4], massUnit)

@@ -9,7 +9,7 @@ import astropy.units as pq
 class Volume(Field):
     def __init__(self, comoving: bool) -> None:
         self.comoving = comoving
-        
+
     def getData(self, snapshot: Snapshot) -> np.ndarray:
         density = BasicField("Density").getData(snapshot)
         masses = BasicField("Masses").getData(snapshot)
