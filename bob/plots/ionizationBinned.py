@@ -3,6 +3,7 @@ from typing import List
 import numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as pq
+import astropy.cosmology.units as cu
 
 from bob.result import Result
 from bob.plots.timePlots import TimePlot
@@ -21,7 +22,7 @@ class IonizationBinned(TimePlot):
         return "$x_{\\mathrm{H+}}$"
 
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> List[float]:
-        density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)
+        density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3 * cu.littleh**2)
         masses = BasicField("Masses").getData(snap)
         ionization = BasicField("ChemicalAbundances", 1).getData(snap)
         data = []
