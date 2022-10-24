@@ -1,8 +1,9 @@
 import os
-from typing import List, Iterator, Union
+from typing import List, Iterator, Union, Any, Dict
 from pathlib import Path
 import yaml
 import logging
+import astropy.units as pq
 
 try:
     import matplotlib.pyplot as plt
@@ -101,3 +102,30 @@ def runFunctionsWithPlotter(plotter: Plotter, functions: List[PostprocessingFunc
 def create_pic_folder(parent_folder: Path) -> None:
     picFolder = Path(parent_folder, config.picFolder)
     picFolder.mkdir(exist_ok=True)
+
+def getPlotConfig(name: str) -> Dict[str, Any]:
+    function = getFunctionByName(name)
+    plot = function(PlotConfig({}))
+    values = {}
+    def convert(v: Any) -> Any:
+        if isinstance(v, pq.UnitBase) or isinstance(v, pq.Quantity):
+            return str(v)
+        else:
+            return v
+    for (k, v) in plot.config.defaults.items():
+        values[k] = convert(v)
+    for (k, v) in plot.config.items():
+        values[k] = convert(v)
+    for k in plot.config.required:
+        values[k] = "required"
+    d = {}
+    d[name] = values
+    return d
+
+def generatePlotConfig(name: str) -> None:
+    resultFile = Path(f"{name}.bob")
+    if resultFile.is_file():
+        raise ValueError("File already exists: {}".format(resultFile))
+        return
+    with open(resultFile, "w") as f:
+        yaml.dump(getPlotConfig(name), f)

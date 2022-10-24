@@ -7,7 +7,7 @@ from bob.simulationSet import getSimsFromFolders, SimulationSet
 from bob.util import getCommonParentFolder
 from bob.watch import watchPost, watchReplot, getPostCommand
 from bob.plotter import Plotter, PlotFilters, PlotFilter
-from bob.postprocess import getFunctionsFromPlotFile, setMatplotlibStyle, readPlotFile, runFunctionsWithPlotter, create_pic_folder
+from bob.postprocess import getFunctionsFromPlotFile, setMatplotlibStyle, readPlotFile, runFunctionsWithPlotter, create_pic_folder, generatePlotConfig
 
 
 def setupArgs() -> argparse.Namespace:
@@ -49,6 +49,9 @@ def setupArgs() -> argparse.Namespace:
     watchPostParser = subparsers.add_parser("watchPost")
     watchPostParser.add_argument("communicationFolder", type=Path, help="The folder to watch for new commands")
     watchPostParser.add_argument("workFolder", type=Path, help="The work folder to execute the commands in")
+
+    generateParser = subparsers.add_parser("generate")
+    generateParser.add_argument("plot", type=str, help="The name of the plot configuration")
 
     args = parser.parse_args()
     return args
@@ -101,5 +104,8 @@ def main() -> None:
         functions = getFunctionsFromPlotFile(args.plot, True)
         create_pic_folder(parent_folder)
         _ = list(runFunctionsWithPlotter(plotter, functions))
+    elif args.function == "generate":
+        name = args.plot
+        generatePlotConfig(name)
     else:
         raise ValueError(f"Wrong function type: {args.function}")

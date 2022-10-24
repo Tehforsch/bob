@@ -45,4 +45,10 @@ for function in postprocessingFunctions:
 
 
 def getFunctionByName(name: str) -> Type[PostprocessingFunction]:
-    return next(function for function in postprocessingFunctions if function.__name__.lower() == name.lower())
+    try:
+        return next(function for function in postprocessingFunctions if function.__name__.lower() == name.lower())
+    except StopIteration:
+        print(f"Plot function not found: {name}. Available functions:")
+        for function in postprocessingFunctions:
+            print(function.__name__)
+        raise
