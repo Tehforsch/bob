@@ -92,7 +92,7 @@ class Slice(SnapFn):
         print(np.mean(data[:, :, 1]))
         print(np.max(data[:, :, 1]))
 
-    def plot(self, plt: plt.axes, result: Result) -> None:
+    def plot(self, plt: plt.axes, result: Result) -> plt.Figure:
         fig = plt.figure()
         super().showTimeIfDesired(fig, result)
         xAxis, yAxis = getOtherAxes(self.config["axis"])
@@ -107,6 +107,7 @@ class Slice(SnapFn):
             self.image(result.data, result.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
         else:
             self.image(result.data, result.extent, vmin=vmin, vmax=vmax, origin="lower")
+        return fig
 
 
 def getAxisByName(name: str) -> np.ndarray:

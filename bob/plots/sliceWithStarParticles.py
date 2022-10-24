@@ -46,7 +46,7 @@ class SliceWithStarParticles(Slice):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        fig = plt.figure()
+        fig = super().plot(plt, result)
         super().showTimeIfDesired(fig, result)
         if len(result.coords1.shape) > 0:
             logging.debug(f"num stars: {result.coords1.shape[0]}")
