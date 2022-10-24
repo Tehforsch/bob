@@ -18,6 +18,7 @@ from bob.plots.meanFieldOverTime import MeanFieldOverTime
 from bob.plots.luminosityOverTime import LuminosityOverTime
 from bob.plots.sourcePosition import SourcePosition
 from bob.plots.stellarMass import StellarMass
+from bob.plots.luminosityOverHaloMass import LuminosityOverHaloMass
 
 postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     SliceWithStarParticles,
@@ -37,6 +38,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     LuminosityOverTime,
     SourcePosition,
     StellarMass,
+    LuminosityOverHaloMass,
 ]
 
 for function in postprocessingFunctions:

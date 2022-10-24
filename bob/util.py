@@ -1,6 +1,5 @@
 from pathlib import Path
 from typing import List, Iterator, Optional, Any
-import os
 import itertools
 import subprocess
 import logging
@@ -12,7 +11,6 @@ import astropy.units as pq
 import tracemalloc
 import os
 import linecache
-from collections import Counter
 
 
 def getCommonParentFolder(folders: List[Path]) -> Path:

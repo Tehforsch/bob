@@ -1,4 +1,3 @@
-from bob.constants import kB, protonMass, gamma
 from bob.field import Field
 from bob.basicField import BasicField
 from bob.snapshot import Snapshot

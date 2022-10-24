@@ -3,16 +3,13 @@ import astropy.units as pq
 import astropy.cosmology.units as cu
 import matplotlib.pyplot as plt
 import numpy as np
-import h5py
-from typing import List, Any
 
 from bob.util import getArrayQuantity
 from bob.simulationSet import SimulationSet
 from bob.result import Result
 from bob.postprocessingFunctions import SetFn
 from bob.plotConfig import PlotConfig
-from bob.util import getFiles, isclose
-from bob.haloCatalog import GroupFile, GroupFiles
+from bob.haloCatalog import GroupFiles
 
 
 class StellarMass(SetFn):
@@ -26,12 +23,11 @@ class StellarMass(SetFn):
         config.setDefault("numBins", 40)
 
     def post(self, sims: SimulationSet) -> Result:
-        # snaps = [sim.getSnapshotAtRedshift(self.config["redshift"]) for sim in sims]
         files = GroupFiles(sims, Path(self.config["groupCatalogFolder"]))
         haloMasses = files.haloMasses()
         stellarMasses = files.stellarMasses()
         result = Result()
-        _, bins = np.histogram(haloMasses, bins=40)
+        _, bins = np.histogram(haloMasses, bins=self.config["numBins"])
         print(bins)
 
         result.meanBins = []

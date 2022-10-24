@@ -1,16 +1,11 @@
 from pathlib import Path
 import astropy.units as pq
 import astropy.cosmology.units as cu
-import matplotlib.pyplot as plt
 import numpy as np
 import h5py
-from typing import List, Any
+from typing import Any
 
-from bob.util import getArrayQuantity
 from bob.simulationSet import SimulationSet
-from bob.result import Result
-from bob.postprocessingFunctions import SetFn
-from bob.plotConfig import PlotConfig
 from bob.util import getFiles, isclose
 
 
@@ -58,3 +53,9 @@ class GroupFiles:
     def stellarMasses(self) -> pq.Quantity:
         massUnit = 1e10 * pq.Msun / cu.littleh
         return self.joinDatasets(lambda f: f["Group"]["GroupMassType"][...][:, 4], massUnit)
+
+    def center_of_mass(self) -> pq.Quantity:
+        return self.joinDatasets(lambda f: f["Group"]["GroupCM"][...], pq.kpc / pq.h)
+
+    def r_crit200(self) -> pq.Quantity:
+        return self.joinDatasets(lambda f: f["Group"]["Group_R_Crit200"][...], pq.kpc / pq.h)
