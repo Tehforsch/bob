@@ -13,10 +13,11 @@ from bob.field import Field
 
 
 class BasicField(Field):
-    def __init__(self, name: str, index: Optional[int] = None, comoving: bool = False) -> None:
+    def __init__(self, name: str, index: Optional[int] = None, comoving: bool = False, partType: int = 0) -> None:
         self.name = name
         self.index = index
         self.comoving = comoving
+        self.partType = partType
 
     def __repr__(self) -> str:
         if self.index is not None:
@@ -79,7 +80,7 @@ class BasicField(Field):
 
     def getData(self, snapshot: "Snapshot") -> pq.Quantity:
         try:
-            unit = self.getArbitraryUnit(snapshot, snapshot.hdf5File["PartType0"][self.name])
+            unit = self.getArbitraryUnit(snapshot, snapshot.hdf5File[f"PartType{self.partType}"][self.name])
         except KeyError:
             if self.name == "ChemicalAbundances":
                 unit = pq.dimensionless_unscaled
@@ -91,7 +92,7 @@ class BasicField(Field):
                 unit = 1 / snapshot.timeUnit
             else:
                 raise ValueError("Fix units for field: {}".format(self.name))
-        fieldData = readIntoNumpyArray(snapshot.hdf5File["PartType0"][self.name]) * unit
+        fieldData = readIntoNumpyArray(snapshot.hdf5File[f"PartType{self.partType}"][self.name]) * unit
         if self.index is None:
             return fieldData
         else:

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Iterator, Optional
+from typing import List, Iterator, Optional, Any
 import os
 import itertools
 import subprocess
@@ -81,7 +81,7 @@ def walkfiles(path: Path) -> Iterator[Path]:
         for f in files:
             yield Path(root) / f
 
-def display_top_lines_by_memory_usage(snapshot, key_type='lineno', limit=3) -> None:
+def display_top_lines_by_memory_usage(snapshot: Any, key_type: Any='lineno', limit: int=3) -> None:
     # requires calling tracemalloc.start() at the beginning
     # taken from https://stackoverflow.com/questions/552744/how-do-i-profile-memory-usage-in-python
     snapshot = snapshot.filter_traces((
