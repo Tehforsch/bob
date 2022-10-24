@@ -9,6 +9,7 @@ from bob.util import getArrayQuantity
 from bob.postprocessingFunctions import SetFn
 from bob.simulationSet import SimulationSet
 from bob.snapshotFilter import SnapshotFilter
+from bob.volume import Volume
 
 
 class IonizationLevel(SetFn):
@@ -36,10 +37,7 @@ class IonizationLevel(SetFn):
         for sim in sims:
             snapshots = SnapshotFilter(self.config["snapshots"]).get_snapshots(sim)
             for snap in snapshots:
-                print(snap)
-                density = BasicField("Density").getData(snap)
-                masses = BasicField("Masses").getData(snap)
-                volumes = masses / density
+                volumes = Volume(comoving=True).getData(snap)
                 totalVolume = np.sum(volumes)
                 ionization = BasicField("ChemicalAbundances", 1).getData(snap)
                 volumeFraction = []
