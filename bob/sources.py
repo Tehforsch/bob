@@ -31,7 +31,12 @@ class Sources:
     def get136IonisationRate(self, sim: Any) -> np.ndarray:
         import astropy.units as pq
 
-        return self.sed[:, 2] * sim.params["UnitPhotons_per_s"] / pq.s
+        return self.sed[:, 2] / pq.s
+
+    def getCoords(self, sim: Any) -> np.ndarray:
+        import astropy.units as pq
+
+        return self.coord * sim.params["UnitLength_in_cm"] * pq.cm
 
     def addSource(self, coord: np.ndarray, sed: np.ndarray, time: Union[List[float], float] = None) -> None:
         timeArray = np.zeros(len(coord)) if time is None else time

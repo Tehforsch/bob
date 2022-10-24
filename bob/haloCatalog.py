@@ -26,11 +26,11 @@ class GroupFile:
 
 class GroupFiles:
     def __init__(self, sims: SimulationSet, groupFolder: Path) -> None:
-        timeEpsilon = 9e-3  # for testing. increase this eventually
-        print("STILL USING VERY LARGE EPSILON, DISABLE")
+        timeEpsilon = 9e-8
         originalScaleFactors = [sim.icsFile().attrs["Time"] for sim in sims]
         assert len(originalScaleFactors) > 0
         originalScaleFactor = originalScaleFactors[0]
+        print(originalScaleFactors)
         assert all(isclose(s, originalScaleFactor) for s in originalScaleFactors)
         groupCatalogs = [GroupFile(f) for f in getFiles(groupFolder) if "fof_subhalo_tab" in f.name]
         self.files = [c for c in groupCatalogs if isclose(c.f["Header"].attrs["Time"], originalScaleFactor, epsilon=timeEpsilon)]
@@ -55,7 +55,7 @@ class GroupFiles:
         return self.joinDatasets(lambda f: f["Group"]["GroupMassType"][...][:, 4], massUnit)
 
     def center_of_mass(self) -> pq.Quantity:
-        return self.joinDatasets(lambda f: f["Group"]["GroupCM"][...], pq.kpc / pq.h)
+        return self.joinDatasets(lambda f: f["Group"]["GroupCM"][...], pq.kpc / cu.littleh)
 
     def r_crit200(self) -> pq.Quantity:
-        return self.joinDatasets(lambda f: f["Group"]["Group_R_Crit200"][...], pq.kpc / pq.h)
+        return self.joinDatasets(lambda f: f["Group"]["Group_R_Crit200"][...], pq.kpc / cu.littleh)
