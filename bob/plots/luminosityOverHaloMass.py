@@ -30,13 +30,11 @@ class LuminosityOverHaloMass(SetFn):
     def post(self, sims: SimulationSet) -> Result:
         files = GroupFiles(sims, Path(self.config["groupCatalogFolder"]))
         haloMasses = files.haloMasses()
-        center_of_mass = files.center_of_mass()
-        radius = files.r_crit200()
+        lengthUnit = pq.kpc / cu.littleh
+        center_of_mass = files.center_of_mass().to(lengthUnit)
+        print("using fake radius")
+        radius = (files.r_crit200() * 10).to(lengthUnit)
         result = Result()
-        _, bins = np.histogram(haloMasses, bins=self.config["numBins"])
-
-        result.luminosity = []
-
         assert len(sims) == 1, "Not implemented for more than one sim"
         sim = sims[0]
         if self.config["postprocessing"]:
@@ -45,22 +43,22 @@ class LuminosityOverHaloMass(SetFn):
             snap = sim.getSnapshotAtRedshift(self.config["redshift"])
         coords = BasicField("Coordinates", partType=0, comoving=True).getData(snap)
         sourceField = SourceField(sim).getData(snap)
-        lengthUnit = pq.kpc / cu.littleh
         tree = cKDTree(coords.to(lengthUnit, cu.with_H0(snap.H0)))
+        luminosities = np.zeros(haloMasses.shape) / pq.s
+        for (i, (pos, r)) in enumerate(zip(center_of_mass, radius)):
+            indices = tree.query_ball_point(pos, r)
+            luminosities[i] = np.sum(sourceField[indices])
+
+        _, bins = np.histogram(haloMasses, bins=self.config["numBins"])
+        result.luminosity = []
 
         for (bstart, bend) in zip(bins, bins[1:]):
             indices = np.where((haloMasses >= bstart) & (haloMasses < bend))
-            com = center_of_mass[indices].to(lengthUnit)
-            radii = radius[indices].to(lengthUnit)
-            luminosities = np.zeros(radii.shape) / pq.s
-            for (i, (pos, r)) in enumerate(zip(com, radii)):
-                indices = tree.query_ball_point(pos, r)
-                luminosities[i] = np.sum(sourceField[indices])
             if len(luminosities) == 0:
                 result.luminosity.append(0.0 / pq.s)
             else:
-                result.luminosity.append(np.mean(luminosities))
-        result.bins = getArrayQuantity(bins[1:])
+                result.luminosity.append(np.mean(luminosities[indices]))
+        result.bins = bins[1:]
         result.luminosity = getArrayQuantity(result.luminosity)
         print(getArrayQuantity(result.luminosity))
         return result
