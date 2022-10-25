@@ -28,6 +28,7 @@ class LuminosityOverHaloMass(SetFn):
         config.setDefault("postprocessing", True)
         config.setDefault("radiusFactor", 1.0)
         config.setDefault("scatter", False)
+        config.setDefault("name", self.config["name"].replace("luminosityOverHaloMass", "luminosityOverHaloMassScatter"))
 
     def post(self, sims: SimulationSet) -> Result:
         files = GroupFiles(sims, Path(self.config["groupCatalogFolder"]))

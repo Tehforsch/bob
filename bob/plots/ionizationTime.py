@@ -27,6 +27,7 @@ class IonizationTime(SetFn):
             self.config.setDefault("vUnit", pq.cm / pq.s)
             self.config.setDefault("cLabel", "$v [\\mathrm{cm} / \mathrm{s}]$")
             self.config.setDefault("vLim", (0.0, 2e0))
+            config.setDefault("name", self.config["name"].replace("ionizationTime", "ionizationVelocity"))
         else:
             self.config.setDefault("vUnit", pq.Myr)
             self.config.setDefault("cLabel", "$t [\\mathrm{Myr}]$")
