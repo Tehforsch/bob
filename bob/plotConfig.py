@@ -1,3 +1,4 @@
+import astropy.units as pq
 from typing import Any, Dict, Optional, List, Set
 
 
@@ -13,6 +14,12 @@ class PlotConfig(dict):
         self.defaults[param] = value
         self.paramMentioned(param)
         self.rememberChoices(param, choices)
+        if type(value) == pq.Quantity:
+            if param in self:
+                try:
+                    self[param] = pq.Quantity(self[param])
+                except ValueError:
+                    pass
 
     def setRequired(self, param: str, choices: Optional[List] = None) -> None:
         self.paramMentioned(param)

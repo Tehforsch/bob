@@ -6,7 +6,7 @@ import astropy.units as pq
 
 
 class Volume(Field):
-    def __init__(self, comoving: bool) -> None:
+    def __init__(self, comoving: bool = False) -> None:
         self.comoving = comoving
 
     def getData(self, snapshot: Snapshot) -> np.ndarray:
