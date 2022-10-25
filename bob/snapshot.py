@@ -25,7 +25,10 @@ class Snapshot:
             self.minExtent, self.maxExtent = sim.subboxCoords()
             self.center = (self.maxExtent + self.minExtent) * 0.5
         else:
-            self.number = SnapNumber(int(self.name))
+            try:
+                self.number = SnapNumber(int(self.name))
+            except ValueError:
+                self.number = SnapNumber(-1)
             self.minExtent = np.array([0.0, 0.0, 0.0]) * self.lengthUnit
             self.maxExtent = np.array([1.0, 1.0, 1.0]) * sim.params["BoxSize"] * self.lengthUnit
             self.center = (self.maxExtent + self.minExtent) * 0.5
@@ -38,11 +41,11 @@ class Snapshot:
         return field in self.hdf5File["PartType0"]
 
     def getName(self) -> str:
-        match = re.match("snap_(.*).hdf5", self.filename.name)
-        if match is None:
-            raise ValueError("Wrong snapshot filename")
+        m = re.match("snap_(.*).hdf5", self.filename.name)
+        if m is None:
+            return self.filename.name.replace(".hdf5", "")
         else:
-            return match.groups()[0]
+            return m.groups()[0]
 
     @property  # type: ignore
     def coordinates(self) -> pq.Quantity:
