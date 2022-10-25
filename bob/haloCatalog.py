@@ -46,16 +46,15 @@ class GroupFiles:
         return result * unit
 
     def haloMasses(self) -> pq.Quantity:
-        print("Shouldn't this be part type = 1? see haloCatalog.py")
         massUnit = 1e10 * pq.Msun / cu.littleh
-        return self.joinDatasets(lambda f: f["Group"]["GroupMassType"][...][:, 0], massUnit)
+        return self.joinDatasets(lambda f: f["Subhalo"]["SubhaloMassType"][...][:, 1], massUnit)
 
     def stellarMasses(self) -> pq.Quantity:
         massUnit = 1e10 * pq.Msun / cu.littleh
-        return self.joinDatasets(lambda f: f["Group"]["GroupMassType"][...][:, 4], massUnit)
+        return self.joinDatasets(lambda f: f["Subhalo"]["SubhaloMassType"][...][:, 4], massUnit)
 
     def center_of_mass(self) -> pq.Quantity:
-        return self.joinDatasets(lambda f: f["Group"]["GroupCM"][...], pq.kpc / cu.littleh)
+        return self.joinDatasets(lambda f: f["Subhalo"]["SubhaloCM"][...], pq.kpc / cu.littleh)
 
-    def r_crit200(self) -> pq.Quantity:
-        return self.joinDatasets(lambda f: f["Group"]["Group_R_Crit200"][...], pq.kpc / cu.littleh)
+    def halfmass_rad(self) -> pq.Quantity:
+        return self.joinDatasets(lambda f: f["Subhalo"]["SubhaloHalfmassRad"][...], pq.kpc / cu.littleh)
