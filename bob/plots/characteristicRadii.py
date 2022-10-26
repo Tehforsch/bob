@@ -31,9 +31,9 @@ def getCharacteristicRadii(snap: Snapshot, distance: pq.Quantity) -> Result:
     distance = distance.to_value(lengthUnit, cu.with_H0(snap.H0))
     hpAbundance = BasicField("ChemicalAbundances", 1).getData(snap)
     ionizedCoordinates = coordinates[np.where(hpAbundance > 0.5)]
-    clustering = AgglomerativeClustering(distance_threshold=distance, n_clusters=None)
+    clustering = AgglomerativeClustering(distance_threshold=distance, n_clusters=None, linkage="single")
     clustering.fit(ionizedCoordinates)
-    print(f"Found {clustering.n_clusters_} clusters.")
+    print(f"Found {clustering.n_clusters_} clusters for snap: {snap}.")
 
     def clusterRadius(i: int) -> pq.Quantity:
         totalVolume = np.sum(volumes[np.where(clustering.labels_ == i)])

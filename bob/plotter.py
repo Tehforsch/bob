@@ -1,9 +1,10 @@
 import os
 import yaml
-from typing import Iterator, List, Optional, Callable, Union
+from typing import Iterator, List, Optional, Callable, Union, Tuple, Any
 from pathlib import Path
 import matplotlib.pyplot as plt
 import logging
+import astropy.units as pq
 
 from bob.postprocessingFunctions import (
     SetFn,
@@ -21,6 +22,13 @@ from bob.util import zeroPadToLength, showImageInTerminal, walkfiles, getFolderN
 from bob.snapshotFilter import SnapshotFilter
 
 QuotientParams = Optional[Union[List[str], Single]]
+
+
+def transformReadable(item: Tuple[str, Any]) -> Tuple[str, Any]:
+    (k, v) = item
+    if type(v) == pq.Quantity:
+        return (k, str(v))
+    return (k, v)
 
 
 class PlotName:
@@ -158,7 +166,7 @@ class Plotter:
 
     def savePlotInfo(self, fn: PostprocessingFunction, plotDataFolder: Path) -> None:
         filename = plotDataFolder / bob.config.plotSerializationFileName
-        yaml.dump({fn.name: dict(fn.config.items())}, open(filename, "w"))
+        yaml.dump({fn.name: dict(transformReadable(item) for item in fn.config.items())}, open(filename, "w"))
 
     def saveResult(self, result: Result, plotDataFolder: Path) -> None:
         result.save(plotDataFolder)

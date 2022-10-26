@@ -2,13 +2,14 @@ import matplotlib.pyplot as plt
 import scipy
 import numpy as np
 import astropy.units as pq
+from typing import Tuple, Any
 
 from bob.simulationSet import SimulationSet
 from bob.basicField import BasicField
 from bob.result import Result
 from bob.postprocessingFunctions import SetFn
 from bob.plots.bobSlice import getSlice
-from bob.plots.ionization import translateTime
+from bob.plots.ionization import scaleFactorToAge, scaleFactorToRedshift
 from bob.plotConfig import PlotConfig
 import bob.config as config
 from bob.util import isclose
@@ -23,19 +24,26 @@ class IonizationTime(SetFn):
         self.config.setDefault("yLabel", "$y [h^{-1} \\mathrm{UNIT}]$")
         self.config.setDefault("velocity", False)  # Plot the velocity of the ionization front instead
         if self.config["velocity"]:
-            self.config.setDefault("smoothingSigma", 0.0)
+            self.config.setDefault("smoothingSigma", 0.0001 * pq.kpc)
             self.config.setDefault("vUnit", pq.cm / pq.s)
             self.config.setDefault("cLabel", "$v [\\mathrm{cm} / \mathrm{s}]$")
-            self.config.setDefault("vLim", (0.0, 2e0))
-            config.setDefault("name", self.config["name"].replace("ionizationTime", "ionizationVelocity"))
+            self.config.setDefault("vLim", (0.0, 2e8))
+            self.config.setDefault("name", self.config["name"].replace("ionizationTime", "ionizationVelocity"))
         else:
-            self.config.setDefault("vUnit", pq.Myr)
-            self.config.setDefault("cLabel", "$t [\\mathrm{Myr}]$")
-            self.config.setDefault("vLim", (0.0, 2e2))
+            self.config.setDefault("time", "z")
+            if self.config["time"] == "z":
+                self.config.setDefault("vUnit", pq.dimensionless_unscaled)
+                self.config.setDefault("cLabel", "$z$")
+                self.config.setDefault("vLim", (0.0, 20))
+            else:
+                self.config.setDefault("vUnit", pq.Myr)
+                self.config.setDefault("cLabel", "$t [\\mathrm{Myr}]$")
+                self.config.setDefault("vLim", (0.0, 2e2))
 
     def post(self, simSet: SimulationSet) -> Result:
-        data = self.getIonizationTimeData(simSet)
+        (extent, data) = self.getIonizationTimeData(simSet)
         result = Result()
+        result.extent = list(extent)
         if self.config["velocity"]:
             if len(simSet) > 1:
                 raise NotImplementedError("ionization velocity not implemented for multiple sims")
@@ -49,7 +57,8 @@ class IonizationTime(SetFn):
             result.data = 1.0 / (sum(np.abs(d) for d in grad))
             result.data[np.isnan(result.data)] = 0.0
             result.data[np.isinf(result.data)] = 0.0
-            result.data = dataUnit * scipy.ndimage.gaussian_filter(result.data, self.config["smoothingSigma"])
+            sigma = self.config["smoothingSigma"].to_value(lengthUnit)
+            result.data = dataUnit * scipy.ndimage.gaussian_filter(result.data, sigma)
         else:
             result.data = data
         return result
@@ -58,25 +67,20 @@ class IonizationTime(SetFn):
         self.setupLabels()
 
         vmin, vmax = self.config["vLim"]
-        self.image(result.data, self.extent, cmap="Reds", vmin=vmin, vmax=vmax)
+        self.image(result.data, result.extent, cmap="Reds", vmin=vmin, vmax=vmax)
 
-    def getIonizationTimeData(self, simSet: SimulationSet) -> pq.Quantity:
-        ionizationTime = None
-        for sim in simSet:
-            if len(sim.snapshots) == 0:
-                print("No snapshots in sim? Continuing.")
-                continue
-            snap = sim.snapshots[-1]
-            (self.extent, newIonizationTime) = getSlice(BasicField("IonizationTime"), snap, "z", 0.5)
-            redshift, scale_factor = translateTime(sim, newIonizationTime)
-            if ionizationTime is None:
-                ionizationTime = newIonizationTime
-            else:
-                unit = ionizationTime.unit
-                value1 = ionizationTime.to(unit).value
-                value2 = newIonizationTime.to(unit).value
-                ionizationTime = np.minimum(value1, value2) * unit
-        if ionizationTime is not None:
-            return ionizationTime
+    def getIonizationTimeData(self, simSet: SimulationSet) -> Tuple[Any, pq.Quantity]:
+        if len(simSet) != 1:
+            raise NotImplementedError("No implementation for multiple sims per set for ionizationTime")
+        sim = simSet[0]
+        if len(sim.snapshots) == 0:
+            raise ValueError("No snapshots in sim")
+        snap = sim.snapshots[-1]
+        (extent, ionizationTime) = getSlice(BasicField("IonizationTime"), snap, "z", 0.5)
+        if not self.config["velocity"] and self.config["time"] == "z":
+            redshift = scaleFactorToRedshift(ionizationTime)
+            return extent, redshift
         else:
-            raise ValueError("No sims/snaps")
+            cosmology = sim.getCosmology()
+            return extent, scaleFactorToAge(cosmology, ionizationTime)
+            raise NotImplementedError("anything other than redshift not implemented - return age here?")

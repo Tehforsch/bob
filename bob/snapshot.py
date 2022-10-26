@@ -19,6 +19,7 @@ class Snapshot:
     def __init__(self, sim: "Simulation", filename: Path) -> None:
         self.filename = filename
         self.name = self.getName()
+        self.sim = sim
         if "subbox" in self.name:
             numbers = self.name.replace("subbox", "").split("_")
             self.number: SnapNumber = SnapNumber((int(numbers[0]), int(numbers[1])))
@@ -76,7 +77,10 @@ class Snapshot:
 
     @property
     def timeUnit(self) -> pq.Quantity:
-        return self.lengthUnit / self.velocityUnit
+        if self.sim.params["ComovingIntegrationOn"] == 0:
+            return self.lengthUnit / self.velocityUnit
+        else:
+            return pq.dimensionless_unscaled
 
     @property
     def energyUnit(self) -> pq.Quantity:
