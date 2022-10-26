@@ -35,6 +35,7 @@ class Test(unittest.TestCase):
         tests = [
             "bobSlice",
             "combinedFieldSlice",
+            "ionizationTime",
             "meanFieldOverTimeInternalEnergy",
             "multipleSlices",
             "multipleSlicesSubstitutions",

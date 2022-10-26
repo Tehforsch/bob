@@ -6,6 +6,7 @@ from typing import Dict, Any, List, Tuple, Union
 import yaml
 from astropy.cosmology import FlatLambdaCDM, z_at_value
 import astropy.units as pq
+from enum import Enum
 
 import bob.config as config
 from bob.snapshot import Snapshot
@@ -36,6 +37,17 @@ def getParamValue(type_: str, value: Any) -> Union[str, bool, int, float, List[i
     else:
         print(type_)
         return NotImplemented
+
+
+class SimType(Enum):
+    HYDRO_STANDARD = 0
+    HYDRO_COSMOLOGICAL = 1
+    POST_STANDARD = 2
+    POST_COSMOLOGICAL = 3
+    POST_CASCADE = 4
+
+    def is_cosmological(self) -> bool:
+        return self == SimType.HYDRO_COSMOLOGICAL or self == SimType.POST_COSMOLOGICAL
 
 
 class Simulation:
@@ -126,6 +138,20 @@ class Simulation:
     def getAge(self, scale_factor: float, doAssert: bool = True) -> float:
         cosmology = self.getCosmology()
         return cosmology.age(self.getRedshift(scale_factor, doAssert=doAssert))
+
+    def simType(self) -> SimType:
+        comoving = self.params["ComovingIntegrationOn"]
+        hydroOn = not ("21" in self.params["runParams"])
+        if comoving:
+            if hydroOn:
+                return SimType.HYDRO_COSMOLOGICAL
+            else:
+                return SimType.POST_COSMOLOGICAL
+        else:
+            if hydroOn:
+                return SimType.HYDRO_STANDARD
+            else:
+                return SimType.POST_STANDARD
 
     def __hash__(self) -> int:
         return str(self.folder).__hash__()

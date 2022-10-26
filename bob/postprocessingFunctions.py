@@ -60,13 +60,15 @@ class PostprocessingFunction(ABC):
         yUnit = pq.Unit(self.config["yUnit"])
         plt.hist2d(xQuantity.to(xUnit).value, yQuantity.to(yUnit).value, *args, **kwargs)
 
-    def image(self, image: pq.Quantity, extent: Tuple[pq.Quantity, pq.Quantity, pq.Quantity, pq.Quantity], *args: Any, **kwargs: Any) -> None:
+    def image(
+        self, ax: plt.Axes, image: pq.Quantity, extent: Tuple[pq.Quantity, pq.Quantity, pq.Quantity, pq.Quantity], *args: Any, **kwargs: Any
+    ) -> None:
         xUnit = pq.Unit(self.config["xUnit"])
         yUnit = pq.Unit(self.config["yUnit"])
         extent = (extent[0].to_value(xUnit), extent[1].to_value(xUnit), extent[2].to_value(yUnit), extent[3].to_value(yUnit))
         vUnit = pq.Unit(self.config["vUnit"])
-        plt.imshow(image.to(vUnit).value, extent=extent, *args, **kwargs)
-        cbar = plt.colorbar()
+        image = ax.imshow(image.to(vUnit).value, extent=extent, *args, **kwargs)
+        cbar = plt.colorbar(image)
         cbar.set_label(self.config["cLabel"])
 
     def scatter(self, xdata: pq.Quantity, ydata: pq.Quantity, *args: Any, **kwargs: Any) -> None:

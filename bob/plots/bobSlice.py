@@ -104,9 +104,9 @@ class Slice(SnapFn):
                 self.transformLog(result.data)
         print(f"min: {np.min(result.data)}, max: {np.max(result.data)}")
         if self.config["log"]:
-            self.image(result.data, result.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
+            self.image(plt, result.data, result.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
         else:
-            self.image(result.data, result.extent, vmin=vmin, vmax=vmax, origin="lower")
+            self.image(plt, result.data, result.extent, vmin=vmin, vmax=vmax, origin="lower")
         return fig
 
 

@@ -1,0 +1,1893 @@
+---
+DO_NOT_MOVE_GAS:
+  Bool: false
+MIN_METALLICITY_ON_STARTUP:
+  Bool: false
+DIFFUSION:
+  Bool: false
+OTVET_OUTPUT_ET:
+  Bool: false
+AB_TURB:
+  Bool: false
+RT_ALLOW_ABSORBING_CELLS:
+  Bool: false
+COMPUTE_POTENTIAL_ENERGY:
+  Bool: false
+ActivePartFracForNewDomainDecomp:
+  Float:
+    - 0.01
+    - "0.010000"
+IDS_OFFSET:
+  Bool: false
+MRT_CHEM_SG:
+  Bool: false
+MRT_SETUP_SPECIAL_BOUNDARIES:
+  Bool: false
+REGULARIZE_MESH_OPTIMAL:
+  Bool: false
+H2OpacityOption:
+  Int: 0
+TimeBetSnapshot:
+  Float:
+    - 0.001
+    - "1.00e-03"
+TETRA_INDEX_IN_FACE:
+  Bool: false
+GFM_WINDS_THERMAL:
+  Bool: false
+ABHE:
+  Bool: false
+UVFieldStrength:
+  Float:
+    - 0.0
+    - "0.000000e+00"
+MRT_BH_IR_INJECTION:
+  Bool: false
+RESET_WRONG_RHO_JUMPS:
+  Bool: false
+BH_ADIOS_ONLY_ABOVE_MINIMUM_DENSITY:
+  Bool: false
+FM_RADIATION_FEEDBACK:
+  Bool: false
+BH_BONDI_DENSITY:
+  Bool: false
+BOUNDARY_REFL_ACTS_AS_SOURCE:
+  Bool: false
+BLACK_HOLES:
+  Bool: false
+ENLARGE_DYNAMIC_RANGE_IN_TIME:
+  Bool: false
+FIX_PATHSCALE_MPI_STATUS_IGNORE_BUG:
+  Bool: true
+FOF_STOREIDS:
+  Bool: false
+SX_RECOMBINE:
+  Bool: false
+MinimumDensityOnStartUp:
+  Float:
+    - 0.0
+    - "0.000000"
+EXACT_GRAVITY_FOR_PARTICLE_TYPE:
+  Bool: false
+RIEMANN_HLLD:
+  Bool: false
+OTVET_NOCOLLISION_IONIZATION:
+  Bool: false
+MRT_RADIATION_PRESSURE:
+  Bool: false
+MRT:
+  Bool: false
+RefinementCriterion:
+  Int: 1
+MHD_DONT_PRINT_BMAGSUM:
+  Bool: false
+SWEEP_NO_WARMSTARTING:
+  Bool: false
+STATICISO:
+  Bool: false
+WINDTUNNEL_EXTERNAL_SOURCE:
+  Bool: false
+VORONOI_NEW_IMAGE:
+  Bool: false
+SHUTOFFTIME_UPDATE:
+  Bool: false
+TypeOfTimestepCriterion:
+  Int: 0
+CHEM_IMAGE:
+  Bool: false
+SX_LOAD_BALANCE:
+  Bool: false
+ADVECTION_ONLY:
+  Bool: false
+ComovingIntegrationOn:
+  Int: 0
+NOH_PROBLEM:
+  Bool: false
+INDIVIDUAL_GRAVITY_SOFTENING:
+  Bool: false
+SGChemInitHPAbund:
+  Float:
+    - 0.0
+    - "0.0"
+MRT_INIT_IONIZATION:
+  Bool: false
+ALPHA_VISCOSITY:
+  Bool: false
+SIDM_NO_KINEMATICS:
+  Bool: false
+CourantFac:
+  Float:
+    - 0.15
+    - "0.150000"
+CellShapingSpeed:
+  Float:
+    - 1.0
+    - "1.000000"
+BH_ADIOS_RANDOMIZED:
+  Bool: false
+NODEREFINE_BACKGROUND_GRID:
+  Bool: false
+ResubmitOn:
+  Int: 0
+SHOCK_FINDER_BEFORE_OUTPUT:
+  Bool: false
+FOF:
+  Bool: false
+OTVET_CHEMISTRY_PS2009:
+  Bool: false
+TRACER_TRAJECTORY:
+  Bool: false
+OTVET_NOTMOVEGAS:
+  Bool: false
+COSMIC_RAYS_DIFFUSION_EXPLICIT:
+  Bool: false
+HOST_MEMORY_REPORTING:
+  Bool: true
+Omega0:
+  Float:
+    - 0.0
+    - "0.000000"
+NETWORK_SCREENING:
+  Bool: false
+EXTENDED_GHOST_SEARCH:
+  Bool: false
+OUTPUT_MCTRNUM:
+  Bool: false
+DISK_MASS_M0:
+  Bool: false
+BH_FRICTION_AGGRESSIVE:
+  Bool: false
+COSMIC_RAYS_COOLING:
+  Bool: false
+COFFEE_PROBLEM:
+  Bool: false
+OUTPUT_XDMF:
+  Bool: false
+LONGIDS:
+  Bool: false
+BH_PRESSURE_CRITERION:
+  Bool: false
+OTVET_MODIFY_EDDINGTON_TENSOR:
+  Bool: false
+IMPLICIT_OHMIC_DIFFUSION:
+  Bool: false
+SX_DISPLAY_MEMORY:
+  Bool: false
+BH_NEW_CENTERING:
+  Bool: false
+TestSourcePosZ:
+  Float:
+    - 0.5
+    - "0.5"
+ATMOSPHERE_GENERAL_RELATIVITY:
+  Bool: false
+CpuTimeBetRestartFile:
+  Float:
+    - 7200.0
+    - "7200.0"
+SX_DISPLAY_TIMERS:
+  Bool: false
+NO_SCALAR_GRADIENTS:
+  Bool: false
+TestSourceRate246:
+  Float:
+    - 0.0
+    - "0.0"
+GFM_DUST_DESTMODE:
+  Bool: false
+MODIFIED_EOS:
+  Bool: false
+MEASURE_DISSIPATION_RATE:
+  Bool: false
+OutputListFilename:
+  Str: output/Outputlist.txt
+EXTERNALSHEARBOX:
+  Bool: false
+RADCOOL_HOTHALO:
+  Bool: false
+NFW_E:
+  Bool: false
+RESTART_DEBUG:
+  Bool: false
+FM_VAR_SN_EFF:
+  Bool: false
+CONSERVED_LIMITER:
+  Bool: false
+MRT_METAL_COOLING:
+  Bool: false
+SWEEP:
+  Bool: true
+ISM_H2_SFR:
+  Bool: false
+SX_OUTPUT_IMAGE:
+  Bool: false
+SX_PP_ZERO_SNAPSHOT:
+  Bool: false
+DELAYED_COOLING_TURB:
+  Bool: false
+MHD_CT:
+  Bool: false
+SPECIAL_RELATIVITY_HLLC:
+  Bool: false
+SGCHEM_SUPPRESS_DVODE_WARNING:
+  Bool: false
+CALCULATE_VERTEX_VELOCITY_DIVERGENCE:
+  Bool: false
+DeutAbund:
+  Float:
+    - 0.000026
+    - "2.600000e-05"
+BH_ADIOS_WIND:
+  Bool: false
+OxyAbund:
+  Float:
+    - 0.0
+    - "0.000000e+00"
+FLD_ANISOTROPIC_CIRCULAR:
+  Bool: false
+ErrTolForceAcc:
+  Float:
+    - 0.0025
+    - "0.002500"
+OTVET_INCLUDE_HE:
+  Bool: false
+BH_BONDI_CAPTURE:
+  Bool: false
+BH_FRICTION:
+  Bool: false
+LOAD_TYPES:
+  Bool: false
+SGCHEM_DISABLE_COMPTON_COOLING:
+  Bool: true
+SIDM_NO_TIMESTEP:
+  Bool: false
+VORONOI_MULTIPLE_PROJECTIONS:
+  Bool: false
+BH_MAGNETIC_DIPOLAR_BUBBLES:
+  Bool: false
+SGCHEM_NO_MOLECULES:
+  Bool: true
+VORONOI_MESHOUTPUT:
+  Bool: false
+COSMIC_RAYS_DIFFUSION_FULL_NORMAL_GRADIENT:
+  Bool: false
+MRT_LSF_GRADIENTS:
+  Bool: false
+MHD:
+  Bool: false
+IMPOSE_PINNING:
+  Bool: true
+MRT_IR_LTE:
+  Bool: false
+FLD_HYPRE:
+  Bool: false
+OUTPUTACCELERATION:
+  Bool: false
+DerefinementCriterion:
+  Int: 1
+EXTERNALGRAVITY:
+  Bool: false
+MHD_POWELL_LIMIT_TIMESTEP:
+  Bool: false
+UNLIMITED_GRADIENTS:
+  Bool: false
+RESTRICT_KAPPA:
+  Bool: false
+GFM_DISCRETE_ENRICHMENT:
+  Bool: false
+BH_USE_GASVEL_IN_BONDI:
+  Bool: false
+SOFTEREQS:
+  Bool: false
+TVD_SLOPE_LIMITER:
+  Bool: false
+OUTPUT_CELL_SPIN:
+  Bool: false
+SFR_KEEP_CELLS:
+  Bool: false
+UnitPhotons_per_s:
+  Float:
+    - 1e48
+    - "1.000e+48"
+OUTPUT_SF_PROBABILITY:
+  Bool: false
+MRT_SOURES:
+  Bool: false
+InitRedshift:
+  Float:
+    - 0.0
+    - "0.000000"
+GFM_STELLAR_FEEDBACK:
+  Bool: false
+MHD_CT_IC:
+  Bool: false
+GFM_UVB_CORRECTIONS:
+  Bool: false
+SX_NUM_ROT:
+  Int: 1
+SGChemInitCOAbund:
+  Float:
+    - 0.0
+    - "0.000e+00"
+FM_STAR_FEEDBACK_KICK_TYPE:
+  Bool: false
+SIDM:
+  Bool: false
+NTYPES:
+  Int: 6
+READ_COORDINATES_IN_DOUBLE:
+  Bool: false
+OUTPUT_VERTEX_VELOCITY:
+  Bool: false
+MRT_REDUCE_OUTPUT:
+  Bool: false
+GFM_WINDS_VARIABLE_HUBBLE:
+  Bool: false
+PhotoApprox:
+  Int: 6
+MaxSizeTimestep:
+  Float:
+    - 0.1
+    - "1.000e-01"
+SGChemConstInitAbundances:
+  Int: 1
+PMGRID:
+  Bool: false
+SIDM_CONST_CROSS:
+  Bool: false
+SX_OUTPUT_FLUX:
+  Bool: false
+CIRCUMSTELLAR_SINKS:
+  Bool: false
+MRT_IR_GRAIN_KAPPA:
+  Bool: false
+MHD_THERMAL_ENERGY_SWITCH:
+  Bool: false
+MPISENDRECV_CHECKSUM:
+  Bool: false
+OUTPUT_MACHNUM:
+  Bool: false
+RELAXOBJECT_BINARY:
+  Bool: false
+DISABLE_SPATIAL_EXTRAPOLATION:
+  Bool: false
+BH_BONDI_DEFAULT:
+  Bool: false
+VERBOSE:
+  Bool: false
+OUTPUT_IN_DOUBLEPRECISION:
+  Bool: true
+SnapFormat:
+  Int: 3
+RESCALEVINI:
+  Bool: false
+WINDTUNNEL:
+  Bool: false
+SX_OUTPUT_IMAGE_ALL:
+  Bool: false
+STATICNFW:
+  Bool: false
+OUTPUT_BFIELD_GRADIENT:
+  Bool: false
+MRT_COUPLED_THERMOCHEMISTRY:
+  Bool: false
+SGChemInitMPAbund:
+  Float:
+    - 0.0
+    - "0.000e+00"
+USE_KINEMATIC_VISCOSITY:
+  Bool: false
+BH_ADIOS_DENS_DEP_EFFICIANCY:
+  Bool: false
+GRACKLE_ABUNDANCE_IN_ICS:
+  Bool: false
+FLD:
+  Bool: false
+CIRCUMSTELLAR_PLANET_GROWTH:
+  Bool: false
+GFM_PRIMORDIAL_RATES:
+  Bool: false
+OUTPUT_VORTICITY:
+  Bool: false
+EOS_NSPECIES:
+  Bool: false
+AMR:
+  Bool: false
+FLD_NO_TEMP_UPDATE:
+  Bool: false
+BoxSize:
+  Float:
+    - 1.0
+    - "1.0"
+MRT_NO_OTSA:
+  Bool: false
+SIDM_NO_NGB_SEL:
+  Bool: false
+CHEMISTRYNETWORK:
+  Int: 1
+MRT_IR_LTE_GSL:
+  Bool: false
+MaxNumNgbDeviation:
+  Int: 1
+SURFACE_ANGLE_APPROX:
+  Bool: false
+SHOCK_FINDER_POST_PROCESSING:
+  Bool: false
+COMPUTE_SFR_FROM_H2:
+  Bool: false
+SofteningComovingType2:
+  Float:
+    - 0.005
+    - "5.000000e-03"
+COSMIC_RAYS_DIFFUSION:
+  Bool: false
+FOF_FUZZ_SORT_BY_NEAREST_GROUP:
+  Bool: false
+OUTPUT_STELLAR_FEEDBACK:
+  Bool: false
+MHD_SEEDFIELD:
+  Bool: false
+FLD_CONES:
+  Bool: false
+FM_EARLY_STAR_FEEDBACK_KICK_TYPE:
+  Bool: false
+FORCETEST:
+  Bool: false
+REFINEMENT_AROUND_BH:
+  Bool: false
+OUTPUT_DIVVEL:
+  Bool: false
+RADIATIVE_RATES:
+  Bool: false
+ExternalDustExtinction:
+  Float:
+    - 0.0
+    - "0.000000"
+DEREFINE_ONLY_DENSE_GAS:
+  Bool: false
+MAX_VARIATION_TOLERANCE:
+  Bool: false
+TRACER_MC_NUM_FLUID_QUANTITIES:
+  Bool: false
+OUTPUT_TASK:
+  Bool: false
+SofteningTypeOfPartType1:
+  Int: 1
+SWEEP_OUTPUT_IONIZATION_TIME:
+  Bool: true
+OUTPUT_CURLVEL:
+  Bool: false
+TestSourcePosY:
+  Float:
+    - 0.5
+    - "0.5"
+NOHYDRO:
+  Bool: false
+BH_USE_ALFVEN_SPEED_IN_BONDI:
+  Bool: false
+TimeOfFirstSnapshot:
+  Float:
+    - 0.0
+    - "0.00e+00"
+SofteningTypeOfPartType2:
+  Int: 2
+MAbund:
+  Float:
+    - 0.0
+    - "0.000000e+00"
+REFINEMENT_MERGE_CELLS:
+  Bool: true
+EXTERNALSHEETY:
+  Bool: false
+NumFilesWrittenInParallel:
+  Int: 1
+FOF_DISABLE_SNAP_REWRITE:
+  Bool: false
+OUTPUT_EARLY_STELLAR_FEEDBACK:
+  Bool: false
+SKIP_BORDER:
+  Bool: false
+CONDUCTION_ANISOTROPIC:
+  Bool: false
+CHUNKING:
+  Bool: true
+MULTIPLE_RESTARTS:
+  Bool: false
+MRT_UV_ONLY_DUST:
+  Bool: false
+FOF_LINKLENGTH:
+  Bool: false
+EDDINGTON_TENSOR_STARS:
+  Bool: false
+COSMIC_RAYS_DIFFUSION_ANISOTROPIC:
+  Bool: false
+ALLOW_DIRECT_SUMMATION:
+  Bool: false
+GFM_COOLING_METAL:
+  Bool: false
+GFM_WINDS_HUBBLESCALING:
+  Bool: false
+NO_SELFGRAVITY_TYPE:
+  Bool: false
+GENERIC_ASYNC:
+  Bool: false
+LONG_Z:
+  Bool: false
+OUTPUT_VOLUME:
+  Bool: false
+SofteningComovingType5:
+  Float:
+    - 0.005
+    - "5.000000e-03"
+MRT_COMOVING:
+  Bool: false
+OUTPUT_TIMEBIN_HYDRO:
+  Bool: false
+HQ_C:
+  Bool: false
+READ_DM_AS_GAS:
+  Bool: false
+ISRFOption:
+  Int: 1
+COSMIC_RAYS_STREAMING:
+  Bool: false
+SGCHEM:
+  Bool: true
+DEBUG_EVOLVE:
+  Bool: false
+SIDM_NO_SCATTER:
+  Bool: false
+READ_LEGACY_ICS:
+  Bool: false
+REFLECTIVE_Z:
+  Bool: false
+DVR_RENDER:
+  Bool: false
+REPOSITION_ON_POTMIN:
+  Bool: false
+UnitLength_in_cm:
+  Float:
+    - 3.949696e22
+    - "3.949696e+22"
+FM_MASS_WEIGHT_SN:
+  Bool: false
+REFINEMENT_SPLIT_CELLS:
+  Bool: true
+SG_HEADER_FLAG:
+  Bool: false
+DO_NOT_RANDOMIZE_DOMAINCENTER:
+  Bool: true
+REGULARIZE_MESH_CM_DRIFT_USE_SOUNDSPEED:
+  Bool: true
+SUBBOX_SNAPSHOTS:
+  Bool: false
+DEBUG_PARTICLE_ID:
+  Bool: false
+MRT_OUTPUT_FLUX:
+  Bool: false
+USE_DSDE:
+  Bool: false
+SIDM_READ_ICS:
+  Bool: false
+VORONOI_PROJ:
+  Bool: false
+PASSIVE_SCALARS:
+  Bool: false
+OFFSET_FOR_NON_CONTIGUOUS_IDS:
+  Bool: false
+BH_BONDI_DISK_VORTICITY:
+  Bool: false
+GFM_VARIABLE_IMF:
+  Bool: false
+SPECIAL_BOUNDARY:
+  Bool: false
+HIERARCHICAL_GRAVITY:
+  Bool: false
+GENERATE_TRACER_PARTICLE_IN_ICS:
+  Bool: false
+NON_LINEAR_SLOPE_LIMITERS:
+  Bool: false
+RADCOOL_HOTHALO_METAL_BOOST:
+  Bool: false
+GFM_DUST_SPUTTERING:
+  Bool: false
+SINK_SIMPLEX:
+  Bool: false
+REFINEMENT_MERGE_PAIRS:
+  Bool: false
+USE_NBC_FOR_IBARRIER:
+  Bool: false
+BH_BIPOLAR_FEEDBACK:
+  Bool: false
+OTVET:
+  Bool: false
+MRT_BH_OMEGA_WEIGHT:
+  Bool: false
+TopNodeFactor:
+  Int: 5
+DARKENERGY:
+  Bool: false
+LWBGType:
+  Int: 0
+MaxMemSize:
+  Float:
+    - 1800.0
+    - "1800.0"
+MultipleDomains:
+  Int: 1
+UVB_SELF_SHIELDING:
+  Bool: false
+MRT_RIEMANN_HLLE_NEW:
+  Bool: false
+TimeBetStatistics:
+  Float:
+    - 1.0
+    - "1.00e+00"
+BOUNDARY_REFL_FLUIDSIDE_MAXID:
+  Bool: false
+SLOPE_LIMIT_HESSIANS:
+  Bool: false
+NO_GAS_SELFGRAVITY:
+  Bool: false
+GFM_BIPOLAR_WINDS:
+  Bool: false
+SINK_PARTICLES:
+  Bool: false
+MRT_UVB:
+  Bool: false
+OUTPUT_OPTICAL_DEPTH:
+  Bool: false
+MinNumPhotons:
+  Float:
+    - 0.0
+    - "0.0"
+SX_RADIATION_PRESSURE:
+  Bool: false
+TVD_SLOPE_LIMITER_SUPERBEE:
+  Bool: false
+TVD_SLOPE_LIMITER_MINBEE:
+  Bool: false
+DG_DEBUG:
+  Bool: false
+GENERATE_GAS_IN_ICS:
+  Bool: false
+OTVET_SILENT:
+  Bool: false
+HYPRE_PCG:
+  Bool: false
+PM_ZOOM_OPTIMIZED:
+  Bool: false
+SGChemInitOHxAbund:
+  Float:
+    - 0.0
+    - "0.000e+00"
+AMR_REDUCE_DOMAIN_DECOMPOISTION:
+  Bool: false
+VORONOI_FIELD_COMPENSATE_VX:
+  Bool: false
+SofteningMaxPhysType2:
+  Float:
+    - 0.005
+    - "5.000000e-03"
+COAXIAL_BOUNDARIES:
+  Bool: false
+OUTPUT_DENSITY_GRADIENT:
+  Bool: false
+CIRCUMSTELLAR_WBOUNDARIES:
+  Bool: false
+OPTIMIZE_MESH_MEMORY_FOR_REFINEMENT:
+  Bool: false
+OTVET_CHECK_PHOTONCOUNT:
+  Bool: false
+SGCHEM_ACCRETION_LUMINOSITY:
+  Bool: false
+EOS_OPAL:
+  Bool: false
+COOLING:
+  Bool: false
+GFM_WIND_ENERGY_METAL_DEPENDENCE:
+  Bool: false
+SofteningTypeOfPartType3:
+  Int: 3
+GravityConstantInternal:
+  Int: 0
+MRT_CHEMISTRY_PS2011:
+  Bool: false
+ONEDIMS:
+  Bool: false
+SINK_PARTICLES_SKIM_CELL_MASS:
+  Bool: false
+EVALPOTENTIAL:
+  Bool: false
+NO_ISEND_IRECV_IN_DOMAIN:
+  Bool: true
+USE_POLYTROPIC_EQSTATE:
+  Bool: false
+RT_INCLUDE_HE:
+  Bool: false
+SofteningTypeOfPartType4:
+  Int: 4
+AUTO_SWAP_ENDIAN_READIC:
+  Bool: false
+NUCLEAR_NETWORK:
+  Bool: false
+FLD_NCONES:
+  Bool: false
+GAMMA:
+  Bool: false
+HQ_DARKFRACTION:
+  Bool: false
+ISM:
+  Bool: false
+LimitUBelowCertainDensityToThisValue:
+  Int: 0
+NETWORK_NSE:
+  Bool: false
+OUTPUT_SURFACE_AREA:
+  Bool: false
+GFM_AGN_RADIATION:
+  Bool: false
+SINK_PARTICLES_VARIABLE_ACC_RADIUS:
+  Bool: false
+ONLY_PM:
+  Bool: false
+ISM_OUTPUT_FIELDS:
+  Bool: false
+DISABLE_OPTIMIZE_DOMAIN_MAPPING:
+  Bool: false
+LOCALLY_ISOTHERM_DISK:
+  Bool: false
+VEL_POWERSPEC:
+  Bool: false
+MinEgySpec:
+  Float:
+    - 0.0
+    - "0.000000"
+TargetGasMassFactor:
+  Float:
+    - 1.0
+    - "1.000000"
+OUTPUTPOTENTIAL:
+  Bool: false
+ID_RGCORE:
+  Bool: false
+FLD_SILENT:
+  Bool: false
+SHOCK_JUMP_T:
+  Bool: false
+OUTPUTCOL:
+  Bool: false
+GFM_WINDS_THERMAL_NEWDEF:
+  Bool: false
+SHOCK_FINDER_AREPO:
+  Bool: false
+SHOCK_DIR_GRAD_T:
+  Bool: false
+VORONOI_FIELD_COMPENSATE_VY:
+  Bool: false
+FM_STAR_FEEDBACK:
+  Bool: false
+AXISYMMETRY:
+  Bool: false
+H2FormEx:
+  Float:
+    - 0.0
+    - "0.000000"
+AMR_CONNECTIONS:
+  Bool: false
+TIMEDEPGRAV:
+  Bool: false
+MRT_COOLING_HEATING:
+  Bool: false
+INJECT_TRACER_INTO_SN:
+  Bool: false
+RELAXOBJECT:
+  Bool: false
+SGChemInitHDAbund:
+  Float:
+    - 0.0
+    - "0.000e+00"
+COMBINETYPES:
+  Bool: false
+ANGLE_BOUND:
+  Bool: false
+DRAINGAS:
+  Bool: false
+CENTRAL_MASS_POTENTIAL:
+  Bool: false
+POSITIVITY_LIMITER:
+  Bool: false
+RADPRESS_OPT_THICK:
+  Bool: false
+SEMI_IMPLICIT_TI:
+  Bool: false
+BH_CONTINOUS_MODE_SWITCH:
+  Bool: false
+FOF_SECONDARY_LINK_TYPES:
+  Bool: false
+DVR_STAY_IN_BOX:
+  Bool: false
+SGCHEM_TEMPERATURE_FLOOR:
+  Bool: false
+MHD_POWELL:
+  Bool: false
+AtomicCoolOption:
+  Int: 2
+TVD_SLOPE_LIMITER_VANLEER:
+  Bool: false
+DEREFINE_GENTLY:
+  Bool: false
+PERIODIC:
+  Bool: false
+FOF_PRIMARY_LINK_TYPES:
+  Bool: false
+EXPLICIT_COOLING:
+  Bool: false
+OTVET_CHANGEFLUXLIMITER:
+  Bool: false
+BH_MAGNETIC_BUBBLES:
+  Bool: false
+TREE_RAD:
+  Bool: false
+HUGEPAGES:
+  Bool: false
+ISO_FRACTION:
+  Bool: false
+BOUNDARY_INFLOWOUTFLOW_MAXID:
+  Bool: false
+NON_IDEAL_MHD:
+  Bool: false
+FLD_UPPER_BOUNDARY_MAXID:
+  Bool: false
+AMR_GRADIENTS:
+  Bool: false
+DMFIXED:
+  Bool: false
+OUTPUT_CR_PRESSURE_GRADIENT:
+  Bool: false
+GFM_STELLAR_PHOTOMETRICS:
+  Bool: false
+GFM_DUST:
+  Bool: false
+SINK_PARTICLES_OUTPUT_EVERY_NEW_SINK:
+  Bool: false
+SX_SKIP_RADIUS:
+  Bool: false
+OUTPUT_PRESSURE:
+  Bool: false
+GFM_CHECKS:
+  Bool: false
+TRACER_PARTICLE:
+  Bool: false
+RT_STELLAR_SOURCES:
+  Bool: false
+DEBUG_ENABLE_FPU_EXCEPTIONS:
+  Bool: false
+EXTERNALDISKPOTENTIAL:
+  Bool: false
+BH_THERMALFEEDBACK:
+  Bool: false
+COSMIC_RAYS_DIFFUSION_GLOBAL_TIMESTEP:
+  Bool: false
+GFM_WIND_ENERGY_METAL_DEPENDENCE_TANH:
+  Bool: false
+OutputDir:
+  Str: output
+GRACKLE_VERBOSE:
+  Bool: false
+TREE_RAD_CO:
+  Bool: false
+PLACEHIGHRESREGION:
+  Bool: false
+OUTPUT_BLACK_HOLE_TIMESTEP:
+  Bool: false
+UNIFIED_FEEDBACK:
+  Bool: false
+NO_ID_UNIQUE_CHECK:
+  Bool: false
+SHOCK_FINDER_ON_THE_FLY:
+  Bool: false
+EOS_DEGENERATE:
+  Bool: false
+STATICHQ:
+  Bool: false
+TIMEDEPDE:
+  Bool: false
+SofteningComovingType4:
+  Float:
+    - 0.005
+    - "5.000000e-03"
+OUTPUTTIMESTEP:
+  Bool: false
+MASSIVE_SEEDS_MERGER:
+  Bool: false
+MPI_HYPERCUBE_ALLGATHERV:
+  Bool: false
+SofteningTypeOfPartType5:
+  Int: 5
+MRT_IR_ONLY_CHEMISTRY:
+  Bool: false
+MRT_IR_PHOTON_TRAPPING:
+  Bool: false
+FLD_TEST_BOUNDARY:
+  Bool: false
+DG_SET_IC_FROM_AVERAGES:
+  Bool: false
+SX_DISPLAY_STATS:
+  Bool: false
+OUTPUT_COOLHEAT:
+  Bool: false
+RIEMANN_HLLC:
+  Bool: false
+MRT_MOLECULAR_COOLING:
+  Bool: false
+VORONOI:
+  Bool: true
+runParams:
+  Str: 21 10 5
+OUTPUT_EVERY_STEP:
+  Bool: false
+EXTERNALSHEARBOX_KSRATE_UPDATE_PARAM:
+  Bool: false
+NFW_C:
+  Bool: false
+STICKY_POINTS_ON_REFLECTIVE_SURFACE:
+  Bool: false
+FORCE_EQUAL_TIMESTEPS:
+  Bool: false
+MRT_IR:
+  Bool: false
+DISABLE_TIME_EXTRAPOLATION:
+  Bool: false
+SGCHEM_RT:
+  Bool: false
+NTYPES_ICS:
+  Bool: false
+MRT_EQUIL_CHEM_COOL:
+  Bool: false
+MINMOD_B:
+  Bool: false
+DISCONTINUITY_DETECTION:
+  Bool: false
+SINK_PARTICLES_FORCE_FORMATION:
+  Bool: false
+NFW_M200:
+  Bool: false
+TRACER_TRAJECTORY_GENERATE:
+  Bool: false
+OUTPUT_GRAVITY_FRACTION:
+  Bool: false
+MULTIPLE_NODE_SOFTENING:
+  Bool: false
+VORONOI_STATIC_MESH:
+  Bool: false
+RELAXOBJECT_COOLING:
+  Bool: false
+CosmicRayIonRate:
+  Float:
+    - 0.0
+    - "0.000000e+00"
+DMPIC:
+  Bool: false
+OUTPUT_COORDINATES_IN_DOUBLEPRECISION:
+  Bool: false
+SGChemInitHCOPAbund:
+  Float:
+    - 0.0
+    - "0.000e+00"
+REDUCE_SOFTENINGS:
+  Bool: false
+CellMaxAngleFactor:
+  Float:
+    - 1.0
+    - "1.000000"
+GFM_WINDS:
+  Bool: false
+TRACER_NO_RESET_EACH_SNAP:
+  Bool: false
+CarbAbund:
+  Float:
+    - 0.0
+    - "0.000000e+00"
+ONLY_OHMIC_DIFFUSION:
+  Bool: false
+FLD_MARSHAK:
+  Bool: false
+MRT_UPDATE_AT_END_OF_STEP:
+  Bool: false
+HDF5_FILTERS:
+  Bool: false
+GFM_WINDS_VARIABLE:
+  Bool: false
+OutputListOn:
+  Int: 0
+BH_EXACT_INTEGRATION:
+  Bool: false
+REFINEMENT_AROUND_DM:
+  Bool: false
+PeriodicBoundariesOn:
+  Int: 1
+DG_VERBOSE:
+  Bool: false
+VORONOI_PROJ_TEMP:
+  Bool: false
+NO_TARGET_MASS_CONDITION:
+  Bool: false
+TRACER_FIELD:
+  Bool: false
+NFW_DARKFRACTION:
+  Bool: false
+SINK_FEEDBACK_SINGLE_STAR:
+  Bool: false
+SGChemInitHePAbund:
+  Float:
+    - 0.0
+    - "0.000e+00"
+MHD_DIVBCLEANING:
+  Bool: false
+CONDUCTION_ISOTROPIC:
+  Bool: false
+TIMESTEP_OUTPUT_LIMIT:
+  Bool: false
+SofteningMaxPhysType1:
+  Float:
+    - 0.005
+    - "5.000000e-03"
+VARIABLE_GAMMA:
+  Bool: false
+RT_COMBINE_N_DIR_IN_OUTPUT:
+  Bool: false
+TimeMax:
+  Str: 146.4.0000
+OTVET_OUTPUT_SOURCEHSML:
+  Bool: false
+PROCESS_TIMES_OF_OUTPUTLIST:
+  Bool: false
+DVR_NUM_FIELDS:
+  Bool: false
+STATIC_CHEMISTRY_TEST:
+  Bool: false
+RT_HEALPIX_NSIDE:
+  Bool: false
+SX_HYDROGEN_ONLY:
+  Bool: true
+POPIII_SNE:
+  Bool: false
+OTVET_SCATTER_SOURCE:
+  Bool: false
+TRACER_MC_SKIPLOAD:
+  Bool: false
+MRT_BH_BIPOLAR_SET_FLUX:
+  Bool: false
+SINKS:
+  Bool: false
+SIDM_REACTIONS:
+  Bool: false
+RT_ADVECT:
+  Bool: false
+CHECKSUM_DEBUG:
+  Bool: false
+TestSourceRate112:
+  Float:
+    - 0.0
+    - "0.0"
+GFM_WINDS_STRIPPING:
+  Bool: false
+IMPOSE_PINNING_OVERRIDE_MODE:
+  Bool: false
+ErrTolTheta:
+  Float:
+    - 0.0
+    - "0.000000"
+DG_TEST_PROBLEM:
+  Bool: false
+SIMPLEX:
+  Bool: true
+BH_NF_RADIO:
+  Bool: false
+VORONOI_VELOCITY_FIELD_2D:
+  Bool: false
+CONDUCTION_CONSTANT:
+  Bool: false
+RUNGE_KUTTA_FULL_UPDATE:
+  Bool: false
+SPLIT_PARTICLE_TYPE:
+  Bool: false
+VORONOI_FIELD_DUMP_PIXELS_Y:
+  Bool: false
+SGChemInitHeIIIAbund:
+  Float:
+    - 0.0
+    - "0.000e+00"
+VORONOI_STATIC_MESH_DO_DOMAIN_DECOMPOSITION:
+  Bool: false
+OUTPUT_MOLECULAR_FRACTION:
+  Bool: false
+MRT_TIME_EXTRAPOLATION:
+  Bool: false
+GFM_DISCARD_ENRICHMENT_GRADIENTS:
+  Bool: false
+CoolingOn:
+  Int: 0
+TEST_SFR:
+  Bool: false
+TestSourceRate152:
+  Float:
+    - 0.0
+    - "0.0"
+OUTPUT_DG_DISCONTINUITIES:
+  Bool: false
+FM_EARLY_STAR_FEEDBACK:
+  Bool: false
+MRT_INCLUDE_HE:
+  Bool: false
+DISABLE_VELOCITY_CSND_SLOPE_LIMITING:
+  Bool: false
+GRADIENTS_GREEN_GAUSS:
+  Bool: false
+BOUNDARY_REFL_SOLIDSIDE_MAXID:
+  Bool: false
+SOURCE_PERIODIC:
+  Bool: false
+SUBFIND_MEASURE_H2MASS:
+  Bool: false
+USE_ENTROPY_FOR_COLD_FLOWS:
+  Bool: false
+OTVET_COOLING_HEATING:
+  Bool: false
+ISO_R200:
+  Bool: false
+BINARYLOG:
+  Bool: false
+REGULARIZE_MESH_FACE_ANGLE:
+  Bool: true
+NETWORK_PARDISO:
+  Bool: false
+DOUBLE_STENCIL:
+  Bool: false
+METALS:
+  Bool: false
+HEALRAY:
+  Bool: false
+BH_HARMONIC_OSCILLATOR_FORCE:
+  Bool: false
+DG:
+  Bool: false
+GFM_NORMALIZED_METAL_ADVECTION:
+  Bool: false
+SWEEP_PERIODIC:
+  Bool: false
+GRADIENT_LIMITER_DUFFELL:
+  Bool: false
+GRACKLE_D:
+  Bool: false
+QUICK_LYALPHA_LATETIMEONLY:
+  Bool: false
+DISK_SCALE_R0:
+  Bool: false
+SELFGRAVITY:
+  Bool: false
+DELAYED_COOLING:
+  Bool: false
+SofteningComovingType0:
+  Float:
+    - 0.005
+    - "5.000000e-03"
+HAVE_HDF5:
+  Bool: true
+RT_CGMETHOD:
+  Bool: false
+REDUCE_FLUSH:
+  Bool: false
+COSMIC_RAYS_ALFVEN_COOLING:
+  Bool: false
+FLD_CONST_KAPPA:
+  Bool: false
+OTVET_MULTI_FREQUENCY:
+  Bool: false
+TimeLimitCPU:
+  Int: 180000
+ADAPTIVE_HYDRO_SOFTENING:
+  Bool: false
+ADD_GROUP_PROPERTIES:
+  Bool: false
+OHMIC_DIFFUSION:
+  Bool: false
+SECOND_DERIVATIVES:
+  Bool: false
+BOUNDARY_STICKY_MAXID:
+  Bool: false
+QUICK_LYALPHA:
+  Bool: false
+AMR_REMAP:
+  Bool: false
+RT_SPREAD_SOURCE:
+  Bool: false
+TWODIMS:
+  Bool: false
+H2FormKin:
+  Float:
+    - 0.0
+    - "0.000000"
+numCores:
+  Int: 4
+ZONE_JUMP_T:
+  Bool: false
+ErrTolIntAccuracy:
+  Float:
+    - 0.012
+    - "0.012000"
+SECOND_ORDER_ICS:
+  Bool: false
+TREE_RAD_H2:
+  Bool: false
+OTVET_NOGRAVITY:
+  Bool: false
+VS_TURB:
+  Bool: false
+CIRCUMSTELLAR_IRRADIATION:
+  Bool: false
+GENERATE_TRACER_MC_IN_ICS:
+  Bool: false
+SofteningComovingType3:
+  Float:
+    - 0.005
+    - "5.000000e-03"
+ASMTH:
+  Bool: false
+GODUNOV_STATS:
+  Bool: false
+RADCOOL:
+  Bool: false
+OUTPUTGRAVINTERACTIONS:
+  Bool: false
+MRT_LOCAL_FEEDBACK:
+  Bool: false
+ENFORCE_JEANS_STABILITY_OF_CELLS_EEOS:
+  Bool: false
+ReferenceGasPartMass:
+  Float:
+    - 2068.9453028691025
+    - "2068.9453028691023"
+TypeOfOpeningCriterion:
+  Int: 0
+RUNNING_SAFETY_FILE:
+  Bool: false
+GFM_EXACT_NUMNGB:
+  Bool: false
+TEST_COOLING_METAL:
+  Bool: false
+OUTPUTCOOLRATE:
+  Bool: false
+INSTANT_EXPLOSIONS:
+  Bool: false
+VTUNE_INSTRUMENT:
+  Bool: false
+SX_FLOAT_PRECISION:
+  Bool: false
+REFLECTIVE_Y:
+  Bool: false
+MRT_BH_EXACT_NGB:
+  Bool: false
+TestSourcePosX:
+  Float:
+    - 0.5
+    - "0.5"
+MRT_NO_UV:
+  Bool: false
+GRIDBOOST:
+  Bool: false
+REACLIB1:
+  Bool: false
+BH_DO_NOT_PREVENT_MERGERS:
+  Bool: false
+TREE_RAD_VEL:
+  Bool: false
+GFM_PREENRICH:
+  Bool: false
+DVR_RENDER_ORTHOGONAL:
+  Bool: false
+DOUBLEPRECISION_FFTW:
+  Bool: true
+COSMIC_RAYS_STREAMING_ANISOTROPIC:
+  Bool: false
+FFT_COLUMN_BASED:
+  Bool: false
+JEANS_REFINEMENT:
+  Int: 8
+NSOFTTYPES_HYDRO:
+  Bool: false
+ENLARGEREGION:
+  Bool: false
+FIX_SPH_PARTICLES_AT_IDENTICAL_COORDINATES:
+  Bool: false
+TestSourceRate056:
+  Float:
+    - 0.0
+    - "0.0"
+GENERAL_RELATIVITY:
+  Bool: false
+SINK_PARTICLES_FEEDBACK:
+  Bool: false
+SofteningMaxPhysType4:
+  Float:
+    - 0.005
+    - "5.000000e-03"
+MinGasTemp:
+  Float:
+    - 0.0
+    - "0.000000"
+OUTPUT_VERTEX_VELOCITY_DIVERGENCE:
+  Bool: false
+SX_CHEMISTRY:
+  Int: 3
+SWEEP_SCATTER:
+  Bool: false
+METRIC_TYPE:
+  Bool: false
+ADDBACKGROUNDGRID:
+  Bool: false
+RCUT:
+  Bool: false
+VORONOI_FREQUENT_IMAGES:
+  Bool: false
+TRACER_PART_NUM_FLUID_QUANTITIES:
+  Bool: false
+FM_RADIATION_FEEDBACK_DEBUG:
+  Bool: false
+GasSoftFactor:
+  Float:
+    - 1.0
+    - "1.00"
+SUBFIND_EXTENDED_PROPERTIES:
+  Bool: false
+EOS_COULOMB_CORRECTIONS:
+  Bool: false
+GFM_WINDS_LOCAL:
+  Bool: false
+GFM_SPLITFE:
+  Bool: false
+OPTIMIZE_MEMORY_USAGE:
+  Bool: false
+DETAILEDTIMINGS:
+  Bool: false
+SIDM_NO_MASSCHANGE:
+  Bool: false
+DUMP_SINK_PARTICLE_INFO:
+  Bool: false
+CUDA:
+  Bool: false
+NOSTOP_WHEN_BELOW_MINTIMESTEP:
+  Bool: false
+REFINEMENT_VOLUME_LIMIT:
+  Bool: false
+RANDOMIZE_DOMAINCENTER:
+  Bool: false
+VORONOI_NOGRADS:
+  Bool: false
+ENTROPY_MACH_THRESHOLD:
+  Bool: false
+COSMIC_RAYS_MAGNETIC_OBLIQUITY:
+  Bool: false
+DMLOWESTTIMEBIN:
+  Bool: false
+DO_NOT_CREATE_STAR_PARTICLES:
+  Bool: false
+SofteningMaxPhysType0:
+  Float:
+    - 0.005
+    - "5.000000e-03"
+InitGasTemp:
+  Float:
+    - 100.0
+    - "100.000000"
+OTVET_FLUXLIMITER:
+  Bool: false
+OUTPUT_PRESSURE_GRADIENT:
+  Bool: false
+BH_DRAG:
+  Bool: false
+MESHRELAX:
+  Bool: false
+MRT_BH_UV_INJECTION:
+  Bool: false
+SINK_PARTICLES_FEEDBACK_RETURN_MASS:
+  Bool: false
+MRT_BH_PULSED:
+  Bool: false
+OUTPUT_DG_INFLOW_BOUNDARIES:
+  Bool: false
+FLD_LOWER_BOUNDARY_MAXID:
+  Bool: false
+HYDROGEN_ONLY:
+  Bool: false
+MUSCL_HANCOCK:
+  Bool: false
+SGChemInitCHxAbund:
+  Float:
+    - 0.0
+    - "0.000e+00"
+OUTPUT_MESH_FACE_ANGLE:
+  Bool: false
+ENFORCE_JEANS_STABILITY_OF_CELLS:
+  Bool: false
+ISM_LOCAL_RADIATION_PRESSURE:
+  Bool: false
+COSMIC_RAYS_DIFFUSION_LIMITER:
+  Bool: false
+ISM_HII_PHOTO_HEATING:
+  Bool: false
+GFM_CONST_IMF:
+  Bool: false
+TREE_BASED_TIMESTEPS:
+  Bool: true
+SHIFT_BY_HALF_BOX:
+  Bool: false
+ATOMIC_DM:
+  Bool: false
+SX_DISPLAY_LOAD:
+  Bool: false
+DIRECT_SUMMATION_THRESHOLD:
+  Bool: false
+TRACER_MC:
+  Bool: false
+SUBFIND_CALC_MORE:
+  Bool: false
+DIRECT_MOMENTUM_INJECTION_FEEDBACK:
+  Bool: false
+STELLARAGE:
+  Bool: false
+SIDM_STATES:
+  Bool: false
+DVR_RENDER_SMOOTH:
+  Bool: false
+DARKENERGY_DEBUG:
+  Bool: false
+BOUNDARY_REFL_SOLIDSIDE_MINID:
+  Bool: false
+REFINEMENT_HIGH_RES_GAS:
+  Bool: false
+COSMIC_RAYS_IN_ICS:
+  Bool: false
+GFM_CHEMTAGS:
+  Bool: false
+ALLOWEXTRAPARAMS:
+  Bool: false
+ISO_E:
+  Bool: false
+ADJ_BOX_POWERSPEC:
+  Bool: false
+NSOFTTYPES:
+  Bool: false
+TRACER_MC_CHECKS:
+  Bool: false
+IMPLICIT_TI:
+  Bool: false
+MRT_STARS:
+  Bool: false
+RIEMANN_ROSUNOV:
+  Bool: false
+TOLERATE_WRITE_ERROR:
+  Bool: false
+COSMIC_RAYS_DIFFUSION_ALWAYS_USE_PRECONDITIONER:
+  Bool: false
+GRAVITY_TALLBOX:
+  Bool: false
+TRACER_PART_STORE_WHAT:
+  Bool: false
+MRT_SLOWLIGHT:
+  Bool: false
+SX_DISPLAY_TIMERS_SITE:
+  Bool: false
+GRAVITY_FROM_STARS_PLANETS_ONLY:
+  Bool: false
+FLD_MG:
+  Bool: false
+MRT_RIEMANN_ROSUNOV:
+  Bool: false
+CONDUCTION_SATURATION:
+  Bool: false
+ResubmitCommand:
+  Int: 0
+MRT_STARS_EXACT_NGB:
+  Bool: false
+CIRCUMSTELLAR:
+  Bool: false
+SGCHEM_CONSTANT_ALPHAB:
+  Float:
+    - 2.59e-13
+    - "2.59e-13"
+NUCLEAR_NETWORK_DETONATE:
+  Bool: false
+BOUNDARY_REFL_FLUIDSIDE_MINID:
+  Bool: false
+LWBGStartRedsh:
+  Int: 0
+StarformationOn:
+  Int: 0
+FLD_LOWER_BOUNDARY_MINID:
+  Bool: false
+FM_SFR:
+  Bool: false
+BH_THERMALFEEDBACK_ACC:
+  Bool: false
+MULTIPLE_TIMESTEP:
+  Bool: false
+UnitMass_in_g:
+  Float:
+    - 1.989e33
+    - "1.989000e+33"
+REFINEMENT_AROUND_BH_FIXED:
+  Bool: false
+RIEMANN_GAMMA:
+  Bool: false
+RIEMANN_HLL:
+  Bool: false
+TGSET:
+  Bool: false
+RT_ENABLE:
+  Bool: false
+MRT_FLUX_EXTRAPOLATION:
+  Bool: false
+EXTERNALHUBBLE:
+  Bool: false
+CALC_QUADRATURE_DATA:
+  Bool: false
+SnapshotFileBase:
+  Str: snap
+SX_NDIR:
+  Int: 84
+ISM_LONG_RANGE_RADIATION_PRESSURE:
+  Bool: false
+SPECIAL_RELATIVITY:
+  Bool: false
+MASSIVE_SEEDS:
+  Bool: false
+InitDustTemp:
+  Float:
+    - 0.0
+    - "0.000000"
+BINARY_POTENTIAL:
+  Bool: false
+NSIDE:
+  Bool: false
+BH_ADIOS_WIND_DIRECTIONAL:
+  Bool: false
+LONG_Y:
+  Bool: false
+USE_MPIALLTOALLV_IN_DOMAINDECOMP:
+  Bool: false
+TVD_SLOPE_LIMITER_ALBADA:
+  Bool: false
+GFM_RPROCESS:
+  Bool: false
+TGCHEM:
+  Bool: false
+FORCETEST_TESTFORCELAW:
+  Bool: false
+VORONOI_DYNAMIC_UPDATE:
+  Bool: true
+OUTPUT_VELOCITY_GRADIENT:
+  Bool: false
+GFM_WINDS_SAVE_PARTTYPE:
+  Bool: false
+GRACKLE_TAB:
+  Bool: false
+TILE_ICS:
+  Bool: false
+LONG_X:
+  Bool: false
+MRT_CONSTANT_KAPPA:
+  Bool: false
+CONDUCTION:
+  Bool: false
+BH_BUBBLES:
+  Bool: false
+PREHEATING:
+  Bool: false
+GFM:
+  Bool: false
+LOCAL_VISCOSITY:
+  Bool: false
+FLD_MG_GS:
+  Bool: false
+NON_STOCHASTIC_MOMENTUM_FEEDBACK:
+  Bool: false
+MRT_CHEMISTRY_PS2009:
+  Bool: false
+FLD_HYPRE_IJ2:
+  Bool: false
+INJECT_INTO_SINGLE_CELL:
+  Bool: false
+DEBUG_RATE_EQ:
+  Bool: false
+COSMIC_RAYS:
+  Bool: false
+LimitUBelowThisDensity:
+  Int: 0
+USE_AREPO_FOF_WITH_GADGET_FIX:
+  Bool: false
+SLOW_RELAX_TO_EOS:
+  Bool: false
+TRACER_DIFFUSION:
+  Bool: false
+MRT_NOCOLLISION_IONIZATION:
+  Bool: false
+GFM_OUTPUT_MASK:
+  Bool: false
+OUTPUT_SOFTENINGS:
+  Bool: false
+PERFORMANCE_TEST_SPARSE_MPI_ALLTOALL:
+  Bool: false
+EXTERNALSHEARBOX_KSRATE_RANDOM:
+  Bool: false
+REFLECTIVE_X:
+  Bool: false
+VORONOI_FIELD_DUMP_PIXELS_X:
+  Bool: false
+OTVET_FIXTIMESTEP:
+  Bool: false
+UPDATE_GRADIENTS_FOR_OUTPUT:
+  Bool: false
+FOF_SECONDARY_LINK_TARGET_TYPES:
+  Bool: false
+SR_HLLC_ZERO_COMPVEL:
+  Bool: false
+MHD_CT_PERTURB_POSITIONS:
+  Bool: false
+DEGREE_K:
+  Bool: false
+ZAtom:
+  Float:
+    - 0.0
+    - "0.000000e+00"
+GFM_OUTPUT_BIRTH_POS:
+  Bool: false
+SGChemInitH2Abund:
+  Float:
+    - 0.0
+    - "0.0"
+RECOMPUTE_POTENTIAL_IN_SNAPSHOT:
+  Bool: false
+ADIABATIC_GENERAL_RELATIVITY:
+  Bool: false
+GFM_STELLAR_EVOLUTION:
+  Bool: false
+DesNumNgb:
+  Int: 32
+INSTANTANEOUS_DEPOSITION:
+  Bool: false
+FIX_MEAN_VALUES:
+  Bool: false
+COSMIC_RAYS_SN_INJECTION:
+  Bool: false
+MRT_IR_LTE_SEMI_IMPLICIT:
+  Bool: false
+RT_SLOWLIGHT:
+  Bool: false
+EXTERNALGY:
+  Bool: false
+MRT_PHOTOELECTRIC_HEATING:
+  Bool: false
+OmegaLambda:
+  Float:
+    - 0.0
+    - "0.000000"
+SNE_FEEDBACK:
+  Bool: false
+HQ_M200:
+  Bool: false
+VORONOI_IMAGES_FOREACHSNAPSHOT:
+  Bool: false
+SGChemInitDIIAbund:
+  Float:
+    - 0.0
+    - "0.0"
+COSMIC_RAYS_DIFFUSION_CONSTANT_TIMESTEP:
+  Bool: false
+MESHRELAX_DENSITY_IN_INPUT:
+  Bool: false
+FOF_GROUP_MIN_LEN:
+  Bool: false
+FLD_HYPRE_IJ1:
+  Bool: false
+THERMAL_CONDUCTION:
+  Bool: false
+MRT_RIEMANN_ROSUNOV_NEW:
+  Bool: false
+GLOBAL_VISCOSITY:
+  Bool: false
+SUBFIND:
+  Bool: false
+SX_CLEAR_PHOTONS_BEFORE_RUN:
+  Bool: false
+RESET_WRONG_JUMPS:
+  Bool: false
+HubbleParam:
+  Float:
+    - 1.0
+    - "1.000000"
+DEBUG:
+  Bool: false
+DISK_POTENTIAL:
+  Bool: false
+OUTPUT_REFBHCOUNTER:
+  Bool: false
+OmegaBaryon:
+  Float:
+    - 0.0
+    - "0.000000"
+STAR_INDEX:
+  Bool: false
+COSMIC_RAYS_SHOCK_ACCELERATION:
+  Bool: false
+VALPOTENTIAL:
+  Bool: false
+SX_SOURCES:
+  Int: 9
+MinSizeTimestep:
+  Float:
+    - 1e-8
+    - "1.000e-08"
+DECOUPLE_TIMESTEPS:
+  Bool: false
+COSMIC_RAYS_DIFFUSION_OLD:
+  Bool: false
+BH_ADIOS_WIND_WITH_QUASARTHRESHOLD:
+  Bool: false
+SofteningMaxPhysType5:
+  Float:
+    - 0.005
+    - "5.000000e-03"
+InitCondFile:
+  Str: ics
+MHD_SEEDPSPEC:
+  Bool: false
+GROWING_DISK_POTENTIAL:
+  Bool: false
+REGULARIZE_MESH_CM_DRIFT:
+  Bool: true
+MONOTONE_CONDUCTION:
+  Bool: false
+SGCHEM_NO_HIGHN_DCHEM:
+  Bool: false
+GRAVITY_NOT_PERIODIC:
+  Bool: false
+OUTPUT_CENTER_OF_MASS:
+  Bool: false
+OUTPUT_CPU_CSV:
+  Bool: false
+NOTREERND:
+  Bool: false
+CELL_CENTER_GRAVITY:
+  Bool: false
+TestSourceRate136:
+  Float:
+    - 1e49
+    - "1.0e49"
+UnitVelocity_in_cm_per_s:
+  Float:
+    - 3129024000.0
+    - "3.129024e+09"
+WINDTUNNEL_COORD:
+  Bool: false
+SofteningMaxPhysType3:
+  Float:
+    - 0.005
+    - "5.000000e-03"
+GRACKLE:
+  Bool: false
+MRT_BH_BIPOLAR:
+  Bool: false
+TRACER_MC_STORE_WHAT:
+  Bool: false
+BH_ADIOS_WIND_WITH_VARIABLE_QUASARTHRESHOLD:
+  Bool: false
+USE_SFR:
+  Bool: false
+POWERSPEC_GRID:
+  Bool: false
+SURFACE_SPHERE_APPROX:
+  Bool: false
+ISO_M200:
+  Bool: false
+ICFormat:
+  Int: 3
+SofteningTypeOfPartType0:
+  Int: 0
+ISOTHERM_EQS:
+  Bool: false
+INPUT_IN_DOUBLEPRECISION:
+  Bool: true
+MRT_MULTI_FREQUENCY:
+  Bool: false
+SAVE_HSML_IN_SNAPSHOT:
+  Bool: false
+RADPRESS_OPT_THIN:
+  Bool: false
+NumFilesPerSnapshot:
+  Int: 1
+MRT_BH:
+  Bool: false
+BOUNDARY_INFLOWOUTFLOW_MINID:
+  Bool: false
+RADPRESS_OPT_THIN_LUMPERMASS:
+  Bool: false
+FLD_UPPER_BOUNDARY_MINID:
+  Bool: false
+SGChemInitCPAbund:
+  Float:
+    - 0.0
+    - "0.000e+00"
+RT_COOLING_PHOTOHEATING:
+  Bool: false
+NO_MPI_IN_PLACE:
+  Bool: true
+TimeBegin:
+  Float:
+    - 0.0
+    - "0.0000"
+MRT_LEVITATION_TEST:
+  Bool: false
+DOUBLEPRECISION:
+  Int: 1
+OTVET_CHEMISTRY_PS2011:
+  Bool: false
+SUPPRESS_SF_IN_REFINEMENT_REGION:
+  Bool: false
+CHARACTERISTIC_LIMITER:
+  Bool: false
+MRT_RIEMANN_HLLE:
+  Bool: false
+RT_N_DIR:
+  Bool: false
+SofteningComovingType1:
+  Float:
+    - 0.005
+    - "5.000000e-03"
+GRACKLE_H2:
+  Bool: false
+BH_RELATIVE_NGB_DEVIATION:
+  Bool: false
+NGB_TREE_DOUBLEPRECISION:
+  Bool: false
+GFM_WINDS_MASSSCALING:
+  Bool: false
+BOUNDARY_STICKY_MINID:
+  Bool: false
+DustToGasRatio:
+  Float:
+    - 0.0
+    - "0.000000e+00"
+SPECIAL_SOFTENINGS:
+  Bool: false
+NUM_THREADS:
+  Bool: false
+RESET_WRONG_P_JUMPS:
+  Bool: false
+ZONE_JUMP_P:
+  Bool: false
+CUDA_INSTRUMENT:
+  Bool: false
+RECONSTRUCT_GRADIENTS:
+  Bool: false

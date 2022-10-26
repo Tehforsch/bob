@@ -77,7 +77,7 @@ class Snapshot:
 
     @property
     def timeUnit(self) -> pq.Quantity:
-        if self.sim.params["ComovingIntegrationOn"] == 0:
+        if not self.sim.simType().is_cosmological():
             return self.lengthUnit / self.velocityUnit
         else:
             return pq.dimensionless_unscaled
