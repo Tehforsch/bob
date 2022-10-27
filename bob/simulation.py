@@ -139,6 +139,21 @@ class Simulation:
         cosmology = self.getCosmology()
         return cosmology.age(self.getRedshift(scale_factor, doAssert=doAssert))
 
+    @property
+    def lengthUnit(self) -> pq.Quantity:
+        return self.params["UnitLength_in_cm"] * pq.cm
+
+    @property
+    def velocityUnit(self) -> pq.Quantity:
+        return self.params["UnitVelocity_in_cm_per_s"] * pq.cm / pq.s
+
+    @property
+    def timeUnit(self) -> pq.Quantity:
+        if not self.simType().is_cosmological():
+            return self.lengthUnit / self.velocityUnit
+        else:
+            return pq.dimensionless_unscaled
+
     def simType(self) -> SimType:
         comoving = self.params["ComovingIntegrationOn"]
         hydroOn = not ("21" in self.params["runParams"])

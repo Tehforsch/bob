@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.ticker
 
-from astropy.cosmology import Cosmology
 import astropy.units as pq
 
 from bob.util import getArrayQuantity
@@ -15,6 +14,7 @@ from bob.postprocessingFunctions import MultiSetFn
 from bob.result import Result
 from bob.multiSet import MultiSet
 from bob.plotConfig import PlotConfig
+from bob.timeUtils import TimeQuantity
 
 
 def printOnce(s: str, previousRuns: Dict[str, bool] = {}) -> None:
@@ -23,45 +23,6 @@ def printOnce(s: str, previousRuns: Dict[str, bool] = {}) -> None:
     else:
         previousRuns[s] = True
         print(s)
-
-
-def scaleFactorToRedshift(scaleFactor: pq.Quantity) -> pq.Quantity:
-    return 1.0 / scaleFactor - 1.0 * pq.dimensionless_unscaled
-
-
-def scaleFactorToAge(cosmology: Cosmology, scaleFactor: pq.Quantity) -> pq.Quantity:
-    return cosmology.age(scaleFactorToRedshift(scaleFactor))
-    # nValues = 500
-    # minValue = np.min(scaleFactor)
-    # maxValue = np.max(scaleFactor)
-    # a = np.linspace(minValue, maxValue, nValues)
-    # z = z_at_value(cosmology.age, a)
-    # assert np.all(np.diff(a) > 0)
-    # return np.interp(scaleFactor, a, z)
-
-
-def translateTime(sim: Simulation, time: pq.Quantity) -> pq.Quantity:
-    if sim.params["ComovingIntegrationOn"] == 1:
-        redshift = scaleFactorToRedshift(time)
-        return redshift
-    else:
-        raise NotImplementedError("The following is probably not valid anymore")
-        # # In the noCascade runs, we have the initial scale_factor
-        # # in the ICS snapshot header, whereas the simulation time runs from
-        # # 0 to however much time we ran for and doesn't really give much information
-        # cosmology = sim.getCosmology()
-        # printOnce("Assuming scale factor is the time scale in the original snapshot! (i.e. ComovingIntegrationOn = 1)")
-        # icsFile = sim.icsFile()
-        # scaleFactorIcs = icsFile.attrs["Time"]
-        # ageIcs = cosmology.age(z_at_value(cosmology.scale_factor, scaleFactorIcs))
-        # ageNow = ageIcs + time
-        # validTimes = np.where(ageNow < np.Infinity)
-        # redshiftNow = np.ones(ageNow.shape) * np.Infinity
-        # if validTimes[0].shape[0] > 0:
-        #     print(validTimes)
-        #     redshiftNow[validTimes] = z_at_value(cosmology.age, ageNow[validTimes])
-
-        # return cosmology.scale_factor(redshiftNow) * pq.dimensionless_unscaled, redshiftNow * pq.dimensionless_unscaled
 
 
 class IonizationData(Result):
@@ -85,8 +46,10 @@ class IonizationData(Result):
                 match = regex.match(line)
                 if match is not None:
                     (time, *remainder) = [float(x) for x in match.groups()]
-                    time, redshift = translateTime(sim, time)
-                    data.append((time, redshift, *remainder))
+                    time = time * sim.timeUnit
+                    timeQuantity = TimeQuantity(sim, time)
+                    redshift = timeQuantity.redshift()
+                    data.append((timeQuantity.scaleFactor(), redshift, *remainder))
 
         self.time.append(getArrayQuantity([d[0] for d in data]))
         self.redshift.append(getArrayQuantity([d[1] for d in data]))

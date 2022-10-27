@@ -32,6 +32,12 @@ class TimeQuantity:
             return self.values
         raise NotImplementedError("")
 
+    def scaleFactor(self) -> pq.Quantity:
+        assert self.sim.simType().is_cosmological()
+        if self.type_ == TimeType.SCALE_FACTOR:
+            return self.values
+        raise NotImplementedError("")
+
     def redshift(self) -> pq.Quantity:
         assert self.sim.simType().is_cosmological()
         if self.type_ == TimeType.SCALE_FACTOR:
