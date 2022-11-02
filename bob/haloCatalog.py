@@ -26,14 +26,15 @@ class GroupFile:
 
 class GroupFiles:
     def __init__(self, sims: SimulationSet, groupFolder: Path) -> None:
-        timeEpsilon = 9e-8
+        timeEpsilon = 9e-2
+        print("using ridiculous time epsilon !")
         originalScaleFactors = [sim.icsFile().attrs["Time"] for sim in sims]
         assert len(originalScaleFactors) > 0
         originalScaleFactor = originalScaleFactors[0]
-        print(originalScaleFactors)
         assert all(isclose(s, originalScaleFactor) for s in originalScaleFactors)
         groupCatalogs = [GroupFile(f) for f in getFiles(groupFolder) if "fof_subhalo_tab" in f.name]
         self.files = [c for c in groupCatalogs if isclose(c.f["Header"].attrs["Time"], originalScaleFactor, epsilon=timeEpsilon)]
+        assert len(self.files) > 0, f"no group catalog files found for scale factor: {originalScaleFactor}"
 
     def joinDatasets(self, getDataset: Any, unit: pq.Quantity) -> pq.Quantity:
         result = None
