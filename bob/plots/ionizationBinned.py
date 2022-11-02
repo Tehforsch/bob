@@ -22,11 +22,12 @@ class IonizationBinned(TimePlot):
         return "$x_{\\mathrm{H+}}$"
 
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> List[float]:
-        density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3 * cu.littleh**2)
+        densityUnit = pq.g / pq.cm**3 * cu.littleh**2
+        density = BasicField("Density").getData(snap)
         masses = BasicField("Masses").getData(snap)
         ionization = BasicField("ChemicalAbundances", 1).getData(snap)
         data = []
-        self.densityBins = [1e-31, 1e-29, 1e-27, 1e-25]
+        self.densityBins = [x * densityUnit for x in [1e-31, 1e-29, 1e-27, 1e-25]]
         for (density1, density2) in zip(self.densityBins, self.densityBins[1:]):
             indices = np.where((density1 < density) & (density < density2))
             avTemp = np.sum(ionization[indices] * masses[indices] / np.sum(masses[indices]))
