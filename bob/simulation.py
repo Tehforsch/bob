@@ -44,7 +44,8 @@ class SimType(Enum):
     HYDRO_COSMOLOGICAL = 1
     POST_STANDARD = 2
     POST_COSMOLOGICAL = 3
-    POST_CASCADE = 4
+    POST_STANDARD_ICS_COSMOLOGICAL = 4
+    POST_CASCADE = 5
 
     def is_cosmological(self) -> bool:
         return self == SimType.HYDRO_COSMOLOGICAL or self == SimType.POST_COSMOLOGICAL
@@ -155,6 +156,8 @@ class Simulation:
             return pq.dimensionless_unscaled
 
     def simType(self) -> SimType:
+        if self.params.get("simType") == "POST_STANDARD_ICS_COSMOLOGICAL":
+            return SimType.POST_STANDARD_ICS_COSMOLOGICAL
         comoving = self.params["ComovingIntegrationOn"]
         hydroOn = not ("21" in self.params["runParams"])
         if comoving:
