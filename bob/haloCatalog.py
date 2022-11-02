@@ -26,8 +26,7 @@ class GroupFile:
 
 class GroupFiles:
     def __init__(self, sims: SimulationSet, groupFolder: Path) -> None:
-        timeEpsilon = 9e-2
-        print("using ridiculous time epsilon !")
+        timeEpsilon = 9e-8
         originalScaleFactors = [sim.icsFile().attrs["Time"] for sim in sims]
         assert len(originalScaleFactors) > 0
         originalScaleFactor = originalScaleFactors[0]
