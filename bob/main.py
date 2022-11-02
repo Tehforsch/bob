@@ -51,7 +51,7 @@ def setupArgs() -> argparse.Namespace:
     watchPostParser.add_argument("workFolder", type=Path, help="The work folder to execute the commands in")
 
     generateParser = subparsers.add_parser("generate")
-    generateParser.add_argument("plot", type=str, help="The name of the plot configuration")
+    generateParser.add_argument("plots", type=str, nargs="*", help="The plot configurations to generate")
 
     args = parser.parse_args()
     return args
@@ -105,7 +105,7 @@ def main() -> None:
         create_pic_folder(parent_folder)
         _ = list(runFunctionsWithPlotter(plotter, functions))
     elif args.function == "generate":
-        name = args.plot
-        generatePlotConfig(name)
+        for name in args.plots:
+            generatePlotConfig(name)
     else:
         raise ValueError(f"Wrong function type: {args.function}")
