@@ -81,6 +81,8 @@ class Result:
             if type(quantity) == pq.Quantity:
                 saveQuantity(filenameBase(folder, name), quantity)
             elif type(quantity) == list:
+                if quantity == []:
+                    raise ValueError(f"Cannot save empty list entry in result: {name}!")
                 if type(quantity[0]) == pq.Quantity:
                     saveQuantityList(filenameBase(folder, name), quantity)
                 elif isinstance(quantity[0], Result):
