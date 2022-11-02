@@ -22,7 +22,7 @@ def addTimeArg(fn: PostprocessingFunction) -> None:
 
 
 def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot) -> float:
-    return getTimeQuantityFromTimeOrScaleFactor(quantity, sim, snap, snap.scale_factor)
+    return snap.timeQuantity(quantity)
 
 
 def getTimeQuantityFromTimeOrScaleFactor(quantity: str, sim: Simulation, snap: Snapshot, time_or_scale_factor: pq.Quantity) -> pq.Quantity:
@@ -34,13 +34,6 @@ def getTimeQuantityFromTimeOrScaleFactor(quantity: str, sim: Simulation, snap: S
         return time.time()
     else:
         raise NotImplementedError
-
-
-def getTimeOrRedshift(sim: Simulation, snap: Snapshot) -> float:
-    if sim.params["ComovingIntegrationOn"] == 1:
-        return getTimeQuantityForSnap("z", sim, snap)
-    else:
-        return getTimeQuantityForSnap("t", sim, snap)
 
 
 class TimePlot(MultiSetFn):
@@ -85,11 +78,11 @@ class TimePlot(MultiSetFn):
 
 def getAllSnapshotsWithTime(timeQuantity: str, simSet: SimulationSet) -> List[Tuple[Snapshot, Simulation, pq.Quantity]]:
     snapshots = [(snap, sim) for sim in simSet for snap in sim.snapshots]
-    snapshotsWithTime = [(snap, sim, getTimeQuantityForSnap(timeQuantity, sim, snap)) for (snap, sim) in snapshots]
+    snapshotsWithTime = [(snap, sim, snap.timeQuantity(timeQuantity)) for (snap, sim) in snapshots]
     snapshotsWithTime.sort(key=lambda x: x[2])
     return snapshotsWithTime
 
 
 def getTimeAndResultForSnap(plot: TimePlot, timeQuantity: str, snapSim: Tuple[Snapshot, Simulation]) -> Tuple[pq.Quantity, pq.Quantity]:
     (snap, sim) = snapSim
-    return (getTimeQuantityForSnap(timeQuantity, sim, snap), plot.getQuantity(sim, snap))
+    return (snap.timeQuantity(timeQuantity), plot.getQuantity(sim, snap))

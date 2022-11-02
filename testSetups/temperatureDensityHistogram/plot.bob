@@ -1,1 +1,2 @@
-temperatureDensityHistogram: {}
+temperatureDensityHistogram:
+  time: t

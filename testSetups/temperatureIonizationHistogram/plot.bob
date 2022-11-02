@@ -1,1 +1,2 @@
-temperatureIonizationHistogram: {}
+temperatureIonizationHistogram:
+  time: t

@@ -5,6 +5,7 @@ import h5py
 import re
 import astropy.units as pq
 from bob.basicField import BasicField
+from bob.timeUtils import TimeQuantity
 
 if TYPE_CHECKING:
     from bob.simulation import Simulation
@@ -97,6 +98,16 @@ class Snapshot:
     @property
     def time(self) -> pq.Quantity:
         return self.hdf5File["Header"].attrs["Time"] * self.timeUnit
+
+    def timeQuantity(self, quantity: str) -> pq.Quantity:
+        time = TimeQuantity(self.sim, self.scale_factor * self.timeUnit)
+        if quantity == "z":
+            # I am completely lost on why but I get two different "redshift" units here that are incopatible and are causing problems, so I'll just take the value and multiply by dimensionless. I find this horrible but I dont know what else to do
+            return time.redshift()
+        elif quantity == "t":
+            return time.time()
+        else:
+            raise NotImplementedError
 
     @property
     def attrs(self) -> Dict[str, Any]:

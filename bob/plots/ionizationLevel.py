@@ -48,9 +48,9 @@ class IonizationLevel(SetFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        self.setupLinePlot()
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
+        self.setupLinePlot(ax)
         ax.set_xscale("log")
         ax.set_yscale("log")
         for volumeFraction in result.volumeFraction:

@@ -1,8 +1,12 @@
 import numpy as np
 import astropy.units as pq
 from astropy.cosmology import z_at_value, Cosmology
-from bob.simulation import Simulation, SimType
+from bob.simType import SimType
 from enum import Enum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from bob.simulation import Simulation
 
 
 class TimeType(Enum):
@@ -29,7 +33,7 @@ def redshiftToAge(cosmology: Cosmology, redshift: pq.Quantity) -> pq.Quantity:
     #     return np.interp(scaleFactor, a, z)
 
 
-def shiftByIcsTime(sim: Simulation, values: pq.Quantity) -> pq.Quantity:
+def shiftByIcsTime(sim: "Simulation", values: pq.Quantity) -> pq.Quantity:
     icsTime = sim.icsFile().attrs["Time"]
     cosmology = sim.getCosmology()
     ageIcs = redshiftToAge(cosmology, scaleFactorToRedshift(icsTime))
@@ -45,7 +49,7 @@ def shiftByIcsTime(sim: Simulation, values: pq.Quantity) -> pq.Quantity:
 
 
 class TimeQuantity:
-    def __init__(self, sim: Simulation, values: pq.Quantity) -> None:
+    def __init__(self, sim: "Simulation", values: pq.Quantity) -> None:
         self.sim = sim
         match sim.simType():
             case SimType.HYDRO_COSMOLOGICAL:

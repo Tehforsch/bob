@@ -35,12 +35,15 @@ class PostprocessingFunction(ABC):
         if "snap" in kwargs and "sim" in kwargs:
             snap: Snapshot = kwargs["snap"]
             sim: Simulation = kwargs["sim"]
-            if sim.params["runParams"] == "0":
-                combined["redshift"] = sim.getRedshift(snap.scale_factor).to_value(pq.dimensionless_unscaled)
+            print(sim.simType())
+            if sim.simType().can_get_redshift():
+                combined["redshift"] = snap.timeQuantity("z")
         return self.config["name"].format(**combined)
 
-    def setupLinePlot(self) -> None:
+    def setupLinePlot(self, ax: Any = None) -> None:
         self.setupLabels()
+        if ax is None:
+            ax = plt
         if "xLim" in self.config:
             plt.xlim(*self.config["xLim"])
         if "yLim" in self.config:
@@ -90,10 +93,11 @@ class SnapFn(PostprocessingFunction):
         self.config.setDefault("snapshots", None)
         self.config.setDefault("name", self.name + "_{simName}_{snapName}")
         self.config.setDefault("showTime", True)
+        self.config.setDefault("time", "t")
         self.config.setDefault("timeUnit", pq.Myr)
 
     def showTime(self, fig: plt.Figure, result: Result) -> None:
-        if result.time.unit == pq.s:
+        if self.config["time"] == "t":
             time = result.time.to(self.config["timeUnit"]).value
             timeUnit = str(self.config["timeUnit"])
             fig.suptitle(f"Time: {time:.01f} {timeUnit}", fontsize=12)
@@ -101,10 +105,8 @@ class SnapFn(PostprocessingFunction):
             fig.suptitle(f"Redshift: {result.time:.01f}", fontsize=12)
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
-        from bob.plots.timePlots import getTimeOrRedshift
-
         result = Result()
-        result.time = getTimeOrRedshift(sim, snap)
+        result.time = snap.timeQuantity(self.config["time"])
         return result
 
     def showTimeIfDesired(self, fig: plt.Figure, result: Result) -> None:

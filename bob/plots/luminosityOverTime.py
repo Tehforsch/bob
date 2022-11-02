@@ -3,7 +3,7 @@ import astropy.units as pq
 from bob.postprocessingFunctions import MultiSetFn
 from bob.result import Result
 from bob.multiSet import MultiSet
-from bob.plots.timePlots import getTimeQuantityForSnap, addTimeArg
+from bob.plots.timePlots import addTimeArg
 from bob.util import getArrayQuantity
 
 from bob.plotConfig import PlotConfig
@@ -23,7 +23,7 @@ class LuminosityOverTime(MultiSetFn):
         result.data = []
         for simSet in simSets:
             subresult = Result()
-            subresult.time = getArrayQuantity([getTimeQuantityForSnap(self.config["time"], sim, sim.snapshots[0]) for sim in simSet])
+            subresult.time = getArrayQuantity([sim.snapshots[0].getTimeQuantity(self.config["time"]) for sim in simSet])
             sources = [sim.sources().sed for sim in simSet]
             subresult.luminosity = getArrayQuantity([sum(sum(s) for s in source) / pq.s for source in sources])
             result.data.append(subresult)
