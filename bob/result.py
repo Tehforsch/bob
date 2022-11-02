@@ -123,6 +123,8 @@ class Result:
             elif isinstance(value, Result):
                 return value.__repr__()
             elif type(value) == list:
+                if value == []:
+                    return f"{name:<15} [?]: []"
                 if type(value[0]) == Result:
                     return "\n\n".join("{}".format(result) for result in value)
                 else:
