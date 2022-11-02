@@ -36,7 +36,11 @@ class Snapshot:
 
     @property
     def hdf5File(self) -> h5py.File:
-        return h5py.File(self.filename, "r")
+        try:
+            return h5py.File(self.filename, "r")
+        except OSError:
+            print(f"Failed to open snapshot: {self.filename}")
+            raise
 
     def hasField(self, field: str) -> bool:
         return field in self.hdf5File["PartType0"]
