@@ -1,6 +1,6 @@
 import numpy as np
 import astropy.units as pq
-from astropy.cosmology import z_at_value
+from astropy.cosmology import z_at_value, Cosmology
 from bob.simulation import Simulation, SimType
 from enum import Enum
 
@@ -16,10 +16,23 @@ def scaleFactorToRedshift(scaleFactor: pq.Quantity) -> pq.Quantity:
     return 1.0 / scaleFactor - 1.0 * pq.dimensionless_unscaled
 
 
+def redshiftToAge(cosmology: Cosmology, redshift: pq.Quantity) -> pq.Quantity:
+    return cosmology.age(redshift)
+    # if redshift.size() > 5000:
+    #     print("Using cached version of redshift -> age conversion for performance reasons")
+    #     nValues = 500
+    #     minValue = np.min(redshift)
+    #     maxValue = np.max(redshift)
+    #     a = np.linspace(minValue, maxValue, nValues)
+    #     z = cosmology.age(cosmology.age, a)
+    #     assert np.all(np.diff(a) > 0)
+    #     return np.interp(scaleFactor, a, z)
+
+
 def shiftByIcsTime(sim: Simulation, values: pq.Quantity) -> pq.Quantity:
     icsTime = sim.icsFile().attrs["Time"]
     cosmology = sim.getCosmology()
-    ageIcs = cosmology.age(z_at_value(cosmology.scale_factor, icsTime))
+    ageIcs = redshiftToAge(cosmology, scaleFactorToRedshift(icsTime))
     ageNow = ageIcs + values
     if ageNow.shape == ():
         redshiftNow = z_at_value(cosmology.age, ageNow)
@@ -37,7 +50,7 @@ class TimeQuantity:
         match sim.simType():
             case SimType.HYDRO_COSMOLOGICAL:
                 self.type_ = TimeType.SCALE_FACTOR
-                self.values = values
+                self.values = values * pq.dimensionless_unscaled
             case SimType.HYDRO_STANDARD:
                 self.type_ = TimeType.TIME
                 self.values = values

@@ -14,6 +14,8 @@ from bob.pool import runInPool
 from bob.util import getArrayQuantity
 from bob.plotConfig import PlotConfig
 
+from bob.timeUtils import TimeQuantity
+
 
 def addTimeArg(fn: PostprocessingFunction) -> None:
     fn.config.setDefault("time", "t", choices=["t", "z"])
@@ -24,14 +26,12 @@ def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot) -> fl
 
 
 def getTimeQuantityFromTimeOrScaleFactor(quantity: str, sim: Simulation, snap: Snapshot, time_or_scale_factor: pq.Quantity) -> pq.Quantity:
+    time = TimeQuantity(sim, time_or_scale_factor * snap.timeUnit)
     if quantity == "z":
         # I am completely lost on why but I get two different "redshift" units here that are incopatible and are causing problems, so I'll just take the value and multiply by dimensionless. I find this horrible but I dont know what else to do
-        return sim.getRedshift(time_or_scale_factor).value * pq.dimensionless_unscaled
+        return time.redshift()
     elif quantity == "t":
-        if sim.params["ComovingIntegrationOn"]:
-            return sim.getLookbackTime(time_or_scale_factor)
-        else:
-            return time_or_scale_factor * snap.timeUnit
+        return time.time()
     else:
         raise NotImplementedError
 
