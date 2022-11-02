@@ -21,10 +21,13 @@ def shiftByIcsTime(sim: Simulation, values: pq.Quantity) -> pq.Quantity:
     cosmology = sim.getCosmology()
     ageIcs = cosmology.age(z_at_value(cosmology.scale_factor, icsTime))
     ageNow = ageIcs + values
-    validTimes = np.where(ageNow < np.Infinity)
-    redshiftNow = np.ones(ageNow.shape) * np.Infinity
-    if validTimes[0].shape[0] > 0:
-        redshiftNow[validTimes] = z_at_value(cosmology.age, ageNow[validTimes])
+    if ageNow.shape == ():
+        redshiftNow = z_at_value(cosmology.age, ageNow)
+    else:
+        validTimes = np.where(ageNow < np.Infinity)
+        redshiftNow = np.ones(ageNow.shape) * np.Infinity
+        if validTimes[0].shape[0] > 0:
+            redshiftNow[validTimes] = z_at_value(cosmology.age, ageNow[validTimes])
     return cosmology.scale_factor(redshiftNow) * pq.dimensionless_unscaled
 
 
@@ -49,20 +52,17 @@ class TimeQuantity:
                 self.values = values
 
     def age(self) -> pq.Quantity:
-        assert self.sim.simType().is_cosmological()
         if self.type_ == TimeType.SCALE_FACTOR:
             cosmology = self.sim.getCosmology()
             return cosmology.age(self.redshift())
         raise NotImplementedError("")
 
     def time(self) -> pq.Quantity:
-        assert not self.sim.simType().is_cosmological()
         if self.type_ == TimeType.TIME:
             return self.values
         raise NotImplementedError("")
 
     def scaleFactor(self) -> pq.Quantity:
-        assert self.sim.simType().is_cosmological()
         if self.type_ == TimeType.SCALE_FACTOR:
             return self.values
         raise NotImplementedError("")
