@@ -12,10 +12,7 @@ from bob.plotConfig import PlotConfig
 class SourceField(Slice):
     def __init__(self, config: PlotConfig) -> None:
         config.setDefault("field", "Sources")
-        config.setDefault("testSources", False)
         config.setDefault("name", self.name + "_{simName}_{snapName}_{axis}")
-        config.setDefault("colorByLuminosity", False)
-        config.setDefault("sliceThickness", 0.02)
         config.setDefault("sigma", 1 * pq.kpc)
         super().__init__(config)
 
