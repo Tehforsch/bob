@@ -14,4 +14,4 @@ defaultTimeUnit = pq.yr
 
 numProcesses = 30
 
-possibleImageSuffixes = [".png", ".pdf"]
+possibleImageSuffixes = ["png", "pdf"]
