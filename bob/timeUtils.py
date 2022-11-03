@@ -3,7 +3,7 @@ import astropy.units as pq
 from astropy.cosmology import z_at_value, Cosmology
 from bob.simType import SimType
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, Any
 
 if TYPE_CHECKING:
     from bob.simulation import Simulation
@@ -20,17 +20,29 @@ def scaleFactorToRedshift(scaleFactor: pq.Quantity) -> pq.Quantity:
     return 1.0 / scaleFactor - 1.0 * pq.dimensionless_unscaled
 
 
+def lin_interpolated(f: Callable[..., Any]) -> Callable[..., Any]:
+    def wrapper(values: pq.Quantity) -> pq.Quantity:
+        if values.size > 5000:
+            print("Using cached version of redshift -> age conversion for performance reasons")
+            nValues = 500
+            minValue = np.min(values)
+            maxValue = np.max(values)
+            xs = np.linspace(minValue, maxValue, nValues)
+            ys = f(xs)
+            assert np.all(np.diff(xs) > 0)
+            return np.interp(values, xs, ys)
+        else:
+            return f(values)
+
+    return wrapper
+
+
 def redshiftToAge(cosmology: Cosmology, redshift: pq.Quantity) -> pq.Quantity:
-    return cosmology.age(redshift)
-    # if redshift.size() > 5000:
-    #     print("Using cached version of redshift -> age conversion for performance reasons")
-    #     nValues = 500
-    #     minValue = np.min(redshift)
-    #     maxValue = np.max(redshift)
-    #     a = np.linspace(minValue, maxValue, nValues)
-    #     z = cosmology.age(cosmology.age, a)
-    #     assert np.all(np.diff(a) > 0)
-    #     return np.interp(scaleFactor, a, z)
+    return lin_interpolated(lambda z: cosmology.age(z))(redshift)
+
+
+def ageToRedshift(cosmology: Cosmology, age: pq.Quantity) -> pq.Quantity:
+    return lin_interpolated(lambda a: z_at_value(cosmology.age, a))(age)
 
 
 def shiftByIcsTime(sim: "Simulation", values: pq.Quantity) -> pq.Quantity:
@@ -39,12 +51,12 @@ def shiftByIcsTime(sim: "Simulation", values: pq.Quantity) -> pq.Quantity:
     ageIcs = redshiftToAge(cosmology, scaleFactorToRedshift(icsTime))
     ageNow = ageIcs + values
     if ageNow.shape == ():
-        redshiftNow = z_at_value(cosmology.age, ageNow)
+        redshiftNow = ageToRedshift(cosmology, ageNow)
     else:
         validTimes = np.where(ageNow < np.Infinity)
         redshiftNow = np.ones(ageNow.shape) * np.Infinity
         if validTimes[0].shape[0] > 0:
-            redshiftNow[validTimes] = z_at_value(cosmology.age, ageNow[validTimes])
+            redshiftNow[validTimes] = ageToRedshift(cosmology, ageNow[validTimes])
     return cosmology.scale_factor(redshiftNow) * pq.dimensionless_unscaled
 
 

@@ -23,15 +23,16 @@ class MeanIonizationRedshift(MultiSetFn):
         config.setDefault("xUnit", pq.Msun / cu.littleh)
         config.setDefault("yUnit", pq.dimensionless_unscaled)
         config.setDefault("groupCatalogFolder", "groups")
-        config.setDefault("numBins", 40)
-        config.setDefault("radiusFactor", 1.0)
+        config.setDefault("numBins", 5)
+        config.setDefault("radiusFactor", 10.0)
 
     def post(self, simSet: MultiSet) -> Result:
         result = Result()
         result.meanBins = []
-        result.meanZ = []
+        result.meanZs = []
         lengthUnit = pq.kpc / cu.littleh
         for sims in simSet:
+            print(sims)
             files = GroupFiles(sims, Path(self.config["groupCatalogFolder"]))
             haloMasses = files.haloMasses()
             assert len(sims) == 1
@@ -47,7 +48,6 @@ class MeanIonizationRedshift(MultiSetFn):
             meanBins = []
             meanZs = []
             for (bstart, bend) in zip(bins, bins[1:]):
-                print(bstart, bend)
                 indices = np.where((haloMasses >= bstart) & (haloMasses < bend))
                 meanBins.append((bstart + bend) * 0.5)
                 z = np.zeros(haloMasses.shape) * pq.dimensionless_unscaled
