@@ -39,6 +39,7 @@ class IonizationBinned(TimePlot):
             masses = BasicField("Masses").getData(snap, indices=indices)
             ionization = BasicField("ChemicalAbundances", 1).getData(snap, indices=indices)
             avIonization = np.sum(ionization * masses / np.sum(masses))
+            print(density1, density2, np.mean(avIonization))
             data.append(avIonization)
         return getArrayQuantity(data)
 

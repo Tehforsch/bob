@@ -92,8 +92,8 @@ class BasicField(Field):
                 raise ValueError("Fix units for field: {}".format(self.name))
         if indices is None:
             indices = ...
-        fieldData = snapshot.hdf5File[f"PartType{self.partType}"][self.name][indices] * unit
+        fieldData = snapshot.hdf5File[f"PartType{self.partType}"][self.name][...] * unit
         if self.index is None:
-            return fieldData
+            return fieldData[indices]
         else:
-            return fieldData[:, self.index]
+            return fieldData[indices, self.index]
