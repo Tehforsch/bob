@@ -21,6 +21,7 @@ from bob.plots.stellarMass import StellarMass
 from bob.plots.luminosityOverHaloMass import LuminosityOverHaloMass
 from bob.plots.characteristicRadii import CharacteristicRadiiOverTime
 from bob.plots.meanIonizationRedshift import MeanIonizationRedshift
+from bob.plots.sourceField import SourceField
 
 postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     SliceWithStarParticles,
@@ -43,6 +44,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     LuminosityOverHaloMass,
     CharacteristicRadiiOverTime,
     MeanIonizationRedshift,
+    SourceField,
 ]
 
 for function in postprocessingFunctions:

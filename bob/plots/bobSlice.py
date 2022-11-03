@@ -47,8 +47,8 @@ def getSlice(field: Field, snapshot: Snapshot, axisName: str, position: float) -
 class Slice(SnapFn):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
-        self.config.setRequired("axis", choices=["x", "y", "z"])
-        self.config.setRequired("field", choices=[f.niceName for f in allFields])
+        self.config.setDefault("axis", "z", choices=["x", "y", "z"])
+        self.config.setDefault("field", "Density", choices=[f.niceName for f in allFields])
         xAxis, yAxis = getOtherAxes(config["axis"])
         self.config.setDefault("xLabel", f"${xAxis} [UNIT]$")
         self.config.setDefault("yLabel", f"${yAxis} [UNIT]$")

@@ -35,7 +35,6 @@ class LuminosityOverHaloMass(SetFn):
         haloMasses = files.haloMasses()
         lengthUnit = pq.kpc / cu.littleh
         center_of_mass = files.center_of_mass().to(lengthUnit)
-        print("using fake radius")
         radius = (files.halfmass_rad()).to(lengthUnit) * self.config["radiusFactor"]
         result = Result()
         assert len(sims) == 1, "Not implemented for more than one sim"
@@ -45,9 +44,10 @@ class LuminosityOverHaloMass(SetFn):
         else:
             snap = sim.getSnapshotAtRedshift(self.config["redshift"])
         coords = BasicField("Coordinates", partType=0, comoving=True).getData(snap)
-        sourceField = SourceField(sim).getData(snap)
+        sourceField = SourceField().getData(snap)
         tree = cKDTree(coords.to(lengthUnit, cu.with_H0(snap.H0)))
         luminosities = np.zeros(haloMasses.shape) / pq.s
+        print(np.mean(sourceField), np.sum(sourceField))
         for (i, (pos, r)) in enumerate(zip(center_of_mass, radius)):
             indices = tree.query_ball_point(pos, r)
             luminosities[i] = np.sum(sourceField[indices])

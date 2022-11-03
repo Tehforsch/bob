@@ -11,15 +11,14 @@ class PlotConfig(dict):
         self.defaults: Dict[str, Any] = {}
 
     def setDefault(self, param: str, value: Any, choices: Optional[List] = None) -> None:
+        if param in self.defaults:
+            return
         self.defaults[param] = value
         self.paramMentioned(param)
         self.rememberChoices(param, choices)
         if type(value) == pq.Quantity:
             if param in self:
-                try:
-                    self[param] = pq.Quantity(self[param])
-                except ValueError:
-                    pass
+                self[param] = pq.Quantity(self[param])
 
     def setRequired(self, param: str, choices: Optional[List] = None) -> None:
         self.paramMentioned(param)

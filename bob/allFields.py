@@ -4,6 +4,7 @@ from bob.field import Field
 from bob.basicField import BasicField
 from bob.temperature import Temperature
 from bob.combinedField import CombinedField
+from bob.sourceField import SourceField
 
 
 def addFields(fields: Iterable[Field]) -> None:
@@ -17,6 +18,7 @@ allFields = [
     BasicField("Coordinates", None),
     BasicField("InternalEnergy", None),
     Temperature(),
+    SourceField(),
 ]
 
 addFields(BasicField("ChemicalAbundances", i) for i in range(6))
