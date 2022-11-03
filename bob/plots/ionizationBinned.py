@@ -17,6 +17,7 @@ from bob.util import getArrayQuantity
 class IonizationBinned(TimePlot):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
+        self.config.setDefault("numSamples", 10000)
 
     def ylabel(self) -> str:
         return "$x_{\\mathrm{H+}}$"
@@ -25,13 +26,14 @@ class IonizationBinned(TimePlot):
         densityUnit = pq.g / pq.cm**3 * cu.littleh**2
         data = []
         self.densityBins = [x * densityUnit for x in [1e-31, 1e-29, 1e-27, 1e-25]]
-        density = BasicField("Density").getData(snap)
+        density = BasicField("Density").getData(snap).to(densityUnit, cu.with_H0(snap.H0))
         for (density1, density2) in zip(self.densityBins, self.densityBins[1:]):
-            indices = np.where((density1 < density) & (density < density2))
+            allIndices = np.where((density1 < density) & (density < density2))
+            skip = int(allIndices[0].shape[0] / self.config["numSamples"])
+            indices = allIndices[0][::skip]
             masses = BasicField("Masses").getData(snap, indices=indices)
             ionization = BasicField("ChemicalAbundances", 1).getData(snap, indices=indices)
-            avTemp = np.sum(ionization[indices] * masses[indices] / np.sum(masses[indices]))
-            print(density1, avTemp)
+            avTemp = np.sum(ionization * masses / np.sum(masses))
             data.append(avTemp)
         return getArrayQuantity(data)
 
