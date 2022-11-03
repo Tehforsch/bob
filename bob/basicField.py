@@ -1,9 +1,7 @@
-from typing import Optional, Dict
+from typing import Optional, Dict, Any
 import astropy.units as pq
 import astropy.cosmology.units as cu
 import h5py
-import numpy as np
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -78,7 +76,7 @@ class BasicField(Field):
         unit *= attrs["to_cgs"]
         return unit
 
-    def getData(self, snapshot: "Snapshot") -> pq.Quantity:
+    def getData(self, snapshot: "Snapshot", indices: Optional[Any] = None) -> pq.Quantity:
         try:
             unit = self.getArbitraryUnit(snapshot, snapshot.hdf5File[f"PartType{self.partType}"][self.name])
         except KeyError:
@@ -92,15 +90,10 @@ class BasicField(Field):
                 unit = 1 / snapshot.timeUnit
             else:
                 raise ValueError("Fix units for field: {}".format(self.name))
-        fieldData = readIntoNumpyArray(snapshot.hdf5File[f"PartType{self.partType}"][self.name]) * unit
+        if indices is None:
+            indices = ...
+        fieldData = snapshot.hdf5File[f"PartType{self.partType}"][self.name][indices] * unit
         if self.index is None:
             return fieldData
         else:
             return fieldData[:, self.index]
-
-
-def readIntoNumpyArray(hdf5Field: h5py._hl.dataset.Dataset) -> np.ndarray:
-    fieldH = hdf5Field
-    field = np.zeros(fieldH.shape)
-    fieldH.read_direct(field)
-    return field
