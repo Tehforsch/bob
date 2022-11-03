@@ -20,7 +20,16 @@ class IonizationBinned(TimePlot):
         self.config.setDefault("numSamples", 100000)
         self.config.setDefault("xLim", [10.0, 4.2])
         self.config.setDefault("densityFactors", [1.0 / 10.0, 1.0 / 2.0, 1.0, 2.0, 10.0])
-        self.config.setDefault("sublabels", ["$1/10 \\rho$", "$1/2 \\rho$", "$\\rho$", "$2 \\rho$", "$10 \\rho$"])
+        self.config.setDefault(
+            "sublabels",
+            [
+                "$1/10 \\langle \\rho \\rangle$",
+                "$1/2 \\langle \\rho \\rangle$",
+                "$1 \\langle \\rho \\rangle$",
+                "$2 \\langle \\rho \\rangle$",
+                "$10 \\langle \\rho \\rangle$",
+            ],
+        )
         self.config.setDefault("colors", ["r", "g", "b", "brown", "orange"])
 
     def ylabel(self) -> str:
