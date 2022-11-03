@@ -17,7 +17,8 @@ from bob.util import getArrayQuantity
 class IonizationBinned(TimePlot):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
-        self.config.setDefault("numSamples", 10000)
+        self.config.setDefault("numSamples", 100000)
+        self.config.setDefault("xLim", [10.0, 4.2])
 
     def ylabel(self) -> str:
         return "$x_{\\mathrm{H+}}$"
@@ -33,8 +34,9 @@ class IonizationBinned(TimePlot):
             indices = allIndices[0][::skip]
             masses = BasicField("Masses").getData(snap, indices=indices)
             ionization = BasicField("ChemicalAbundances", 1).getData(snap, indices=indices)
-            avTemp = np.sum(ionization * masses / np.sum(masses))
-            data.append(avTemp)
+            avIonization = np.sum(ionization * masses / np.sum(masses))
+            print(density1, density2, np.mean(avIonization))
+            data.append(avIonization)
         return getArrayQuantity(data)
 
     def plot(self, plt: plt.axes, result: Result) -> None:
@@ -46,12 +48,15 @@ class IonizationBinned(TimePlot):
             "$\\rho = 10^{-29} - 10^{-27} \\mathrm{g} / \\mathrm{cm}^3$",
             "$\\rho = 10^{-27} - 10^{-25} \\mathrm{g} / \\mathrm{cm}^3$",
         ]
+        colors = ["r", "g", "b"]
+        for (color, label) in zip(colors, sublabels):
+            plt.plot([], [], color=color, label=label)
 
         plt.xlabel(self.xlabel())
         plt.ylabel(self.ylabel())
-        plt.xlim((55, 6))
+        plt.xlim(self.config["xLim"])
         plt.ylim((1e-6, 1e0))
         for result in result.data:
-            for (i, label) in zip(range(result.values.shape[1]), sublabels):
-                plt.plot(result.times, result.values[:, i], label=label)
+            for (i, color) in zip(range(result.values.shape[1]), colors):
+                plt.plot(result.times, result.values[:, i], color=color)
         plt.legend(loc="lower left")
