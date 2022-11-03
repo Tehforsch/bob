@@ -26,16 +26,19 @@ class IonizationBinned(TimePlot):
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> List[float]:
         densityUnit = pq.g / pq.cm**3 * cu.littleh**2
         data = []
-        self.densityBins = [x * densityUnit for x in [1e-31, 1e-29, 1e-27, 1e-25]]
+        densityFactors = [1.0 / 10.0, 1.0 / 2.0, 1.0, 2.0, 10.0]
         density = BasicField("Density").getData(snap).to(densityUnit, cu.with_H0(snap.H0))
-        for (density1, density2) in zip(self.densityBins, self.densityBins[1:]):
+        meanDensity = np.mean(density)
+        densities = [meanDensity * factor for factor in densityFactors]
+        epsilon = 0.01
+        densityBins = [[dens * (1 - epsilon), dens * (1 + epsilon)] for dens in densities]
+        for (density1, density2) in densityBins:
             allIndices = np.where((density1 < density) & (density < density2))
-            skip = int(allIndices[0].shape[0] / self.config["numSamples"])
+            skip = max(1, int(allIndices[0].shape[0] / self.config["numSamples"]))
             indices = allIndices[0][::skip]
             masses = BasicField("Masses").getData(snap, indices=indices)
             ionization = BasicField("ChemicalAbundances", 1).getData(snap, indices=indices)
             avIonization = np.sum(ionization * masses / np.sum(masses))
-            print(density1, density2, np.mean(avIonization))
             data.append(avIonization)
         return getArrayQuantity(data)
 
@@ -44,11 +47,13 @@ class IonizationBinned(TimePlot):
         ax = fig.add_subplot(1, 1, 1)
         ax.set_yscale("log")
         sublabels = [
-            "$\\rho = 10^{-31} - 10^{-29} \\mathrm{g} / \\mathrm{cm}^3$",
-            "$\\rho = 10^{-29} - 10^{-27} \\mathrm{g} / \\mathrm{cm}^3$",
-            "$\\rho = 10^{-27} - 10^{-25} \\mathrm{g} / \\mathrm{cm}^3$",
+            "$\\rho = 1/10 \\rho",
+            "$\\rho = 1/2 \\rho",
+            "$\\rho = \\rho",
+            "$\\rho = 2 \\rho",
+            "$\\rho = 10 \\rho",
         ]
-        colors = ["r", "g", "b"]
+        colors = ["r", "g", "b", "brown", "orange"]
         for (color, label) in zip(colors, sublabels):
             plt.plot([], [], color=color, label=label)
 
