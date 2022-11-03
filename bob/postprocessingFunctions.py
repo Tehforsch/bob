@@ -4,7 +4,7 @@ import astropy.units as pq
 import matplotlib.pyplot as plt
 
 from abc import ABC, abstractmethod
-from typing import Any, Tuple, Iterable
+from typing import Any, Tuple, Iterable, Dict
 from bob.simulation import Simulation
 from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
@@ -35,7 +35,6 @@ class PostprocessingFunction(ABC):
         if "snap" in kwargs and "sim" in kwargs:
             snap: Snapshot = kwargs["snap"]
             sim: Simulation = kwargs["sim"]
-            print(sim.simType())
             if sim.simType().can_get_redshift():
                 combined["redshift"] = snap.timeQuantity("z")
         return self.config["name"].format(**combined)
@@ -135,8 +134,8 @@ class MultiSetFn(PostprocessingFunction):
         super().__init__(config)
         self.config.setDefault("labels", None)
         self.config.setDefault("quotient", None)
-        self.config.setDefault("colors", ["b", "r", "g", "purple", "brown", "orange", "pink", "teal"] * 5)
-        self.config.setDefault("styles", [{}] * 20)
+        self.config.setDefault("colors", None)
+        self.config.setDefault("styles", None)
 
     @abstractmethod
     def post(self, sims: MultiSet) -> Result:
@@ -147,13 +146,22 @@ class MultiSetFn(PostprocessingFunction):
         pass
 
     def getColors(self) -> Iterable[str]:
-        return self.config["colors"]
+        if self.config["colors"] is None:
+            return ["b", "r", "g", "purple", "brown", "orange", "pink", "teal"] * 5
+        else:
+            return self.config["colors"]
 
     def getLabels(self) -> Iterable[str]:
         labels = self.config["labels"]
         if labels is None:
             labels = []
         return itertools.chain(labels, itertools.repeat(""))
+
+    def getStyles(self) -> Iterable[Dict]:
+        if self.config["styles"] is None:
+            return [{}] * 20
+        else:
+            return self.config["styles"]
 
 
 class SliceFn(PostprocessingFunction):

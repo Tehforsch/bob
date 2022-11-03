@@ -48,14 +48,18 @@ class MeanIonizationRedshift(MultiSetFn):
             meanBins = []
             meanZs = []
             for (bstart, bend) in zip(bins, bins[1:]):
-                indices = np.where((haloMasses >= bstart) & (haloMasses < bend))
+                haloIndices = np.where((haloMasses >= bstart) & (haloMasses < bend))
                 meanBins.append((bstart + bend) * 0.5)
-                z = np.zeros(haloMasses.shape) * pq.dimensionless_unscaled
-                for (i, (pos, r)) in enumerate(zip(center_of_mass, radius)):
-                    indices = tree.query_ball_point(pos, r)
-                    z[i] = np.mean(ionizationRedshift[indices])
-                z = np.mean(z)
-                meanZs.append(z)
+                zs = []
+                for (i, (pos, r)) in enumerate(zip(center_of_mass[haloIndices], radius[haloIndices])):
+                    coordIndices = tree.query_ball_point(pos, r)
+                    redshiftsThisHalo = ionizationRedshift[coordIndices]
+                    redshiftsThisHalo[np.isinf(redshiftsThisHalo)] = 0.0
+                    redshiftsThisHalo[np.isinf(redshiftsThisHalo)] = 0.0
+                    redshiftsThisHalo = redshiftsThisHalo[np.where(redshiftsThisHalo < np.Inf)]
+                    if redshiftsThisHalo.shape[0] > 0:
+                        zs.append(np.mean(redshiftsThisHalo))
+                meanZs.append(np.mean(np.array(zs)))
             result.meanBins.append(getArrayQuantity(meanBins))
             result.meanZs.append(getArrayQuantity(meanZs))
         return result
@@ -67,5 +71,6 @@ class MeanIonizationRedshift(MultiSetFn):
         self.setupLabels()
         ax.set_xscale("log")
         ax.set_yscale("log")
+        print(result)
         for (meanBins, meanZs) in zip(result.meanBins, result.meanZs):
-            self.addLine(result.meanBins, result.meanZs)
+            self.addLine(meanBins, meanZs)

@@ -16,11 +16,10 @@ from bob.util import getArrayQuantity
 
 class IonizationBinned(TimePlot):
     def __init__(self, config: PlotConfig) -> None:
-        super().__init__(config)
-        self.config.setDefault("numSamples", 100000)
-        self.config.setDefault("xLim", [10.0, 4.2])
-        self.config.setDefault("densityFactors", [1.0 / 10.0, 1.0 / 2.0, 1.0, 2.0, 10.0])
-        self.config.setDefault(
+        config.setDefault("numSamples", 100000)
+        config.setDefault("xLim", [10.0, 4.2])
+        config.setDefault("densityFactors", [1.0 / 10.0, 1.0 / 2.0, 1.0, 2.0, 10.0])
+        config.setDefault(
             "sublabels",
             [
                 "$1/10 \\langle \\rho \\rangle$",
@@ -30,7 +29,8 @@ class IonizationBinned(TimePlot):
                 "$10 \\langle \\rho \\rangle$",
             ],
         )
-        self.config.setDefault("colors", ["r", "g", "b", "brown", "orange"])
+        config.setDefault("colors", ["r", "g", "b", "brown", "orange"])
+        super().__init__(config)
 
     def ylabel(self) -> str:
         return "$x_{\\mathrm{H+}}$"

@@ -31,12 +31,12 @@ class InfiniteCone:
 
 class ShadowingVolume(TimePlot):
     def __init__(self, config: PlotConfig) -> None:
+        config.setDefault("xUnit", pq.kyr)
+        config.setDefault("yUnit", 1.0)
+        config.setDefault("xLabel", "$t \; [\mathrm{kyr}]$")
+        config.setDefault("yLabel", "$\overline{x_{\mathrm{H}}}$")
+        config.setDefault("colors", ["b", "b", "b", "r", "r", "r"])
         super().__init__(config)
-        self.config.setDefault("xUnit", pq.kyr)
-        self.config.setDefault("yUnit", 1.0)
-        self.config.setDefault("xLabel", "$t \; [\mathrm{kyr}]$")
-        self.config.setDefault("yLabel", "$\overline{x_{\mathrm{H}}}$")
-        self.config.setDefault("colors", ["b", "b", "b", "r", "r", "r"])
 
     def plotToBox(self, x: np.ndarray) -> np.ndarray:
         return x + self.center

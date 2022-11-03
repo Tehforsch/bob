@@ -61,7 +61,7 @@ class TimePlot(MultiSetFn):
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         self.setupLinePlot()
-        for (label, color, style, result) in zip(self.getLabels(), self.getColors(), self.config["styles"], result.data):
+        for (label, color, style, result) in zip(self.getLabels(), self.getColors(), self.getStyles(), result.data):
             self.addLine(result.times, result.values, label=label, color=color, **style)
         plt.legend()
 
