@@ -19,6 +19,9 @@ class IonizationBinned(TimePlot):
         super().__init__(config)
         self.config.setDefault("numSamples", 100000)
         self.config.setDefault("xLim", [10.0, 4.2])
+        self.config.setDefault("densityFactors", [1.0 / 10.0, 1.0 / 2.0, 1.0, 2.0, 10.0])
+        self.config.setDefault("sublabels", ["$1/10 \\rho$", "$1/2 \\rho$", "$\\rho$", "$2 \\rho$", "$10 \\rho$"])
+        self.config.setDefault("colors", ["r", "g", "b", "brown", "orange"])
 
     def ylabel(self) -> str:
         return "$x_{\\mathrm{H+}}$"
@@ -26,10 +29,9 @@ class IonizationBinned(TimePlot):
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> List[float]:
         densityUnit = pq.g / pq.cm**3 * cu.littleh**2
         data = []
-        densityFactors = [1.0 / 10.0, 1.0 / 2.0, 1.0, 2.0, 10.0]
         density = BasicField("Density").getData(snap).to(densityUnit, cu.with_H0(snap.H0))
         meanDensity = np.mean(density)
-        densities = [meanDensity * factor for factor in densityFactors]
+        densities = [meanDensity * factor for factor in self.config["densityFactors"]]
         epsilon = 0.01
         densityBins = [[dens * (1 - epsilon), dens * (1 + epsilon)] for dens in densities]
         for (density1, density2) in densityBins:
@@ -39,7 +41,7 @@ class IonizationBinned(TimePlot):
             masses = BasicField("Masses").getData(snap, indices=indices)
             ionization = BasicField("ChemicalAbundances", 1).getData(snap, indices=indices)
             avIonization = np.sum(ionization * masses / np.sum(masses))
-            print(density1, density2, np.mean(avIonization))
+            print(f"{density1} - {density2}: {np.mean(avIonization)} ({indices.shape} values)")
             data.append(avIonization)
         return getArrayQuantity(data)
 
@@ -47,15 +49,7 @@ class IonizationBinned(TimePlot):
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         ax.set_yscale("log")
-        sublabels = [
-            "$\\rho = 1/10 \\rho",
-            "$\\rho = 1/2 \\rho",
-            "$\\rho = \\rho",
-            "$\\rho = 2 \\rho",
-            "$\\rho = 10 \\rho",
-        ]
-        colors = ["r", "g", "b", "brown", "orange"]
-        for (color, label) in zip(colors, sublabels):
+        for (color, label) in zip(self.config["colors"], self.config["sublabels"]):
             plt.plot([], [], color=color, label=label)
 
         plt.xlabel(self.xlabel())
@@ -63,6 +57,6 @@ class IonizationBinned(TimePlot):
         plt.xlim(self.config["xLim"])
         plt.ylim((1e-6, 1e0))
         for result in result.data:
-            for (i, color) in zip(range(result.values.shape[1]), colors):
+            for (i, color) in zip(range(result.values.shape[1]), self.config["colors"]):
                 plt.plot(result.times, result.values[:, i], color=color)
         plt.legend(loc="lower left")
