@@ -27,7 +27,7 @@ class IonizationTime(SetFn):
         self.config.setDefault("yUnit", pq.Mpc)
         self.config.setDefault("xLabel", "$x [h^{-1} \\mathrm{UNIT}]$")
         self.config.setDefault("yLabel", "$y [h^{-1} \\mathrm{UNIT}]$")
-        self.config.setDefault("velocity", False)  # Plot the velocity of the ionization front instead
+        self.config.setDefault("velocity", True)
         self.config.setDefault("time", "z")
         self.config.setDefault("axis", "z")
         if self.config["velocity"]:
