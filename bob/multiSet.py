@@ -12,7 +12,7 @@ class MultiSet:
         if labels is None:
             self.labels = [str(i) for (i, _) in enumerate(self.sims)]
         else:
-            assert len(labels) == len(self.sims)
+            assert len(labels) == len(self.sims), f"Found {len(labels)} labels but {len(self.sims)} sims"
             self.labels = labels
         print("Simulation sets:")
         for (simSet, label, config) in zip(self.sims, self.labels, self.configs):
