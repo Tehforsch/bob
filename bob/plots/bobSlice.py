@@ -56,7 +56,7 @@ class Slice(SnapFn):
         self.config.setDefault("xUnit", pq.Mpc)
         self.config.setDefault("yUnit", pq.Mpc)
         self.config.setDefault("vUnit", self.field.unit)
-        self.config.setDefault("vLim", (1e-6, 1e0))
+        self.config.setDefault("vLim", [1e-6, 1e0])
         self.config.setDefault("log", True)
         self.config.setDefault("logmin0", -9)
         self.config.setDefault("logmin1", -9)

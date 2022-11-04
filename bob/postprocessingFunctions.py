@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from abc import ABC, abstractmethod
 from typing import Any, Tuple, Iterable, Dict
 from bob.simulation import Simulation
-from bob.simulationSet import SimulationSet, Single
+from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
 from bob.result import Result
 from bob.multiSet import MultiSet
@@ -117,7 +117,7 @@ class SetFn(PostprocessingFunction):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
         self.config.setDefault("labels", None)
-        self.config.setDefault("quotient", Single)
+        self.config.setDefault("quotient", "single")
         self.config.setDefault("name", self.name + "_{setNum}")
 
     @abstractmethod
@@ -133,7 +133,7 @@ class MultiSetFn(PostprocessingFunction):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
         self.config.setDefault("labels", None)
-        self.config.setDefault("quotient", Single)
+        self.config.setDefault("quotient", "single")
         self.config.setDefault("colors", None)
         self.config.setDefault("styles", None)
 

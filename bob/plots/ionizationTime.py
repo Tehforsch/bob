@@ -37,11 +37,11 @@ class IonizationTime(SetFn):
         if self.config["time"] == "z":
             self.config.setDefault("vUnit", pq.dimensionless_unscaled)
             self.config.setDefault("cLabel", "$z$")
-            self.config.setDefault("vLim", (0.0, 20))
+            self.config.setDefault("vLim", [0.0, 20])
         else:
             self.config.setDefault("vUnit", pq.Myr)
             self.config.setDefault("cLabel", "$t [\\mathrm{Myr}]$")
-            self.config.setDefault("vLim", (0.0, 2e2))
+            self.config.setDefault("vLim", [0.0, 2e2])
 
     def post(self, simSet: SimulationSet) -> Result:
         result = self.getIonizationTimeData(simSet)

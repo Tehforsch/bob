@@ -55,7 +55,7 @@ class TemperatureOverTime(TimePlot):
 
         plt.xlabel(self.xlabel())
         plt.ylabel(self.ylabel())
-        plt.ylim((1e1, 1e5))
+        plt.ylim([1e1, 1e5])
         for (labels, arr) in zip(self.getLabels(), result.arrs):
             for (i, label) in zip(range(1, arr.shape[1]), sublabels):
                 plt.plot(arr[:, 0], arr[:, i], label=label)
