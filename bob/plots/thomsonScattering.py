@@ -4,15 +4,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from bob.util import getArrayQuantity
-from bob.simulationSet import SimulationSet
 from bob.snapshot import Snapshot
 from bob.basicField import BasicField
 from bob.constants import speedOfLight, protonMass
 from bob.plots.timePlots import getAllSnapshotsWithTime
 from bob.result import Result
 from bob.electronAbundance import ElectronAbundance
-from bob.postprocessingFunctions import SetFn
+from bob.postprocessingFunctions import MultiSetFn
 from bob.plotConfig import PlotConfig
+from bob.multiSet import MultiSet
 
 
 def getRateForSnap(snap: Snapshot) -> pq.Quantity:
@@ -23,7 +23,7 @@ def getRateForSnap(snap: Snapshot) -> pq.Quantity:
     return speedOfLight * sig * np.mean(ne)
 
 
-class ThomsonScattering(SetFn):
+class ThomsonScattering(MultiSetFn):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
         config.setDefault("xLabel", "$z$")
@@ -31,22 +31,25 @@ class ThomsonScattering(SetFn):
         config.setDefault("yLabel", "$\\tau$")
         config.setDefault("yUnit", pq.dimensionless_unscaled)
 
-    def post(self, sims: SimulationSet) -> Result:
-        snapshots = getAllSnapshotsWithTime("z", sims)
+    def post(self, simSet: MultiSet) -> Result:
         result = Result()
-        result.redshifts = getArrayQuantity([redshift for (_, _, redshift) in snapshots])[1:]
-        ages = getArrayQuantity([sim.getLookbackTime(snap.scale_factor) for (snap, sim, _) in snapshots])
-        dt = np.diff(ages)
+        result.redshifts = []
+        result.tau = []
+        for sims in simSet:
+            snapshots = getAllSnapshotsWithTime("z", sims)
+            result.redshifts.append(getArrayQuantity([redshift for (_, _, redshift) in snapshots])[1:])
+            ages = getArrayQuantity([sim.getLookbackTime(snap.scale_factor) for (snap, sim, _) in snapshots])
+            dt = np.diff(ages)
 
-        dTau = [dt[i] * getRateForSnap(snapshots[i][0]) for i in range(len(dt))]
-        result.tau = np.cumsum(dTau) * pq.dimensionless_unscaled
+            dTau = [dt[i] * getRateForSnap(snapshots[i][0]) for i in range(len(dt))]
+            result.tau.append(np.cumsum(dTau) * pq.dimensionless_unscaled)
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         self.setupLinePlot()
-        print(result.redshifts, result.tau)
-        print(type(result.redshifts), type(result.tau))
-        self.addLine(result.redshifts, result.tau)
+        for (redshifts, taus, label) in zip(result.redshifts, result.tau, self.getLabels()):
+            self.addLine(redshifts, taus, label=label)
+        plt.legend()
         nx = int(50)
         ztau = np.linspace(0.0, 50.0, nx)
         taumax = np.full(nx, 0.061)
