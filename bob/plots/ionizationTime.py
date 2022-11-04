@@ -33,7 +33,11 @@ class IonizationTime(SetFn):
         if self.config["velocity"]:
             self.config.setDefault("smoothingSigma", 0.0)
             self.config.setDefault("coarseness", 20)
-            self.config.setDefault("velUnit", pq.cm / pq.s)
+            self.config.setDefault("norm", False)
+            if self.config["norm"]:
+                self.config.setDefault("velUnit", pq.dimensionless_unscaled)
+            else:
+                self.config.setDefault("velUnit", pq.cm / pq.s)
         if self.config["time"] == "z":
             self.config.setDefault("vUnit", pq.dimensionless_unscaled)
             self.config.setDefault("cLabel", "$z$")
@@ -66,7 +70,10 @@ class IonizationTime(SetFn):
             sigma = self.config["smoothingSigma"]
             result.velX = dataUnit * scipy.ndimage.gaussian_filter(result.velX, sigma)
             result.velY = dataUnit * scipy.ndimage.gaussian_filter(result.velY, sigma)
-            print(np.mean(result.velX))
+            if self.config["norm"]:
+                norm = np.sqrt(result.velX**2 + result.velY**2)
+                result.velX = result.velX / norm
+                result.velY = result.velY / norm
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:

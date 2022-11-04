@@ -78,6 +78,18 @@ class PostprocessingFunction(ABC):
         yUnit = pq.Unit(self.config["yUnit"])
         plt.scatter(xdata.to_value(xUnit), ydata.to_value(yUnit), *args, **kwargs)
 
+    def showTimeIfDesired(self, fig: plt.Figure, result: Result) -> None:
+        if self.config["showTime"]:
+            self.showTime(fig, result)
+
+    def showTime(self, fig: plt.Figure, result: Result) -> None:
+        if self.config["time"] == "t":
+            time = result.time.to(self.config["timeUnit"]).value
+            timeUnit = str(self.config["timeUnit"])
+            fig.suptitle(f"Time: {time:.01f} {timeUnit}", fontsize=12)
+        else:
+            fig.suptitle(f"Redshift: {result.time:.01f}", fontsize=12)
+
     def __repr__(self) -> str:
         return f"{self.name}: {self.config}"
 
@@ -95,22 +107,10 @@ class SnapFn(PostprocessingFunction):
         self.config.setDefault("time", "t")
         self.config.setDefault("timeUnit", pq.Myr)
 
-    def showTime(self, fig: plt.Figure, result: Result) -> None:
-        if self.config["time"] == "t":
-            time = result.time.to(self.config["timeUnit"]).value
-            timeUnit = str(self.config["timeUnit"])
-            fig.suptitle(f"Time: {time:.01f} {timeUnit}", fontsize=12)
-        else:
-            fig.suptitle(f"Redshift: {result.time:.01f}", fontsize=12)
-
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         result = Result()
         result.time = snap.timeQuantity(self.config["time"])
         return result
-
-    def showTimeIfDesired(self, fig: plt.Figure, result: Result) -> None:
-        if self.config["showTime"]:
-            self.showTime(fig, result)
 
 
 class SetFn(PostprocessingFunction):
