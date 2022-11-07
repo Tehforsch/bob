@@ -39,7 +39,7 @@ class Histogram(SnapFn):
         result.y_edges = result.y_edges * pq.dimensionless_unscaled
         return result
 
-    def plot(self, plt: plt.axes, result: Result) -> None:
+    def plot(self, plt: plt.axes, result: Result) -> Any:
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         self.setupLabels()
@@ -50,3 +50,4 @@ class Histogram(SnapFn):
         plt.pcolormesh(X, Y, result.H, norm=colors.LogNorm())
         plt.colorbar()
         super().plot(plt, result)
+        return fig, ax

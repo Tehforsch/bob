@@ -26,6 +26,6 @@ class TemperatureDensityHistogram(Histogram):
         return super().postHistogram(sim, snap, BasicField("Density"), Temperature())
 
     def plot(self, plt: plt.axes, result: Result) -> None:
+        super().plot(plt, result)
         plt.xticks([1e-31, 1e-30, 1e-29, 1e-28, 1e-27, 1e-26])
         plt.yticks([1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7])
-        super().plot(plt, result)

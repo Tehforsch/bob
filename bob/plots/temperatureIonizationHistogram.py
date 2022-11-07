@@ -26,6 +26,6 @@ class TemperatureIonizationHistogram(Histogram):
         return super().postHistogram(sim, snap, BasicField("ChemicalAbundances", 1), Temperature())
 
     def plot(self, plt: plt.axes, result: Result) -> None:
+        super().plot(plt, result)
         plt.xticks([1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1e0])
         plt.yticks([1e0, 1e1, 1e2, 1e3, 1e4, 1e5])
-        super().plot(plt, result)
