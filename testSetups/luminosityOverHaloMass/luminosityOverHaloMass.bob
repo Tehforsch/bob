@@ -1,0 +1,22 @@
+luminosityOverHaloMass:
+  groupCatalogFolder: groups
+  labels: null
+  median: false
+  name: luminosityOverHaloMass
+  numBins: 40
+  outputFileType: png
+  postprocessing: true
+  quotient: single
+  radiusFactor: 1.0
+  redshift: 6.0
+  scatter: false
+  showTime: true
+  sims: null
+  statistic: sum
+  stellarMass: false
+  time: z
+  timeUnit: ''
+  xLabel: $M_{\mathrm{halo}} [M_{\odot}]$
+  xUnit: solMass / littleh
+  yLabel: $L_{\star} [1/s]$
+  yUnit: 1.0 1 / s

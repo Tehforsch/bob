@@ -72,7 +72,7 @@ class TimeQuantity:
                 self.values = values
             case SimType.POST_COSMOLOGICAL:
                 self.type_ = TimeType.SCALE_FACTOR
-                self.values = shiftByIcsTime(sim, values)
+                raise NotImplementedError
             case SimType.POST_STANDARD_ICS_COSMOLOGICAL:
                 self.type_ = TimeType.SCALE_FACTOR
                 self.values = shiftByIcsTime(sim, values)
