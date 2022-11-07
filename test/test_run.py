@@ -45,6 +45,8 @@ class Test(unittest.TestCase):
             "temperatureDensityHistogram",
             "temperatureIonizationHistogram",
             "sourceField",
+            "luminosityOverHaloMass",
+            "resolvedEscapeFraction",
         ]
         folders = [self.testPath / f for f in tests]
         runInPool(runTestInTemporaryDirectory, folders, self.pybobPath)

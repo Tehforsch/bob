@@ -8,8 +8,9 @@ class Ray:
         self.pos = pos
         self.direction = direction
 
-    def getValues(self, tree: cKDTree, dataset: pq.Quantity, interval: tuple[float, float], numValues: int) -> pq.Quantity:
+    def integrate(self, tree: cKDTree, dataset: pq.Quantity, interval: tuple[pq.Quantity, pq.Quantity], numValues: int) -> pq.Quantity:
         tValues = np.linspace(interval[0], interval[1], num=numValues)
-        positions = self.pos + tValues * self.direction
+        positions = self.pos + np.outer(tValues, self.direction)
         cellIndices = tree.query(positions)[1]
-        return dataset[cellIndices]
+        dr = (interval[1] - interval[0]) / numValues
+        return np.sum(dataset[cellIndices]) * dr

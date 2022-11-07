@@ -10,6 +10,7 @@ from bob.plots.overHaloMass import OverHaloMass
 class LuminosityOverHaloMass(OverHaloMass):
     def __init__(self, config: PlotConfig) -> None:
         config.setDefault("yUnit", 1.0 / pq.s)
+        config.setDefault("yLabel", "$L_{\\star} [1/s]$")
         config.setDefault("statistic", "sum")
         super().__init__(config)
 

@@ -5,6 +5,7 @@ import astropy.cosmology.units as cu
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial import cKDTree
+import tqdm
 
 from bob.util import getArrayQuantity
 from bob.simulationSet import SimulationSet
@@ -23,7 +24,6 @@ class OverHaloMass(SetFn):
             config.setDefault("xLabel", "$M_{\\star} [M_{\\odot}]$")
         else:
             config.setDefault("xLabel", "$M_{\\mathrm{halo}} [M_{\\odot}]$")
-        config.setDefault("yLabel", "$L_{\\star} [1/s]$")
         config.setDefault("xUnit", pq.Msun / cu.littleh)
         config.setDefault("groupCatalogFolder", "groups")
         config.setDefault("numBins", 40)
@@ -42,15 +42,23 @@ class OverHaloMass(SetFn):
     def quantity(self, snap: Snapshot) -> pq.Quantity:
         pass
 
+    def evaluateQuantityForHalo(self, tree: cKDTree, quantity: pq.Quantity, pos: pq.Quantity, r: pq.Quantity) -> pq.Quantity:
+        indices = tree.query_ball_point(pos, r)
+        statistic = self.config["statistic"]
+        if statistic == "sum":
+            return np.sum(quantity[indices])
+        elif statistic == "mean":
+            return np.mean(quantity[indices])
+        else:
+            raise ValueError("Unknown statistic f{statistic}")
+
     def post(self, sims: SimulationSet) -> Result:
         files = GroupFiles(sims, Path(self.config["groupCatalogFolder"]))
         if self.config["stellarMass"]:
             masses = files.stellarMasses()
         else:
             masses = files.haloMasses()
-        lengthUnit = pq.kpc / cu.littleh
-        center_of_mass = files.center_of_mass().to(lengthUnit)
-        radius = (files.halfmass_rad()).to(lengthUnit) * self.config["radiusFactor"]
+        lengthUnit = pq.kpc
         result = Result()
         assert len(sims) == 1, "Not implemented for more than one sim"
         sim = sims[0]
@@ -59,19 +67,17 @@ class OverHaloMass(SetFn):
         else:
             snap = sim.getSnapshotAtRedshift(self.config["redshift"])
         result.time = snap.timeQuantity(self.config["time"])
+        center_of_mass = files.center_of_mass().to(lengthUnit, cu.with_H0(snap.H0))
+        radius = (files.halfmass_rad()).to(lengthUnit, cu.with_H0(snap.H0)) * self.config["radiusFactor"]
         coords = BasicField("Coordinates", partType=0, comoving=True).getData(snap)
         tree = cKDTree(coords.to(lengthUnit, cu.with_H0(snap.H0)))
         quantity = self.quantity(snap)
         values = np.zeros(masses.shape) * self.config["yUnit"]
-        for (i, (pos, r)) in enumerate(zip(center_of_mass, radius)):
-            indices = tree.query_ball_point(pos, r)
-            statistic = self.config["statistic"]
-            if statistic == "sum":
-                values[i] = np.sum(quantity[indices])
-            elif statistic == "mean":
-                values[i] = np.mean(quantity[indices])
-            else:
-                raise ValueError("Unknown statistic f{statistic}")
+        numHaloes = center_of_mass.shape[0]
+        for i in tqdm.trange(numHaloes):
+            pos = center_of_mass[i]
+            r = radius[i]
+            values[i] = self.evaluateQuantityForHalo(tree, quantity, pos.to(lengthUnit, cu.with_H0(snap.H0)), r)
 
         _, bins = np.histogram(masses, bins=self.config["numBins"])
         if self.config["scatter"]:

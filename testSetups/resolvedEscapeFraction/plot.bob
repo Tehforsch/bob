@@ -1,4 +1,4 @@
-luminosityOverHaloMass:
+resolvedEscapeFraction:
   groupCatalogFolder: groups
   labels: null
   median: false
@@ -18,5 +18,3 @@ luminosityOverHaloMass:
   timeUnit: ''
   xLabel: $M_{\mathrm{halo}} [M_{\odot}]$
   xUnit: solMass / littleh
-  yLabel: $L_{\star} [1/s]$
-  yUnit: 1.0 1 / s
