@@ -54,12 +54,11 @@ class MeanIonizationRedshift(MultiSetFn):
                 for (i, (pos, r)) in enumerate(zip(center_of_mass[haloIndices], radius[haloIndices])):
                     coordIndices = tree.query_ball_point(pos, r)
                     redshiftsThisHalo = ionizationRedshift[coordIndices]
-                    redshiftsThisHalo[np.isinf(redshiftsThisHalo)] = 0.0
-                    redshiftsThisHalo[np.isinf(redshiftsThisHalo)] = 0.0
                     redshiftsThisHalo = redshiftsThisHalo[np.where(redshiftsThisHalo < np.Inf)]
                     if redshiftsThisHalo.shape[0] > 0:
                         zs.append(np.mean(redshiftsThisHalo))
-                meanZs.append(np.mean(np.array(zs)))
+                meanZs.append(np.mean(np.array(zs)) * pq.dimensionless_unscaled)
+            print(getArrayQuantity(meanZs))
             result.meanBins.append(getArrayQuantity(meanBins))
             result.meanZs.append(getArrayQuantity(meanZs))
         return result

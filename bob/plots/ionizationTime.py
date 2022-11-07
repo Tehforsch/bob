@@ -27,21 +27,25 @@ class IonizationTime(SetFn):
         self.config.setDefault("yUnit", pq.Mpc)
         self.config.setDefault("xLabel", "$x [h^{-1} \\mathrm{UNIT}]$")
         self.config.setDefault("yLabel", "$y [h^{-1} \\mathrm{UNIT}]$")
-        self.config.setDefault("velocity", False)  # Plot the velocity of the ionization front instead
+        self.config.setDefault("velocity", True)
         self.config.setDefault("time", "z")
         self.config.setDefault("axis", "z")
         if self.config["velocity"]:
             self.config.setDefault("smoothingSigma", 0.0)
             self.config.setDefault("coarseness", 20)
-            self.config.setDefault("velUnit", pq.cm / pq.s)
+            self.config.setDefault("norm", False)
+            if self.config["norm"]:
+                self.config.setDefault("velUnit", pq.dimensionless_unscaled)
+            else:
+                self.config.setDefault("velUnit", pq.cm / pq.s)
         if self.config["time"] == "z":
             self.config.setDefault("vUnit", pq.dimensionless_unscaled)
             self.config.setDefault("cLabel", "$z$")
-            self.config.setDefault("vLim", (0.0, 20))
+            self.config.setDefault("vLim", [0.0, 20])
         else:
             self.config.setDefault("vUnit", pq.Myr)
             self.config.setDefault("cLabel", "$t [\\mathrm{Myr}]$")
-            self.config.setDefault("vLim", (0.0, 2e2))
+            self.config.setDefault("vLim", [0.0, 2e2])
 
     def post(self, simSet: SimulationSet) -> Result:
         result = self.getIonizationTimeData(simSet)
@@ -66,7 +70,10 @@ class IonizationTime(SetFn):
             sigma = self.config["smoothingSigma"]
             result.velX = dataUnit * scipy.ndimage.gaussian_filter(result.velX, sigma)
             result.velY = dataUnit * scipy.ndimage.gaussian_filter(result.velY, sigma)
-            print(np.mean(result.velX))
+            if self.config["norm"]:
+                norm = np.sqrt(result.velX**2 + result.velY**2)
+                result.velX = result.velX / norm
+                result.velY = result.velY / norm
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:

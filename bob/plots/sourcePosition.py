@@ -11,8 +11,8 @@ from bob.plotConfig import PlotConfig
 class SourcePosition(SetFn):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
-        self.config.setDefault("xLim", (0.0, 1.0))
-        self.config.setDefault("yLim", (0.0, 1.0))
+        self.config.setDefault("xLim", [0.0, 1.0])
+        self.config.setDefault("yLim", [0.0, 1.0])
         self.config.setDefault("xUnit", pq.kpc)
         self.config.setDefault("yUnit", pq.kpc)
         self.config.setDefault("xLabel", "x [UNIT]")

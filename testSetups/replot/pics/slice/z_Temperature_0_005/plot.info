@@ -10,7 +10,7 @@ slice:
   logmin1: -9
   logmin2: -9
   showTime: false
-  vLim: !!python/tuple
+  vLim:
   - 1.0e-06
   - 1.0
   vUnit: !!python/object/apply:astropy.units.core._recreate_irreducible_unit
