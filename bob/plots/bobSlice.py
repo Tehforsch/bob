@@ -103,7 +103,8 @@ class Slice(SnapFn):
             if self.config["log"]:
                 self.transformLog(result.data)
         print(f"min: {np.min(result.data)}, max: {np.max(result.data)}")
-        if self.config["log"]:
+        # imshow does not seem to support LogNorm for RGB data anymore
+        if self.config["log"] and result.data.ndim != 3:
             self.image(plt, result.data, result.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
         else:
             self.image(plt, result.data, result.extent, vmin=vmin, vmax=vmax, origin="lower")
