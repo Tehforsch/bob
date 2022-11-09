@@ -28,6 +28,7 @@ class IonizationRate(MultiSetFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
+        print(result)
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         ax.set_yscale("log")
@@ -61,10 +62,10 @@ class IonizationRate(MultiSetFn):
         plt.errorbar(zcal11, gammacal11, yerr=[ermgammacal11, erpgammacal11], fmt="o", color="r", mec="r", label=r"Calverley+11", capsize=5)
         plt.errorbar(zfc08, gamfc08 * 1e-12, yerr=e_gamfc08 * 1e-12, fmt="s", color="g", mec="g", label=r"Faucher-Giguere+08", capsize=5)
         plt.errorbar(
-            zbb13, gambb13 * 1e-12, yerr=[erpgbb13 * 1e-12, -ermgbb13 * 1e-12], fmt="^", color="b", mec="b", label=r"Becker-Bolton+13", capsize=5
+            zbb13, gambb13 * 1e-12, yerr=[-erpgbb13 * 1e-12, ermgbb13 * 1e-12], fmt="^", color="b", mec="b", label=r"Becker-Bolton+13", capsize=5
         )
         plt.errorbar(
-            zdal18, gamdal18 * 1e-12, yerr=[erpdal18 * 1e-12, -ermdal18 * 1e-12], fmt="*", color="m", mec="m", label=r"D'Aloisio+18", capsize=5
+            zdal18, gamdal18 * 1e-12, yerr=[erpdal18 * 1e-12, ermdal18 * 1e-12], fmt="*", color="m", mec="m", label=r"D'Aloisio+18", capsize=5
         )
 
 

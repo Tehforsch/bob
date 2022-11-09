@@ -18,6 +18,7 @@ class IonizationBinned(TimePlot):
     def __init__(self, config: PlotConfig) -> None:
         config.setDefault("numSamples", 100000)
         config.setDefault("xLim", [10.0, 4.2])
+        config.setDefault("yLim", [1e0, 1e-6])
         config.setDefault("densityFactors", [1.0 / 10.0, 1.0 / 2.0, 1.0, 2.0, 10.0])
         config.setDefault(
             "sublabels",
@@ -30,6 +31,8 @@ class IonizationBinned(TimePlot):
             ],
         )
         config.setDefault("colors", ["r", "g", "b", "brown", "orange"])
+        config.setDefault("linestyles", ["o", "v", "^", "<", ">"])
+        config.setDefault("legend_loc", "lower left")
         super().__init__(config)
 
     def ylabel(self) -> str:
@@ -58,14 +61,15 @@ class IonizationBinned(TimePlot):
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         ax.set_yscale("log")
-        for (color, label) in zip(self.config["colors"], self.config["sublabels"]):
-            plt.plot([], [], color=color, label=label)
+        for (label, linestyle) in zip(self.config["sublabels"], self.config["linestyles"]):
+            plt.plot([], [], color="black", linestyle=linestyle, label=label)
 
         plt.xlabel(self.xlabel())
         plt.ylabel(self.ylabel())
         plt.xlim(self.config["xLim"])
-        plt.ylim((1e-6, 1e0))
-        for result in result.data:
-            for (i, color) in zip(range(result.values.shape[1]), self.config["colors"]):
-                plt.plot(result.times, result.values[:, i], color=color)
-        plt.legend(loc="lower left")
+        plt.ylim(self.config["yLim"])
+        for (result, color, label) in zip(result.data, self.config["colors"], self.getLabels()):
+            plt.plot([], [], color=color, label=label)
+            for (i, linestyle) in zip(range(result.values.shape[1]), self.config["linestyles"]):
+                plt.plot(result.times, result.values[:, i], color=color, linestyle=linestyle)
+        plt.legend(loc=self.config["legend_loc"])
