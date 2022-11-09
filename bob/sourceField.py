@@ -4,6 +4,7 @@ from bob.snapshot import Snapshot
 
 import numpy as np
 import astropy.units as pq
+import astropy.cosmology.units as cu
 from scipy.spatial import cKDTree
 
 
@@ -14,11 +15,15 @@ class SourceField(Field):
         source = np.zeros(coords.shape[0]) / pq.s
         type_ = snapshot.sim.params["SX_SOURCES"]
         if type_ == 4:
-            starMasses = BasicField("masses", partType=4).getData(snapshot)
-            starCoords = BasicField("Coordinates", partType=4).getData(snapshot)
+            try:
+                starMasses = BasicField("Masses", partType=4).getData(snapshot)
+                starCoords = BasicField("Coordinates", partType=4).getData(snapshot)
+            except KeyError:
+                # Might just be that there are no stars at this point
+                return source
             cellIndices = tree.query(starCoords)[1]
             print("Using ridiculous approximation for source strength. To do this properly, write out stellar age and take SourceFactor into account")
-            source[cellIndices] = 1e40 / pq.s * starMasses.to_value(pq.Msun)
+            source[cellIndices] = 1e40 / pq.s * starMasses.to_value(pq.Msun, cu.with_H0(snapshot.H0))
         elif type_ == 10:
             sources = snapshot.sim.sources()
             starCoords = sources.getCoords(snapshot.sim)

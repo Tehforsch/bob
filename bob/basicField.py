@@ -88,6 +88,8 @@ class BasicField(Field):
                 unit = 1 / snapshot.timeUnit
             elif self.name == "PhotonFlux":
                 unit = 1 / snapshot.timeUnit
+            elif self.name == "Masses":
+                unit = pq.g * snapshot.sim.params["UnitMass_in_g"]
             else:
                 raise ValueError("Fix units for field: {}".format(self.name))
         if indices is None:
