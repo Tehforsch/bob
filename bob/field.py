@@ -1,4 +1,4 @@
-import numpy as np
+import astropy.units as pq
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 class Field(ABC):
     @abstractmethod
-    def getData(self, snapshot: "Snapshot") -> np.ndarray:
+    def getData(self, snapshot: "Snapshot") -> pq.Quantity:
         pass
 
     @property

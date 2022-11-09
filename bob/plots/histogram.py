@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import astropy.units as pq
+import astropy.cosmology.units as cu
 
 from bob.simulation import Simulation
 from bob.snapshot import Snapshot
@@ -21,8 +22,8 @@ class Histogram(SnapFn):
 
     def postHistogram(self, sim: Simulation, snap: Snapshot, fieldX: Field, fieldY: Field) -> Result:
         result = super().post(sim, snap)
-        dataX = fieldX.getData(snap) / self.config["xUnit"]
-        dataY = fieldY.getData(snap) / self.config["yUnit"]
+        dataX = fieldX.getData(snap).to_value(self.config["xUnit"], cu.with_H0(snap.H0))
+        dataY = fieldY.getData(snap).to_value(self.config["yUnit"], cu.with_H0(snap.H0))
         if self.config["only_ionized"]:
             hpAbundance = BasicField("ChemicalAbundances", 1).getData(snap)
             indices = np.where(hpAbundance > 0.5)
