@@ -27,7 +27,6 @@ class PostprocessingFunction(ABC):
         self.config = config
         self.config.setDefault("sims", None)
         self.config.setDefault("outputFileType", "png")
-        self.config.setDefault("name", self.name)
 
     def getName(self, **kwargs: Any) -> str:
         combined = self.config.copy()
@@ -136,6 +135,7 @@ class MultiSetFn(PostprocessingFunction):
         self.config.setDefault("quotient", "single")
         self.config.setDefault("colors", None)
         self.config.setDefault("styles", None)
+        self.config.setDefault("name", self.name)
 
     @abstractmethod
     def post(self, sims: MultiSet) -> Result:
