@@ -30,6 +30,8 @@ class ThomsonScattering(MultiSetFn):
         config.setDefault("xUnit", pq.dimensionless_unscaled)
         config.setDefault("yLabel", "$\\tau$")
         config.setDefault("yUnit", pq.dimensionless_unscaled)
+        config.setDefault("xLim", [0, 20])
+        config.setDefault("yLim", [0, 0.25])
 
     def post(self, simSet: MultiSet) -> Result:
         result = Result()
@@ -37,12 +39,22 @@ class ThomsonScattering(MultiSetFn):
         result.tau = []
         for sims in simSet:
             snapshots = getAllSnapshotsWithTime("z", sims)
-            result.redshifts.append(getArrayQuantity([redshift for (_, _, redshift) in snapshots])[1:])
-            ages = getArrayQuantity([sim.getLookbackTime(snap.scale_factor) for (snap, sim, _) in snapshots])
+            redshifts = [redshift for (_, _, redshift) in snapshots]
+            # Why the fuck does lookback time return a time around ~13 Gyr, whereas
+            # age returns small numbers? Am I dumb? shouldnt these be reversed?
+            ages = [sim.getLookbackTime(snap.scale_factor) for (snap, sim, _) in snapshots]
+            # make sure we "integrate" all the way to z = 0, by pretending that the last snapshot is also valid for z = 0
+            redshifts.insert(0, pq.dimensionless_unscaled * 0)
+            ages.insert(0, sims[0].getLookbackTime(1.0 * pq.dimensionless_unscaled))
+            ages = getArrayQuantity(ages)
             dt = np.diff(ages)
 
             dTau = [dt[i] * getRateForSnap(snapshots[i][0]) for i in range(len(dt))]
-            result.tau.append(np.cumsum(dTau) * pq.dimensionless_unscaled)
+            result.redshifts.append(getArrayQuantity(redshifts))
+            tau = np.cumsum(dTau) * pq.dimensionless_unscaled
+            # again, insert an additional data point for z = 0
+            tau = np.concatenate((np.array([0.0]) * pq.dimensionless_unscaled, tau))
+            result.tau.append(tau)
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
