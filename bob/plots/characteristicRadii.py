@@ -1,5 +1,4 @@
 import numpy as np
-from typing import Any
 from sklearn.cluster import AgglomerativeClustering
 import astropy.units as pq
 import astropy.cosmology.units as cu
@@ -14,7 +13,7 @@ from bob.plotConfig import PlotConfig
 from bob.plots.timePlots import TimePlot
 from bob.volume import Volume
 from bob.util import getArrayQuantity
-from bob.ray import Ray, getRandomRaysFrom
+from bob.ray import getRandomRaysFrom
 
 
 class CharacteristicRadiiOverTime(TimePlot):
@@ -41,7 +40,7 @@ class CharacteristicRadiiOverTime(TimePlot):
         if self.config["rayLength"] is None:
             length = boxSize * 0.5
         else:
-            length = rayLength.to(lengthUnit, cu.with_H0(snap.H0))
+            length = self.config["rayLength"].to(lengthUnit, cu.with_H0(snap.H0))
 
         lengths = np.zeros(self.config["numRays"]) * lengthUnit
         for (i, pos) in enumerate(randomPositions):

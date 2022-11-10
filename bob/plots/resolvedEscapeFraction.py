@@ -8,8 +8,7 @@ from bob.snapshot import Snapshot
 from bob.basicField import BasicField
 from bob.plots.overHaloMass import OverHaloMass
 from bob.constants import protonMass, sigmaH136Bin
-from bob.ray import Ray, integrateWithRandomRays
-from bob.util import getArrayQuantity
+from bob.ray import integrateWithRandomRays
 
 
 class ResolvedEscapeFraction(OverHaloMass):

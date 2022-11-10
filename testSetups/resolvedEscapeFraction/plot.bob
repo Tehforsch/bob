@@ -3,7 +3,9 @@ resolvedEscapeFraction:
   labels: null
   median: false
   name: luminosityOverHaloMass
-  numBins: 40
+  numBins: 3
+  numRays: 5
+  numPointsAlongRay: 5
   outputFileType: png
   postprocessing: true
   quotient: single

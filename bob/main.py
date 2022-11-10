@@ -9,6 +9,7 @@ from bob.watch import watchPost, watchReplot, getPostCommand
 from bob.plotter import Plotter, PlotFilters, PlotFilter
 from bob.postprocess import getFunctionsFromPlotFile, setMatplotlibStyle, readPlotFile, runFunctionsWithPlotter, create_pic_folder, generatePlotConfig
 from bob.run import runPlotConfig
+from bob.report import createReport
 
 
 def setupArgs() -> argparse.Namespace:
@@ -56,6 +57,9 @@ def setupArgs() -> argparse.Namespace:
 
     runParser = subparsers.add_parser("run")
     runParser.add_argument("plots", type=Path, nargs="*", help="The plot configurations to run")
+
+    reportParser = subparsers.add_parser("report")
+    reportParser.add_argument("simFolder", type=Path, nargs="?", help="Path to simulation directory")
 
     args = parser.parse_args()
     return args
@@ -114,5 +118,7 @@ def main() -> None:
     elif args.function == "run":
         for name in args.plots:
             runPlotConfig(name)
+    elif args.function == "report":
+        createReport(Path(".") if args.simFolder is None else args.simFolder)
     else:
         raise ValueError(f"Wrong function type: {args.function}")
