@@ -16,9 +16,9 @@ startexe="{runProgram} {executableName} {params}"""
 def getJobFileContents(params: dict[str, Any]) -> str:
     return jobFileTemplate.format(**params)
 
-
 def runPlotConfig(plot: Path) -> None:
     name = plot.name
+    logFile = Path(name).with_suffix(".log")
     params = {
         "partition": "single",
         "numNodes": 1,
@@ -29,7 +29,7 @@ def runPlotConfig(plot: Path) -> None:
         "executableName": "/gpfs/bwfor/home/hd/hd_hd/hd_hp240/projects/pybob/main.py",
         "params": f"--post plot . {plot}",
     }
-    jobFile = plot.with_suffix(".job")
+    jobFile = (Path(".") / plot.name).with_suffix(".job")
     with open(jobFile, "w") as f:
         f.write(getJobFileContents(params))
     os.system(f"sbatch {jobFile}")
