@@ -64,12 +64,7 @@ class MeanIonizationRedshift(MultiSetFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        fig = plt.figure()
-        ax = fig.add_subplot(2, 1, 1)
         self.setupLinePlot()
         self.setupLabels()
-        ax.set_xscale("log")
-        ax.set_yscale("log")
-        print(result)
-        for (meanBins, meanZs) in zip(result.meanBins, result.meanZs):
-            self.addLine(meanBins, meanZs)
+        for (meanBins, meanZs, label) in zip(result.meanBins, result.meanZs, self.getLabels()):
+            self.addLine(meanBins, meanZs, label=label)
