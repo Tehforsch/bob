@@ -15,7 +15,7 @@ from bob.util import getArrayQuantity
 class ResolvedEscapeFraction(OverHaloMass):
     def __init__(self, config: PlotConfig) -> None:
         config.setDefault("yUnit", 1.0 * pq.dimensionless_unscaled)
-        config.setDefault("yLabel", "$f_{\\mathrm{esc}}$")
+        config.setDefault("yLabel", "$\\tau$")
         config.setDefault("numRays", 10)
         config.setDefault("numPointsAlongRay", 10)
         super().__init__(config)
