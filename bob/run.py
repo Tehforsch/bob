@@ -10,7 +10,7 @@ jobFileTemplate = """#!/bin/bash
 #SBATCH --time={wallTime}
 #SBATCH --output={logFile}
 #SBATCH --export=HDF5_DISABLE_VERSION_CHECK=2
-startexe="{runProgram} {executableName} {params}"""
+exec {runProgram} {executableName} {params}"""
 
 
 def getJobFileContents(params: dict[str, Any]) -> str:
@@ -24,7 +24,7 @@ def runPlotConfig(plot: Path) -> None:
         "numNodes": 1,
         "numCoresPerNode": 64,
         "wallTime": "2:00:00",
-        "logFile": name,
+        "logFile": logFile,
         "runProgram": "/gpfs/bwfor/home/hd/hd_hd/hd_hp240/projects/cpython/python",
         "executableName": "/gpfs/bwfor/home/hd/hd_hd/hd_hp240/projects/pybob/main.py",
         "params": f"--post plot . {plot}",
