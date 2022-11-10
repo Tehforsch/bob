@@ -16,6 +16,7 @@ exec {runProgram} {executableName} {params}"""
 def getJobFileContents(params: dict[str, Any]) -> str:
     return jobFileTemplate.format(**params)
 
+
 def runPlotConfig(plot: Path) -> None:
     name = plot.name
     logFile = Path(name).with_suffix(".log")

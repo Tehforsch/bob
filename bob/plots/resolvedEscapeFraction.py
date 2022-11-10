@@ -8,7 +8,7 @@ from bob.snapshot import Snapshot
 from bob.basicField import BasicField
 from bob.plots.overHaloMass import OverHaloMass
 from bob.constants import protonMass, sigmaH136Bin
-from bob.ray import Ray
+from bob.ray import Ray, integrateWithRandomRays
 from bob.util import getArrayQuantity
 
 
@@ -28,10 +28,4 @@ class ResolvedEscapeFraction(OverHaloMass):
         return n * sigma
 
     def evaluateQuantityForHalo(self, tree: cKDTree, quantity: pq.Quantity, pos: pq.Quantity, r: pq.Quantity) -> pq.Quantity:
-        directions = np.random.rand(self.config["numRays"], 3)
-        values = []
-        for i in range(self.config["numRays"]):
-            d = directions[i, :] / np.linalg.norm(directions[i, :])
-            ray = Ray(pos, d)
-            values.append(ray.integrate(tree, quantity, (0.0 * r, r), self.config["numPointsAlongRay"]))
-        return np.mean(getArrayQuantity(values))
+        return np.mean(integrateWithRandomRays(tree, quantity, pos, r, self.config["numRays"], self.config["numPointsAlongRay"]))
