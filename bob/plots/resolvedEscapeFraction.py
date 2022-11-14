@@ -1,8 +1,10 @@
+import matplotlib.pyplot as plt
 from scipy.spatial import cKDTree
 import astropy.cosmology.units as cu
 import astropy.units as pq
 import numpy as np
 
+from bob.result import Result
 from bob.plotConfig import PlotConfig
 from bob.snapshot import Snapshot
 from bob.basicField import BasicField
@@ -14,7 +16,8 @@ from bob.ray import integrateWithRandomRays
 class ResolvedEscapeFraction(OverHaloMass):
     def __init__(self, config: PlotConfig) -> None:
         config.setDefault("yUnit", 1.0 * pq.dimensionless_unscaled)
-        config.setDefault("yLabel", "$\\tau$")
+        config.setDefault("yLabel", "$1-e^{-\\tau}$")
+        config.setDefault("yLim", [0, 1])
         config.setDefault("numRays", 10)
         config.setDefault("numPointsAlongRay", 10)
         super().__init__(config)
@@ -28,3 +31,10 @@ class ResolvedEscapeFraction(OverHaloMass):
 
     def evaluateQuantityForHalo(self, tree: cKDTree, quantity: pq.Quantity, pos: pq.Quantity, r: pq.Quantity) -> pq.Quantity:
         return np.mean(integrateWithRandomRays(tree, quantity, pos, r, self.config["numRays"], self.config["numPointsAlongRay"]))
+
+    def plot(self, plt: plt.axes, result: Result) -> None:
+        if self.config["scatter"]:
+            result.fullValues = np.exp(-result.fullValues)
+        else:
+            result.values = np.exp(result.values)
+        super().plot(plt, result)
