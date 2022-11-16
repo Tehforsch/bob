@@ -163,6 +163,10 @@ class MultiSetFn(PostprocessingFunction):
         else:
             return self.config["styles"]
 
+    def updateLabelsInConfig(self, sims: MultiSet) -> None:
+        if self.config["labels"] is None:
+            self.config["labels"] = [simSet.label for simSet in sims]
+
 
 class SliceFn(PostprocessingFunction):
     def __init__(self, config: PlotConfig) -> None:

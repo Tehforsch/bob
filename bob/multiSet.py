@@ -10,7 +10,7 @@ class MultiSet:
         self.configs = [s[0] for s in simSets]
         self.sims = [s[1] for s in simSets]
         if labels is None:
-            self.labels = [str(i) for (i, _) in enumerate(self.sims)]
+            self.labels = [sim.label if sim.label is not None else str(i) for (i, sim) in enumerate(self.sims)]
         else:
             assert len(labels) == len(self.sims), f"Found {len(labels)} labels but {len(self.sims)} sims"
             self.labels = labels

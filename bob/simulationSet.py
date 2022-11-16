@@ -12,6 +12,10 @@ class Single:
 class SimulationSet(list):
     def __init__(self, sims: Iterable[Simulation]) -> None:
         super().__init__(sims)
+        if len(self) == 1:
+            self.label = self[0].label
+        else:
+            self.label = None
 
     def quotient(self, parameters: Union[List[str], Single]) -> List[Tuple[Dict[str, Any], "SimulationSet"]]:
         def getConfiguration(sim: Simulation, parameters: List[str]) -> Tuple[Tuple[Any, Any], ...]:

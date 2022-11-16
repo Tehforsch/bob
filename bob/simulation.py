@@ -43,6 +43,7 @@ class Simulation:
     def __init__(self, folder: Path) -> None:
         self.folder = folder
         self.params = getParams(folder)
+        self.label = self.params.get("simLabel")
 
     @property  # type: ignore
     def name(self) -> str:

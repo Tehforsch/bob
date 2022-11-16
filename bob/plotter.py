@@ -187,6 +187,7 @@ class Plotter:
 
     def runMultiSetFn(self, function: MultiSetFn) -> Iterator[PlotName]:
         quotient = self.getQuotient(function.config["quotient"], function.config["sims"], function.config["labels"])
+        function.updateLabelsInConfig(quotient)
         yield self.runPostAndPlot(function, function.getName(), lambda: function.post(quotient), function.plot)
 
     def runSetFn(self, function: SetFn) -> Iterator[PlotName]:
