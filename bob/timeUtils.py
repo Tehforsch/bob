@@ -89,7 +89,7 @@ class TimeQuantity:
     def time(self) -> pq.Quantity:
         if self.type_ == TimeType.TIME:
             return self.values
-        raise NotImplementedError("")
+        raise NotImplementedError("Time quantity TIME not implemented for this simulation type. (Try \"time: z\" ?)")
 
     def scaleFactor(self) -> pq.Quantity:
         if self.type_ == TimeType.SCALE_FACTOR:
