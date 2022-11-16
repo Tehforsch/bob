@@ -13,7 +13,7 @@ from bob.multiSet import MultiSet
 from bob.pool import runInPool
 from bob.util import getArrayQuantity
 from bob.plotConfig import PlotConfig
-
+from bob.snapshotFilter import SnapshotFilter
 from bob.timeUtils import TimeQuantity
 
 
@@ -40,6 +40,7 @@ class TimePlot(MultiSetFn):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
         addTimeArg(self)
+        self.config.setDefault("snapshots", None)
         self.config.setDefault("xUnit", "Myr")
         self.config.setDefault("xLabel", format(f"{self.xlabel()} [UNIT]"))
         self.config.setDefault("yLabel", format(f"{self.ylabel()} [UNIT]"))
@@ -66,7 +67,8 @@ class TimePlot(MultiSetFn):
         plt.legend()
 
     def getQuantityOverTime(self, timeQuantity: str, simSet: SimulationSet) -> Result:
-        snapshots = [(snap, sim) for sim in simSet for snap in sim.snapshots]
+        filter_ = SnapshotFilter(self.config["snapshots"])
+        snapshots = [(snap, sim) for sim in simSet for snap in filter_.get_snapshots(sim)]
 
         data = runInPool(getTimeAndResultForSnap, snapshots, self, timeQuantity)
         data.sort(key=lambda x: x[0])
