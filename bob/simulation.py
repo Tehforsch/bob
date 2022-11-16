@@ -81,7 +81,11 @@ class Simulation:
         return min(snapshots, key=lambda snap: abs(redshift - self.getRedshift(snap.scale_factor)))
 
     def icsFile(self) -> Snapshot:
-        return Snapshot(self, self.folder / "{}.hdf5".format(self.params["InitCondFile"]))
+        icsFilePath = self.folder / "{}.hdf5".format(self.params["InitCondFile"])
+        if not icsFilePath.is_file():
+            icsFilePath = self.folder / "{}.0.hdf5".format(self.params["InitCondFile"])
+            print(f"ics are not a file, trying {icsFilePath}, not checking other files")
+        return Snapshot(self, icsFilePath)
 
     def sources(self) -> Sources:
         return Sources(self.folder / self.params["TestSrcFile"])
