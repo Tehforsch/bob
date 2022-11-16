@@ -10,11 +10,13 @@ from bob.plotter import Plotter, PlotFilters, PlotFilter
 from bob.postprocess import getFunctionsFromPlotFile, setMatplotlibStyle, readPlotFile, runFunctionsWithPlotter, create_pic_folder, generatePlotConfig
 from bob.run import runPlotConfig
 from bob.report import createReport
+import bob.config
 
 
 def setupArgs() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Postprocess arepo sims")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
+    parser.add_argument("--num-threads", type=int, default=20, nargs="?", help="Number of worker threads to use")
     parser.add_argument("--hide", action="store_true", help="Do not show figures in terminal before saving them")
     parser.add_argument("--post", action="store_true", help="Only postprocess the data, do not run the corresponding plot scripts (for cluster)")
 
@@ -84,6 +86,7 @@ def setupAstropy() -> None:
 
 def main() -> None:
     args = setupArgs()
+    bob.config.numProcesses = args.num_threads
     setupLogging(args)
     setupAstropy()
     if args.function in ["remotePlot", "replot", "plot"] and not args.post:
