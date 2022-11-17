@@ -70,7 +70,11 @@ class TimePlot(MultiSetFn):
         filter_ = SnapshotFilter(self.config["snapshots"])
         snapshots = [(snap, sim) for sim in simSet for snap in filter_.get_snapshots(sim)]
 
-        data = runInPool(getTimeAndResultForSnap, snapshots, self, timeQuantity)
+        data = [getTimeAndResultForSnap(self, timeQuantity, s) for s in snapshots]
+        # I had very interesting problems where doing the following would just stop
+        # execution forever without any reason. I suspect some kind of memory problem,
+        # but am not sure. For now, I am disabling any parallelism
+        # data = runInPool(getTimeAndResultForSnap, snapshots, self, timeQuantity)
         data.sort(key=lambda x: x[0])
         result = Result()
         result.times = getArrayQuantity([x[0] for x in data])
