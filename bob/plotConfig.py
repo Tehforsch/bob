@@ -10,8 +10,8 @@ class PlotConfig(dict):
         self.choices: Dict[str, List[Any]] = {}
         self.defaults: Dict[str, Any] = {}
 
-    def setDefault(self, param: str, value: Any, choices: Optional[List] = None) -> None:
-        if param in self.defaults:
+    def setDefault(self, param: str, value: Any, choices: Optional[List] = None, override: bool = False) -> None:
+        if not override and param in self.defaults:
             return
         self.defaults[param] = value
         self.paramMentioned(param)

@@ -7,6 +7,7 @@ from bob.allFields import allFields, getFieldByName
 from bob.basicField import BasicField
 from bob.plots.timePlots import TimePlot
 
+from bob.volume import Volume
 from bob.plotConfig import PlotConfig
 
 
@@ -16,14 +17,15 @@ def getField(config: PlotConfig) -> Field:
 
 class MeanFieldOverTime(TimePlot):
     def __init__(self, config: PlotConfig) -> None:
-        config.setRequired("field", choices=[f.niceName for f in allFields])
-        field = config["field"]
-        config.setDefault("yUnit", getField(config).unit)
-        config.setDefault("name", f"{self.name}_{field}")
-        if config.get("time") == "z":
-            config.setDefault("xLim", [40, 0])
         super().__init__(config)
-        return
+        self.config.setDefault("field", "Temperature", choices=[f.niceName for f in allFields])
+        field = self.config["field"]
+        self.config.setDefault("yUnit", getField(self.config).unit)
+        if self.config.get("time") == "z":
+            self.config.setDefault("xLim", [40, 0])
+        self.config.setDefault("average", "mass", choices=["mass", "volume"])
+        avType = self.config["average"] + "Av"
+        self.config.setDefault("name", f"{self.name}_{field}_{avType}", override=True)
 
     def xlabel(self) -> str:
         return self.config["time"]
@@ -32,6 +34,10 @@ class MeanFieldOverTime(TimePlot):
         return getField(self.config).symbol
 
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> float:
-        masses = BasicField("Masses").getData(snap)
         data = getField(self.config).getData(snap)
-        return np.mean(data * masses) / np.mean(masses)
+        if self.config["average"] == "mass":
+            masses = BasicField("Masses").getData(snap)
+            return np.mean(data * masses) / np.mean(masses)
+        else:
+            volumes = Volume().getData(snap)
+            return np.mean(data * volumes) / np.mean(volumes)
