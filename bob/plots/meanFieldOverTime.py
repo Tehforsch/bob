@@ -20,6 +20,8 @@ class MeanFieldOverTime(TimePlot):
         field = config["field"]
         config.setDefault("yUnit", getField(config).unit)
         config.setDefault("name", f"{self.name}_{field}")
+        if config.get("time") == "z":
+            config.setDefault("xLim", [40, 0])
         super().__init__(config)
         return
 
