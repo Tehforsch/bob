@@ -10,7 +10,6 @@ from bob.result import Result
 from bob.simulationSet import SimulationSet
 from bob.simulation import Simulation
 from bob.multiSet import MultiSet
-from bob.pool import runInPool
 from bob.util import getArrayQuantity
 from bob.plotConfig import PlotConfig
 from bob.snapshotFilter import SnapshotFilter
@@ -41,7 +40,10 @@ class TimePlot(MultiSetFn):
         super().__init__(config)
         addTimeArg(self)
         self.config.setDefault("snapshots", None)
-        self.config.setDefault("xUnit", "Myr")
+        if self.config["time"] == "t":
+            self.config.setDefault("xUnit", "Myr")
+        else:
+            self.config.setDefault("xUnit", pq.dimensionless_unscaled)
         self.config.setDefault("xLabel", format(f"{self.xlabel()} [UNIT]"))
         self.config.setDefault("yLabel", format(f"{self.ylabel()} [UNIT]"))
 

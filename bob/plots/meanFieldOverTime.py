@@ -10,26 +10,26 @@ from bob.plots.timePlots import TimePlot
 from bob.plotConfig import PlotConfig
 
 
+def getField(config: PlotConfig) -> Field:
+    return getFieldByName(config["field"])
+
+
 class MeanFieldOverTime(TimePlot):
     def __init__(self, config: PlotConfig) -> None:
+        config.setRequired("field", choices=[f.niceName for f in allFields])
+        field = config["field"]
+        config.setDefault("yUnit", getField(config).unit)
+        config.setDefault("name", f"{self.name}_{field}")
         super().__init__(config)
-        self.config.setRequired("field", choices=[f.niceName for f in allFields])
-        self.config.setDefault("yUnit", self.field().unit)
-        field = self.config["field"]
-        timeQuantity = self.config["time"]
-        self.config.setDefault("name", f"{self.name}_{field}_{timeQuantity}")
         return
 
     def xlabel(self) -> str:
         return self.config["time"]
 
     def ylabel(self) -> str:
-        return self.field().symbol
-
-    def field(self) -> Field:
-        return getFieldByName(self.config["field"])
+        return getField(self.config).symbol
 
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> float:
         masses = BasicField("Masses").getData(snap)
-        data = self.field().getData(snap)
+        data = getField(self.config).getData(snap)
         return np.mean(data * masses) / np.mean(masses)
