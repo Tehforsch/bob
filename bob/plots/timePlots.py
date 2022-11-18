@@ -96,4 +96,5 @@ def getAllSnapshotsWithTime(timeQuantity: str, simSet: SimulationSet) -> List[Tu
 
 def getTimeAndResultForSnap(plot: TimePlot, timeQuantity: str, snapSim: Tuple[Snapshot, Simulation]) -> Tuple[pq.Quantity, pq.Quantity]:
     (snap, sim) = snapSim
+    print(snap)
     return (snap.timeQuantity(timeQuantity), plot.getQuantity(sim, snap))
