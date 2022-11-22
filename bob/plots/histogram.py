@@ -50,4 +50,8 @@ class Histogram(SnapFn):
         X, Y = np.meshgrid(result.x_edges, result.y_edges)
         plt.pcolormesh(X, Y, result.H, norm=colors.LogNorm())
         plt.colorbar()
+        if self.config["xTicks"] is not []:
+            plt.xticks(self.config["xTicks"])
+        if self.config["yTicks"] is not []:
+            plt.yticks(self.config["yTicks"])
         super().plot(plt, result)
