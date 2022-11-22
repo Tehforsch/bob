@@ -26,7 +26,12 @@ def readQuantity(filenameBase: Path) -> pq.Quantity:
     numpyFileName = filenameBase.with_suffix(numpyFileEnding)
     unitFileName = filenameBase.with_suffix(unitFileEnding)
     unit = readUnit(unitFileName)
-    return np.load(numpyFileName) * unit
+    value = np.load(numpyFileName)
+    try:
+        return pq.Quantity(value=value, unit=unit)
+    except TypeError:
+        assert unit == pq.dimensionless_unscaled
+        return np.array(value)
 
 
 def readQuantityFromNumpyFilePath(numpyFilePath: Path) -> pq.Quantity:
