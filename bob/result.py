@@ -78,6 +78,8 @@ class Result:
         self.delete_old_files(folder)
         folder.mkdir(exist_ok=True)
         for (name, quantity) in self.__dict__.items():
+            if name == "saveArraysWithoutUnits":
+                continue
             if type(quantity) == pq.Quantity:
                 saveQuantity(filenameBase(folder, name), quantity)
             elif type(quantity) == list:
@@ -90,7 +92,13 @@ class Result:
                 else:
                     raise ValueError("'{}' is list of unknown unsupported type: {}".format(name, type(quantity[0])))
             elif type(quantity) == np.ndarray:
-                raise ValueError("Refusing to save array without units")
+
+                class TempQuantity:
+                    def __init__(self, value: Any) -> None:
+                        self.value = value
+                        self.unit = pq.dimensionless_unscaled
+
+                saveQuantity(filenameBase(folder, name), TempQuantity(quantity))
             else:
                 raise ValueError(f"Currently unsupported type: {type(quantity)}")
 

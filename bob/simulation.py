@@ -54,6 +54,11 @@ class Simulation:
         with (self.folder / config.arepoLogFile).open("r", errors="replace") as f:
             return f.readlines()
 
+    @property  # type: ignore
+    def cpuFile(self) -> List[str]:
+        with (self.outputDir / config.cpuLogFile).open("r", errors="replace") as f:
+            return f.readlines()
+
     def __repr__(self) -> str:
         return f"Sim{self.name}"
 

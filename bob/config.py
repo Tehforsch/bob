@@ -1,6 +1,7 @@
 import astropy.units as pq
 
 arepoLogFile = "stdout.log"
+cpuLogFile = "cpu.txt"
 
 # Bob names
 picFolder = "pics"

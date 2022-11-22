@@ -23,6 +23,7 @@ from bob.plots.characteristicRadii import CharacteristicRadiiOverTime
 from bob.plots.meanIonizationRedshift import MeanIonizationRedshift
 from bob.plots.sourceField import SourceField
 from bob.plots.resolvedEscapeFraction import ResolvedEscapeFraction
+from bob.plots.runTime import RunTime
 
 postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     SliceWithStarParticles,
@@ -47,6 +48,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     MeanIonizationRedshift,
     SourceField,
     ResolvedEscapeFraction,
+    RunTime,
 ]
 
 for function in postprocessingFunctions:
