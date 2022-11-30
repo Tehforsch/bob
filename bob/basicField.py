@@ -3,11 +3,20 @@ import astropy.units as pq
 import astropy.cosmology.units as cu
 import h5py
 from typing import TYPE_CHECKING
+import numpy as np
 
 if TYPE_CHECKING:
     from bob.snapshot import Snapshot
 
 from bob.field import Field
+
+
+class DatasetUnavailableError(Exception):
+    def __init__(self, s: str) -> None:
+        self.message = s
+
+    def __repr__(self) -> str:
+        return f"DatasetUnaviableError: {self.message}"
 
 
 class BasicField(Field):
@@ -77,8 +86,12 @@ class BasicField(Field):
         return unit
 
     def getData(self, snapshot: "Snapshot", indices: Optional[Any] = None) -> pq.Quantity:
+        partTypeKey = f"PartType{self.partType}"
+        files = snapshot.hdf5FilesWithDataset(partTypeKey)
+        if len(files) == 0:
+            raise DatasetUnavailableError(f"Dataset {self.partType}/{self.name} not available in snapshot {snapshot}")
         try:
-            unit = self.getArbitraryUnit(snapshot, snapshot.hdf5File[f"PartType{self.partType}"][self.name])
+            unit = self.getArbitraryUnit(snapshot, files[0][partTypeKey][self.name])
         except KeyError:
             if self.name == "ChemicalAbundances":
                 unit = pq.dimensionless_unscaled
@@ -94,7 +107,7 @@ class BasicField(Field):
                 raise ValueError("Fix units for field: {}".format(self.name))
         if indices is None:
             indices = ...
-        fieldData = snapshot.hdf5File[f"PartType{self.partType}"][self.name][...] * unit
+        fieldData = np.concatenate(list(f[f"PartType{self.partType}"][self.name][...] * unit for f in files))
         if self.index is None:
             return fieldData[indices]
         else:

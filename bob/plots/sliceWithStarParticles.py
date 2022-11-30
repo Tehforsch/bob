@@ -7,6 +7,7 @@ from bob.snapshot import Snapshot
 from bob.result import Result
 from bob.plots.bobSlice import Slice, findOrthogonalAxes, getAxisByName
 from bob.plotConfig import PlotConfig
+from bob.basicField import DatasetUnavailableError, BasicField
 
 
 class SliceWithStarParticles(Slice):
@@ -18,19 +19,18 @@ class SliceWithStarParticles(Slice):
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         result = super().post(sim, snap)
-        f = snap.hdf5File
         if self.config["testSources"]:
             sources = sim.sources()
             coords = sources.coord * sim.snapshots[0].lengthUnit
             rates = sources.get136IonisationRate(sim)
         else:
-            if "PartType4" in f:
-                coords = snap.hdf5File["PartType4"]["Coordinates"] * snap.lengthUnit
+            try:
+                coords = BasicField("Coordinates", partType=4).getData(snap)
                 # times = np.array(f["PartType4"]["GFM_StellarFormationTime"])
                 # coords = coords[np.where(times >= 0)]  # Filter out wind particles
                 if self.config["colorByLuminosity"]:
                     raise NotImplementedError("Luminosity calculation not implemented for star particles yet")
-            else:
+            except DatasetUnavailableError:
                 result.coords1 = np.zeros(()) * snap.lengthUnit
                 result.coords2 = np.zeros(()) * snap.lengthUnit
                 return result

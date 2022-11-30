@@ -1,4 +1,5 @@
-from typing import Union, Tuple, TYPE_CHECKING, Dict, Any
+import os
+from typing import Union, Tuple, TYPE_CHECKING, Dict, Any, Callable
 from pathlib import Path
 import numpy as np
 import h5py
@@ -17,8 +18,12 @@ class SnapNumber:
 
 
 class Snapshot:
-    def __init__(self, sim: "Simulation", filename: Path) -> None:
-        self.filename = filename
+    def __init__(self, sim: "Simulation", path: Path) -> None:
+        self.path = path
+        if path.is_dir():
+            self.filenames = [path / f for f in os.listdir(path)]
+        else:
+            self.filenames = [path]
         self.name = self.getName()
         self.sim = sim
         if "subbox" in self.name:
@@ -36,49 +41,58 @@ class Snapshot:
             self.center = (self.maxExtent + self.minExtent) * 0.5
 
     @property
-    def hdf5File(self) -> h5py.File:
+    def hdf5Files(self) -> list[h5py.File]:
         try:
-            return h5py.File(self.filename, "r")
+            return [h5py.File(f, "r") for f in self.filenames]
         except OSError:
-            print(f"Failed to open snapshot: {self.filename}")
+            print(f"Failed to open snapshot: {self.path}")
             raise
 
-    def hasField(self, field: str) -> bool:
-        return field in self.hdf5File["PartType0"]
+    def filterHdf5Files(self, predicate: Callable[[h5py.File], bool]) -> list[h5py.File]:
+        return [f for f in self.hdf5Files if predicate(f)]
+
+    def hdf5FilesWithDataset(self, dataset: str) -> list[h5py.File]:
+        return self.filterHdf5Files(lambda f: dataset in f)
 
     def getName(self) -> str:
-        m = re.match("snap_(.*).hdf5", self.filename.name)
-        if m is None:
-            return self.filename.name.replace(".hdf5", "")
-        else:
+        if self.path.is_dir():
+            m = re.match("snapdir_(.*)", self.path.name)
+            if m is None:
+                raise ValueError("Format of snapshot folder does not match expected format snapdir_...")
             return m.groups()[0]
+        else:
+            m = re.match("snap_(.*).hdf5", self.path.name)
+            if m is None:
+                return self.path.name.replace(".hdf5", "")
+            else:
+                return m.groups()[0]
 
     @property  # type: ignore
     def coordinates(self) -> pq.Quantity:
         return BasicField("Coordinates", comoving=True).getData(self)
 
     def __repr__(self) -> str:
-        return str(self.filename)
+        return str(self.path)
 
     @property
     def h(self) -> pq.Quantity:
-        return self.hdf5File["Header"].attrs["HubbleParam"]
+        return self.sim.params["HubbleParam"]
 
     @property
     def H0(self) -> pq.Quantity:
-        return self.hdf5File["Header"].attrs["HubbleParam"] * 100 * pq.km / pq.s / pq.Mpc
+        return self.sim.params["HubbleParam"] * 100 * pq.km / pq.s / pq.Mpc
 
     @property
     def lengthUnit(self) -> pq.Quantity:
-        return self.hdf5File["Header"].attrs["UnitLength_in_cm"] * pq.cm
+        return self.sim.params["UnitLength_in_cm"] * pq.cm
 
     @property
     def massUnit(self) -> pq.Quantity:
-        return self.hdf5File["Header"].attrs["UnitMass_in_g"] * pq.g
+        return self.sim.params["UnitMass_in_g"] * pq.g
 
     @property
     def velocityUnit(self) -> pq.Quantity:
-        return self.hdf5File["Header"].attrs["UnitVelocity_in_cm_per_s"] * pq.cm / pq.s
+        return self.sim.params["UnitVelocity_in_cm_per_s"] * pq.cm / pq.s
 
     @property
     def timeUnit(self) -> pq.Quantity:
@@ -93,11 +107,11 @@ class Snapshot:
 
     @property
     def scale_factor(self) -> float:
-        return self.hdf5File["Header"].attrs["Time"]
+        return self.hdf5Files[0]["Header"].attrs["Time"]
 
     @property
     def time(self) -> pq.Quantity:
-        return self.hdf5File["Header"].attrs["Time"] * self.timeUnit
+        return self.hdf5Files[0]["Header"].attrs["Time"] * self.timeUnit
 
     def timeQuantity(self, quantity: str) -> pq.Quantity:
         time = TimeQuantity(self.sim, self.scale_factor * self.timeUnit)
@@ -111,4 +125,4 @@ class Snapshot:
 
     @property
     def attrs(self) -> Dict[str, Any]:
-        return self.hdf5File["Header"].attrs
+        return self.hdf5Files[0]["Header"].attrs

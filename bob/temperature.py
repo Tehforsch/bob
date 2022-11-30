@@ -9,7 +9,7 @@ import astropy.units as pq
 class Temperature(Field):
     def getData(self, snapshot: Snapshot) -> np.ndarray:
         density = BasicField("Density").getData(snapshot)
-        if snapshot.hasField("ChemicalAbundances"):
+        if snapshot.sim.params["SGCHEM"]:
             x0He = 0.1
             yn = density / ((1.0 + 4.0 * x0He) * protonMass)
             en = BasicField("InternalEnergy").getData(snapshot) * density
