@@ -69,7 +69,7 @@ class Simulation:
     @property
     def snapshots(self) -> List[Snapshot]:
         if self.params["NumFilesPerSnapshot"] > 1:
-            snapshotFileBase = "snapdir" # just arepo things
+            snapshotFileBase = "snapdir"  # just arepo things
             snapshotGlob = "snapdir*"
         else:
             snapshotFileBase = self.params["SnapshotFileBase"]

@@ -2,6 +2,8 @@ slice:
     field: Temperature
     axis: z
     name: "{axis}_{simName}_{relativePosition}"
+    timeUnit: Myr
+    time: t
 substitutions:
     relativePosition:
       - 0.4

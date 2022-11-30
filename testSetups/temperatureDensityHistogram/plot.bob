@@ -1,2 +1,3 @@
 temperatureDensityHistogram:
   time: t
+  timeUnit: Myr

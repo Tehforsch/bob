@@ -103,8 +103,8 @@ class SnapFn(PostprocessingFunction):
         self.config.setDefault("snapshots", None)
         self.config.setDefault("name", self.name + "_{simName}_{snapName}")
         self.config.setDefault("showTime", True)
-        self.config.setDefault("time", "t")
-        self.config.setDefault("timeUnit", pq.Myr)
+        self.config.setDefault("time", "z")
+        self.config.setDefault("timeUnit", 1.0)
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         result = Result()

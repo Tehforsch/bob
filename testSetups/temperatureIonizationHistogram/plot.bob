@@ -1,2 +1,3 @@
 temperatureIonizationHistogram:
   time: t
+  timeUnit: Myr

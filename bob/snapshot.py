@@ -121,7 +121,7 @@ class Snapshot:
         elif quantity == "t":
             return time.time()
         else:
-            raise NotImplementedError
+            raise ValueError(f"Unkown time quantity: {quantity}")
 
     @property
     def attrs(self) -> Dict[str, Any]:

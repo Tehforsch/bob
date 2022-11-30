@@ -4,3 +4,5 @@ sliceWithStarParticles:
   testSources: True
   colorByLuminosity: True
   relativePosition: 0.481
+  time: t
+  timeUnit: Myr

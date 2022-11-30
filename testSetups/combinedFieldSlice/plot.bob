@@ -1,3 +1,5 @@
 slice:
   field: DensityAbundance1
   axis: z
+  time: t
+  timeUnit: Myr

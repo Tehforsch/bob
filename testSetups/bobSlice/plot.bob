@@ -1,3 +1,5 @@
 slice:
   field: Temperature
   axis: z
+  time: t
+  timeUnit: Myr
