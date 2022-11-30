@@ -68,8 +68,12 @@ class Simulation:
 
     @property
     def snapshots(self) -> List[Snapshot]:
-        snapshotFileBase = self.params["SnapshotFileBase"]
-        snapshotGlob = "{}_*.hdf5".format(snapshotFileBase)
+        if self.params["NumFilesPerSnapshot"] > 1:
+            snapshotFileBase = "snapdir" # just arepo things
+            snapshotGlob = "snapdir*"
+        else:
+            snapshotFileBase = self.params["SnapshotFileBase"]
+            snapshotGlob = "{}_*.hdf5".format(snapshotFileBase)
         snapshotFiles = list(self.outputDir.glob(snapshotGlob))
 
         def getNumber(name: Path) -> int:
