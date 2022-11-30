@@ -74,6 +74,7 @@ class Slice(SnapFn):
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         result = super().post(sim, snap)
         (extent, result.data) = getSlice(self.field, snap, self.config["axis"], self.config["relativePosition"])
+        result.data = result.data.to(self.config["vUnit"], cu.with_H0(snap.H0))
         result.extent = list(extent)
         print(f"Field: {self.field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
         return result

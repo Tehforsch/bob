@@ -68,7 +68,7 @@ class PostprocessingFunction(ABC):
         yUnit = pq.Unit(self.config["yUnit"])
         extent = (extent[0].to_value(xUnit), extent[1].to_value(xUnit), extent[2].to_value(yUnit), extent[3].to_value(yUnit))
         vUnit = pq.Unit(self.config["vUnit"])
-        image = ax.imshow(image.to(vUnit).value, extent=extent, *args, **kwargs)
+        image = ax.imshow(image.to_value(vUnit), extent=extent, *args, **kwargs)
         cbar = plt.colorbar(image)
         cbar.set_label(self.config["cLabel"])
 
