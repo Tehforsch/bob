@@ -48,7 +48,7 @@ class Slice(SnapFn):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
         self.config.setDefault("axis", "z", choices=["x", "y", "z"])
-        self.config.setDefault("field", "Density", choices=[f.niceName for f in allFields])
+        self.config.setDefault("field", "Abundance1", choices=[f.niceName for f in allFields])
         xAxis, yAxis = getOtherAxes(config["axis"])
         self.config.setDefault("xLabel", f"${xAxis} [UNIT]$")
         self.config.setDefault("yLabel", f"${yAxis} [UNIT]$")

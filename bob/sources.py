@@ -38,7 +38,7 @@ class Sources:
 
         return self.coord * sim.params["UnitLength_in_cm"] * pq.cm
 
-    def addSource(self, coord: np.ndarray, sed: np.ndarray, time: Union[List[float], float] = None) -> None:
+    def addSource(self, coord: np.ndarray, sed: np.ndarray, time: Optional[Union[List[float], float]] = None) -> None:
         timeArray = np.zeros(len(coord)) if time is None else time
         if self.nSources == 0:
             self.coord = np.array([coord])
