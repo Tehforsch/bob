@@ -127,7 +127,7 @@ def getPlotConfig(name: str) -> Dict[str, Any]:
 
 
 def generatePlotConfig(name: str) -> None:
-    resultFile = Path(f"{name}.bob")
+    resultFile = Path(f"{name}.yml")
     if resultFile.is_file():
         raise ValueError("File already exists: {}".format(resultFile))
         return
