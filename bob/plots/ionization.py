@@ -63,6 +63,8 @@ class Ionization(MultiSetFn):
     def __init__(self, config: PlotConfig):
         super().__init__(config)
         self.config.setDefault("xLim", [4.2, 10.0])
+        self.config.setDefault("yLim", None)
+        self.config.setDefault("split", True)
 
     def post(self, simSets: MultiSet) -> Result:
         result = IonizationData(simSets)
@@ -71,20 +73,26 @@ class Ionization(MultiSetFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.style.use("classic")
         colors = self.getColors()
-        linAx, logAx = self.setupIonizationPlot()
-
-        self.addConstraintsToAxis(linAx)
-        self.addConstraintsToAxis(logAx)
+        if self.config["split"]:
+            axes = list(self.setupIonizationPlot())
+        else:
+            plt.rcParams["axes.formatter.useoffset"] = False
+            ax = plt.subplot(111)
+            ax.set_xlim(self.config["xLim"])
+            ax.set_ylim(self.config["yLim"])
+            axes = [ax]
+        for ax in axes:
+            self.addConstraintsToAxis(ax)
 
         for (redshift, neutralVolumeAv, neutralMassAv, color) in zip(result.redshift, result.volumeAv, result.massAv, itertools.cycle(colors)):
-            self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, linAx, color)
-            self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, logAx, color)
+            for ax in axes:
+                self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, ax, color)
         # add legend labels
         for (_, label, color) in zip(result.redshift, self.getLabels(), self.getColors()):
-            linAx.plot([], [], color=color, label=label, linewidth=3)
-        linAx.plot([], [], label="Volume av.", linestyle="-", linewidth=3, color="black")
-        linAx.plot([], [], label="Mass av.", linestyle="--", linewidth=3, color="black")
-        plt.legend(loc=(0, -0.2))
+            axes[0].plot([], [], color=color, label=label, linewidth=3)
+        axes[0].plot([], [], label="Volume av.", linestyle="-", linewidth=3, color="black")
+        axes[0].plot([], [], label="Mass av.", linestyle="--", linewidth=3, color="black")
+        # plt.legend(loc=(0, -0.2))
 
     def plotResultsToAxis(self, redshift: pq.Quantity, neutralVolumeAv: pq.Quantity, neutralMassAv: pq.Quantity, ax: plt.axes, color: str) -> None:
         ax.plot(redshift, neutralVolumeAv, linewidth=3, color=color, linestyle="-")
