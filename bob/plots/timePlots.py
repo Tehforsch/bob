@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 from abc import abstractmethod
 
 import matplotlib.pyplot as plt
@@ -17,7 +17,7 @@ from bob.timeUtils import TimeQuantity
 
 
 def addTimeArg(fn: PostprocessingFunction) -> None:
-    fn.config.setDefault("time", "t", choices=["t", "z"])
+    fn.config.setDefault("time", "z", choices=["t", "z"])
 
 
 def getTimeQuantityForSnap(quantity: str, sim: Simulation, snap: Snapshot) -> float:
@@ -60,6 +60,7 @@ class TimePlot(MultiSetFn):
     def post(self, simSets: MultiSet) -> Result:
         results = Result()
         results.data = [self.getQuantityOverTime(self.config["time"], simSet) for simSet in simSets]
+        results.data = [x for x in results.data if x is not None]
         return results
 
     def plot(self, plt: plt.axes, result: Result) -> None:
@@ -71,7 +72,7 @@ class TimePlot(MultiSetFn):
             self.addLine(result.times, result.values, label=label, color=color, **style)
         plt.legend()
 
-    def getQuantityOverTime(self, timeQuantity: str, simSet: SimulationSet) -> Result:
+    def getQuantityOverTime(self, timeQuantity: str, simSet: SimulationSet) -> Optional[Result]:
         filter_ = SnapshotFilter(self.config["snapshots"])
         snapshots = [(snap, sim) for sim in simSet for snap in filter_.get_snapshots(sim)]
 
@@ -82,8 +83,15 @@ class TimePlot(MultiSetFn):
         # data = runInPool(getTimeAndResultForSnap, snapshots, self, timeQuantity)
         data.sort(key=lambda x: x[0])
         result = Result()
+        if len(data) == 0:
+            print(f"WARNING: Found empty simSet {simSet} - skipping!")
+            return None
+
         result.times = getArrayQuantity([x[0] for x in data])
-        result.values = getArrayQuantity([x[1] for x in data])
+        if type(data[0][1]) == list:
+            result.values = getArrayQuantity([getArrayQuantity(x[1]) for x in data])
+        else:
+            result.values = getArrayQuantity([x[1] for x in data])
         return result
 
 
