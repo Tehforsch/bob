@@ -17,8 +17,8 @@ def getField(config: PlotConfig) -> Field:
 
 class MeanFieldOverTime(TimePlot):
     def __init__(self, config: PlotConfig) -> None:
+        config.setDefault("field", "Temperature", choices=[f.niceName for f in allFields])
         super().__init__(config)
-        self.config.setDefault("field", "Temperature", choices=[f.niceName for f in allFields])
         field = self.config["field"]
         self.config.setDefault("yUnit", getField(self.config).unit)
         if self.config.get("time") == "z":

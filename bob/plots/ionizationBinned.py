@@ -33,6 +33,7 @@ class IonizationBinned(TimePlot):
         config.setDefault("colors", ["r", "g", "b", "brown", "orange"])
         config.setDefault("linestyles", ["solid", "dashed", "dashdot", "dotted", (0, (1, 5))])
         config.setDefault("legend_loc", "lower left")
+        config.setDefault("time", "z")
         super().__init__(config)
 
     def ylabel(self) -> str:

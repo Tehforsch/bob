@@ -1,6 +1,6 @@
 import re
 import itertools
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Any
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -73,6 +73,7 @@ class Ionization(MultiSetFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         plt.style.use("classic")
         colors = self.getColors()
+        legendLoc: Any = (0, -0.2)
         if self.config["split"]:
             axes = list(self.setupIonizationPlot())
         else:
@@ -80,9 +81,13 @@ class Ionization(MultiSetFn):
             ax = plt.subplot(111)
             ax.set_xlim(self.config["xLim"])
             ax.set_ylim(self.config["yLim"])
+            ax.set_xlabel("z")
+            ax.set_ylabel("<xHI>")
             axes = [ax]
-        for ax in axes:
-            self.addConstraintsToAxis(ax)
+            legendLoc = "upper left"
+        if self.config["split"]:
+            for ax in axes:
+                self.addConstraintsToAxis(ax)
 
         for (redshift, neutralVolumeAv, neutralMassAv, color) in zip(result.redshift, result.volumeAv, result.massAv, itertools.cycle(colors)):
             for ax in axes:
@@ -92,7 +97,7 @@ class Ionization(MultiSetFn):
             axes[0].plot([], [], color=color, label=label, linewidth=3)
         axes[0].plot([], [], label="Volume av.", linestyle="-", linewidth=3, color="black")
         axes[0].plot([], [], label="Mass av.", linestyle="--", linewidth=3, color="black")
-        # plt.legend(loc=(0, -0.2))
+        plt.legend(loc=legendLoc)
 
     def plotResultsToAxis(self, redshift: pq.Quantity, neutralVolumeAv: pq.Quantity, neutralMassAv: pq.Quantity, ax: plt.axes, color: str) -> None:
         ax.plot(redshift, neutralVolumeAv, linewidth=3, color=color, linestyle="-")
