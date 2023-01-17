@@ -84,7 +84,7 @@ class Ionization(MultiSetFn):
             ax.set_xlabel("z")
             ax.set_ylabel("<xHI>")
             axes = [ax]
-            legendLoc = "upper left"
+            legendLoc = "lower left"
         if self.config["split"]:
             for ax in axes:
                 self.addConstraintsToAxis(ax)

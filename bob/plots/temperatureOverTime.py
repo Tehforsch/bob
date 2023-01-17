@@ -5,38 +5,34 @@ import matplotlib.pyplot as plt
 import astropy.units as pq
 
 from bob.result import Result
-from bob.plots.timePlots import TimePlot
 from bob.snapshot import Snapshot
 from bob.basicField import BasicField
 from bob.simulation import Simulation
 from bob.temperature import Temperature
 from bob.plotConfig import PlotConfig
+from bob.plots.meanFieldOverTime import MeanFieldOverTime
 
 
-class TemperatureOverTime(TimePlot):
+class TemperatureOverTime(MeanFieldOverTime):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
-        self.config.setDefault("bins", False)
-        binString = "_binned" if self.config["bins"] else ""
         time = self.config["time"]
-        self.config.setDefault("name", f"{self.name}_{time}{binString}")
+        self.config.setDefault("name", f"{self.name}_{time}_binned")
+        self.config.setDefault("yLim", [1e3, 1e5])
 
     def ylabel(self) -> str:
         return "$T [\\mathrm{K}]$"
 
-    def getQuantity(self, sim: Simulation, snap: Snapshot) -> List[float]:
+    def getQuantity(self, sim: Simulation, snap: Snapshot) -> List[float]:  # type: ignore
         density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)
         masses = BasicField("Masses").getData(snap)
         temperature = Temperature().getData(snap) / pq.K
         result = []
-        if self.config["bins"]:
-            self.densityBins = [1e-31, 1e-29, 1e-27, 1e-25]
-            for (density1, density2) in zip(self.densityBins, self.densityBins[1:]):
-                indices = np.where((density1 < density) & (density < density2))
-                avTemp = np.sum(temperature[indices] * masses[indices] / np.sum(masses[indices]))
-                result.append(avTemp)
-        else:
-            avTemp = np.sum(temperature * masses / np.sum(masses))
+        self.densityBins = [1e-31, 1e-29, 1e-27, 1e-25]
+        for (density1, density2) in zip(self.densityBins, self.densityBins[1:]):
+            indices = np.where((density1 < density) & (density < density2))
+            avTemp = np.sum(temperature[indices] * masses[indices] / np.sum(masses[indices]))
+            result.append(avTemp)
             result.append(avTemp)
         return result
 
@@ -44,22 +40,27 @@ class TemperatureOverTime(TimePlot):
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         ax.set_yscale("log")
-        if self.config["bins"]:
-            sublabels = [
-                "$\\rho = 10^{-31} - 10^{-29} \mathrm{g} / \mathrm{cm}^3$",
-                "$\\rho = 10^{-29} - 10^{-27} \mathrm{g} / \mathrm{cm}^3$",
-                "$\\rho = 10^{-27} - 10^{-25} \mathrm{g} / \mathrm{cm}^3$",
-            ]
-        else:
-            sublabels = [""]
+        sublabels = [
+            "$\\rho = 10^{-31} - 10^{-29} \mathrm{g} / \mathrm{cm}^3$",
+            "$\\rho = 10^{-29} - 10^{-27} \mathrm{g} / \mathrm{cm}^3$",
+            "$\\rho = 10^{-27} - 10^{-25} \mathrm{g} / \mathrm{cm}^3$",
+        ]
+        subcolors = [
+            "r",
+            "g",
+            "b",
+        ]
 
         plt.xlabel(self.xlabel())
         plt.ylabel(self.ylabel())
-        plt.ylim([1e1, 1e5])
-        print(result)
-        for (labels, arr) in zip(self.getLabels(), result.values):
-            for (i, label) in zip(range(1, arr.shape[1]), sublabels):
-                plt.plot(arr[:, 0], arr[:, i], label=label)
+        plt.xlim(self.config["xLim"])
+        plt.ylim(self.config["yLim"])
+        for (i, (res, label)) in enumerate(zip(result.data, self.config["labels"])):
+            for (i, (sublabel, subcolor)) in enumerate(zip(sublabels, subcolors)):
+                plt.plot(res.times, res.values[:, i], color=subcolor)
+
+        for (sublabel, subcolor) in zip(sublabels, subcolors):
+            plt.plot([], [], color=subcolor, label=sublabel)
         plt.legend(loc="lower left")
         if self.config["time"] == "t":
             self.addConstraints(plt)
