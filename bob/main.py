@@ -1,13 +1,11 @@
 from pathlib import Path
 import logging
 import argparse
-from os.path import relpath, realpath
 
 from bob.simulationSet import getSimsFromFolders, SimulationSet
 from bob.util import getCommonParentFolder
-from bob.watch import watchPost, watchReplot, getPostCommand
 from bob.plotter import Plotter, PlotFilters, PlotFilter
-from bob.postprocess import getFunctionsFromPlotFile, setMatplotlibStyle, readPlotFile, runFunctionsWithPlotter, create_pic_folder, generatePlotConfig
+from bob.postprocess import getFunctionsFromPlotFile, setMatplotlibStyle, runFunctionsWithPlotter, create_pic_folder, generatePlotConfig
 from bob.run import runPlotConfig
 from bob.report import createReport
 import bob.config
@@ -33,12 +31,6 @@ def setupArgs() -> argparse.Namespace:
     remotePlotParser.add_argument("simFolders", type=Path, nargs="+", help="Path to simulation directories")
     remotePlotParser.add_argument("plot", type=Path, help="The plot configuration")
 
-    watchReplotParser = subparsers.add_parser("watchReplot")
-    watchReplotParser.add_argument("communicationFolder", type=Path, help="The folder to write the new commands to")
-    watchReplotParser.add_argument("remoteWorkFolder", type=Path, help="The folder from which the plots should be copied")
-    watchReplotParser.add_argument("localWorkFolder", type=Path, help="The folder into which the plots should be copied")
-    watchReplotParser.add_argument("simFolders", type=Path, nargs="+", help="Path to simulation directories")
-
     replotParser = subparsers.add_parser("replot")
     replotParser.add_argument("simFolders", type=Path, nargs="+", help="Path to simulation directories")
     replotParser.add_argument("--plots", type=str, nargs="*", help="The plots to replot")
@@ -49,10 +41,6 @@ def setupArgs() -> argparse.Namespace:
         action="store_true",
         help="Replot all plots that have new data or havent been generated yet but don't refresh old ones",
     )
-
-    watchPostParser = subparsers.add_parser("watchPost")
-    watchPostParser.add_argument("communicationFolder", type=Path, help="The folder to watch for new commands")
-    watchPostParser.add_argument("workFolder", type=Path, help="The work folder to execute the commands in")
 
     generateParser = subparsers.add_parser("generate")
     generateParser.add_argument("plots", type=str, nargs="*", help="The plot configurations to generate")
@@ -91,19 +79,7 @@ def main() -> None:
     setupAstropy()
     if args.function in ["remotePlot", "replot", "plot"] and not args.post:
         setMatplotlibStyle()
-    if args.function == "watchPost":
-        watchPost(args.communicationFolder, args.workFolder)
-    elif args.function == "remotePlot":
-        if len(args.simFolders) > 1:
-            raise NotImplementedError("No implementation for multiple sim folders currently (easy extension)")
-        config = readPlotFile(args.plot, False)
-        relPath = Path(relpath(realpath(args.simFolders[0]), realpath(args.localWorkFolder)))
-        command = getPostCommand(relPath, config)
-        command.write(args.communicationFolder)
-        watchReplot(args.communicationFolder, args.remoteWorkFolder, args.simFolders[0], command["id"], not args.hide)
-    elif args.function == "watchReplot":
-        watchReplot(args.communicationFolder, args.remoteWorkFolder, args.simFolders[0], None, not args.hide)
-    elif args.function == "replot":
+    if args.function == "replot":
         for simFolder in args.simFolders:
             plotter = Plotter(simFolder, SimulationSet([]), args.post, not args.hide)
             filters = PlotFilters(None if args.plots is None else [PlotFilter(baseName=plot) for plot in args.plots])
