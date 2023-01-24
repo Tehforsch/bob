@@ -10,6 +10,8 @@ from bob.run import runPlotConfig
 from bob.report import createReport
 import bob.config
 
+from bob.postprocess import readPlotFile
+
 
 def setupArgs() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Postprocess arepo sims")
@@ -24,17 +26,11 @@ def setupArgs() -> argparse.Namespace:
     plotParser.add_argument("simFolders", type=Path, nargs="+", help="Path to simulation directories")
     plotParser.add_argument("plot", type=Path, help="The plot configuration")
 
-    remotePlotParser = subparsers.add_parser("remotePlot")
-    remotePlotParser.add_argument("communicationFolder", type=Path, help="The folder to write the new commands to")
-    remotePlotParser.add_argument("remoteWorkFolder", type=Path, help="The folder from which the plots should be copied")
-    remotePlotParser.add_argument("localWorkFolder", type=Path, help="The folder into which the plots should be copied")
-    remotePlotParser.add_argument("simFolders", type=Path, nargs="+", help="Path to simulation directories")
-    remotePlotParser.add_argument("plot", type=Path, help="The plot configuration")
-
     replotParser = subparsers.add_parser("replot")
     replotParser.add_argument("simFolders", type=Path, nargs="+", help="Path to simulation directories")
-    replotParser.add_argument("--plots", type=str, nargs="*", help="The plots to replot")
-    replotParser.add_argument("--config", type=Path, help="A custom plot config to overwrite the one created during postprocessing")
+    replotParser.add_argument(
+        "--configs", type=Path, nargs="*", help="The plot configurations to replot. Matching plots will be identified by their basename."
+    )
     replotParser.add_argument(
         "--only-new",
         dest="onlyNew",
@@ -82,8 +78,13 @@ def main() -> None:
     if args.function == "replot":
         for simFolder in args.simFolders:
             plotter = Plotter(simFolder, SimulationSet([]), args.post, not args.hide)
-            filters = PlotFilters(None if args.plots is None else [PlotFilter(baseName=plot) for plot in args.plots])
-            plotter.replot(filters, args.onlyNew, args.config)
+            if args.configs is not None:
+                for config in args.configs:
+                    config = readPlotFile(config, safe=True)
+                    filters = PlotFilters([PlotFilter(baseName=plotName) for plotName in config])
+                    plotter.replot(filters, args.onlyNew, config)
+            else:
+                plotter.replot(PlotFilters(None), args.onlyNew, None)
     elif args.function == "plot":
         sims = getSimsFromFolders(args.simFolders)
         parent_folder = getCommonParentFolder(args.simFolders)
