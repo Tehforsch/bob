@@ -24,6 +24,7 @@ from bob.plots.meanIonizationRedshift import MeanIonizationRedshift
 from bob.plots.sourceField import SourceField
 from bob.plots.resolvedEscapeFraction import ResolvedEscapeFraction
 from bob.plots.runTime import RunTime
+from bob.plots.h2Expansion import H2Expansion
 
 postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     SliceWithStarParticles,
@@ -49,6 +50,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     SourceField,
     ResolvedEscapeFraction,
     RunTime,
+    H2Expansion,
 ]
 
 for function in postprocessingFunctions:

@@ -46,9 +46,9 @@ class TemperatureOverTime(MeanFieldOverTime):
             "$\\rho = 10^{-27} - 10^{-25} \mathrm{g} / \mathrm{cm}^3$",
         ]
         subcolors = [
+            "b",
             "r",
             "g",
-            "b",
         ]
 
         plt.xlabel(self.xlabel())
