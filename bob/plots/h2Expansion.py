@@ -45,7 +45,8 @@ class H2Expansion(SnapFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> plt.Figure:
-        fig, [[ax00, ax01, ax02], [ax10, ax11, ax12]] = plt.subplots(2, 3)
+        fig, axes  = plt.subplots(2, 3, figsize=(12,6))
+        [[ax00, ax01, ax02], [ax10, ax11, ax12]] = axes
         self.setupLabels()
         ax00.plot(result.radii.to(pq.kpc), result.ab0)
         ax01.plot(result.radii.to(pq.kpc), result.ab1)
@@ -56,6 +57,14 @@ class H2Expansion(SnapFn):
         fluxes = [result.flux1, result.flux2, result.flux0]
         for iax, ax in enumerate([ax10, ax11, ax12]):
             ax.set_yscale("log")
-            ax.set_ylim(np.max(fluxes[iax]).to_value(1 / pq.s)/1e4, None)
+            ax.set_ylim( np.max(fluxes[iax]).to_value(1 / pq.s)/1e2,np.max(fluxes[iax]).to_value(1 / pq.s)*5)
+        for ax in axes[1]:
+            ax.set_xlabel("r [kpc]")
+        ax00.set_ylabel("H_2")
+        ax01.set_ylabel("H+")
+        ax02.set_ylabel("T")
+        ax10.set_ylabel("F(11.6 eV)")
+        ax11.set_ylabel("F(13.6 eV)")
+        ax12.set_ylabel("F(5.6 eV)")
         return fig
 
