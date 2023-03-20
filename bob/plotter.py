@@ -122,7 +122,7 @@ class Plotter:
                 if suffix is None or self.isNew(name, suffix):
                     yield name
 
-    def replot(self, plotFilters: PlotFilters, onlyNew: bool, customConfig: Optional[Path]) -> None:
+    def replot(self, plotFilters: PlotFilters, onlyNew: bool, customConfig: Optional[dict]) -> None:
         if onlyNew:
             plots = list(self.getNewPlots())
         else:
@@ -132,10 +132,8 @@ class Plotter:
                 for baseName in plotBaseNames
                 for qualifiedName in getFolderNames(self.picFolder / baseName)
             ]
-        from bob.postprocess import readPlotFile
-
         if customConfig is not None:
-            config = readPlotFile(customConfig, safe=True)
+            config = customConfig
         else:
             config = None
         plots.sort(key=lambda plot: plot.qualifiedName)
