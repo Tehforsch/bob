@@ -51,7 +51,7 @@ def showImageInTerminal(path: Path) -> None:
     subprocess.check_call(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     args = ["kitty", "+kitten", "icat", "--silent", "--transfer-mode", "file", str(tmpfile)]
     logging.debug(path)
-    subprocess.check_call(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.check_call(args)
 
 
 def listdir(folder: Path) -> Iterator[Path]:
