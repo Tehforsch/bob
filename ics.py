@@ -25,7 +25,6 @@ class ICS:
             "NumPart_Total_HighWord": [0] * 6,
             "MassTable": [0.0] * 6,
             "Redshift": 0.0,  # redshift (for cosmological)
-            "BoxSize": 1.0,  # in code units
             "NumFilesPerSnapshot": 1,
             "Omega0": 0.0,  # for cosmological
             "OmegaLambda": 0.0,  # for cosmological
@@ -49,6 +48,7 @@ class ICS:
         self.header["UnitLength_in_cm"] = float(sim.params["UnitLength_in_cm"])
         self.header["UnitMass_in_g"] = float(sim.params["UnitMass_in_g"])
         self.header["UnitVelocity_in_cm_per_s"] = float(sim.params["UnitVelocity_in_cm_per_s"])
+        self.header["BoxSize"] = float(sim.params["BoxSize"])
 
         self.resolution = resolution
         self.numParticles = resolution ** 3
@@ -66,6 +66,7 @@ class ICS:
         self.xi = np.array([np.linspace(0, self.header["BoxSize"], self.resolution, endpoint=False) for i in range(3)])
         # size of the cell
         self.cellsize = self.header["BoxSize"] / self.resolution
+        print(self.cellsize)
         # shift coordinates by half a cell
         self.xi += self.cellsize / 2
         self.xxi = np.meshgrid(*self.xi)
