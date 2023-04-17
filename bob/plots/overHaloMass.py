@@ -85,7 +85,7 @@ class OverHaloMass(SetFn):
             result.masses = masses
         else:  # histogram
             result.values = []
-            for (bstart, bend) in zip(bins, bins[1:]):
+            for bstart, bend in zip(bins, bins[1:]):
                 indices = np.where((masses >= bstart) & (masses < bend))
                 if len(values) == 0:
                     result.values.append(0.0 / pq.s)

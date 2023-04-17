@@ -29,7 +29,7 @@ class TemperatureOverTime(MeanFieldOverTime):
         temperature = Temperature().getData(snap) / pq.K
         result = []
         self.densityBins = [1e-31, 1e-29, 1e-27, 1e-25]
-        for (density1, density2) in zip(self.densityBins, self.densityBins[1:]):
+        for density1, density2 in zip(self.densityBins, self.densityBins[1:]):
             indices = np.where((density1 < density) & (density < density2))
             avTemp = np.sum(temperature[indices] * masses[indices] / np.sum(masses[indices]))
             result.append(avTemp)
@@ -55,11 +55,11 @@ class TemperatureOverTime(MeanFieldOverTime):
         plt.ylabel(self.ylabel())
         plt.xlim(self.config["xLim"])
         plt.ylim(self.config["yLim"])
-        for (i, (res, label)) in enumerate(zip(result.data, self.config["labels"])):
-            for (i, (sublabel, subcolor)) in enumerate(zip(sublabels, subcolors)):
+        for i, (res, label) in enumerate(zip(result.data, self.config["labels"])):
+            for i, (sublabel, subcolor) in enumerate(zip(sublabels, subcolors)):
                 plt.plot(res.times, res.values[:, i], color=subcolor)
 
-        for (sublabel, subcolor) in zip(sublabels, subcolors):
+        for sublabel, subcolor in zip(sublabels, subcolors):
             plt.plot([], [], color=subcolor, label=sublabel)
         plt.legend(loc="lower left")
         if self.config["time"] == "t":

@@ -46,10 +46,10 @@ def getFunctionsFromPlotFile(filename: Path, safe: bool) -> List[PostprocessingF
 
 def replaceParams(fn: str, config: dict, substitutions: dict) -> List[dict]:
     numParams = len(substitutions[list(substitutions.keys())[0]])
-    for (k, v) in substitutions.items():
+    for k, v in substitutions.items():
         assert len(v) == numParams
     configs = [config.copy() for _ in range(numParams)]
-    for (k, v) in substitutions.items():
+    for k, v in substitutions.items():
         for i in range(numParams):
             configs[i][k] = v[i]
     return [{fn: config} for config in configs]
@@ -115,9 +115,9 @@ def getPlotConfig(name: str) -> Dict[str, Any]:
         else:
             return v
 
-    for (k, v) in plot.config.defaults.items():
+    for k, v in plot.config.defaults.items():
         values[k] = convert(v)
-    for (k, v) in plot.config.items():
+    for k, v in plot.config.items():
         values[k] = convert(v)
     for k in plot.config.required:
         values[k] = "required"

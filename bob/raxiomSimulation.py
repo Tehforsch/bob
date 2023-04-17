@@ -1,11 +1,14 @@
+from typing import Any
 from pathlib import Path
 import yaml
 from bob.raxiomSnapshot import RaxiomSnapshot
 from bob.util import getFolders
 from bob.baseSim import BaseSim
 
+RaxiomParameters = dict[str, Any]
 
-def getParams(folder: Path):
+
+def getParams(folder: Path) -> RaxiomParameters:
     filename = folder / "output" / "parameters.yml"
     with open(filename, "r") as f:
         return yaml.safe_load(f)

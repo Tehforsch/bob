@@ -19,7 +19,7 @@ class Plot(dict):
         return super().__getitem__(k)
 
     def verifyAllSetParamsUsed(self) -> None:
-        for (paramName, exists) in self.name_in_defaults.items():
+        for paramName, exists in self.name_in_defaults.items():
             if not exists:
                 raise ValueError(f"Parameter set from style file that does not appear in set defaults: {paramName}")
 

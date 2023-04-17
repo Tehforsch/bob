@@ -51,7 +51,7 @@ class ICS:
         self.header["BoxSize"] = float(sim.params["BoxSize"])
 
         self.resolution = resolution
-        self.numParticles = resolution ** 3
+        self.numParticles = resolution**3
         # Particle types
         # 0 - gas (high-res)
         # 1 - gas (low-res)
@@ -111,8 +111,10 @@ def createIcs(sim: Simulation, outputFile: Path, densityFunction: Callable[[np.n
     f.save(outputFile)
     return targetGasMass
 
-def densityFunction(coord: np.array) -> float:
-    return 2.345e-21 # molecular h2 region test
+
+def densityFunction(coord: np.ndarray) -> float:
+    return 2.345e-21  # molecular h2 region test
+
 
 def main() -> None:
     simPath = Path(sys.argv[1])
@@ -121,5 +123,6 @@ def main() -> None:
     resolution = int(sys.argv[2])
     targetGasMass = createIcs(sim, initialIcsFile, densityFunction, resolution)
     print(targetGasMass)
+
 
 main()

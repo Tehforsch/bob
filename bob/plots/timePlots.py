@@ -68,7 +68,7 @@ class TimePlot(MultiSetFn):
         ax = fig.add_subplot(1, 1, 1)
         ax.set_yscale("log")
         self.setupLinePlot(ax)
-        for (label, color, style, result) in zip(self.getLabels(), self.getColors(), self.getStyles(), result.data):
+        for label, color, style, result in zip(self.getLabels(), self.getColors(), self.getStyles(), result.data):
             self.addLine(result.times, result.values, label=label, color=color, **style)
         plt.legend()
 

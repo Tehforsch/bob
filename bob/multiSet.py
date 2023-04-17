@@ -15,7 +15,7 @@ class MultiSet:
             assert len(labels) == len(self.sims), f"Found {len(labels)} labels but {len(self.sims)} sims"
             self.labels = labels
         print("Simulation sets:")
-        for (simSet, label, config) in zip(self.sims, self.labels, self.configs):
+        for simSet, label, config in zip(self.sims, self.labels, self.configs):
             logging.info(f"{simSet}, {label}, {config}")
 
     def iterWithConfigs(self) -> Iterator[Tuple[Dict[str, Any], SimulationSet]]:

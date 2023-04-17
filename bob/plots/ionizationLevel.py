@@ -41,7 +41,7 @@ class IonizationLevel(SetFn):
                 totalVolume = np.sum(volumes)
                 ionization = BasicField("ChemicalAbundances", 1).getData(snap)
                 volumeFraction = []
-                for (bMin, bMax) in zip(binsX, binsX[1:]):
+                for bMin, bMax in zip(binsX, binsX[1:]):
                     indices = np.where((bMin <= ionization) & (ionization < bMax))
                     volumeFraction.append(np.sum(volumes[indices]) / totalVolume)
                 result.volumeFraction.append(getArrayQuantity(volumeFraction) * np.diff(binsX))

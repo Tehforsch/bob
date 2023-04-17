@@ -62,17 +62,17 @@ class Tests(unittest.TestCase):
         assert np.equal(q1.value, q2.value).all()
 
     def assert_result_contains_other_result(self, res1: Result, res2: Result) -> None:
-        for (k, v) in res1.__dict__.items():
+        for k, v in res1.__dict__.items():
             assert k in res2.__dict__
             if type(v) == pq.Quantity:
                 self.assert_equal_quantities(res2.__getattribute__(k), v)
             else:
                 assert type(v) == list
                 if isinstance(v[0], Result):
-                    for (subres1, subres2) in zip(v, res2.__getattribute__(k)):
+                    for subres1, subres2 in zip(v, res2.__getattribute__(k)):
                         self.assert_equal_results(subres1, subres2)
                 else:
-                    for (q1, q2) in zip(res2.__getattribute__(k), v):
+                    for q1, q2 in zip(res2.__getattribute__(k), v):
                         self.assert_equal_quantities(q1, q2)
 
     def assert_equal_results(self, res1: Result, res2: Result) -> None:

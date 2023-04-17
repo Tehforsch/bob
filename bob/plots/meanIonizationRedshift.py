@@ -47,11 +47,11 @@ class MeanIonizationRedshift(MultiSetFn):
             _, bins = np.histogram(haloMasses, bins=self.config["numBins"])
             meanBins = []
             meanZs = []
-            for (bstart, bend) in zip(bins, bins[1:]):
+            for bstart, bend in zip(bins, bins[1:]):
                 haloIndices = np.where((haloMasses >= bstart) & (haloMasses < bend))
                 meanBins.append((bstart + bend) * 0.5)
                 zs = []
-                for (i, (pos, r)) in enumerate(zip(center_of_mass[haloIndices], radius[haloIndices])):
+                for i, (pos, r) in enumerate(zip(center_of_mass[haloIndices], radius[haloIndices])):
                     coordIndices = tree.query_ball_point(pos, r)
                     redshiftsThisHalo = ionizationRedshift[coordIndices]
                     redshiftsThisHalo = redshiftsThisHalo[np.where(redshiftsThisHalo < np.Inf)]
@@ -66,5 +66,5 @@ class MeanIonizationRedshift(MultiSetFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         self.setupLinePlot()
         self.setupLabels()
-        for (meanBins, meanZs, label) in zip(result.meanBins, result.meanZs, self.getLabels()):
+        for meanBins, meanZs, label in zip(result.meanBins, result.meanZs, self.getLabels()):
             self.addLine(meanBins, meanZs, label=label)

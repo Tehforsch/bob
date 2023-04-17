@@ -32,6 +32,6 @@ def integrateWithRandomRays(
     tree: cKDTree, quantity: pq.Quantity, startPos: pq.Quantity, rayLength: pq.Quantity, numRays: int, numPointsAlongRay: int
 ) -> pq.Quantity:
     values = np.zeros(numRays) * quantity.unit * rayLength.unit
-    for (i, ray) in enumerate(getRandomRaysFrom(startPos, numRays)):
+    for i, ray in enumerate(getRandomRaysFrom(startPos, numRays)):
         values[i] = ray.integrate(tree, quantity, (0.0 * rayLength, rayLength), numPointsAlongRay)
     return values

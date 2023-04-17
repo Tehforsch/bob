@@ -32,7 +32,7 @@ class StellarMass(SetFn):
 
         result.meanBins = []
         result.stellarMasses = []
-        for (bstart, bend) in zip(bins, bins[1:]):
+        for bstart, bend in zip(bins, bins[1:]):
             indices = np.where((haloMasses >= bstart) & (haloMasses < bend))
             stellarMass = np.mean(stellarMasses[indices])
             result.meanBins.append((bstart + bend) * 0.5)

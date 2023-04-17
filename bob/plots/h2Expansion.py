@@ -11,6 +11,7 @@ from bob.fieldOverRadius import getDataForRadii
 from bob.basicField import BasicField
 from bob.temperature import Temperature
 
+
 class H2Expansion(SnapFn):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
@@ -42,7 +43,7 @@ class H2Expansion(SnapFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> plt.Figure:
-        fig, axes  = plt.subplots(2, 3, figsize=(12,6))
+        fig, axes = plt.subplots(2, 3, figsize=(12, 6))
         [[ax00, ax01, ax02], [ax10, ax11, ax12]] = axes
         self.setupLabels()
         ax00.plot(result.radii.to(pq.pc), result.ab0)
@@ -66,4 +67,3 @@ class H2Expansion(SnapFn):
         ax11.set_ylabel("F(13.6 eV)")
         ax12.set_ylabel("F(5.6 eV)")
         return fig
-

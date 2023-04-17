@@ -89,11 +89,11 @@ class Ionization(MultiSetFn):
             for ax in axes:
                 self.addConstraintsToAxis(ax)
 
-        for (redshift, neutralVolumeAv, neutralMassAv, color) in zip(result.redshift, result.volumeAv, result.massAv, itertools.cycle(colors)):
+        for redshift, neutralVolumeAv, neutralMassAv, color in zip(result.redshift, result.volumeAv, result.massAv, itertools.cycle(colors)):
             for ax in axes:
                 self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, ax, color)
         # add legend labels
-        for (_, label, color) in zip(result.redshift, self.getLabels(), self.getColors()):
+        for _, label, color in zip(result.redshift, self.getLabels(), self.getColors()):
             axes[0].plot([], [], color=color, label=label, linewidth=3)
         axes[0].plot([], [], label="Volume av.", linestyle="-", linewidth=3, color="black")
         axes[0].plot([], [], label="Mass av.", linestyle="--", linewidth=3, color="black")

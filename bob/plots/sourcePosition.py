@@ -28,7 +28,7 @@ class SourcePosition(SetFn):
         return result
 
     def plot(self, axes: plt.axes, result: Result) -> None:
-        for (i, (coords, luminosities)) in enumerate(zip(result.coords, result.luminosities)):
+        for i, (coords, luminosities) in enumerate(zip(result.coords, result.luminosities)):
             maxZ = np.max(coords[:, 2])
             indices = np.where(coords[:, 2] < 0.1 * maxZ)
             xCoords = coords[indices][:, 0]

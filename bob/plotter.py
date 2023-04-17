@@ -96,7 +96,7 @@ class Plotter:
             return self.sims
         else:
             select = [str(x) for x in select]
-            return SimulationSet(sim for sim in self.sims if sim.name in select)
+            return SimulationSet(self.sims.sim_type, (sim for sim in self.sims if sim.name in select))
 
     def isNew(self, plot: PlotName, fileType: str) -> bool:
         imageFile = plot.getOutputFile(fileType)
@@ -191,7 +191,7 @@ class Plotter:
     def runSetFn(self, function: SetFn) -> Iterator[PlotName]:
         quotient = self.getQuotient(function.config["quotient"], function.config["sims"], function.config["labels"])
         numSims = len(quotient)
-        for (i, (config, sims)) in enumerate(quotient.iterWithConfigs()):
+        for i, (config, sims) in enumerate(quotient.iterWithConfigs()):
             yield self.runPostAndPlot(function, function.getName(setNum=zeroPadToLength(i, numSims)), lambda: function.post(sims), function.plot)
 
     def runSnapFn(self, function: SnapFn) -> Iterator[PlotName]:

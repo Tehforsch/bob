@@ -59,7 +59,7 @@ class ThomsonScattering(MultiSetFn):
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         self.setupLinePlot()
-        for (redshifts, taus, label) in zip(result.redshifts, result.tau, self.getLabels()):
+        for redshifts, taus, label in zip(result.redshifts, result.tau, self.getLabels()):
             self.addLine(redshifts, taus, label=label)
         plt.legend()
         nx = int(50)

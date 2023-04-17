@@ -52,14 +52,14 @@ def saveQuantity(filenameBase: Path, quantity: pq.Quantity) -> None:
 
 def saveQuantityList(folder: Path, quantities: List[pq.Quantity]) -> None:
     folder.mkdir()
-    for (i, quantity) in enumerate(quantities):
+    for i, quantity in enumerate(quantities):
         assert type(quantity) == pq.Quantity, f"Wrong type in list result: {type(quantity)}"
         saveQuantity(folder / str(i), quantity)
 
 
 def saveResultList(folder: Path, results: List["Result"]) -> None:
     folder.mkdir()
-    for (i, result) in enumerate(results):
+    for i, result in enumerate(results):
         subfolder = folder / str(i)
         subfolder.mkdir()
         result.save(subfolder)
@@ -82,7 +82,7 @@ class Result:
     def save(self, folder: Path) -> None:
         self.delete_old_files(folder)
         folder.mkdir(exist_ok=True)
-        for (name, quantity) in self.__dict__.items():
+        for name, quantity in self.__dict__.items():
             if name == "saveArraysWithoutUnits":
                 continue
             if type(quantity) == pq.Quantity:

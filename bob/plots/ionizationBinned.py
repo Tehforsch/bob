@@ -47,7 +47,7 @@ class IonizationBinned(TimePlot):
         densities = [meanDensity * factor for factor in self.config["densityFactors"]]
         epsilon = 0.01
         densityBins = [[dens * (1 - epsilon), dens * (1 + epsilon)] for dens in densities]
-        for (density1, density2) in densityBins:
+        for density1, density2 in densityBins:
             allIndices = np.where((density1 < density) & (density < density2))
             skip = max(1, int(allIndices[0].shape[0] / self.config["numSamples"]))
             indices = allIndices[0][::skip]
@@ -62,15 +62,15 @@ class IonizationBinned(TimePlot):
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         ax.set_yscale("log")
-        for (label, linestyle) in zip(self.config["sublabels"], self.config["linestyles"]):
+        for label, linestyle in zip(self.config["sublabels"], self.config["linestyles"]):
             plt.plot([], [], color="black", linestyle=linestyle, label=label)
 
         plt.xlabel(self.xlabel())
         plt.ylabel(self.ylabel())
         plt.xlim(self.config["xLim"])
         plt.ylim(self.config["yLim"])
-        for (result, color, label) in zip(result.data, self.config["colors"], self.getLabels()):
+        for result, color, label in zip(result.data, self.config["colors"], self.getLabels()):
             plt.plot([], [], color=color, label=label)
-            for (i, linestyle) in zip(range(result.values.shape[1]), self.config["linestyles"]):
+            for i, linestyle in zip(range(result.values.shape[1]), self.config["linestyles"]):
                 plt.plot(result.times, result.values[:, i], color=color, linestyle=linestyle)
         plt.legend(loc=self.config["legend_loc"])

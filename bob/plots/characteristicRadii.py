@@ -43,7 +43,7 @@ class CharacteristicRadiiOverTime(TimePlot):
             length = self.config["rayLength"].to(lengthUnit, cu.with_H0(snap.H0))
 
         lengths = np.zeros(self.config["numRays"]) * lengthUnit
-        for (i, pos) in enumerate(randomPositions):
+        for i, pos in enumerate(randomPositions):
             for ray in getRandomRaysFrom(pos, 1):
                 values = ray.getValues(tree, ionizedOrNot, (0 * length, 1 * length), self.config["numPointsAlongRay"])
                 islands = np.flatnonzero(np.diff(np.r_[0, values, 0]) != 0).reshape(-1, 2) - [0, 1]
