@@ -28,9 +28,15 @@ class RaxiomSnapshot(BaseSnapshot):
         assert all(f.str_num == self.str_num for f in snapshot_infos)
         self.num = snapshot_infos[0].num
         assert all(f.num == self.num for f in snapshot_infos)
+        self.lengthUnit = pq.m
+        self.H0 = 65.0 * (pq.m / pq.s / pq.Mpc)
+        print("Returning fake value for H0")
 
     def readAttr(self, name):
         return self.hdf5Files[0].attrs[name]
+
+    def hdf5FilesWithDataset(self, dataset: str) -> list[h5py.File]:
+        return self.hdf5Files
 
     def readUnitAttr(self, name):
         return pq.Quantity(self.readAttr(name))
@@ -42,6 +48,10 @@ class RaxiomSnapshot(BaseSnapshot):
     def position(self) -> pq.Quantity:
         return self.read_dataset("position")
 
+    @property
+    def coordinates(self) -> pq.Quantity:
+        return self.position()
+
     def ionized_hydrogen_fraction(self) -> pq.Quantity:
         return self.read_dataset("ionized_hydrogen_fraction")
 
@@ -51,21 +61,22 @@ class RaxiomSnapshot(BaseSnapshot):
     def temperature(self) -> pq.Quantity:
         return self.read_dataset("temperature")
 
-    def mass(self) -> pq.Quantity:
-        return self.read_dataset("mass")
-
-    def time(self) -> pq.Quantity:
-        return self.read_attr("time") * pq.s
-
     def read_dataset(self, name: str) -> pq.Quantity:
-        files = self.hdf5_files()
+        files = self.hdf5Files
         data = np.concatenate(tuple(f[name][...] for f in files))
         unit = read_unit_from_dataset(name, files[0])
         return unit * data
 
-    def read_attr(self, name: str) -> pq.Quantity:
-        files = self.hdf5_files()
-        return files[0].attrs[name]
+    @property
+    def maxExtent(self):
+        try:
+            return pq.Quantity(self.sim.params["box_size"])
+        except ValueError:
+            raise NotImplementedError
+
+    @property
+    def minExtent(self):
+        return np.array([0, 0, 0])
 
     def __repr__(self) -> str:
         return self.str_num

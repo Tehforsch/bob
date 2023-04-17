@@ -5,6 +5,7 @@ from bob.raxiomSnapshot import RaxiomSnapshot
 from bob.util import getFolders
 from bob.baseSim import BaseSim
 from bob.simType import SimType
+from bob.time_series import TimeSeries
 
 RaxiomParameters = dict[str, Any]
 
@@ -43,3 +44,6 @@ class RaxiomSimulation(BaseSim):
 
     def simType(self) -> SimType:
         return SimType.POST_STANDARD
+
+    def get_timeseries(self, name: str) -> TimeSeries:
+        return read_time_series(self.path / config.TIME_SERIES_DIR_NAME / f"{name}.hdf5", name)
