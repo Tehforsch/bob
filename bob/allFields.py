@@ -17,6 +17,7 @@ allFields = [
     BasicField("Masses", None),
     BasicField("Coordinates", None),
     BasicField("InternalEnergy", None),
+    BasicField("ionized_hydrogen_fraction", None),
     Temperature(),
     SourceField(),
 ]
@@ -29,4 +30,5 @@ addFields(BasicField("SGCHEM_HeatCoolRates", i) for i in range(12))
 
 
 def getFieldByName(name: str) -> Field:
+    print(name)
     return next(field for field in allFields if field.niceName == name)

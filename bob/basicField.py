@@ -7,6 +7,7 @@ import numpy as np
 
 if TYPE_CHECKING:
     from bob.snapshot import Snapshot
+    from bob.baseSnapshot import AnySnap
 
 from bob.field import Field
 
@@ -43,6 +44,7 @@ class BasicField(Field):
             "PhotonRates": "PhotonRates",
             "Masses": "Mass",
             "Coordinates": "Coordinates",
+            "ionized_hydrogen_fraction": "ionized_hydrogen_fraction",
         }
         if self.index is None:
             return fieldName[self.name]
@@ -85,7 +87,7 @@ class BasicField(Field):
         unit *= attrs["to_cgs"]
         return unit
 
-    def getData(self, snapshot: "Snapshot", indices: Optional[Any] = None) -> pq.Quantity:
+    def getDataForArepoSnapshot(self, snapshot: "Snapshot", indices: Optional[Any] = None) -> pq.Quantity:
         partTypeKey = f"PartType{self.partType}"
         files = snapshot.hdf5FilesWithDataset(partTypeKey)
         if len(files) == 0:
@@ -112,3 +114,20 @@ class BasicField(Field):
             return fieldData[indices]
         else:
             return fieldData[indices, self.index]
+
+    def getDataForRaxiomSnapshot(self, snapshot: "Snapshot", indices: Optional[Any] = None) -> pq.Quantity:
+        name = self.name.lower()
+        if name == "ionized_hydrogen_fraction":
+            return snapshot.ionized_hydrogen_fraction()
+        elif name == "density":
+            return snapshot.density()
+        else:
+            raise NotImplementedError
+
+    def getData(self, snapshot: "AnySnap", indices: Optional[Any] = None) -> pq.Quantity:
+        from bob.snapshot import Snapshot
+
+        if type(snapshot) == Snapshot:
+            return self.getDataForArepoSnapshot(snapshot, indices)
+        else:
+            return self.getDataForRaxiomSnapshot(snapshot, indices)

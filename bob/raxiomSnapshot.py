@@ -32,18 +32,15 @@ class RaxiomSnapshot(BaseSnapshot):
         self.H0 = 65.0 * (pq.m / pq.s / pq.Mpc)
         print("Returning fake value for H0")
 
-    def readAttr(self, name):
-        return self.hdf5Files[0].attrs[name]
-
     def hdf5FilesWithDataset(self, dataset: str) -> list[h5py.File]:
         return self.hdf5Files
 
-    def readUnitAttr(self, name):
-        return pq.Quantity(self.readAttr(name))
+    def readAttr(self, name):
+        return self.hdf5Files[0].attrs[name]
 
     @property
     def time(self) -> pq.Quantity:
-        return self.readUnitAttr("time")
+        return self.readAttr("time") * pq.s
 
     def position(self) -> pq.Quantity:
         return self.read_dataset("position")
@@ -54,6 +51,9 @@ class RaxiomSnapshot(BaseSnapshot):
 
     def ionized_hydrogen_fraction(self) -> pq.Quantity:
         return self.read_dataset("ionized_hydrogen_fraction")
+
+    def density(self) -> pq.Quantity:
+        return self.read_dataset("density")
 
     def velocity(self) -> pq.Quantity:
         return self.read_dataset("velocity")
@@ -70,13 +70,13 @@ class RaxiomSnapshot(BaseSnapshot):
     @property
     def maxExtent(self):
         try:
-            return pq.Quantity(self.sim.params["box_size"])
+            return np.array([1.0, 1.0, 1.0]) * pq.Quantity(self.sim.params["box_size"])
         except ValueError:
             raise NotImplementedError
 
     @property
     def minExtent(self):
-        return np.array([0, 0, 0])
+        return np.array([0, 0, 0]) * pq.m
 
     def __repr__(self) -> str:
         return self.str_num

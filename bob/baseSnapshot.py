@@ -1,10 +1,17 @@
+from typing import Union
 import astropy.units as pq
 import h5py
 
 from bob.timeUtils import TimeQuantity
 
+AnySnap = Union["Snapshot", "RaxiomSnapshot"]
+
 
 class BaseSnapshot:
+    def __init__(self) -> None:
+        self.sim = None
+        self.time = None
+
     def timeQuantity(self, quantity: str) -> pq.Quantity:
         time = TimeQuantity(self.sim, self.time)
         if quantity == "z":
