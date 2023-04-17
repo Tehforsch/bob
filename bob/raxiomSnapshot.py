@@ -1,11 +1,95 @@
+import astropy.units as pq
 from pathlib import Path
+from bob.baseSnapshot import BaseSnapshot
 import os
+from bob.config import LENGTH_SCALING_IDENTIFIER, TIME_SCALING_IDENTIFIER, MASS_SCALING_IDENTIFIER, SCALE_FACTOR_SI_IDENTIFIER, SNAPSHOT_FILE_NAME
+from bob.util import getFolders, getFiles
+import h5py
+import numpy as np
 
 
-class RaxiomSnapshot:
-    def __init__(self, path: Path) -> None:
+class SnapshotFileInfo:
+    def __init__(self, path: Path, str_num: str, str_rank: str):
+        self.path = path
+        self.str_num = str_num
+        self.str_rank = str_rank
+        self.num = int(str_num)
+        self.rank = int(str_rank)
+
+
+class RaxiomSnapshot(BaseSnapshot):
+    def __init__(self, path: Path, sim: "RaxiomSimulation") -> None:
+        snapshot_infos = [parse_snapshot_file_name(snap_file) for snap_file in getFiles(path)]
         self.path = path
         self.filenames = [path / f for f in os.listdir(path)]
         self.name = path.name
+        self.sim = sim
+        self.str_num = snapshot_infos[0].str_num
+        assert all(f.str_num == self.str_num for f in snapshot_infos)
+        self.num = snapshot_infos[0].num
+        assert all(f.num == self.num for f in snapshot_infos)
 
-    pass
+    def readAttr(self, name):
+        return self.hdf5Files[0].attrs[name]
+
+    def readUnitAttr(self, name):
+        return pq.Quantity(self.readAttr(name))
+
+    @property
+    def time(self) -> pq.Quantity:
+        return self.readUnitAttr("time")
+
+    def position(self) -> pq.Quantity:
+        return self.read_dataset("position")
+
+    def ionized_hydrogen_fraction(self) -> pq.Quantity:
+        return self.read_dataset("ionized_hydrogen_fraction")
+
+    def velocity(self) -> pq.Quantity:
+        return self.read_dataset("velocity")
+
+    def temperature(self) -> pq.Quantity:
+        return self.read_dataset("temperature")
+
+    def mass(self) -> pq.Quantity:
+        return self.read_dataset("mass")
+
+    def time(self) -> pq.Quantity:
+        return self.read_attr("time") * pq.s
+
+    def read_dataset(self, name: str) -> pq.Quantity:
+        files = self.hdf5_files()
+        data = np.concatenate(tuple(f[name][...] for f in files))
+        unit = read_unit_from_dataset(name, files[0])
+        return unit * data
+
+    def read_attr(self, name: str) -> pq.Quantity:
+        files = self.hdf5_files()
+        return files[0].attrs[name]
+
+    def __repr__(self) -> str:
+        return self.str_num
+
+
+def read_unit_from_dataset(dataset_name: str, f: h5py.File) -> pq.Quantity:
+    dataset = f[dataset_name]
+    unit = 1.0
+    unit *= pq.m ** dataset.attrs[LENGTH_SCALING_IDENTIFIER]
+    unit *= pq.s ** dataset.attrs[TIME_SCALING_IDENTIFIER]
+    unit *= pq.kg ** dataset.attrs[MASS_SCALING_IDENTIFIER]
+    return unit * dataset.attrs[SCALE_FACTOR_SI_IDENTIFIER]
+
+
+def get_snapshot_paths_from_output_files(output_files: list[Path]) -> list[Path]:
+    return [path for path in output_files if is_snapshot_file(path)]
+
+
+def get_snapshots_from_dir(path: Path) -> list[RaxiomSnapshot]:
+    snap_dirs = getFolders(path)
+    return sorted([get_snapshot_from_dir(snap_dir) for snap_dir in snap_dirs], key=lambda snap: snap.num)
+
+
+def parse_snapshot_file_name(path: Path) -> SnapshotFileInfo:
+    snap_num = path.parent.stem
+    rank_num = path.stem
+    return SnapshotFileInfo(path, snap_num, rank_num)

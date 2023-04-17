@@ -76,12 +76,12 @@ def main() -> None:
     bob.config.numProcesses = args.num_threads
     setupLogging(args)
     setupAstropy()
-    sim_type = RaxiomSimulation if args.raxiom else Simulation
+    simClass = RaxiomSimulation if args.raxiom else Simulation
     if args.function in ["remotePlot", "replot", "plot"] and not args.post:
         setMatplotlibStyle()
     if args.function == "replot":
         for simFolder in args.simFolders:
-            plotter = Plotter(simFolder, SimulationSet(sim_type, []), args.post, not args.hide)
+            plotter = Plotter(simFolder, SimulationSet(simClass, []), args.post, not args.hide)
             if args.configs is not None:
                 for config in args.configs:
                     config = readPlotFile(config, safe=True)
@@ -90,7 +90,7 @@ def main() -> None:
             else:
                 plotter.replot(PlotFilters(None), args.onlyNew, None)
     elif args.function == "plot":
-        sims = getSimsFromFolders(sim_type, args.simFolders)
+        sims = getSimsFromFolders(simClass, args.simFolders)
         parent_folder = getCommonParentFolder(args.simFolders)
         plotter = Plotter(parent_folder, sims, args.post, not args.hide)
         functions = getFunctionsFromPlotFile(args.plot, True)

@@ -4,6 +4,7 @@ import yaml
 from bob.raxiomSnapshot import RaxiomSnapshot
 from bob.util import getFolders
 from bob.baseSim import BaseSim
+from bob.simType import SimType
 
 RaxiomParameters = dict[str, Any]
 
@@ -38,4 +39,7 @@ class RaxiomSimulation(BaseSim):
         snapshotFolders = list(getFolders(self.snapshotDir))
 
         snapshotFolders.sort(key=lambda x: int(x.name))
-        return [RaxiomSnapshot(s) for s in snapshotFolders]
+        return [RaxiomSnapshot(s, self) for s in snapshotFolders]
+
+    def simType(self) -> SimType:
+        return SimType.POST_STANDARD

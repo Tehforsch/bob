@@ -7,6 +7,7 @@ import re
 import astropy.units as pq
 from bob.basicField import BasicField
 from bob.timeUtils import TimeQuantity
+from bob.baseSnapshot import BaseSnapshot
 
 if TYPE_CHECKING:
     from bob.simulation import Simulation
@@ -17,7 +18,7 @@ class SnapNumber:
         self.value = value
 
 
-class Snapshot:
+class Snapshot(BaseSnapshot):
     def __init__(self, sim: "Simulation", path: Path) -> None:
         self.path = path
         if path.is_dir():
@@ -39,14 +40,6 @@ class Snapshot:
             self.minExtent = np.array([0.0, 0.0, 0.0]) * self.lengthUnit
             self.maxExtent = np.array([1.0, 1.0, 1.0]) * sim.params["BoxSize"] * self.lengthUnit
             self.center = (self.maxExtent + self.minExtent) * 0.5
-
-    @property
-    def hdf5Files(self) -> list[h5py.File]:
-        try:
-            return [h5py.File(f, "r") for f in self.filenames]
-        except OSError:
-            print(f"Failed to open snapshot: {self.path}")
-            raise
 
     def filterHdf5Files(self, predicate: Callable[[h5py.File], bool]) -> list[h5py.File]:
         return [f for f in self.hdf5Files if predicate(f)]
