@@ -11,13 +11,14 @@ import bob.config as config
 from bob.simType import SimType
 from bob.snapshot import Snapshot
 from bob.sources import Sources
+from bob.baseSim import BaseSim
 
 
 def getParams(folder: Path) -> Dict[str, Any]:
     bobParamsFile = folder / "bobParams.yaml"
     contents = yaml.load(bobParamsFile.open("r"), Loader=yaml.SafeLoader)
     result = {}
-    for (k, v) in contents.items():
+    for k, v in contents.items():
         if v == "None":
             continue
         readValue = getParamValue(*list(v.items())[0])
@@ -39,15 +40,11 @@ def getParamValue(type_: str, value: Any) -> Union[str, bool, int, float, List[i
         return NotImplemented
 
 
-class Simulation:
+class Simulation(BaseSim):
     def __init__(self, folder: Path) -> None:
         self.folder = folder
         self.params = getParams(folder)
         self.label = self.params.get("simLabel")
-
-    @property  # type: ignore
-    def name(self) -> str:
-        return self.folder.name
 
     @property  # type: ignore
     def log(self) -> List[str]:
