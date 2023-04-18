@@ -30,5 +30,4 @@ addFields(BasicField("SGCHEM_HeatCoolRates", i) for i in range(12))
 
 
 def getFieldByName(name: str) -> Field:
-    print(name)
     return next(field for field in allFields if field.niceName == name)
