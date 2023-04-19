@@ -1,5 +1,16 @@
 #!/bin/bash
 
+black --check $(fd -e py)
+if [[ $? != 0 ]]; then
+    echo "There are formatting errors, run black"
+fi
+
+ruff .
+if [[ $? != 0 ]]; then
+    echo "There are ruff errors, fix them before committing"
+    exit 1
+fi
+
 mypy --ignore-missing-imports $(fd -e py)
 if [[ $? != 0 ]]; then
     echo "There are mypy errors, fix them before committing"
@@ -9,12 +20,6 @@ fi
 python -m unittest discover -v
 if [[ $? != 0 ]]; then
     echo "There are failing tests, fix?"
-    exit 1
-fi
-
-pyflakes $(fd -e py)
-if [[ $? != 0 ]]; then
-    echo "There are pyflakes errors, fix them before committing"
     exit 1
 fi
 
