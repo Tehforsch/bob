@@ -17,10 +17,13 @@ from bob.plotConfig import PlotConfig
 
 
 def getDataAtPoints(field: Field, snapshot: Snapshot, points: pq.Quantity) -> np.ndarray:
-    # coords = snapshot.coordinates.to(snapshot.lengthUnit / cu.littleh, cu.with_H0(snapshot.H0)).value
-    coords = snapshot.coordinates.to(snapshot.lengthUnit).value
+    print("Arepo snaps with comoving units don't work because of the following change")
+    # lengthUnit = snapshot.lengthUnit / cu.littleh
+    lengthUnit = snapshot.lengthUnit
+    coords = snapshot.coordinates.to(lengthUnit, cu.with_H0(snapshot.H0)).value
+    points = points.to(snapshot.lengthUnit, cu.with_H0(snapshot.H0))
     tree = cKDTree(coords)
-    cellIndices = tree.query(points.to(snapshot.lengthUnit))[1]
+    cellIndices = tree.query(points)[1]
     data = field.getData(snapshot)
     return data[cellIndices]
 
