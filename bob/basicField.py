@@ -121,8 +121,12 @@ class BasicField(Field):
             return snapshot.ionized_hydrogen_fraction()
         elif name == "density":
             return snapshot.density()
+        elif name == "coordinates":
+            return snapshot.coordinates
+        elif name == "chemicalabundances":
+            return snapshot.ionized_hydrogen_fraction()
         else:
-            raise NotImplementedError
+            raise NotImplementedError(f"Field {name}")
 
     def getData(self, snapshot: "AnySnap", indices: Optional[Any] = None) -> pq.Quantity:
         from bob.snapshot import Snapshot

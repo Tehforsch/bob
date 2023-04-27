@@ -116,6 +116,9 @@ class Simulation(BaseSim):
             unit = pq.m
             return (unit * np.array([minX, minY, minZ]), unit * np.array([maxX, maxY, maxZ]))
 
+    def boxSize(self) -> pq.Quantity:
+        return self.params["BoxSize"] * self.lengthUnit
+
     def getCosmology(self) -> FlatLambdaCDM:
         Ob0 = self.params["OmegaBaryon"]
         Om0 = self.params["Omega0"]

@@ -7,6 +7,7 @@ from bob.baseSim import BaseSim
 from bob.simType import SimType
 from bob.time_series import TimeSeries
 from bob.special_params import SingleSource
+import astropy.units as pq
 
 RaxiomParameters = dict[str, Any]
 
@@ -48,3 +49,6 @@ class RaxiomSimulation(BaseSim):
 
     def get_timeseries(self, name: str) -> TimeSeries:
         return read_time_series(self.path / config.TIME_SERIES_DIR_NAME / f"{name}.hdf5", name)
+
+    def boxSize(self) -> pq.Quantity:
+        return pq.Quantity(self.params["box_size"])

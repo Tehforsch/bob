@@ -46,6 +46,7 @@ class TimePlot(MultiSetFn):
             self.config.setDefault("xUnit", pq.dimensionless_unscaled)
         self.config.setDefault("xLabel", format(f"{self.xlabel()} [UNIT]"))
         self.config.setDefault("yLabel", format(f"{self.ylabel()} [UNIT]"))
+        self.config.setDefault("yLog", False)
 
     @abstractmethod
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> pq.Quantity:
@@ -66,7 +67,8 @@ class TimePlot(MultiSetFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
-        ax.set_yscale("log")
+        if self.config["yLog"]:
+            ax.set_yscale("log")
         self.setupLinePlot(ax)
         for label, color, style, result in zip(self.getLabels(), self.getColors(), self.getStyles(), result.data):
             self.addLine(result.times, result.values, label=label, color=color, **style)
@@ -104,5 +106,4 @@ def getAllSnapshotsWithTime(timeQuantity: str, simSet: SimulationSet) -> List[Tu
 
 def getTimeAndResultForSnap(plot: TimePlot, timeQuantity: str, snapSim: Tuple[Snapshot, Simulation]) -> Tuple[pq.Quantity, pq.Quantity]:
     (snap, sim) = snapSim
-    print(snap)
     return (snap.timeQuantity(timeQuantity), plot.getQuantity(sim, snap))

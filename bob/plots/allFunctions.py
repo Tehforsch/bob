@@ -25,6 +25,8 @@ from bob.plots.sourceField import SourceField
 from bob.plots.resolvedEscapeFraction import ResolvedEscapeFraction
 from bob.plots.runTime import RunTime
 from bob.plots.h2Expansion import H2Expansion
+from bob.plots.hExpansion import HExpansion
+from bob.plots.expansion import Expansion
 
 postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     SliceWithStarParticles,
@@ -51,6 +53,8 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     ResolvedEscapeFraction,
     RunTime,
     H2Expansion,
+    HExpansion,
+    Expansion,
 ]
 
 for function in postprocessingFunctions:
