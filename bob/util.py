@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Iterator, Optional, Any
+from typing import List, Iterator, Optional, Any, Dict
 import itertools
 import subprocess
 import logging
@@ -107,3 +107,11 @@ def display_top_lines_by_memory_usage(snapshot: Any, key_type: Any = "lineno", l
         print("%s other: %.1f KiB" % (len(other), size / 1024))
     total = sum(stat.size for stat in top_stats)
     print("Total allocated size: %.1f KiB" % (total / 1024))
+
+
+def printOnce(s: str, previousRuns: Dict[str, bool] = {}) -> None:
+    if s in previousRuns:
+        return
+    else:
+        previousRuns[s] = True
+        print(s)

@@ -1,9 +1,10 @@
+import re
 import astropy.units as pq
 from pathlib import Path
 from bob.baseSnapshot import BaseSnapshot
 import os
 from bob.config import LENGTH_SCALING_IDENTIFIER, TIME_SCALING_IDENTIFIER, MASS_SCALING_IDENTIFIER, SCALE_FACTOR_SI_IDENTIFIER, SNAPSHOT_FILE_NAME
-from bob.util import getFolders, getFiles
+from bob.util import getFolders, getFiles, printOnce
 import h5py
 import numpy as np
 
@@ -30,13 +31,20 @@ class RaxiomSnapshot(BaseSnapshot):
         assert all(f.num == self.num for f in snapshot_infos)
         self.lengthUnit = pq.m
         self.H0 = 65.0 * (pq.m / pq.s / pq.Mpc)
-        print("Returning fake value for H0")
+        printOnce("Returning fake value for H0")
 
     def hdf5FilesWithDataset(self, dataset: str) -> list[h5py.File]:
         return self.hdf5Files
 
     def readAttr(self, name):
         return self.hdf5Files[0].attrs[name]
+
+    def getName(self) -> str:
+        m = re.match("snap_(.*).hdf5", self.path.name)
+        if m is None:
+            return self.path.name.replace(".hdf5", "")
+        else:
+            return m.groups()[0]
 
     @property
     def time(self) -> pq.Quantity:

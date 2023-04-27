@@ -1,6 +1,6 @@
 import re
 import itertools
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Any
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -15,14 +15,6 @@ from bob.result import Result
 from bob.multiSet import MultiSet
 from bob.plotConfig import PlotConfig
 from bob.timeUtils import TimeQuantity
-
-
-def printOnce(s: str, previousRuns: Dict[str, bool] = {}) -> None:
-    if s in previousRuns:
-        return
-    else:
-        previousRuns[s] = True
-        print(s)
 
 
 class IonizationData(Result):
