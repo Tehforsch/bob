@@ -6,6 +6,7 @@ from bob.util import getFolders
 from bob.baseSim import BaseSim
 from bob.simType import SimType
 from bob.time_series import TimeSeries
+from bob.special_params import SingleSource
 
 RaxiomParameters = dict[str, Any]
 
@@ -13,7 +14,7 @@ RaxiomParameters = dict[str, Any]
 def getParams(folder: Path) -> RaxiomParameters:
     filename = folder / "output" / "parameters.yml"
     with open(filename, "r") as f:
-        return yaml.safe_load(f)
+        return yaml.unsafe_load(f)
 
 
 class RaxiomSimulation(BaseSim):
