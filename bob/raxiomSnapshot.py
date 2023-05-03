@@ -3,7 +3,7 @@ import astropy.units as pq
 from pathlib import Path
 from bob.baseSnapshot import BaseSnapshot
 import os
-from bob.config import LENGTH_SCALING_IDENTIFIER, TIME_SCALING_IDENTIFIER, MASS_SCALING_IDENTIFIER, SCALE_FACTOR_SI_IDENTIFIER, SNAPSHOT_FILE_NAME
+from bob.config import LENGTH_SCALING_IDENTIFIER, TIME_SCALING_IDENTIFIER, MASS_SCALING_IDENTIFIER, SCALE_FACTOR_SI_IDENTIFIER, SNAPSHOT_FILE_NAME, TEMPERATURE_SCALING_IDENTIFIER
 from bob.util import getFolders, getFiles, printOnce
 import h5py
 import numpy as np
@@ -96,6 +96,7 @@ def read_unit_from_dataset(dataset_name: str, f: h5py.File) -> pq.Quantity:
     unit *= pq.m ** dataset.attrs[LENGTH_SCALING_IDENTIFIER]
     unit *= pq.s ** dataset.attrs[TIME_SCALING_IDENTIFIER]
     unit *= pq.kg ** dataset.attrs[MASS_SCALING_IDENTIFIER]
+    unit *= pq.K ** dataset.attrs[TEMPERATURE_SCALING_IDENTIFIER]
     return unit * dataset.attrs[SCALE_FACTOR_SI_IDENTIFIER]
 
 

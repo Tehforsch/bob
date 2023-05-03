@@ -125,6 +125,8 @@ class BasicField(Field):
             return snapshot.coordinates
         elif name == "chemicalabundances":
             return snapshot.ionized_hydrogen_fraction()
+        elif name == "temperature":
+            return snapshot.temperature()
         else:
             raise NotImplementedError(f"Field {name}")
 
