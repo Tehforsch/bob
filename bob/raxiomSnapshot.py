@@ -3,7 +3,14 @@ import astropy.units as pq
 from pathlib import Path
 from bob.baseSnapshot import BaseSnapshot
 import os
-from bob.config import LENGTH_SCALING_IDENTIFIER, TIME_SCALING_IDENTIFIER, MASS_SCALING_IDENTIFIER, SCALE_FACTOR_SI_IDENTIFIER, SNAPSHOT_FILE_NAME, TEMPERATURE_SCALING_IDENTIFIER
+from bob.config import (
+    LENGTH_SCALING_IDENTIFIER,
+    TIME_SCALING_IDENTIFIER,
+    MASS_SCALING_IDENTIFIER,
+    SCALE_FACTOR_SI_IDENTIFIER,
+    SNAPSHOT_FILE_NAME,
+    TEMPERATURE_SCALING_IDENTIFIER,
+)
 from bob.util import getFolders, getFiles, printOnce
 import h5py
 import numpy as np
@@ -68,6 +75,9 @@ class RaxiomSnapshot(BaseSnapshot):
 
     def temperature(self) -> pq.Quantity:
         return self.read_dataset("temperature")
+
+    def heating_rate(self) -> pq.Quantity:
+        return self.read_dataset("heating_rate")
 
     def read_dataset(self, name: str) -> pq.Quantity:
         files = self.hdf5Files

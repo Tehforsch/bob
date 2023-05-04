@@ -35,20 +35,9 @@ class BasicField(Field):
 
     @property
     def niceName(self) -> str:
-        fieldName: Dict[str, str] = {
-            "SGCHEM_HeatCoolRates": "SGCHEM_HeatCoolRates",
-            "InternalEnergy": "InternalEnergy",
-            "ChemicalAbundances": "Abundance",
-            "PhotonFlux": "PhotonFlux",
-            "Density": "Density",
-            "PhotonRates": "PhotonRates",
-            "Masses": "Mass",
-            "Coordinates": "Coordinates",
-            "ionized_hydrogen_fraction": "ionized_hydrogen_fraction",
-        }
         if self.index is None:
-            return fieldName[self.name]
-        return fieldName[self.name] + str(self.index)
+            return self.name
+        return self.name + str(self.index)
 
     @property
     def symbol(self) -> str:
@@ -127,6 +116,8 @@ class BasicField(Field):
             return snapshot.ionized_hydrogen_fraction()
         elif name == "temperature":
             return snapshot.temperature()
+        elif name == "heating_rate":
+            return snapshot.heating_rate()
         else:
             raise NotImplementedError(f"Field {name}")
 

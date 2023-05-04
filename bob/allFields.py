@@ -18,6 +18,7 @@ allFields = [
     BasicField("Coordinates", None),
     BasicField("InternalEnergy", None),
     BasicField("ionized_hydrogen_fraction", None),
+    BasicField("heating_rate", None),
     Temperature(),
     SourceField(),
 ]
