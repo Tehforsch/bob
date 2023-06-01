@@ -19,6 +19,8 @@ allFields = [
     BasicField("InternalEnergy", None),
     BasicField("ionized_hydrogen_fraction", None),
     BasicField("heating_rate", None),
+    BasicField("timestep", None),
+    BasicField("ionization_time", None),
     Temperature(),
     SourceField(),
 ]

@@ -118,6 +118,10 @@ class BasicField(Field):
             return snapshot.temperature()
         elif name == "heating_rate":
             return snapshot.heating_rate()
+        elif name == "timestep":
+            return snapshot.timestep()
+        elif name == "ionization_time":
+            return snapshot.ionization_time()
         else:
             raise NotImplementedError(f"Field {name}")
 

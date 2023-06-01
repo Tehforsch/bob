@@ -79,6 +79,12 @@ class RaxiomSnapshot(BaseSnapshot):
     def heating_rate(self) -> pq.Quantity:
         return self.read_dataset("heating_rate")
 
+    def ionization_time(self) -> pq.Quantity:
+        return self.read_dataset("ionization_time")
+
+    def timestep(self) -> pq.Quantity:
+        return self.read_dataset("timestep")
+
     def read_dataset(self, name: str) -> pq.Quantity:
         files = self.hdf5Files
         data = np.concatenate(tuple(f[name][...] for f in files))
