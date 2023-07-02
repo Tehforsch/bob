@@ -11,6 +11,7 @@ from bob.postprocess import getFunctionsFromPlotFile, setMatplotlibStyle, runFun
 from bob.run import runPlotConfig
 from bob.report import createReport
 import bob.config
+from bob.config import setupAstropy
 
 from bob.postprocess import readPlotFile
 
@@ -59,16 +60,6 @@ def setupLogging(args: argparse.Namespace) -> None:
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.INFO)
-
-
-def setupAstropy() -> None:
-    # Make the parser recognize these
-    import astropy.units as pq
-    import astropy.cosmology.units as cu
-
-    redshift = pq.def_unit("redshift", cu.redshift)
-    littleh = pq.def_unit("littleh", cu.littleh)
-    pq.add_enabled_units([redshift, littleh])
 
 
 def main() -> None:

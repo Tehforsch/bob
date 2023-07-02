@@ -26,4 +26,16 @@ LENGTH_SCALING_IDENTIFIER = "scaling_length"
 TIME_SCALING_IDENTIFIER = "scaling_time"
 MASS_SCALING_IDENTIFIER = "scaling_mass"
 TEMPERATURE_SCALING_IDENTIFIER = "scaling_temperature"
+A_SCALING_IDENTIFIER = "scaling_a"
+H_SCALING_IDENTIFIER = "scaling_h"
 SCALE_FACTOR_SI_IDENTIFIER = "scale_factor_si"
+
+def setupAstropy() -> None:
+    # Make the parser recognize these
+    import astropy.units as pq
+    import astropy.cosmology.units as cu
+
+    redshift = pq.def_unit("redshift", cu.redshift)
+    littleh = pq.def_unit("littleh", cu.littleh)
+    h = pq.def_unit("h", cu.littleh)
+    pq.set_enabled_units([pq.pc, pq.kpc, pq.Mpc, pq.m, pq.kg, pq.g, pq.s, pq.yr, pq.Myr, pq.kyr, redshift, littleh, h])
