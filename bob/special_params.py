@@ -11,6 +11,7 @@ class SingleSource(yaml.YAMLObject):
     def from_yaml(cls, loader, node):
         return cls(node.value)
 
+
 class ReadGrid(yaml.YAMLObject):
     yaml_tag = "!read"
 
@@ -21,6 +22,7 @@ class ReadGrid(yaml.YAMLObject):
     def from_yaml(cls, loader, node):
         return cls(node.value)
 
+
 class ConstructGrid(yaml.YAMLObject):
     yaml_tag = "!construct"
 
@@ -30,6 +32,7 @@ class ConstructGrid(yaml.YAMLObject):
     @classmethod
     def from_yaml(cls, loader, node):
         return cls(node.value)
+
 
 class FromIcs(yaml.YAMLObject):
     yaml_tag = "!from_ics"

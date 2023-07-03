@@ -25,6 +25,7 @@ def getDataAtPoints(field: Field, snapshot: Snapshot, points: pq.Quantity) -> np
     tree = cKDTree(coords)
     cellIndices = tree.query(points)[1]
     data = field.getData(snapshot)
+    print(np.max(data))
     return data[cellIndices]
 
 

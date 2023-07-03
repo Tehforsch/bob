@@ -30,6 +30,7 @@ A_SCALING_IDENTIFIER = "scaling_a"
 H_SCALING_IDENTIFIER = "scaling_h"
 SCALE_FACTOR_SI_IDENTIFIER = "scale_factor_si"
 
+
 def setupAstropy() -> None:
     # Make the parser recognize these
     import astropy.units as pq

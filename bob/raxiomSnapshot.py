@@ -89,6 +89,9 @@ class RaxiomSnapshot(BaseSnapshot):
     def rate(self) -> pq.Quantity:
         return self.read_dataset("rate")
 
+    def source(self) -> pq.Quantity:
+        return self.read_dataset("source")
+
     def timestep(self) -> pq.Quantity:
         return self.read_dataset("timestep")
 

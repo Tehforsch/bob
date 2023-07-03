@@ -22,6 +22,7 @@ allFields = [
     BasicField("timestep", None),
     BasicField("ionization_time", None),
     BasicField("rate", None),
+    BasicField("source", None),
     Temperature(),
     SourceField(),
 ]
