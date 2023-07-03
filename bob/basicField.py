@@ -122,6 +122,8 @@ class BasicField(Field):
             return snapshot.timestep()
         elif name == "ionization_time":
             return snapshot.ionization_time()
+        elif name == "rate":
+            return snapshot.rate()
         else:
             raise NotImplementedError(f"Field {name}")
 
