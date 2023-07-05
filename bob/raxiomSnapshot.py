@@ -17,7 +17,6 @@ from bob.config import (
 from bob.util import getFolders, getFiles, printOnce
 import h5py
 import numpy as np
-from bob.config import setupAstropy
 
 
 class SnapshotFileInfo:
@@ -41,8 +40,6 @@ class RaxiomSnapshot(BaseSnapshot):
         self.num = snapshot_infos[0].num
         assert all(f.num == self.num for f in snapshot_infos)
         self.lengthUnit = pq.m
-        self.H0 = 65.0 * (pq.km / pq.s / pq.Mpc)
-        printOnce("Returning fake value for H0")
 
     def hdf5FilesWithDataset(self, dataset: str) -> list[h5py.File]:
         return self.hdf5Files
@@ -101,22 +98,14 @@ class RaxiomSnapshot(BaseSnapshot):
         unit = read_unit_from_dataset(name, files[0])
         return unit * data
 
-    def scale_factor(self) -> pq.Quantity:
-        if "cosmology" in self.sim.params:
-            return self.sim.params["cosmology"]["a"] * pq.dimensionless_unscaled
-        else:
-            return 1.0
+    @property
+    def H0(self) -> pq.Quantity:
+        return self.sim.H0
 
     @property
     def maxExtent(self):
         try:
-            a = pq.def_unit("a", self.scale_factor().value * pq.dimensionless_unscaled)
-            pq.add_enabled_units([a])
-            boxSize = pq.Quantity(self.sim.params["box_size"])
-            boxSize = boxSize.to(self.lengthUnit, cu.with_H0(self.H0))
-            setupAstropy()
-            # reset the units
-
+            boxSize = self.sim.boxSize()
             return np.array([1.0, 1.0, 1.0]) * boxSize
         except ValueError:
             raise NotImplementedError
