@@ -94,9 +94,16 @@ class TimeQuantity:
     def scaleFactor(self) -> pq.Quantity:
         if self.type_ == TimeType.SCALE_FACTOR:
             return self.values
+        elif self.type_ == TimeType.TIME:
+            return 1.0 - 1.0 / self.redshift()
+            
         raise NotImplementedError("")
 
     def redshift(self) -> pq.Quantity:
         if self.type_ == TimeType.SCALE_FACTOR:
             return scaleFactorToRedshift(self.values)
+        elif self.type_ == TimeType.TIME:
+            raise NotImplementedError("")
+            # cosmology = self.sim.getCosmology()
+            # return z_at_value(cosmology.age, cosmology.age(init_time) + self.values)
         raise NotImplementedError("")

@@ -1,3 +1,4 @@
+import re
 import os
 from pathlib import Path
 
@@ -156,6 +157,17 @@ class Simulation(BaseSim):
             return self.lengthUnit / self.velocityUnit
         else:
             return pq.dimensionless_unscaled
+
+    def get_ionization_data(self):
+        regex = re.compile(
+            "SWEEP: Time ([0-9.+]+): Volume Av. H ionization: ([0-9.+]+), Mass Av. H ionization: ([0-9.+]+), Volume av. Ionization rate: ([0-9.+-e]+), Mass av. Ionization rate: ([0-9.+-e]+)"
+        )
+        for line in self.log:
+            match = regex.match(line)
+            if match is not None:
+                result = [float(x) for x in match.groups()]
+                result[0] = result[0] * self.timeUnit
+                yield result
 
     def simType(self) -> SimType:
         if self.params.get("simType") == "POST_STANDARD_ICS_COSMOLOGICAL":

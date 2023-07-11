@@ -10,6 +10,9 @@ import bob.special_params
 import astropy.units as pq
 import astropy.cosmology.units as cu
 from bob.config import setupAstropy
+from bob.time_series import read_time_series
+import bob.config as config
+from astropy.cosmology import FlatLambdaCDM
 
 RaxiomParameters = dict[str, Any]
 
@@ -50,20 +53,36 @@ class RaxiomSimulation(BaseSim):
         return SimType.POST_STANDARD
 
     def get_timeseries(self, name: str) -> TimeSeries:
-        return read_time_series(self.path / config.TIME_SERIES_DIR_NAME / f"{name}.hdf5", name)
+        return read_time_series(self.outputDir / config.TIME_SERIES_DIR_NAME / f"{name}.hdf5", name)
+
+    def cosmology(self) -> dict[str, float]:
+        if self.params["cosmology"] is not None:
+            return self.params["cosmology"]
+        else:
+            return { "a": 1.0, "h": 0.677 }
 
     def scale_factor(self) -> pq.Quantity:
-        if "cosmology" in self.params:
-            return self.params["cosmology"]["a"] * pq.dimensionless_unscaled
-        else:
-            return 1.0
+        return self.cosmology()["a"] * pq.dimensionless_unscaled
+
+    def get_ionization_data(self):
+        mass_av = self.get_timeseries("hydrogen_ionization_mass_average")
+        time = mass_av.time
+        mass_av = mass_av.value
+        volume_av = self.get_timeseries("hydrogen_ionization_volume_average").value
+        print("returning zero rate")
+        for (t, m, v) in zip(time, mass_av, volume_av):
+            yield t, m, v, 0.0, 0.0
 
     @property
     def H0(self) -> pq.Quantity:
-        if "cosmology" in self.params:
-            return self.params["cosmology"]["h"] * 100.0 * (pq.km / pq.s) / pq.Mpc
-        else:
-            raise ValueError("Trying to determine H0 in run without cosmology")
+        return self.cosmology()["h"] * pq.dimensionless_unscaled* 100.0 * (pq.km / pq.s) / pq.Mpc
+
+    def getCosmology(self) -> FlatLambdaCDM:
+        print("Assuming TNG cosmology")
+        Ob0 = 0.0475007
+        Om0 = 0.308983
+        H0 = self.H0
+        return FlatLambdaCDM(H0=H0, Om0=Om0, Ob0=Ob0)
 
     def boxSize(self) -> pq.Quantity:
         a = pq.def_unit("a", self.scale_factor().value * pq.dimensionless_unscaled)

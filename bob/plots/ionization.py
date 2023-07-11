@@ -16,7 +16,6 @@ from bob.multiSet import MultiSet
 from bob.plotConfig import PlotConfig
 from bob.timeUtils import TimeQuantity
 
-
 class IonizationData(Result):
     def __init__(self, simSets: MultiSet) -> None:
         self.time: List[pq.Quantity] = []
@@ -31,17 +30,10 @@ class IonizationData(Result):
     def addSims(self, sims: List[Simulation]) -> None:
         data = []
         for sim in sims:
-            regex = re.compile(
-                "SWEEP: Time ([0-9.+]+): Volume Av. H ionization: ([0-9.+]+), Mass Av. H ionization: ([0-9.+]+), Volume av. Ionization rate: ([0-9.+-e]+), Mass av. Ionization rate: ([0-9.+-e]+)"
-            )
-            for line in sim.log:
-                match = regex.match(line)
-                if match is not None:
-                    (time, *remainder) = [float(x) for x in match.groups()]
-                    time = time * sim.timeUnit
-                    timeQuantity = TimeQuantity(sim, time)
-                    redshift = timeQuantity.redshift()
-                    data.append((timeQuantity.scaleFactor(), redshift, *remainder))
+            for (time, *remainder) in sim.get_ionization_data():
+                timeQuantity = TimeQuantity(sim, time)
+                redshift = timeQuantity.redshift()
+                data.append((timeQuantity.scaleFactor(), redshift, *remainder))
 
         self.time.append(getArrayQuantity([d[0] for d in data]))
         self.redshift.append(getArrayQuantity([d[1] for d in data]))
@@ -49,7 +41,6 @@ class IonizationData(Result):
         self.massAv.append((1.0 - np.array([d[3] for d in data])) * pq.dimensionless_unscaled)
         self.volumeAvRate.append(np.array([d[4] for d in data]) / pq.s)
         self.massAvRate.append(np.array([d[5] for d in data]) / pq.s)
-
 
 class Ionization(MultiSetFn):
     def __init__(self, config: PlotConfig):

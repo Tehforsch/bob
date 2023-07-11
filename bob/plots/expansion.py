@@ -26,7 +26,7 @@ def getDistanceToCenter(coordinates: np.ndarray, center: np.ndarray) -> np.ndarr
 
 def getIonizationRadius(snapshot: Snapshot, center: np.ndarray, boxSize: u.Quantity, val: float = 0.5) -> u.Quantity:
     coordinates = snapshot.coordinates
-    field = BasicField("ChemicalAbundances")
+    field = BasicField("ChemicalAbundances", 1)
     data = field.getData(snapshot)
 
     def valueFunction(radius: u.Quantity) -> u.Quantity:
