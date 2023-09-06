@@ -122,8 +122,8 @@ class BasicField(Field):
             return snapshot.timestep()
         elif name == "ionization_time":
             return snapshot.ionization_time()
-        elif name == "rate":
-            return snapshot.rate()
+        elif name == "photon_rate":
+            return snapshot.photon_rate()
         elif name == "source":
             return snapshot.source()
         else:

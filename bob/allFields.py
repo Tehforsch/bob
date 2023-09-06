@@ -21,7 +21,7 @@ allFields = [
     BasicField("heating_rate", None),
     BasicField("timestep", None),
     BasicField("ionization_time", None),
-    BasicField("rate", None),
+    BasicField("photon_rate", None),
     BasicField("source", None),
     Temperature(),
     SourceField(),

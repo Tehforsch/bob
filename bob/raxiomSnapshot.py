@@ -83,8 +83,8 @@ class RaxiomSnapshot(BaseSnapshot):
     def ionization_time(self) -> pq.Quantity:
         return self.read_dataset("ionization_time")
 
-    def rate(self) -> pq.Quantity:
-        return self.read_dataset("rate")
+    def photon_rate(self) -> pq.Quantity:
+        return self.read_dataset("photon_rate")
 
     def source(self) -> pq.Quantity:
         return self.read_dataset("source")

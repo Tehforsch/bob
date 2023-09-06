@@ -10,6 +10,7 @@ from bob.plots.ionizationLevel import IonizationLevel
 from bob.plots.thomsonScattering import ThomsonScattering
 from bob.plots.arepoSlice import ArepoSlicePlot
 from bob.plots.bobSlice import Slice
+from bob.plots.slice_1d import Slice1d
 from bob.plots.shadowingVolume import ShadowingVolume
 from bob.plots.temperatureDensityHistogram import TemperatureDensityHistogram
 from bob.plots.temperatureIonizationHistogram import TemperatureIonizationHistogram
@@ -39,6 +40,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     ThomsonScattering,
     ArepoSlicePlot,
     Slice,
+    Slice1d,
     ShadowingVolume,
     TemperatureDensityHistogram,
     TemperatureIonizationHistogram,
