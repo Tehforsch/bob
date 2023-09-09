@@ -43,5 +43,7 @@ class Slice1d(SnapFn):
         self.setupLinePlot(plt)
         self.showTime(fig, result)
         self.setupLabels()
-        self.addLine(result.coords[:, 0], result.data)
+        if self.config["log"]:
+            plt.yscale("log")
+        self.addLine(result.coords[:, 0], result.data, linestyle="", marker="o")
         return fig

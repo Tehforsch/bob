@@ -66,6 +66,8 @@ class Expansion(TimePlot):
         super().__init__(config)
         self.config.setDefault("yUnit", u.kpc)
         self.config.setDefault("legend_loc", "lower right")
+        self.config.setDefault("stroemgren_radius", 6.79 * u.kpc)
+        self.config.setDefault("recombination_time", 122.34 * u.Myr)
 
     def ylabel(self) -> str:
         return "r"
@@ -78,8 +80,8 @@ class Expansion(TimePlot):
     def plot(self, plt: plt.axes, result: Result) -> None:
         super().plot(plt, result)
         plt.legend(loc=self.config["legend_loc"])
-        recombination_time = 122.34 * u.Myr
-        stroemgren_radius = 6.79 * u.kpc
+        recombination_time = self.config["recombination_time"]
+        stroemgren_radius = self.config["stroemgren_radius"]
         self.addLine(
             result.data[0].times,
             stroemgren_radius * analyticalRTypeExpansion(result.data[0].times / recombination_time),

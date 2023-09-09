@@ -11,4 +11,7 @@ class SnapshotFilter:
         if self.values is None:
             return sim.snapshots
         else:
-            return [snap for snap in sim.snapshots if int(snap.getName()) in self.values]
+            negativeValues = [v for v in self.values if v < 0]
+            snaps = sorted(sim.snapshots, key=lambda snap: int(snap.getName()))
+            negativeSnaps = [snaps[len(snaps) + v] for v in negativeValues]
+            return negativeSnaps + [snap for snap in sim.snapshots if int(snap.getName()) in self.values]
