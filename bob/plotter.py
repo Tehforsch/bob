@@ -1,3 +1,4 @@
+import polars as pl
 import os
 import yaml
 from typing import Iterator, List, Optional, Callable, Union, Tuple, Any
@@ -166,8 +167,11 @@ class Plotter:
         filename = plotDataFolder / bob.config.plotSerializationFileName
         yaml.dump({fn.name: dict(transformReadable(item) for item in fn.config.items())}, open(filename, "w"))
 
-    def saveResult(self, result: Result, plotDataFolder: Path) -> None:
-        result.save(plotDataFolder)
+    def saveResult(self, result: Union[Result, pl.DataFrame], plotDataFolder: Path) -> None:
+        if type(result) == pl.DataFrame:
+            pass
+        else:
+            result.save(plotDataFolder)
 
     def getQuotient(
         self, quotient_params: Optional[Union[str, List[str]]], sims_filter: Optional[List[str]], labels: Optional[List[str]]

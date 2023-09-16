@@ -26,6 +26,11 @@ class SimulationSet(list):
             def getValue(k: str) -> Any:
                 if k == "name":  # For cases where sim sets are indistuingishable by actual sim parameters
                     return sim.folder.parent
+                if "/" in k:
+                    split = k.split("/")
+                    if len(split) != 2:
+                        raise NotImplementedError("super easy to fix")
+                    return sim.params[split[0]][split[1]]
                 return sim.params[k]
 
             return tuple((k, getValue(k)) for k in parameters)

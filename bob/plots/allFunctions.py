@@ -28,6 +28,7 @@ from bob.plots.runTime import RunTime
 from bob.plots.h2Expansion import H2Expansion
 from bob.plots.hExpansion import HExpansion
 from bob.plots.expansion import Expansion
+from bob.plots.convergence import Convergence
 
 postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     SliceWithStarParticles,
@@ -57,6 +58,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     H2Expansion,
     HExpansion,
     Expansion,
+    Convergence,
 ]
 
 for function in postprocessingFunctions:
