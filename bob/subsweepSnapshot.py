@@ -28,8 +28,8 @@ class SnapshotFileInfo:
         self.rank = int(str_rank)
 
 
-class RaxiomSnapshot(BaseSnapshot):
-    def __init__(self, path: Path, sim: "RaxiomSimulation") -> None:
+class SubsweepSnapshot(BaseSnapshot):
+    def __init__(self, path: Path, sim: "SubsweepSimulation") -> None:
         snapshot_infos = [parse_snapshot_file_name(snap_file) for snap_file in getFiles(path)]
         self.path = path
         self.filenames = [path / f for f in os.listdir(path)]
@@ -136,7 +136,7 @@ def get_snapshot_paths_from_output_files(output_files: list[Path]) -> list[Path]
     return [path for path in output_files if is_snapshot_file(path)]
 
 
-def get_snapshots_from_dir(path: Path) -> list[RaxiomSnapshot]:
+def get_snapshots_from_dir(path: Path) -> list[SubsweepSnapshot]:
     snap_dirs = getFolders(path)
     return sorted([get_snapshot_from_dir(snap_dir) for snap_dir in snap_dirs], key=lambda snap: snap.num)
 

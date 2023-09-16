@@ -4,7 +4,7 @@ import h5py
 
 from bob.timeUtils import TimeQuantity
 
-AnySnap = Union["Snapshot", "RaxiomSnapshot"]
+AnySnap = Union["Snapshot", "SubsweepSnapshot"]
 
 
 class BaseSnapshot:

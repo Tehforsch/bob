@@ -3,7 +3,7 @@ import numpy as np
 import h5py
 import astropy.units as u
 
-from bob.raxiomSnapshot import read_unit_from_dataset
+from bob.subsweepSnapshot import read_unit_from_dataset
 
 
 class TimeSeries:

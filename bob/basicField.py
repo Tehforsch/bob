@@ -104,7 +104,7 @@ class BasicField(Field):
         else:
             return fieldData[indices, self.index]
 
-    def getDataForRaxiomSnapshot(self, snapshot: "Snapshot", indices: Optional[Any] = None) -> pq.Quantity:
+    def getDataForSubsweepSnapshot(self, snapshot: "Snapshot", indices: Optional[Any] = None) -> pq.Quantity:
         name = self.name.lower()
         if name == "ionized_hydrogen_fraction":
             return snapshot.ionized_hydrogen_fraction()
@@ -135,4 +135,4 @@ class BasicField(Field):
         if type(snapshot) == Snapshot:
             return self.getDataForArepoSnapshot(snapshot, indices)
         else:
-            return self.getDataForRaxiomSnapshot(snapshot, indices)
+            return self.getDataForSubsweepSnapshot(snapshot, indices)

@@ -1,7 +1,7 @@
 from typing import Any
 from pathlib import Path
 import yaml
-from bob.raxiomSnapshot import RaxiomSnapshot
+from bob.subsweepSnapshot import SubsweepSnapshot
 from bob.util import getFolders
 from bob.baseSim import BaseSim
 from bob.simType import SimType
@@ -14,16 +14,16 @@ from bob.time_series import read_time_series
 import bob.config as config
 from astropy.cosmology import FlatLambdaCDM
 
-RaxiomParameters = dict[str, Any]
+SubsweepParameters = dict[str, Any]
 
 
-def getParams(folder: Path) -> RaxiomParameters:
+def getParams(folder: Path) -> SubsweepParameters:
     filename = folder / "output" / "parameters.yml"
     with open(filename, "r") as f:
         return yaml.unsafe_load(f)
 
 
-class RaxiomSimulation(BaseSim):
+class SubsweepSimulation(BaseSim):
     def __init__(self, folder: Path) -> None:
         self.folder = folder
         self.params = getParams(folder)
@@ -43,11 +43,11 @@ class RaxiomSimulation(BaseSim):
         return self.outputDir / "snapshots"
 
     @property
-    def snapshots(self) -> list[RaxiomSnapshot]:
+    def snapshots(self) -> list[SubsweepSnapshot]:
         snapshotFolders = list(getFolders(self.snapshotDir))
 
         snapshotFolders.sort(key=lambda x: int(x.name))
-        return [RaxiomSnapshot(s, self) for s in snapshotFolders]
+        return [SubsweepSnapshot(s, self) for s in snapshotFolders]
 
     def simType(self) -> SimType:
         return SimType.POST_STANDARD

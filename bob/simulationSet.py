@@ -3,9 +3,9 @@ import itertools
 import os
 from pathlib import Path
 from bob.simulation import Simulation
-from bob.raxiomSimulation import RaxiomSimulation
+from bob.subsweepSimulation import SubsweepSimulation
 
-AnySim = Simulation | RaxiomSimulation
+AnySim = Simulation | SubsweepSimulation
 
 
 class Single:

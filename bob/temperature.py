@@ -3,13 +3,13 @@ from bob.constants import kB, protonMass, gamma
 from bob.field import Field
 from bob.basicField import BasicField
 from bob.snapshot import Snapshot
-from bob.raxiomSnapshot import RaxiomSnapshot
+from bob.subsweepSnapshot import SubsweepSnapshot
 import astropy.units as pq
 
 
 class Temperature(Field):
     def getData(self, snapshot: Snapshot) -> np.ndarray:
-        if type(snapshot) == RaxiomSnapshot:
+        if type(snapshot) == SubsweepSnapshot:
             return BasicField("Temperature").getData(snapshot)
 
         density = BasicField("Density").getData(snapshot)
