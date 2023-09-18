@@ -53,13 +53,13 @@ class SubsweepSimulation(BaseSim):
         return SimType.POST_STANDARD
 
     def get_timeseries(self, name: str) -> TimeSeries:
-        return read_time_series(self.outputDir / config.TIME_SERIES_DIR_NAME / f"{name}.hdf5", name)
+        return read_time_series(self.outputDir / config.TIME_SERIES_DIR_NAME / f"{name}.yml", name)
 
     def cosmology(self) -> dict[str, float]:
         if self.params["cosmology"] is not None:
             return self.params["cosmology"]
         else:
-            return { "a": 1.0, "h": 0.677 }
+            return {"a": 1.0, "h": 0.677}
 
     def scale_factor(self) -> pq.Quantity:
         return self.cosmology()["a"] * pq.dimensionless_unscaled
@@ -70,12 +70,12 @@ class SubsweepSimulation(BaseSim):
         mass_av = mass_av.value
         volume_av = self.get_timeseries("hydrogen_ionization_volume_average").value
         print("returning zero rate")
-        for (t, m, v) in zip(time, mass_av, volume_av):
+        for t, m, v in zip(time, mass_av, volume_av):
             yield t, m, v, 0.0, 0.0
 
     @property
     def H0(self) -> pq.Quantity:
-        return self.cosmology()["h"] * pq.dimensionless_unscaled* 100.0 * (pq.km / pq.s) / pq.Mpc
+        return self.cosmology()["h"] * pq.dimensionless_unscaled * 100.0 * (pq.km / pq.s) / pq.Mpc
 
     def getCosmology(self) -> FlatLambdaCDM:
         print("Assuming TNG cosmology")
