@@ -83,6 +83,14 @@ class SubsweepSnapshot(BaseSnapshot):
     def ionization_time(self) -> pq.Quantity:
         return self.read_dataset("ionization_time")
 
+    def timeQuantity(self, quantity: str) -> pq.Quantity:
+        if quantity == "z":
+            return pq.Quantity(self.readAttr("redshift"))
+        elif quantity == "t":
+            return pq.Quantity(self.readAttr("time")) * pq.s
+        else:
+            raise ValueError(f"Unkown time quantity: {quantity}")
+
     def photon_rate(self) -> pq.Quantity:
         return self.read_dataset("photon_rate")
 
