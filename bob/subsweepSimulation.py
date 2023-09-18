@@ -67,11 +67,12 @@ class SubsweepSimulation(BaseSim):
     def get_ionization_data(self):
         mass_av = self.get_timeseries("hydrogen_ionization_mass_average")
         time = mass_av.time
+        redshift = mass_av.redshift
         mass_av = mass_av.value
         volume_av = self.get_timeseries("hydrogen_ionization_volume_average").value
         print("returning zero rate")
-        for t, m, v in zip(time, mass_av, volume_av):
-            yield t, m, v, 0.0, 0.0
+        for z, t, m, v in zip(redshift, time, mass_av, volume_av):
+            yield z, t, m, v, 0.0, 0.0
 
     @property
     def H0(self) -> pq.Quantity:

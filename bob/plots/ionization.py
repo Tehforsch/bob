@@ -31,10 +31,10 @@ class IonizationData(Result):
     def addSims(self, sims: List[Simulation]) -> None:
         data = []
         for sim in sims:
-            for time, *remainder in sim.get_ionization_data():
-                timeQuantity = TimeQuantity(sim, time)
-                redshift = timeQuantity.redshift()
-                data.append((timeQuantity.scaleFactor(), redshift, *remainder))
+            for redshift, time, *remainder in sim.get_ionization_data():
+                redshift = redshift
+                scale_factor = 1.0 / (1.0 + redshift)
+                data.append((scale_factor, redshift, *remainder))
 
         self.time.append(getArrayQuantity([d[0] for d in data]))
         self.redshift.append(getArrayQuantity([d[1] for d in data]))
