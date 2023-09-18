@@ -9,6 +9,7 @@ from bob.result import Result
 from bob.multiSet import MultiSet
 from bob.plotConfig import PlotConfig
 
+
 class Convergence(MultiSetFn):
     def __init__(self, config: PlotConfig):
         super().__init__(config)
@@ -56,7 +57,16 @@ class Convergence(MultiSetFn):
         print(result)
         plt.clf()
         g = sns.relplot(
-            data=result, x="timescale[kyr]", y="ratio", hue="num_levels", row="threshold", kind="line", linewidth=1.2, height=2, aspect=1.5, legend=True
+            data=result,
+            x="timescale[kyr]",
+            y="ratio",
+            hue="num_levels",
+            row="threshold",
+            kind="line",
+            linewidth=1.2,
+            height=2,
+            aspect=1.5,
+            legend=True,
         )
         g.tight_layout()
         # plt.xlim((10**-1.2, 1e4))

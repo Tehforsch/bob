@@ -16,6 +16,7 @@ from bob.multiSet import MultiSet
 from bob.plotConfig import PlotConfig
 from bob.timeUtils import TimeQuantity
 
+
 class IonizationData(Result):
     def __init__(self, simSets: MultiSet) -> None:
         self.time: List[pq.Quantity] = []
@@ -30,7 +31,7 @@ class IonizationData(Result):
     def addSims(self, sims: List[Simulation]) -> None:
         data = []
         for sim in sims:
-            for (time, *remainder) in sim.get_ionization_data():
+            for time, *remainder in sim.get_ionization_data():
                 timeQuantity = TimeQuantity(sim, time)
                 redshift = timeQuantity.redshift()
                 data.append((timeQuantity.scaleFactor(), redshift, *remainder))
@@ -41,6 +42,7 @@ class IonizationData(Result):
         self.massAv.append((1.0 - np.array([d[3] for d in data])) * pq.dimensionless_unscaled)
         self.volumeAvRate.append(np.array([d[4] for d in data]) / pq.s)
         self.massAvRate.append(np.array([d[5] for d in data]) / pq.s)
+
 
 class Ionization(MultiSetFn):
     def __init__(self, config: PlotConfig):

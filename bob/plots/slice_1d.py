@@ -11,8 +11,6 @@ from bob.field import Field
 from bob.plotConfig import PlotConfig
 
 
-
-
 class Slice1d(SnapFn):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)

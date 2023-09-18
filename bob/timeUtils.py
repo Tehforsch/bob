@@ -96,7 +96,7 @@ class TimeQuantity:
             return self.values
         elif self.type_ == TimeType.TIME:
             return 1.0 - 1.0 / self.redshift()
-            
+
         raise NotImplementedError("")
 
     def redshift(self) -> pq.Quantity:
