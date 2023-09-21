@@ -47,7 +47,11 @@ class SubsweepSimulation(BaseSim):
         snapshotFolders = list(getFolders(self.snapshotDir))
 
         snapshotFolders.sort(key=lambda x: int(x.name))
-        return [SubsweepSnapshot(s, self) for s in snapshotFolders]
+        snaps = [SubsweepSnapshot(s, self) for s in snapshotFolders]
+        first = snaps[0]
+        for snap in snaps:
+            snap.first_snapshot_this_sim = first
+        return snaps
 
     def simType(self) -> SimType:
         return SimType.POST_STANDARD

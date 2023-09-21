@@ -59,7 +59,7 @@ class SubsweepSnapshot(BaseSnapshot):
         return self.readAttr("time") * pq.s
 
     def position(self) -> pq.Quantity:
-        return self.read_dataset("position")
+        return self.first_snapshot_this_sim.read_dataset("position")
 
     @property
     def coordinates(self) -> pq.Quantity:
@@ -69,7 +69,7 @@ class SubsweepSnapshot(BaseSnapshot):
         return self.read_dataset("ionized_hydrogen_fraction")
 
     def density(self) -> pq.Quantity:
-        return self.read_dataset("density")
+        return self.first_snapshot_this_sim.read_dataset("density")
 
     def velocity(self) -> pq.Quantity:
         return self.read_dataset("velocity")
@@ -95,7 +95,7 @@ class SubsweepSnapshot(BaseSnapshot):
         return self.read_dataset("photon_rate")
 
     def source(self) -> pq.Quantity:
-        return self.read_dataset("source")
+        return self.first_snapshot_this_sim.read_dataset("source")
 
     def timestep(self) -> pq.Quantity:
         return self.read_dataset("timestep")
