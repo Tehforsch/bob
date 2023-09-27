@@ -82,6 +82,10 @@ class SubsweepSimulation(BaseSim):
     def H0(self) -> pq.Quantity:
         return self.cosmology()["h"] * pq.dimensionless_unscaled * 100.0 * (pq.km / pq.s) / pq.Mpc
 
+    @property
+    def little_h(self) -> pq.Quantity:
+        return self.cosmology()["h"]
+
     def getCosmology(self) -> FlatLambdaCDM:
         print("Assuming TNG cosmology")
         Ob0 = 0.0475007
@@ -91,7 +95,10 @@ class SubsweepSimulation(BaseSim):
 
     def boxSize(self) -> pq.Quantity:
         a = pq.def_unit("a", self.scale_factor().value * pq.dimensionless_unscaled)
-        pq.add_enabled_units([a])
+        cpc_over_h = pq.def_unit("cpc/h", pq.pc * self.scale_factor().value / self.little_h)
+        ckpc_over_h = pq.def_unit("ckpc/h", pq.kpc * self.scale_factor().value / self.little_h)
+        cMpc_over_h = pq.def_unit("cMpc/h", pq.Mpc * self.scale_factor().value / self.little_h)
+        pq.add_enabled_units([a, cpc_over_h, ckpc_over_h, cMpc_over_h])
         boxSize = pq.Quantity(self.params["box_size"])
         boxSize = boxSize.to(pq.m, cu.with_H0(self.H0))
         # reset the units
