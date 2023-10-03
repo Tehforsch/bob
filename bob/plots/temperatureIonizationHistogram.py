@@ -1,3 +1,4 @@
+import numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as pq
 
@@ -15,7 +16,7 @@ class TemperatureIonizationHistogram(Histogram):
         super().__init__(config)
         self.config.setDefault("xUnit", pq.dimensionless_unscaled)
         self.config.setDefault("yUnit", pq.K)
-        self.config.setDefault("xLabel", "$x_{\\mathrm{H}} [UNIT]$")
+        self.config.setDefault("xLabel", "$x_{\\mathrm{HII}} [UNIT]$")
         self.config.setDefault("yLabel", "T [UNIT]")
         self.config.setDefault("minX", 1e-10)
         self.config.setDefault("maxX", 5e-0)
@@ -29,3 +30,6 @@ class TemperatureIonizationHistogram(Histogram):
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         super().plot(plt, result)
+
+def stats(n: np.ndarray):
+    print(f" min: {np.min(n)} max: {np.max(n)} mean: {np.mean(n)}")
