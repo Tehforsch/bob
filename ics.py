@@ -98,6 +98,8 @@ class ICS:
             velocities = self.velocities / self.header["UnitVelocity_in_cm_per_s"]
             f[pt].create_dataset("Velocities", data=velocities)
             f[pt].create_dataset("ParticleIDs", data=self.ids)
+            f[pt].create_dataset("Density", data=self.mass / self.volume)
+            f[pt].create_dataset("InternalEnergy", data=np.zeros(self.mass.shape))
 
 
 def createIcs(sim: Simulation, outputFile: Path, densityFunction: Callable[[np.ndarray], float], resolution: int) -> float:
