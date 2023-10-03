@@ -1,3 +1,4 @@
+import numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as pq
 
@@ -12,6 +13,9 @@ from bob.plots.histogram import Histogram
 
 class TemperatureDensityHistogram(Histogram):
     def __init__(self, config: PlotConfig) -> None:
+        config.setDefault("onlyIonized", False)
+        filterStr = "_ionized" if config.get("onlyIonized") else ""
+        config.setDefault("name", self.name + "_{simName}_{snapName}" + filterStr)
         super().__init__(config)
         self.config.setDefault("xUnit", pq.g / pq.cm**3)
         self.config.setDefault("yUnit", pq.K)
@@ -29,3 +33,11 @@ class TemperatureDensityHistogram(Histogram):
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         super().plot(plt, result)
+
+    def filterFunction(self, snap):
+        if self.config.get("onlyIonized"):
+            hpAbundance = snap.ionized_hydrogen_fraction()
+            indices = np.where(hpAbundance > 0.5)
+            return indices
+        else:
+            return None

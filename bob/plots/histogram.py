@@ -16,17 +16,13 @@ from bob.field import Field
 class Histogram(SnapFn):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
-        self.config.setDefault("only_ionized", False)
-        ionizedStr = "_only_ionized" if self.config["only_ionized"] else ""
-        self.config.setDefault("name", self.config["name"] + f"{ionizedStr}")
 
     def postHistogram(self, sim: Simulation, snap: Snapshot, fieldX: Field, fieldY: Field) -> Result:
         result = super().post(sim, snap)
         dataX = fieldX.getData(snap).to_value(self.config["xUnit"], cu.with_H0(snap.H0))
         dataY = fieldY.getData(snap).to_value(self.config["yUnit"], cu.with_H0(snap.H0))
-        if self.config["only_ionized"]:
-            hpAbundance = BasicField("ChemicalAbundances", 1).getData(snap)
-            indices = np.where(hpAbundance > 0.5)
+        indices = self.filterFunction(snap)
+        if indices is not None:
             dataX = dataX[indices]
             dataY = dataY[indices]
         minX, minY, maxX, maxY = self.config["minX"], self.config["minY"], self.config["maxX"], self.config["maxY"]
@@ -55,3 +51,6 @@ class Histogram(SnapFn):
         if self.config["yTicks"] is not []:
             plt.yticks(self.config["yTicks"])
         super().plot(plt, result)
+
+    def filterFunction(self, snap):
+        return None

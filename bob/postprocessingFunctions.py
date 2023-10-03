@@ -101,7 +101,8 @@ class SnapFn(PostprocessingFunction):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
         self.config.setDefault("snapshots", None)
-        self.config.setDefault("name", self.name + "_{simName}_{snapName}")
+        if self.config.get("name") is None:
+            self.config.setDefault("name", self.name + "_{simName}_{snapName}")
         self.config.setDefault("showTime", True)
         self.config.setDefault("time", "z")
         self.config.setDefault("timeUnit", 1.0)

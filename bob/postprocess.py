@@ -131,6 +131,9 @@ def generatePlotConfig(name: str) -> None:
     if resultFile.is_file():
         raise ValueError("File already exists: {}".format(resultFile))
         return
-    contents = yaml.dump(getPlotConfig(name))
+    config = getPlotConfig(name)
+    for (_, plot) in config.items():
+        del plot["name"]
+    contents = yaml.dump(config)
     with open(resultFile, "w") as f:
         f.write(contents)
