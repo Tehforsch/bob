@@ -132,7 +132,7 @@ def generatePlotConfig(name: str) -> None:
         raise ValueError("File already exists: {}".format(resultFile))
         return
     config = getPlotConfig(name)
-    for (_, plot) in config.items():
+    for _, plot in config.items():
         del plot["name"]
     contents = yaml.dump(config)
     with open(resultFile, "w") as f:

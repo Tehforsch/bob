@@ -16,7 +16,9 @@ class TemperatureIonizationHistogram(Histogram):
         defaultFilter = [">", "0 g cm^-3"]
         config.setDefault("densityFilter", defaultFilter)
         (aboveOrBelow, threshold) = config["densityFilter"]
-        filterStr = "_dens" + aboveOrBelow + "" + str(pq.Quantity(threshold).to_value(pq.g / pq.cm**3)) if config["densityFilter"] != defaultFilter else ""
+        filterStr = (
+            "_dens" + aboveOrBelow + "" + str(pq.Quantity(threshold).to_value(pq.g / pq.cm**3)) if config["densityFilter"] != defaultFilter else ""
+        )
         config.setDefault("name", self.name + "_{simName}_{snapName}" + filterStr)
         super().__init__(config)
         self.config.setDefault("xUnit", pq.dimensionless_unscaled)
