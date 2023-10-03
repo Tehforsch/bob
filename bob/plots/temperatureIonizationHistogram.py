@@ -13,6 +13,11 @@ from bob.plots.histogram import Histogram
 
 class TemperatureIonizationHistogram(Histogram):
     def __init__(self, config: PlotConfig) -> None:
+        defaultFilter = [">", "0 g cm^-3"]
+        config.setDefault("densityFilter", defaultFilter)
+        (aboveOrBelow, threshold) = config["densityFilter"]
+        filterStr = "_dens" + aboveOrBelow + "" + str(pq.Quantity(threshold).to_value(pq.g / pq.cm**3)) if config["densityFilter"] != defaultFilter else ""
+        config.setDefault("name", self.name + "_{simName}_{snapName}" + filterStr)
         super().__init__(config)
         self.config.setDefault("xUnit", pq.dimensionless_unscaled)
         self.config.setDefault("yUnit", pq.K)
@@ -31,5 +36,17 @@ class TemperatureIonizationHistogram(Histogram):
     def plot(self, plt: plt.axes, result: Result) -> None:
         super().plot(plt, result)
 
-def stats(n: np.ndarray):
-    print(f" min: {np.min(n)} max: {np.max(n)} mean: {np.mean(n)}")
+    def filterFunction(self, snap):
+        densityFilter = self.config.get("densityFilter")
+        if densityFilter[0] == ">":
+            above = True
+        elif densityFilter[0] == "<":
+            above = False
+        else:
+            raise ValueError(densityFilter[0])
+        densityThreshold = pq.Quantity(densityFilter[1])
+        dens = snap.density().to_value(densityThreshold.unit)
+        if above:
+            return np.where(dens > densityThreshold.value)
+        else:
+            return np.where(dens < densityThreshold)

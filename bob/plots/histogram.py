@@ -22,14 +22,19 @@ class Histogram(SnapFn):
         dataX = fieldX.getData(snap).to_value(self.config["xUnit"], cu.with_H0(snap.H0))
         dataY = fieldY.getData(snap).to_value(self.config["yUnit"], cu.with_H0(snap.H0))
         indices = self.filterFunction(snap)
+        self.config["empty"] = False
         if indices is not None:
             dataX = dataX[indices]
             dataY = dataY[indices]
+            if indices[0].shape[0] == 0:
+                print("Empty plot due to filter settings!")
+                self.config["empty"] = True
         minX, minY, maxX, maxY = self.config["minX"], self.config["minY"], self.config["maxX"], self.config["maxY"]
         binsX = np.logspace(np.log10(minX), np.log10(maxX), num=104)
         binsY = np.logspace(np.log10(minY), np.log10(maxY), num=104)
-        print(np.min(dataX), np.mean(dataX), np.max(dataX))
-        print(np.min(dataY), np.mean(dataY), np.max(dataY))
+        if not self.config["empty"]:
+            print(np.min(dataX), np.mean(dataX), np.max(dataX))
+            print(np.min(dataY), np.mean(dataY), np.max(dataY))
         result.H, result.x_edges, result.y_edges = np.histogram2d(dataX, dataY, bins=(binsX, binsY), density=True)
         result.H = result.H.T * pq.dimensionless_unscaled
         result.x_edges = result.x_edges * pq.dimensionless_unscaled
@@ -45,7 +50,8 @@ class Histogram(SnapFn):
         super().showTimeIfDesired(fig, result)
         X, Y = np.meshgrid(result.x_edges, result.y_edges)
         plt.pcolormesh(X, Y, result.H, norm=colors.LogNorm())
-        plt.colorbar()
+        if not self.config["empty"]:
+            plt.colorbar()
         if self.config["xTicks"] is not []:
             plt.xticks(self.config["xTicks"])
         if self.config["yTicks"] is not []:
