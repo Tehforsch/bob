@@ -23,6 +23,8 @@ class MeanFieldOverTime(TimePlot):
         self.config.setDefault("yUnit", getField(self.config).unit)
         if self.config.get("time") == "z":
             self.config.setDefault("xLim", [40, 0])
+        else:
+            self.config.setDefault("xLim", [0, 1000])
         self.config.setDefault("average", "mass", choices=["mass", "volume"])
         avType = self.config["average"] + "Av"
         self.config.setDefault("name", f"{self.name}_{field}_{avType}", override=True)

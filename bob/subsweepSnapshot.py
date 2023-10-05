@@ -71,6 +71,9 @@ class SubsweepSnapshot(BaseSnapshot):
     def density(self) -> pq.Quantity:
         return self.first_snapshot_this_sim.read_dataset("density")
 
+    def mass(self) -> pq.Quantity:
+        return self.first_snapshot_this_sim.read_dataset("mass")
+
     def velocity(self) -> pq.Quantity:
         return self.read_dataset("velocity")
 

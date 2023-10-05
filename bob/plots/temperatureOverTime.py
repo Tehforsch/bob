@@ -26,13 +26,12 @@ class TemperatureOverTime(MeanFieldOverTime):
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> List[float]:  # type: ignore
         density = BasicField("Density").getData(snap) / (pq.g / pq.cm**3)
         masses = BasicField("Masses").getData(snap)
-        temperature = Temperature().getData(snap) / pq.K
+        temperature = Temperature().getData(snap)
         result = []
         self.densityBins = [1e-31, 1e-29, 1e-27, 1e-25]
         for density1, density2 in zip(self.densityBins, self.densityBins[1:]):
             indices = np.where((density1 < density) & (density < density2))
             avTemp = np.sum(temperature[indices] * masses[indices] / np.sum(masses[indices]))
-            result.append(avTemp)
             result.append(avTemp)
         return result
 
@@ -55,9 +54,9 @@ class TemperatureOverTime(MeanFieldOverTime):
         plt.ylabel(self.ylabel())
         plt.xlim(self.config["xLim"])
         plt.ylim(self.config["yLim"])
-        for i, (res, label) in enumerate(zip(result.data, self.config["labels"])):
+        for _, (res, label) in enumerate(zip(result.data, self.config["labels"])):
             for i, (sublabel, subcolor) in enumerate(zip(sublabels, subcolors)):
-                plt.plot(res.times, res.values[:, i], color=subcolor)
+                self.addLine(res.times, res.values[:, i], color=subcolor)
 
         for sublabel, subcolor in zip(sublabels, subcolors):
             plt.plot([], [], color=subcolor, label=sublabel)

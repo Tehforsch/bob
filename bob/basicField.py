@@ -126,6 +126,10 @@ class BasicField(Field):
             return snapshot.photon_rate()
         elif name == "source":
             return snapshot.source()
+        elif name == "mass":
+            return snapshot.mass()
+        elif name == "masses":
+            return snapshot.mass()
         else:
             raise NotImplementedError(f"Field {name}")
 
