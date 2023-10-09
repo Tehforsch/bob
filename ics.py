@@ -75,7 +75,9 @@ class ICS:
             self.create_dataset(f, "Velocities", self.velocities)
             f["PartType0"].create_dataset("ParticleIDs", data=self.ids)
             self.create_dataset(f, "Density", self.mass / self.volume)
-            self.create_dataset(f, "InternalEnergy", np.zeros(self.mass.shape) * pq.J / pq.g)
+            kB = 1.38e-23 * pq.J / pq.K 
+            proton_mass = pq.kg * 1.67e-27
+            self.create_dataset(f, "InternalEnergy", np.ones(self.mass.shape) * kB * 100.0 * pq.K / proton_mass)
 
 
     def create_dataset(self, f, name, data):
