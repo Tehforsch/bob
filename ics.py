@@ -60,8 +60,7 @@ class ICS:
 
     def densFromGrid(self, densityFunction: Callable[[np.ndarray], float]) -> float:
         self.volume = (self.cellsize * self.header["UnitLength_in_cm"]) ** 3 * pq.cm**3
-        self.mass = np.zeros(self.numParticles) * pq.g
-        self.mass = self.volume * densityFunction()
+        self.mass = np.ones(self.numParticles) * self.volume * densityFunction()
         return np.mean(self.mass / self.header["UnitMass_in_g"])
 
     def save(self, fileName: Path) -> None:
@@ -93,6 +92,7 @@ class ICS:
         d.attrs.create("mass_scaling", mass)
         d.attrs.create("velocity_scaling", velocity)
         d.attrs.create("to_cgs", scale)
+        print(f"Creating {name} with {data.shape}")
 
 def get_dims(data):
     # i dont like astropy units. cant get the dimension of a unit 
