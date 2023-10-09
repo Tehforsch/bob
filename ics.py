@@ -1,3 +1,5 @@
+import itertools
+import astropy.units as pq
 import logging
 import sys
 import shutil
@@ -10,12 +12,6 @@ import argparse
 from bob.simulationSet import SimulationSet
 from bob import config
 from bob.simulation import Simulation
-
-M_sol = 1.989e33  # solar mass [g]
-m_p = 1.67262178e-24  # proton mass [g]
-yr = 3.15576e7  # year [s]
-pc = 3.085678e18  # parsec [cm]
-
 
 class ICS:
     def __init__(self) -> None:
@@ -37,9 +33,6 @@ class ICS:
             "Flag_Feedback": 0,
             "Flag_DoublePrecision": 1,  # 0-single, 1-double
             "Composition_vector_length": 0,
-            "UnitLength_in_cm": 1,
-            "UnitMass_in_g": 1,
-            "UnitVelocity_in_cm_per_s": 1,
             "Time": 0,
         }
 
@@ -52,36 +45,23 @@ class ICS:
 
         self.resolution = resolution
         self.numParticles = resolution**3
-        # Particle types
-        # 0 - gas (high-res)
-        # 1 - gas (low-res)
-        # 2 - DM  (high-res)
-        # 3 - DM  (low-res)
-        # 4 - stars
-        # 5 - sinks
         self.header["NumPart_ThisFile"][0] = self.numParticles
-        # self.header['NumPart_ThisFile'][3] = self.numParticles_dm
         self.header["NumPart_Total"][0] = self.numParticles
-        # create coordinate bins in all directions
         self.xi = np.array([np.linspace(0, self.header["BoxSize"], self.resolution, endpoint=False) for i in range(3)])
-        # size of the cell
         self.cellsize = self.header["BoxSize"] / self.resolution
-        print(self.cellsize)
-        # shift coordinates by half a cell
         self.xi += self.cellsize / 2
         self.xxi = np.meshgrid(*self.xi)
         # ordered as: x*ny*nz + y*nz + z
         self.coords = np.vstack([np.ravel(self.xxi[1]), np.ravel(self.xxi[0]), np.ravel(self.xxi[2])]).T
         # add a random scatter to the coordinates
         self.coords += (np.random.rand(self.numParticles, 3) - 0.5) * self.cellsize
-        self.velocities = np.zeros((self.numParticles, 3))
+        self.velocities = np.zeros((self.numParticles, 3)) * pq.cm / pq.s
         self.ids = np.arange(1, self.numParticles + 1)  # 1,2,3,4,5,....
 
     def densFromGrid(self, densityFunction: Callable[[np.ndarray], float]) -> float:
-        self.volume = (self.cellsize * self.header["UnitLength_in_cm"]) ** 3  # cm^3
-        self.mass = np.zeros(self.numParticles)  # g
-        for c, coord in enumerate(self.coords):
-            self.mass[c] = self.volume * densityFunction(coord)
+        self.volume = (self.cellsize * self.header["UnitLength_in_cm"]) ** 3 * pq.cm**3
+        self.mass = np.zeros(self.numParticles) * pq.g
+        self.mass = self.volume * densityFunction()
         return np.mean(self.mass / self.header["UnitMass_in_g"])
 
     def save(self, fileName: Path) -> None:
@@ -89,17 +69,41 @@ class ICS:
             f.create_group("Header")
             for name, value in self.header.items():
                 f["Header"].attrs.create(name, value)
-            pt = "PartType0"
-            f.create_group(pt)
-            coords = self.coords  # in code units
-            f[pt].create_dataset("Coordinates", data=coords)
-            masses = self.mass / self.header["UnitMass_in_g"]
-            f[pt].create_dataset("Masses", data=masses)
-            velocities = self.velocities / self.header["UnitVelocity_in_cm_per_s"]
-            f[pt].create_dataset("Velocities", data=velocities)
-            f[pt].create_dataset("ParticleIDs", data=self.ids)
-            f[pt].create_dataset("Density", data=self.mass / self.volume)
-            f[pt].create_dataset("InternalEnergy", data=np.zeros(self.mass.shape))
+            f.create_group("PartType0")
+            coords = self.coords * pq.cm * self.header["UnitLength_in_cm"]
+            self.create_dataset(f, "Coordinates", data=coords)
+            self.create_dataset(f, "Masses", self.mass)
+            self.create_dataset(f, "Velocities", self.velocities)
+            f["PartType0"].create_dataset("ParticleIDs", data=self.ids)
+            self.create_dataset(f, "Density", self.mass / self.volume)
+            self.create_dataset(f, "InternalEnergy", np.zeros(self.mass.shape) * pq.J / pq.g)
+
+
+    def create_dataset(self, f, name, data):
+        (_, (length, mass, velocity)) = get_dims(data)
+        data = data.to(
+            (pq.g * self.header["UnitMass_in_g"]) ** mass *
+            (pq.cm * self.header["UnitLength_in_cm"]) ** length *
+            ((pq.cm / pq.s) * self.header["UnitVelocity_in_cm_per_s"]) ** velocity)
+        (scale, (length, mass, velocity)) = get_dims(data)
+        d = f["PartType0"].create_dataset(name, data=data)
+        d.attrs.create("a_scaling", 0)
+        d.attrs.create("h_scaling", 0)
+        d.attrs.create("length_scaling", length)
+        d.attrs.create("mass_scaling", mass)
+        d.attrs.create("velocity_scaling", velocity)
+        d.attrs.create("to_cgs", scale)
+
+def get_dims(data):
+    # i dont like astropy units. cant get the dimension of a unit 
+    for (length, mass, velocity) in itertools.product(range(-3,3), range(-3, 3), range(-3, 3)):
+        t = pq.cm**length * pq.g ** mass * (pq.cm / pq.s) ** velocity
+        try:
+            scaling = (data.unit / t).to(pq.dimensionless_unscaled)
+            return (scaling, (length, mass, velocity))
+        except Exception as e:
+            continue
+    raise ValueError()
 
 
 def createIcs(sim: Simulation, outputFile: Path, densityFunction: Callable[[np.ndarray], float], resolution: int) -> float:
@@ -107,15 +111,14 @@ def createIcs(sim: Simulation, outputFile: Path, densityFunction: Callable[[np.n
     f.create(
         sim,
         resolution=resolution,
-    )  # 14 kpc  # 1 M_sol  # Myr
+    )
     targetGasMass = f.densFromGrid(densityFunction)
-    print(outputFile)
     f.save(outputFile)
     return targetGasMass
 
 
-def densityFunction(coord: np.ndarray) -> float:
-    return 2.345e-21  # molecular h2 region test
+def densityFunction():
+    return 1.67262e-27 * pq.g / pq.cm**3
 
 
 def main() -> None:
@@ -124,7 +127,6 @@ def main() -> None:
     initialIcsFile = Path(sim.folder, "ics.hdf5")
     resolution = int(sys.argv[2])
     targetGasMass = createIcs(sim, initialIcsFile, densityFunction, resolution)
-    print(targetGasMass)
 
 
 main()
