@@ -29,6 +29,7 @@ from bob.plots.h2Expansion import H2Expansion
 from bob.plots.hExpansion import HExpansion
 from bob.plots.expansion import Expansion
 from bob.plots.convergence import Convergence
+from bob.plots.chainedTimeSeries import ChainedTimeSeries
 
 postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     SliceWithStarParticles,
