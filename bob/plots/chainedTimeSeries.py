@@ -11,6 +11,8 @@ from bob.simulation import Simulation
 from bob.temperature import Temperature
 from bob.plotConfig import PlotConfig
 from bob.plots.meanFieldOverTime import MeanFieldOverTime
+from bob.postprocessingFunctions import MultiSetFn
+from bob.multiSet import MultiSet
 
 
 class ChainedTimeSeries(MultiSetFn):
@@ -21,7 +23,6 @@ class ChainedTimeSeries(MultiSetFn):
     def ylabel(self) -> str:
         return "$T [\\mathrm{K}]$"
 
-    @abstractmethod
     def post(self, sims: MultiSet) -> Result:
         for sims in sims:
             for sim in sims:
