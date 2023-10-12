@@ -54,7 +54,10 @@ class SubsweepSimulation(BaseSim):
         return snaps
 
     def simType(self) -> SimType:
-        return SimType.POST_STANDARD
+        if "cosmology" in self.params:
+            return SimType.POST_COSMOLOGICAL
+        else:
+            return SimType.POST_STANDARD
 
     def get_timeseries(self, name: str) -> TimeSeries:
         return read_time_series(self.outputDir / config.TIME_SERIES_DIR_NAME / f"{name}.yml", name)
@@ -87,10 +90,18 @@ class SubsweepSimulation(BaseSim):
         return self.cosmology()["h"]
 
     def getCosmology(self) -> FlatLambdaCDM:
-        print("Assuming TNG cosmology")
-        Ob0 = 0.0475007
-        Om0 = 0.308983
-        H0 = self.H0
+        if "cosmology" in self.params and "params" in self.params["cosmology"]:
+            return 
+            Ob0 = 0.0475007
+            print("Assuming omega_bayron = 0.0475")
+            Om0 = self["cosmology"]["params"]["omega_0"]
+            H0 = self.H0
+            return FlatLambdaCDM(H0=H0, Om0=Om0, Ob0=Ob0)
+        else:
+            print("Assuming TNG cosmology")
+            Ob0 = 0.0475007
+            Om0 = 0.308983
+            H0 = self.H0
         return FlatLambdaCDM(H0=H0, Om0=Om0, Ob0=Ob0)
 
     def boxSize(self) -> pq.Quantity:
