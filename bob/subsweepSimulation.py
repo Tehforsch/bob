@@ -91,7 +91,7 @@ class SubsweepSimulation(BaseSim):
 
     def getCosmology(self) -> FlatLambdaCDM:
         if "cosmology" in self.params and "params" in self.params["cosmology"]:
-            return 
+            return
             Ob0 = 0.0475007
             print("Assuming omega_bayron = 0.0475")
             Om0 = self["cosmology"]["params"]["omega_0"]

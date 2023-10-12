@@ -16,13 +16,13 @@ from bob.field import Field
 class Histogram(SnapFn):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
+        self.config.setDefault("empty", False)
 
     def postHistogram(self, sim: Simulation, snap: Snapshot, fieldX: Field, fieldY: Field) -> Result:
         result = super().post(sim, snap)
         dataX = fieldX.getData(snap).to_value(self.config["xUnit"], cu.with_H0(snap.H0))
         dataY = fieldY.getData(snap).to_value(self.config["yUnit"], cu.with_H0(snap.H0))
         indices = self.filterFunction(snap)
-        self.config["empty"] = False
         if indices is not None:
             dataX = dataX[indices]
             dataY = dataY[indices]
