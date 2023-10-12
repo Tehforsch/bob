@@ -169,7 +169,7 @@ class Plotter:
 
     def saveResult(self, result: Union[Result, pl.DataFrame], plotDataFolder: Path) -> None:
         if type(result) == pl.DataFrame:
-            pass
+            result.write_csv(file=plotDataFolder / "result.csv", has_header=True)
         else:
             result.save(plotDataFolder)
 

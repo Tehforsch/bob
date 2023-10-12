@@ -60,6 +60,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     HExpansion,
     Expansion,
     Convergence,
+    ChainedTimeSeries,
 ]
 
 for function in postprocessingFunctions:

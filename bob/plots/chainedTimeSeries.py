@@ -3,6 +3,7 @@ from typing import List
 import numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as pq
+import polars as pl
 
 from bob.result import Result
 from bob.snapshot import Snapshot
@@ -17,17 +18,17 @@ from bob.multiSet import MultiSet
 
 class ChainedTimeSeries(MultiSetFn):
     def __init__(self, config: PlotConfig) -> None:
+        config.setDefault("quotient", None)
         super().__init__(config)
-        self.config.setDefault("series", "mass_av_temperature")
+        self.config.setDefault("series", "temperature_mass_average")
+        self.config.setDefault("yUnit", "1.0 K")
 
     def ylabel(self) -> str:
         return "$T [\\mathrm{K}]$"
 
     def post(self, sims: MultiSet) -> Result:
-        for sims in sims:
-            for sim in sims:
-                print(sim)
-                print(sim.get_timeseries(self.config["series"]))
+        df = pl.concat([pl.concat([sim.get_timeseries_as_dataframe(self.config["series"], pq.Quantity(self.config["yUnit"])) for sim in sims]) for sims in sims])
+        return df
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         fig = plt.figure()

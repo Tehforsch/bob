@@ -13,6 +13,7 @@ from bob.config import setupAstropy
 from bob.time_series import read_time_series
 import bob.config as config
 from astropy.cosmology import FlatLambdaCDM
+import polars as pl
 
 SubsweepParameters = dict[str, Any]
 
@@ -61,6 +62,14 @@ class SubsweepSimulation(BaseSim):
 
     def get_timeseries(self, name: str) -> TimeSeries:
         return read_time_series(self.outputDir / config.TIME_SERIES_DIR_NAME / f"{name}.yml", name)
+
+    def get_timeseries_as_dataframe(self, name: str, yUnit) -> pl.DataFrame:
+        series = self.get_timeseries(name)
+        return pl.DataFrame({
+            "redshift": [val.to_value(1.0) for val in series.redshift],
+            "value": [val.to_value(yUnit) for val in series.value],
+            })
+
 
     def cosmology(self) -> dict[str, float]:
         if self.params["cosmology"] is not None:
