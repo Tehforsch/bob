@@ -51,4 +51,4 @@ class TemperatureIonizationHistogram(Histogram):
         if above:
             return np.where(dens > densityThreshold.value)
         else:
-            return np.where(dens < densityThreshold)
+            return np.where(dens < densityThreshold.value)
