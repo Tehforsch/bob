@@ -28,7 +28,7 @@ class TemperatureOverTime(MeanFieldOverTime):
         masses = BasicField("Masses").getData(snap)
         temperature = Temperature().getData(snap)
         result = []
-        self.densityBins = [1e-31, 1e-29, 1e-27, 1e-25]
+        self.densityBins = [1e-29, 1e-27, 1e-25, 1e-23]
         for density1, density2 in zip(self.densityBins, self.densityBins[1:]):
             indices = np.where((density1 < density) & (density < density2))
             avTemp = np.sum(temperature[indices] * masses[indices] / np.sum(masses[indices]))
@@ -40,9 +40,9 @@ class TemperatureOverTime(MeanFieldOverTime):
         ax = fig.add_subplot(1, 1, 1)
         ax.set_yscale("log")
         sublabels = [
-            "$\\rho = 10^{-31} - 10^{-29} \mathrm{g} / \mathrm{cm}^3$",
             "$\\rho = 10^{-29} - 10^{-27} \mathrm{g} / \mathrm{cm}^3$",
             "$\\rho = 10^{-27} - 10^{-25} \mathrm{g} / \mathrm{cm}^3$",
+            "$\\rho = 10^{-25} - 10^{-23} \mathrm{g} / \mathrm{cm}^3$",
         ]
         subcolors = [
             "b",
