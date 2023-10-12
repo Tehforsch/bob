@@ -243,6 +243,9 @@ def runPlot(plotter: Plotter, customConfig: Optional[dict], plot: PlotName) -> P
         functions = getFunctionsFromPlotFile(dataFolder / bob.config.plotSerializationFileName, False)
     assert len(functions) == 1, "More than one plot in replot information."
     fn = functions[0]
-    result = Result.readFromFolder(dataFolder)
+    if (dataFolder / "result.csv").exists():
+        result = pl.read_csv(dataFolder / "result.csv")
+    else:
+        result = Result.readFromFolder(dataFolder)
     fn.plot(plt, result)
     return plotter.saveAndShow(plot, fn)
