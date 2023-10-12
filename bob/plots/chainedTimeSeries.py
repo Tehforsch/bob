@@ -25,6 +25,8 @@ class ChainedTimeSeries(MultiSetFn):
         self.config.setDefault("yUnit", "1.0 K")
         self.config.setDefault("xLabel", "z")
         self.config.setDefault("yLabel", "$T [K]$")
+        self.config.setDefault("xLim", None)
+        self.config.setDefault("yLim", None)
 
     def ylabel(self) -> str:
         return "$T [\\mathrm{K}]$"

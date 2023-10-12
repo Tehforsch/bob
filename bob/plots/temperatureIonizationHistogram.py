@@ -48,6 +48,8 @@ class TemperatureIonizationHistogram(Histogram):
             raise ValueError(densityFilter[0])
         densityThreshold = pq.Quantity(densityFilter[1])
         dens = snap.density().to_value(densityThreshold.unit)
+        print("dens", np.min(snap.density()))
+        print(np.min(snap.density().to_value(densityThreshold.unit)))
         if above:
             return np.where(dens > densityThreshold.value)
         else:
