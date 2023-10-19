@@ -11,6 +11,3 @@ class SimType(Enum):
 
     def is_cosmological(self) -> bool:
         return self == SimType.HYDRO_COSMOLOGICAL or self == SimType.POST_COSMOLOGICAL
-
-    def can_get_redshift(self) -> bool:
-        return self == SimType.HYDRO_COSMOLOGICAL or self == SimType.POST_COSMOLOGICAL or self == SimType.POST_STANDARD_ICS_COSMOLOGICAL

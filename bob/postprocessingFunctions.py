@@ -34,7 +34,7 @@ class PostprocessingFunction(ABC):
         if "snap" in kwargs and "sim" in kwargs:
             snap: Snapshot = kwargs["snap"]
             sim: Simulation = kwargs["sim"]
-            if sim.simType().can_get_redshift():
+            if sim.can_get_redshift():
                 combined["redshift"] = snap.timeQuantity("z")
         return self.config["name"].format(**combined)
 

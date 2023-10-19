@@ -60,6 +60,9 @@ class SubsweepSimulation(BaseSim):
         else:
             return SimType.POST_STANDARD
 
+    def can_get_redshift(self):
+        return "cosmology" in self.params and self.params["cosmology"] != None and "params" in self.params["cosmology"]
+
     def get_timeseries(self, name: str) -> TimeSeries:
         return read_time_series(self.outputDir / config.TIME_SERIES_DIR_NAME / f"{name}.yml", name)
 
