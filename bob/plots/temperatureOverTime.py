@@ -40,9 +40,9 @@ class TemperatureOverTime(MeanFieldOverTime):
         ax = fig.add_subplot(1, 1, 1)
         ax.set_yscale("log")
         sublabels = [
-            "$\\rho = 10^{-29} - 10^{-27} \mathrm{g} / \mathrm{cm}^3$",
-            "$\\rho = 10^{-27} - 10^{-25} \mathrm{g} / \mathrm{cm}^3$",
-            "$\\rho = 10^{-25} - 10^{-23} \mathrm{g} / \mathrm{cm}^3$",
+            "$\\rho = 10^{-29} - 10^{-27} \\mathrm{g} / \\mathrm{cm}^3$",
+            "$\\rho = 10^{-27} - 10^{-25} \\mathrm{g} / \\mathrm{cm}^3$",
+            "$\\rho = 10^{-25} - 10^{-23} \\mathrm{g} / \\mathrm{cm}^3$",
         ]
         subcolors = [
             "b",
