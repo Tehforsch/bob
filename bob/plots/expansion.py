@@ -61,16 +61,26 @@ class Expansion(MultiSetFn):
 
     def plot(self, plt: plt.axes, df: Result) -> None:
         print(df)
-        fig = plt.figure()
-        ax = fig.add_subplot(1, 1, 1)
-        self.setupLinePlot()
-        labels = self.getLabels()
-        ax.set_xlim(self.config["xLim"])
-        ax.set_ylim(self.config["yLim"])
+        ax0 = plt.subplot(211)
+        ax1 = plt.subplot(212, sharex=ax0)
+        ax1.set_xlabel(self.config["xLabel"])
+        ax0.set_ylabel(self.config["yLabel"])
+        ax1.set_ylabel("Rel. error")
+        ax0.set_xlim(self.config["xLim"])
+        ax0.set_ylim(self.config["yLim"])
+        ax1.set_ylim([0, 0.03])
         for resolution, df in df.sort("resolution").groupby(pl.col("resolution")):
             xd = u.Quantity(df["time"]) / u.Quantity(self.config["recombination_time"]).to_value(u.Myr)
             yd = u.Quantity(df["radius"]) * self.yUnit() / u.Quantity(self.config["stroemgren_radius"]).to_value(u.kpc)
-            self.addLine(xd, yd, linestyle="-", label=resolution)
+            ax0.plot(xd, yd, linestyle="-", label=resolution)
+            yd = error(xd, yd)
+            ax1.plot(xd, yd, linestyle="-", label=resolution)
         x = np.arange(0.0, 2.0, 0.001)
-        self.addLine(x * u.Quantity(1.0), analyticalRTypeExpansion(x) * u.Quantity(1.0), linestyle="-", label="Analytical")
-        plt.legend(loc="lower right")
+        ax0.plot(x * u.Quantity(1.0), analyticalRTypeExpansion(x) * u.Quantity(1.0), linestyle="-", label="Analytical")
+        ax0.legend(loc="lower right")
+
+
+def error(xd, yd):
+    ana = analyticalRTypeExpansion(xd)
+    error = np.abs(yd - ana) / ana
+    return error
