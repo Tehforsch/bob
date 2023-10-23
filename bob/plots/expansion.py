@@ -20,14 +20,13 @@ def analyticalRTypeExpansion(t: np.ndarray) -> np.ndarray:
 
 class Expansion(MultiSetFn):
     def __init__(self, config: PlotConfig) -> None:
-        config.setDefault("quotient", None)
         super().__init__(config)
         self.config.setDefault("xUnit", "1.0")
         self.config.setDefault("yUnit", "1.0")
         self.config.setDefault("xLabel", "$t / t_{\\text{rec}}$")
         self.config.setDefault("yLabel", "$R / R_{\\text{St}}$")
-        self.config.setDefault("xLim", None)
-        self.config.setDefault("yLim", None)
+        self.config.setDefault("xLim", [0, 1])
+        self.config.setDefault("yLim", [0, 1])
         self.config.setDefault("stroemgren_radius", 6.79 * u.kpc)
         self.config.setDefault("recombination_time", 122.34 * u.Myr)
 
@@ -62,8 +61,6 @@ class Expansion(MultiSetFn):
         ax = fig.add_subplot(1, 1, 1)
         self.setupLinePlot()
         labels = self.getLabels()
-        ax.set_xlim((0.0, 1.0))
-        ax.set_ylim((0.0, 1.0))
         for (resolution, df) in df.groupby(pl.col("resolution")):
             xd =u.Quantity(df["time"])  / u.Quantity(self.config["recombination_time"]).to_value(u.Myr)
             yd =u.Quantity(df["radius"]) * self.yUnit() / u.Quantity(self.config["stroemgren_radius"]).to_value(u.kpc)
