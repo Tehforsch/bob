@@ -25,8 +25,9 @@ class Convergence(MultiSetFn):
         dfs = []
         for sims in simSets:
             for sim in sims:
-                data = list(sim.get_ionization_data())
-                finalFraction = data[-1][1]
+                print(sim.folder)
+                data = sim.get_timeseries("hydrogen_ionization_mass_average")
+                finalFraction = data.value[-1]
                 converged = abs(finalFraction - convergedFraction) < ERROR_THRESHOLD
                 num_particles = sim.params["1d"]["num_particles"]
                 flux = pq.Quantity(sim.params["1d"]["photon_flux"])

@@ -19,7 +19,7 @@ class TimeSeries:
                 self.scale_factor = [u.Quantity(entry["scale_factor"]) for entry in time_entries]
                 self.time = [u.Quantity(entry["time_elapsed"]) for entry in time_entries]
             else:
-                self.time = [u.Quantity(entry) for entry in entries]
+                self.time = [u.Quantity(entry["time"]) for entry in entries]
         self.value = [u.Quantity(entry["val"]) for entry in entries]
 
 
