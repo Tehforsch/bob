@@ -15,8 +15,10 @@ from bob.result import Result
 from bob.postprocessingFunctions import MultiSetFn
 from bob.multiSet import MultiSet
 
+
 def analyticalRTypeExpansion(t: np.ndarray) -> np.ndarray:
     return (1 - np.exp(-t)) ** (1.0 / 3)
+
 
 class Expansion(MultiSetFn):
     def __init__(self, config: PlotConfig) -> None:
@@ -41,7 +43,7 @@ class Expansion(MultiSetFn):
 
     def post(self, sims: MultiSet) -> Result:
         def getDf(sims):
-            assert(len(sims) == 1)
+            assert len(sims) == 1
             sim = sims[0]
             resolution = int(sim.params["input"]["paths"][0].replace("ics/", "").replace(".hdf5", ""))
             df = sim.get_timeseries_as_dataframe("hydrogen_ionization_mass_average", 1.0, "Myr")
@@ -52,7 +54,9 @@ class Expansion(MultiSetFn):
                 [
                     pl.lit(resolution).alias("resolution"),
                     ((3.0 * L**3 / (4.0 * pi) * pl.col("value")) ** (1.0 / 3.0)).alias("radius"),
-                ])
+                ]
+            )
+
         return pl.concat([getDf(sims) for sims in sims])
 
     def plot(self, plt: plt.axes, df: Result) -> None:
@@ -61,13 +65,12 @@ class Expansion(MultiSetFn):
         ax = fig.add_subplot(1, 1, 1)
         self.setupLinePlot()
         labels = self.getLabels()
-        for (resolution, df) in df.groupby(pl.col("resolution")):
-            xd =u.Quantity(df["time"])  / u.Quantity(self.config["recombination_time"]).to_value(u.Myr)
-            yd =u.Quantity(df["radius"]) * self.yUnit() / u.Quantity(self.config["stroemgren_radius"]).to_value(u.kpc)
-            self.addLine(
-                xd,
-                yd ,
-                
-                linestyle="-",
-            )
-        # plt.legend(loc=self.config["legend_loc"])
+        ax.set_xlim(self.config["xLim"])
+        ax.set_ylim(self.config["yLim"])
+        for resolution, df in df.sort("resolution").groupby(pl.col("resolution")):
+            xd = u.Quantity(df["time"]) / u.Quantity(self.config["recombination_time"]).to_value(u.Myr)
+            yd = u.Quantity(df["radius"]) * self.yUnit() / u.Quantity(self.config["stroemgren_radius"]).to_value(u.kpc)
+            self.addLine(xd, yd, linestyle="-", label=resolution)
+        x = np.arange(0.0, 2.0, 0.001)
+        self.addLine(x * u.Quantity(1.0), analyticalRTypeExpansion(x) * u.Quantity(1.0), linestyle="-", label="Analytical")
+        plt.legend(loc="lower right")

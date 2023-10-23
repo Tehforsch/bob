@@ -85,7 +85,11 @@ class Simulation(BaseSim):
         return [Snapshot(self, s) for s in snapshotFiles]
 
     def can_get_redshift(self):
-        return self.simType() == SimType.HYDRO_COSMOLOGICAL or self.simType() == SimType.POST_COSMOLOGICAL or self.simType() == SimType.POST_STANDARD_ICS_COSMOLOGICAL
+        return (
+            self.simType() == SimType.HYDRO_COSMOLOGICAL
+            or self.simType() == SimType.POST_COSMOLOGICAL
+            or self.simType() == SimType.POST_STANDARD_ICS_COSMOLOGICAL
+        )
 
     def getSnapshotAtRedshift(self, redshift: pq.dimensionless_unscaled) -> Snapshot:
         snapshots = self.snapshots

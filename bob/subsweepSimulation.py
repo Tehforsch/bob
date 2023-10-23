@@ -66,18 +66,22 @@ class SubsweepSimulation(BaseSim):
     def get_timeseries(self, name: str) -> TimeSeries:
         return read_time_series(self.outputDir / config.TIME_SERIES_DIR_NAME / f"{name}.yml", name)
 
-    def get_timeseries_as_dataframe(self, name: str, yUnit, tUnit = None) -> pl.DataFrame:
+    def get_timeseries_as_dataframe(self, name: str, yUnit, tUnit=None) -> pl.DataFrame:
         series = self.get_timeseries(name)
         if "redshift" in series.__dict__:
-            df = pl.DataFrame({
-                "value": [val.to_value(yUnit) for val in series.value],
-                "redshift": [val.to_value(1.0) for val in series.redshift],
-            })
+            df = pl.DataFrame(
+                {
+                    "value": [val.to_value(yUnit) for val in series.value],
+                    "redshift": [val.to_value(1.0) for val in series.redshift],
+                }
+            )
         if "time" in series.__dict__:
-            df = pl.DataFrame({
-                "value": [val.to_value(yUnit) for val in series.value],
-                "time": [val.to_value(tUnit) for val in series.time],
-            })
+            df = pl.DataFrame(
+                {
+                    "value": [val.to_value(yUnit) for val in series.value],
+                    "time": [val.to_value(tUnit) for val in series.time],
+                }
+            )
             print(df)
         return df
 
