@@ -76,7 +76,7 @@ class Expansion(MultiSetFn):
             yd = error(xd, yd)
             ax1.plot(xd, yd, linestyle="-", label=resolution)
         x = np.arange(0.0, 2.0, 0.001)
-        ax0.plot(x * u.Quantity(1.0), analyticalRTypeExpansion(x) * u.Quantity(1.0), linestyle="-", label="Analytical")
+        ax0.plot(x * u.Quantity(1.0), analyticalRTypeExpansion(x) * u.Quantity(1.0), linestyle="--", label="Analytical")
         ax0.legend(loc="lower right")
 
 
