@@ -33,7 +33,7 @@ class Temperature(Field):
 
     @property
     def niceName(self) -> str:
-        return "Temperature"
+        return "temperature"
 
     @property
     def symbol(self) -> str:
