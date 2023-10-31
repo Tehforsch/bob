@@ -2,7 +2,7 @@ import yaml
 
 
 class SingleSource(yaml.YAMLObject):
-    yaml_tag = "!single_source"
+    yaml_tag = "!explicit"
 
     def __init__(self, val):
         self.val = val
