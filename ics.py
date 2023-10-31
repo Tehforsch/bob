@@ -13,6 +13,8 @@ from bob.simulationSet import SimulationSet
 from bob import config
 from bob.simulation import Simulation
 
+proton_mass = pq.kg * 1.67e-27
+
 class ICS:
     def __init__(self) -> None:
         self.header: Dict[str, Any] = {
@@ -36,7 +38,7 @@ class ICS:
             "Time": 0,
         }
 
-    def create(self, sim: Simulation, resolution: int) -> None:
+    def create(self, sim: Simulation, resolution: int, densityFunction) -> None:
         # set the header information
         self.header["UnitLength_in_cm"] = float(sim.params["UnitLength_in_cm"])
         self.header["UnitMass_in_g"] = float(sim.params["UnitMass_in_g"])
@@ -57,10 +59,10 @@ class ICS:
         self.coords += (np.random.rand(self.numParticles, 3) - 0.5) * self.cellsize
         self.velocities = np.zeros((self.numParticles, 3)) * pq.cm / pq.s
         self.ids = np.arange(1, self.numParticles + 1)  # 1,2,3,4,5,....
-
-    def densFromGrid(self, densityFunction: Callable[[np.ndarray], float]) -> float:
         self.volume = (self.cellsize * self.header["UnitLength_in_cm"]) ** 3 * pq.cm**3
-        self.mass = np.ones(self.numParticles) * self.volume * densityFunction()
+        length_unit = self.header["UnitLength_in_cm"] * pq.cm
+        density = densityFunction(self.coords * length_unit)
+        self.mass = np.ones(self.numParticles) * self.volume * density
         return np.mean(self.mass / self.header["UnitMass_in_g"])
 
     def save(self, fileName: Path) -> None:
@@ -74,18 +76,18 @@ class ICS:
             self.create_dataset(f, "Masses", self.mass)
             self.create_dataset(f, "Velocities", self.velocities)
             f["PartType0"].create_dataset("ParticleIDs", data=self.ids)
+            print(np.mean(self.mass / self.volume) / proton_mass)
             self.create_dataset(f, "Density", self.mass / self.volume)
-            kB = 1.38e-23 * pq.J / pq.K 
-            proton_mass = pq.kg * 1.67e-27
+            kB = 1.38e-23 * pq.J / pq.K
             self.create_dataset(f, "InternalEnergy", np.ones(self.mass.shape) * kB * 100.0 * pq.K / proton_mass)
-
 
     def create_dataset(self, f, name, data):
         (_, (length, mass, velocity)) = get_dims(data)
         data = data.to(
-            (pq.g * self.header["UnitMass_in_g"]) ** mass *
-            (pq.cm * self.header["UnitLength_in_cm"]) ** length *
-            ((pq.cm / pq.s) * self.header["UnitVelocity_in_cm_per_s"]) ** velocity)
+            (pq.g * self.header["UnitMass_in_g"]) ** mass
+            * (pq.cm * self.header["UnitLength_in_cm"]) ** length
+            * ((pq.cm / pq.s) * self.header["UnitVelocity_in_cm_per_s"]) ** velocity
+        )
         (scale, (length, mass, velocity)) = get_dims(data)
         d = f["PartType0"].create_dataset(name, data=data)
         d.attrs.create("a_scaling", 0)
@@ -96,10 +98,11 @@ class ICS:
         d.attrs.create("to_cgs", scale)
         print(f"Creating {name} with {data.shape}")
 
+
 def get_dims(data):
-    # i dont like astropy units. cant get the dimension of a unit 
-    for (length, mass, velocity) in itertools.product(range(-3,3), range(-3, 3), range(-3, 3)):
-        t = pq.cm**length * pq.g ** mass * (pq.cm / pq.s) ** velocity
+    # i dont like astropy units. cant get the dimension of a unit
+    for length, mass, velocity in itertools.product(range(-3, 3), range(-3, 3), range(-3, 3)):
+        t = pq.cm**length * pq.g**mass * (pq.cm / pq.s) ** velocity
         try:
             scaling = (data.unit / t).to(pq.dimensionless_unscaled)
             return (scaling, (length, mass, velocity))
@@ -113,14 +116,21 @@ def createIcs(sim: Simulation, outputFile: Path, densityFunction: Callable[[np.n
     f.create(
         sim,
         resolution=resolution,
+        densityFunction=densityFunction,
     )
-    targetGasMass = f.densFromGrid(densityFunction)
     f.save(outputFile)
-    return targetGasMass
 
 
-def densityFunction():
-    return 1.67262e-27 * pq.g / pq.cm**3
+def densityFunction(pos: pq.Quantity):
+    print("CREATING SHADOWING ICS")
+    number_dens = 1e0 * pq.cm**(-3)
+    mass_dens = proton_mass * number_dens
+    density = np.ones(pos.shape[0]) * mass_dens
+    radius = (4 * pq.pc).to(pos.unit)
+    (x, y, z) = 16 * pq.pc, 16 * pq.pc, 16 * pq.pc
+    density[np.where((pos[:, 0] - x) ** 2 + (pos[:, 1] - y) ** 2 + (pos[:, 2] - z) ** 2 < radius ** 2)] = 1000 * mass_dens
+    print("mean:", np.mean(density))
+    return density
 
 
 def main() -> None:
@@ -128,7 +138,7 @@ def main() -> None:
     sim = Simulation(simPath)
     initialIcsFile = Path(sim.folder, "ics.hdf5")
     resolution = int(sys.argv[2])
-    targetGasMass = createIcs(sim, initialIcsFile, densityFunction, resolution)
+    createIcs(sim, initialIcsFile, densityFunction, resolution)
 
 
 main()
