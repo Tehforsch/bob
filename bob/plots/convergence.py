@@ -35,6 +35,7 @@ class Convergence(MultiSetFn):
                 length_box = 1.0 * pq.Mpc
                 length_cell = length_box / num_particles
                 timescale = length_cell * number_density / flux
+                runtime = sim.get_performance_data()["Stages::Sweep"]["total"]
                 subdf = pl.DataFrame(
                     {
                         "dt[kyr]": pq.Quantity(sim.params["sweep"]["max_timestep"]).to_value(pq.kyr),
@@ -44,6 +45,7 @@ class Convergence(MultiSetFn):
                         "timescale[kyr]": timescale.to_value(pq.kyr),
                         "converged": converged,
                         "ratio": timescale.to_value(pq.kyr) / pq.Quantity(sim.params["sweep"]["max_timestep"]).to_value(pq.kyr),
+                        "runtime": runtime,
                     }
                 )
                 dfs.append(subdf)
@@ -55,23 +57,26 @@ class Convergence(MultiSetFn):
         return df
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        print(result)
         plt.clf()
-        g = sns.relplot(
+        result = result.rename({"num_levels": "n"})
+        print(result)
+        fig, axs = plt.subplots(nrows=2)
+        ax = sns.lineplot(
+            ax=axs[0],
             data=result,
-            x="timescale[kyr]",
-            y="ratio",
-            hue="num_levels",
-            row="threshold",
-            kind="line",
+            x="num_particles",
+            y="dt[kyr]",
+            hue="n",
             linewidth=1.2,
-            height=2,
-            aspect=1.5,
             legend=True,
         )
-        g.tight_layout()
-        # plt.xlim((10**-1.2, 1e4))
-        # plt.ylim((0.0, 1.0))
-        plt.xscale("log")
-        plt.yscale("log")
-        # self.addLine(pq.s * np.array([1,2,3]), pq.s * np.array([4,5,6]))
+        ax.set(xlabel="N", ylabel="$\\Delta t [\\text{kyr}]$", xscale="log", yscale="log")
+        ax = sns.lineplot(
+            ax=axs[1],
+            data=result,
+            x="num_particles",
+            y="runtime",
+            hue="n",
+            linewidth=1.2
+        )
+        ax.set(xlabel="N", ylabel="\\text{runtime} [\\text{s}]", xscale="log", yscale="log", ylim=[0.1,1000])
