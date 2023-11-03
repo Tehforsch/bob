@@ -56,11 +56,11 @@ class Convergence(MultiSetFn):
 
     def plot(self, plt: plt.axes, df: Result) -> None:
         plt.clf()
-        df = df.rename({"num_levels": "n"})
         df = df.filter(pl.col("converged_1") == 1)
         dfs = df.partition_by(["num_levels", "num_particles", "threshold"])
         dfs = [df.top_k(1, by="dt[kyr]") for df in dfs]
         df = pl.concat(dfs)
+        df = df.rename({"num_levels": "n"})
         print(df)
 
         fig=plt.figure()
