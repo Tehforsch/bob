@@ -26,7 +26,9 @@ class SourceField(Field):
                     # Might just be that there are no stars at this point
                     return source
                 cellIndices = tree.query(starCoords)[1]
-                print("Using ridiculous approximation for source strength. To do this properly, write out stellar age and take SourceFactor into account")
+                print(
+                    "Using ridiculous approximation for source strength. To do this properly, write out stellar age and take SourceFactor into account"
+                )
                 source[cellIndices] = 1e40 / pq.s * starMasses.to_value(pq.Msun, cu.with_H0(snapshot.H0))
             elif type_ == 10:
                 sources = snapshot.sim.sources()

@@ -63,6 +63,11 @@ class SubsweepSimulation(BaseSim):
     def can_get_redshift(self):
         return "cosmology" in self.params and self.params["cosmology"] != None and "params" in self.params["cosmology"]
 
+    def get_performance_data(self) -> dict:
+        path = self.outputDir / "performance.yml"
+        with open(path, "r") as f:
+            return yaml.load(f, Loader=yaml.SafeLoader)
+
     def get_timeseries(self, name: str) -> TimeSeries:
         return read_time_series(self.outputDir / config.TIME_SERIES_DIR_NAME / f"{name}.yml", name)
 

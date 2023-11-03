@@ -15,6 +15,7 @@ from bob.simulation import Simulation
 
 proton_mass = pq.kg * 1.67e-27
 
+
 class ICS:
     def __init__(self) -> None:
         self.header: Dict[str, Any] = {
@@ -123,12 +124,12 @@ def createIcs(sim: Simulation, outputFile: Path, densityFunction: Callable[[np.n
 
 def densityFunction(pos: pq.Quantity):
     print("CREATING SHADOWING ICS")
-    number_dens = 1e0 * pq.cm**(-3)
+    number_dens = 1e0 * pq.cm ** (-3)
     mass_dens = proton_mass * number_dens
     density = np.ones(pos.shape[0]) * mass_dens
     radius = (4 * pq.pc).to(pos.unit)
     (x, y, z) = 16 * pq.pc, 16 * pq.pc, 16 * pq.pc
-    density[np.where((pos[:, 0] - x) ** 2 + (pos[:, 1] - y) ** 2 + (pos[:, 2] - z) ** 2 < radius ** 2)] = 1000 * mass_dens
+    density[np.where((pos[:, 0] - x) ** 2 + (pos[:, 1] - y) ** 2 + (pos[:, 2] - z) ** 2 < radius**2)] = 1000 * mass_dens
     print("mean:", np.mean(density))
     return density
 
