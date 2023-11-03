@@ -45,7 +45,7 @@ class Convergence(MultiSetFn):
                         "timescale[kyr]": timescale.to_value(pq.kyr),
                         "converged": converged,
                         "ratio": timescale.to_value(pq.kyr) / pq.Quantity(sim.params["sweep"]["max_timestep"]).to_value(pq.kyr),
-                        "runtime": runtime,
+                        "runtime[s]": pq.Quantity(runtime).to_value(pq.s),
                     }
                 )
                 dfs.append(subdf)
@@ -60,9 +60,14 @@ class Convergence(MultiSetFn):
         plt.clf()
         result = result.rename({"num_levels": "n"})
         print(result)
-        fig, axs = plt.subplots(nrows=2)
+
+        fig=plt.figure()
+        ax1 = plt.subplot(211)
+        ax2 = plt.subplot(212, sharex = ax1)
+        fig.set_size_inches(3, 4)
+
         ax = sns.lineplot(
-            ax=axs[0],
+            ax=ax1,
             data=result,
             x="num_particles",
             y="dt[kyr]",
@@ -70,13 +75,18 @@ class Convergence(MultiSetFn):
             linewidth=1.2,
             legend=True,
         )
-        ax.set(xlabel="N", ylabel="$\\Delta t [\\text{kyr}]$", xscale="log", yscale="log")
+        ax.set(ylabel="$\\Delta t [\\text{kyr}]$", xscale="log", yscale="log", xticklabels=[], xlabel=None)
+
+        ax.set_xticklabels([])
+        print(ax.get_xticks())
+        ax.set(xticklabels=[])
         ax = sns.lineplot(
-            ax=axs[1],
+            ax=ax2,
             data=result,
             x="num_particles",
-            y="runtime",
+            y="runtime[s]",
             hue="n",
-            linewidth=1.2
+            linewidth=1.2,
+            legend=False,
         )
-        ax.set(xlabel="N", ylabel="\\text{runtime} [\\text{s}]", xscale="log", yscale="log", ylim=[0.1,1000])
+        ax.set(xlabel="N", ylabel="\\text{runtime} [\\text{s}]", xscale="log", yscale="log", ylim=[0.01,1000])
