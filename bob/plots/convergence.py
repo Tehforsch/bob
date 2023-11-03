@@ -48,7 +48,7 @@ class Convergence(MultiSetFn):
                     }
                 for (i, threshold) in enumerate(error_thresholds):
                     converged = abs(finalFraction - convergedFraction) < threshold
-                    entries["converged_{i}"] = converged
+                    entries[f"converged_{i}"] = converged
                 subdf = pl.DataFrame(entries)
                 dfs.append(subdf)
         df = pl.concat(dfs)
@@ -57,7 +57,7 @@ class Convergence(MultiSetFn):
     def plot(self, plt: plt.axes, df: Result) -> None:
         plt.clf()
         df = df.rename({"num_levels": "n"})
-        df = df.filter(pl.col("converged") == 1)
+        df = df.filter(pl.col("converged_1") == 1)
         dfs = df.partition_by(["num_levels", "num_particles", "threshold"])
         dfs = [df.top_k(1, by="dt[kyr]") for df in dfs]
         df = pl.concat(dfs)
