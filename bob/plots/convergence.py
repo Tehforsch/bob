@@ -3,6 +3,8 @@ import polars as pl
 import numpy as np
 import astropy.units as pq
 import matplotlib.pyplot as plt
+from matplotlib.ticker import StrMethodFormatter, NullFormatter
+import matplotlib
 
 from bob.postprocessingFunctions import MultiSetFn
 from bob.result import Result
@@ -66,6 +68,8 @@ class Convergence(MultiSetFn):
         ax2 = plt.subplot(212, sharex = ax1)
         fig.set_size_inches(3, 4)
 
+        xlim=[10,10240]
+
         ax = sns.lineplot(
             ax=ax1,
             data=result,
@@ -75,11 +79,9 @@ class Convergence(MultiSetFn):
             linewidth=1.2,
             legend=True,
         )
-        ax.set(ylabel="$\\Delta t [\\text{kyr}]$", xscale="log", yscale="log", xticklabels=[], xlabel=None)
+        ax1.set(ylabel="$\\Delta t [\\text{kyr}]$", xscale="log", yscale="log", xlabel=None, xticks=[], xlim=xlim)
+        ax.xaxis.set_minor_formatter(NullFormatter()) # GOD I FUCKING HATE MATPLOTLIB WHY IS THIS SO HARD TO FIND
 
-        ax.set_xticklabels([])
-        print(ax.get_xticks())
-        ax.set(xticklabels=[])
         ax = sns.lineplot(
             ax=ax2,
             data=result,
@@ -89,4 +91,5 @@ class Convergence(MultiSetFn):
             linewidth=1.2,
             legend=False,
         )
-        ax.set(xlabel="N", ylabel="\\text{runtime} [\\text{s}]", xscale="log", yscale="log", ylim=[0.01,1000])
+        ax.set(xlabel="N", ylabel="\\text{runtime} [\\text{s}]", xscale="log", ylim=[0.0,15], xlim=xlim)
+        ax.xaxis.set_minor_formatter(NullFormatter()) # GOD I FUCKING HATE MATPLOTLIB WHY IS THIS SO HARD TO FIND
