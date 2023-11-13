@@ -5,6 +5,7 @@ import astropy.units as pq
 import matplotlib.pyplot as plt
 from matplotlib.ticker import StrMethodFormatter, NullFormatter
 import matplotlib
+import matplotlib.gridspec as gridspec
 
 from bob.postprocessingFunctions import MultiSetFn
 from bob.result import Result
@@ -63,33 +64,38 @@ class Convergence(MultiSetFn):
         df = df.rename({"num_levels": "n"})
         print(df)
 
-        fig=plt.figure()
+        fig = plt.figure()
         ax1 = plt.subplot(211)
         ax2 = plt.subplot(212, sharex = ax1)
+        # gs1 = gridspec.GridSpec(2, 1)
+        # gs1.update(wspace=0.025, hspace=0.05)
+        # ax1 = plt.subplot(111)
+        # ax2 = plt.subplot(222)
+        plt.setp(ax1.get_xticklabels(), visible=False) # GOD I FUCKING HATE MATPLOTLIB WHY IS THIS SO HARD TO FIND
         fig.set_size_inches(3, 4)
+        fig.subplots_adjust(wspace=None, hspace=0.05)
 
         xlim=[10,10240]
 
-        ax = sns.lineplot(
+        sns.lineplot(
             ax=ax1,
             data=df,
             x="num_particles",
             y="dt[kyr]",
             hue="n",
             linewidth=1.2,
-            legend=True,
+            legend=False,
         )
-        ax1.set(ylabel="$\\Delta t [\\text{kyr}]$", xscale="log", yscale="log", xlabel=None, xticks=[], xlim=xlim)
-        ax.xaxis.set_minor_formatter(NullFormatter()) # GOD I FUCKING HATE MATPLOTLIB WHY IS THIS SO HARD TO FIND
 
-        ax = sns.lineplot(
+        sns.lineplot(
             ax=ax2,
             data=df,
             x="num_particles",
             y="runtime[s]",
             hue="n",
             linewidth=1.2,
-            legend=False,
+            legend=True,
         )
-        ax.set(xlabel="N", ylabel="\\text{runtime} [\\text{s}]", xscale="log", ylim=[0.0,15], xlim=xlim)
-        ax.xaxis.set_minor_formatter(NullFormatter()) # GOD I FUCKING HATE MATPLOTLIB WHY IS THIS SO HARD TO FIND
+        ax1.set(ylabel="$\\Delta t [\\text{kyr}]$", xscale="log", yscale="log", xlabel=None, xlim=xlim)
+        ax1.xaxis.set_minor_formatter(NullFormatter()) # GOD I FUCKING HATE MATPLOTLIB WHY IS THIS SO HARD TO FIND
+        ax2.set(xlabel="N", ylabel="\\text{runtime} [\\text{s}]", xscale="log", ylim=[0.0,15], xlim=xlim)
