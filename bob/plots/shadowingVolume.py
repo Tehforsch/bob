@@ -10,6 +10,7 @@ from bob.snapshot import Snapshot
 from bob.basicField import BasicField
 from bob.simulation import Simulation
 from bob.plotConfig import PlotConfig
+from bob.constants import protonMass
 
 
 class InfiniteCone:
@@ -43,7 +44,7 @@ class ShadowingVolume(TimePlot):
 
     def getQuantity(self, sim: Simulation, snap: Snapshot) -> List[float]:
         lengthUnit = snap.lengthUnit
-        self.L = 1.0 * lengthUnit
+        self.L = sim.boxSize()
         self.center = self.L * np.array([0.5, 0.5, 0.5])
         self.plotCenter = np.array([0.5, 0.5, 0.5])
         distanceFromCenter = 14.0 / 32.0 * self.L
@@ -55,7 +56,9 @@ class ShadowingVolume(TimePlot):
             self.plotToBox(distanceFromCenter * np.array([0.0, -1.0, 0.0])), np.array([0.0, 1.0, 0.0]), radiusBlob / distanceFromCenter, self.center
         )
         densities = BasicField("Density").getData(snap)
-        densityThreshold = 1500 * snap.massUnit / (snap.lengthUnit**3)
+        densityThreshold = 100.0 * pq.cm ** (-3) * protonMass
+        densities = densities.to(pq.g / pq.cm**3)
+        print(sim, snap, len(np.where(densities <  densityThreshold)[0]) / len(np.where(densities >  densityThreshold)[0]))
         selection = np.array(
             [
                 i
@@ -63,7 +66,7 @@ class ShadowingVolume(TimePlot):
                 if (self.cone1.contains(coord) and self.cone2.contains(coord) and densities[i] < densityThreshold)
             ]
         )
-        data = BasicField("ChemicalAbundances", 1).getData(snap)[selection]
+        data = snap.ionized_hydrogen_fraction()[selection]
         masses = BasicField("Masses").getData(snap)[selection]
         return np.sum(data * masses) / np.sum(masses)
 
