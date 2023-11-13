@@ -28,7 +28,6 @@ def getDataAtPoints(field: Field, snapshot: Snapshot, points: pq.Quantity) -> np
     print(np.max(data))
     return data[cellIndices]
 
-
 def getSlice(field: Field, snapshot: Snapshot, axisName: str, position: float) -> Tuple[Tuple[float, float, float, float], pq.Quantity]:
     axis = getAxisByName(axisName)
     axis = np.array(axis)

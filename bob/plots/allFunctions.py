@@ -30,6 +30,7 @@ from bob.plots.hExpansion import HExpansion
 from bob.plots.expansion import Expansion
 from bob.plots.convergence import Convergence
 from bob.plots.chainedTimeSeries import ChainedTimeSeries
+from bob.plots.shadowing import Shadowing
 
 postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     SliceWithStarParticles,
@@ -61,6 +62,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     Expansion,
     Convergence,
     ChainedTimeSeries,
+    Shadowing,
 ]
 
 for function in postprocessingFunctions:
