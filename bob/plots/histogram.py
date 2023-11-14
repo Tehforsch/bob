@@ -26,6 +26,7 @@ class Histogram(SnapFn):
         if indices is not None:
             dataX = dataX[indices]
             dataY = dataY[indices]
+            print(indices, indices[0].shape[0], indices[0].shape[0] == 0)
             if indices[0].shape[0] == 0:
                 print("Empty plot due to filter settings!")
                 self.config["empty"] = True
