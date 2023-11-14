@@ -11,6 +11,7 @@ class SingleSource(yaml.YAMLObject):
     def from_yaml(cls, loader, node):
         return cls(node.value)
 
+
 class SingleSourceOld(yaml.YAMLObject):
     yaml_tag = "!single_source"
 

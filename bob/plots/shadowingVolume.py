@@ -59,7 +59,7 @@ class ShadowingVolume(TimePlot):
         densities = BasicField("Density").getData(snap)
         densityThreshold = 100.0 * pq.cm ** (-3) * protonMass
         densities = densities.to(pq.g / pq.cm**3)
-        print(sim, snap, len(np.where(densities <  densityThreshold)[0]) / len(np.where(densities >  densityThreshold)[0]))
+        print(sim, snap, len(np.where(densities < densityThreshold)[0]) / len(np.where(densities > densityThreshold)[0]))
         selection = np.array(
             [
                 i
