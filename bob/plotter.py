@@ -139,6 +139,7 @@ class Plotter:
             config = None
         plots.sort(key=lambda plot: plot.qualifiedName)
         plots = [plot for plot in plots if plotFilters.contains(plot)]
+        # for path in [runPlot(self, config, plot) for plot in plots]:
         for path in runInPool(runPlot, plots, self, config):
             if self.show:
                 showImageInTerminal(path)
