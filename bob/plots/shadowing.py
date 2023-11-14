@@ -79,7 +79,7 @@ class Shadowing(MultiSetFn):
         return fig
 
 def get_snaps_at_times(sim):
-    times = [3.2 * pq.kyr, 32 * pq.kyr, 48 * pq.kyr]
+    times = [3.0 * pq.kyr, 32 * pq.kyr, 48 * pq.kyr]
     return [findSnapAtTime(sim, time) for time in times]
 
 def findSnapAtTime(sim, time):
