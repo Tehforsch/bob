@@ -39,15 +39,15 @@ class Convergence(MultiSetFn):
                 timescale = length_cell * number_density / flux
                 runtime = sim.get_performance_data()["Stages::Sweep"]["total"]
                 entries = {
-                        "dt[kyr]": pq.Quantity(sim.params["sweep"]["max_timestep"]).to_value(pq.kyr),
-                        "num_levels": sim.params["sweep"]["num_timestep_levels"],
-                        "num_particles": num_particles,
-                        "threshold": pq.Quantity(sim.params["sweep"]["significant_rate_threshold"]).value,
-                        "timescale[kyr]": timescale.to_value(pq.kyr),
-                        "ratio": timescale.to_value(pq.kyr) / pq.Quantity(sim.params["sweep"]["max_timestep"]).to_value(pq.kyr),
-                        "runtime[s]": pq.Quantity(runtime).to_value(pq.s),
-                    }
-                for (i, threshold) in enumerate(error_thresholds):
+                    "dt[kyr]": pq.Quantity(sim.params["sweep"]["max_timestep"]).to_value(pq.kyr),
+                    "num_levels": sim.params["sweep"]["num_timestep_levels"],
+                    "num_particles": num_particles,
+                    "threshold": pq.Quantity(sim.params["sweep"]["significant_rate_threshold"]).value,
+                    "timescale[kyr]": timescale.to_value(pq.kyr),
+                    "ratio": timescale.to_value(pq.kyr) / pq.Quantity(sim.params["sweep"]["max_timestep"]).to_value(pq.kyr),
+                    "runtime[s]": pq.Quantity(runtime).to_value(pq.s),
+                }
+                for i, threshold in enumerate(error_thresholds):
                     converged = abs(finalFraction - convergedFraction) < threshold
                     entries[f"converged_{i}"] = converged
                 subdf = pl.DataFrame(entries)
@@ -66,16 +66,16 @@ class Convergence(MultiSetFn):
 
         fig = plt.figure()
         ax1 = plt.subplot(211)
-        ax2 = plt.subplot(212, sharex = ax1)
+        ax2 = plt.subplot(212, sharex=ax1)
         # gs1 = gridspec.GridSpec(2, 1)
         # gs1.update(wspace=0.025, hspace=0.05)
         # ax1 = plt.subplot(111)
         # ax2 = plt.subplot(222)
-        plt.setp(ax1.get_xticklabels(), visible=False) # GOD I FUCKING HATE MATPLOTLIB WHY IS THIS SO HARD TO FIND
+        plt.setp(ax1.get_xticklabels(), visible=False)  # GOD I FUCKING HATE MATPLOTLIB WHY IS THIS SO HARD TO FIND
         fig.set_size_inches(3, 4)
         fig.subplots_adjust(wspace=None, hspace=0.05)
 
-        xlim=[10,10240]
+        xlim = [10, 10240]
 
         sns.lineplot(
             ax=ax1,
@@ -97,5 +97,5 @@ class Convergence(MultiSetFn):
             legend=True,
         )
         ax1.set(ylabel="$\\Delta t [\\text{kyr}]$", xscale="log", yscale="log", xlabel=None, xlim=xlim)
-        ax1.xaxis.set_minor_formatter(NullFormatter()) # GOD I FUCKING HATE MATPLOTLIB WHY IS THIS SO HARD TO FIND
-        ax2.set(xlabel="N", ylabel="\\text{runtime} [\\text{s}]", xscale="log", ylim=[0.0,15], xlim=xlim)
+        ax1.xaxis.set_minor_formatter(NullFormatter())  # GOD I FUCKING HATE MATPLOTLIB WHY IS THIS SO HARD TO FIND
+        ax2.set(xlabel="N", ylabel="\\text{runtime} [\\text{s}]", xscale="log", ylim=[0.0, 15], xlim=xlim)

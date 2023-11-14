@@ -36,7 +36,8 @@ class ShadowingVolume(TimePlot):
         config.setDefault("yUnit", 1.0)
         config.setDefault("xLabel", "$t \; [\mathrm{kyr}]$")
         config.setDefault("yLabel", "$\overline{x_{\mathrm{H}}}$")
-        config.setDefault("colors", ["b", "b", "b", "r", "r", "r"])
+        config.setDefault("colors", ["r", "b", "g"])
+        config.setDefault("labels", ["$32^3$", "$64^3$", "$128^3$"])
         super().__init__(config)
 
     def plotToBox(self, x: np.ndarray) -> np.ndarray:
@@ -58,7 +59,7 @@ class ShadowingVolume(TimePlot):
         densities = BasicField("Density").getData(snap)
         densityThreshold = 100.0 * pq.cm ** (-3) * protonMass
         densities = densities.to(pq.g / pq.cm**3)
-        print(sim, snap, len(np.where(densities <  densityThreshold)[0]) / len(np.where(densities >  densityThreshold)[0]))
+        print(sim, snap, len(np.where(densities < densityThreshold)[0]) / len(np.where(densities > densityThreshold)[0]))
         selection = np.array(
             [
                 i
@@ -74,9 +75,4 @@ class ShadowingVolume(TimePlot):
         super().plot(plt, result)
         plt.xlim(0, 60)
         plt.ylim(0, 1.0)
-        plt.plot([], [], label="Sweep", color="b")
-        plt.plot([], [], label="SPRAI", color="r")
-        plt.plot([], [], label="$128^3$", linestyle="-", color="black")
-        plt.plot([], [], label="$64^3$", linestyle="--", color="black")
-        plt.plot([], [], label="$32^3$", linestyle=":", color="black")
         plt.legend(loc="upper left")
