@@ -48,7 +48,7 @@ class Shadowing(MultiSetFn):
         fig, axes = plt.subplots(3, 3, figsize=(10, 8), sharex=True, sharey=True)
         plt.tight_layout(pad=0.00)
         vmin=1e-15
-        vmax=1e-9
+        vmax=1e-8
         for (ax, d) in zip(axes.flat, result.data):
 
             print(np.min(d), np.max(d))

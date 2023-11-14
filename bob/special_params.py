@@ -11,6 +11,16 @@ class SingleSource(yaml.YAMLObject):
     def from_yaml(cls, loader, node):
         return cls(node.value)
 
+class SingleSourceOld(yaml.YAMLObject):
+    yaml_tag = "!single_source"
+
+    def __init__(self, val):
+        self.val = val
+
+    @classmethod
+    def from_yaml(cls, loader, node):
+        return cls(node.value)
+
 
 class ReadGrid(yaml.YAMLObject):
     yaml_tag = "!read"
