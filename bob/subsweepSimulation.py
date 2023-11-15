@@ -126,15 +126,28 @@ class SubsweepSimulation(BaseSim):
             H0 = self.H0
         return FlatLambdaCDM(H0=H0, Om0=Om0, Ob0=Ob0)
 
-    def boxSize(self) -> pq.Quantity:
+    def convertComovingUnit(self, u, v):
         a = pq.def_unit("a", self.scale_factor().value * pq.dimensionless_unscaled)
         cpc_over_h = pq.def_unit("cpc/h", pq.pc * self.scale_factor().value / self.little_h)
         ckpc_over_h = pq.def_unit("ckpc/h", pq.kpc * self.scale_factor().value / self.little_h)
         cMpc_over_h = pq.def_unit("cMpc/h", pq.Mpc * self.scale_factor().value / self.little_h)
-        pq.add_enabled_units([a, cpc_over_h, ckpc_over_h, cMpc_over_h])
-        boxSize = pq.Quantity(self.params["box_size"])
-        boxSize = boxSize.to(pq.m, cu.with_H0(self.H0))
+        h = pq.def_unit("h", self.little_h)
+        cpc = pq.def_unit("cpc", pq.pc * self.scale_factor().value)
+        ckpc = pq.def_unit("ckpc", pq.kpc * self.scale_factor().value)
+        cMpc = pq.def_unit("cMpc", pq.Mpc * self.scale_factor().value)
+        pq.add_enabled_units([a, cpc_over_h, ckpc_over_h, cMpc_over_h, cpc, ckpc, cMpc, h])
+        u = pq.Unit(u)
+        v = pq.Quantity(v)
+        res = v.to(u, cu.with_H0(self.H0))
         # reset the units
         setupAstropy()
+        return res
+        
+    def boxSizeForUnit(self, u) -> pq.Quantity:
+        return self.convertComovingUnit(u, self.params["box_size"])
 
-        return boxSize
+    def boxSize(self) -> pq.Quantity:
+        return self.boxSizeForUnit(pq.m)
+
+    def comovingBoxSize(self) -> pq.Quantity:
+        return self.boxSizeForUnit("ckpc/h")

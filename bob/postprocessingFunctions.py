@@ -42,9 +42,9 @@ class PostprocessingFunction(ABC):
         self.setupLabels()
         if ax is None:
             ax = plt
-        if "xLim" in self.config:
+        if "xLim" in self.config and self.config["xLim"] is not None:
             plt.xlim(*self.config["xLim"])
-        if "yLim" in self.config:
+        if "yLim" in self.config and self.config["yLim"] is not None:
             plt.ylim(*self.config["yLim"])
 
     def setupLabels(self) -> None:

@@ -35,7 +35,7 @@ class ChainedTimeSeries(MultiSetFn):
         if len(sims) > 1:
             raise NotImplementedError("To do this, properly label sims in the df i guess")
         df = pl.concat(
-            [pl.concat([sim.get_timeseries_as_dataframe(self.config["series"], pq.Quantity(self.config["yUnit"])) for sim in sims]) for sims in sims]
+            [pl.concat([sim.get_timeseries_as_dataframe(self.config["series"], pq.Unit(self.config["yUnit"])) for sim in sims]) for sims in sims]
         )
         return df
 
@@ -46,9 +46,27 @@ class ChainedTimeSeries(MultiSetFn):
         ax.set_yscale("log")
         self.setupLinePlot()
         labels = self.getLabels()
-        self.addLine(
-            pq.Quantity(result["redshift"]) * pq.Quantity(self.config["xUnit"]),
-            pq.Quantity(result["value"]) * pq.Quantity(self.config["yUnit"]),
-            linestyle="-",
-        )
-        # plt.legend(loc=self.config["legend_loc"])
+        plt.plot(result["redshift"], result["value"], linestyle="-")
+
+class LuminosityOverTimeSubsweep(ChainedTimeSeries):
+    def __init__(self, config: PlotConfig) -> None:
+        config.setDefault("yUnit", "s^-1 ckpc^-3 h^-3", override=True)
+        config.setDefault("yLabel", "$L / V [s^{-1} ckpc^{-3} h^{-3}]$")
+        super().__init__(config)
+        self.config["series"] = "total_luminosity"
+
+    def post(self, sims: MultiSet) -> Result:
+        if len(sims) > 1:
+            raise NotImplementedError("To do this, properly label sims in the df i guess")
+        sims = next(iter(sims))
+        def getDf(sim):
+            L = sim.comovingBoxSize()
+            # uglily multiply by s so we get the time factor out. i dont like astropy units 
+            print(L)
+            one_over_vol = sim.convertComovingUnit(self.config["yUnit"] + " s", L**-3)
+            print(one_over_vol)
+            df = sim.get_timeseries_as_dataframe(self.config["series"], 1 / pq.s)
+            return df.with_columns((pl.col("value") * pl.lit(one_over_vol.value)).alias("value"))
+        df = pl.concat([getDf(sim) for sim in sims])
+        return df
+    
