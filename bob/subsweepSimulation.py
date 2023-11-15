@@ -14,6 +14,8 @@ from bob.time_series import read_time_series
 import bob.config as config
 from astropy.cosmology import FlatLambdaCDM
 import polars as pl
+from contextlib import contextmanager
+
 
 SubsweepParameters = dict[str, Any]
 
@@ -22,6 +24,28 @@ def getParams(folder: Path) -> SubsweepParameters:
     filename = folder / "output" / "parameters.yml"
     with open(filename, "r") as f:
         return yaml.unsafe_load(f)
+
+
+class Cosmology(dict):
+    def __init__(self, vals):
+        super().__init__(vals)
+
+    @contextmanager
+    def unit_context(self):
+        a = pq.def_unit("a", self["a"] * pq.dimensionless_unscaled)
+        cpc_over_h = pq.def_unit("cpc/h", pq.pc * self["a"] / self["h"])
+        ckpc_over_h = pq.def_unit("ckpc/h", pq.kpc * self["a"] / self["h"])
+        cMpc_over_h = pq.def_unit("cMpc/h", pq.Mpc * self["a"] / self["h"])
+        h = pq.def_unit("h", self["h"])
+        cpc = pq.def_unit("cpc", pq.pc * self["a"])
+        ckpc = pq.def_unit("ckpc", pq.kpc * self["a"])
+        cMpc = pq.def_unit("cMpc", pq.Mpc * self["a"])
+        pq.add_enabled_units([a, cpc_over_h, ckpc_over_h, cMpc_over_h, cpc, ckpc, cMpc, h])
+        try:
+            yield ()
+        finally:
+            # reset the units
+            setupAstropy()
 
 
 class SubsweepSimulation(BaseSim):
@@ -74,21 +98,21 @@ class SubsweepSimulation(BaseSim):
     def get_timeseries_as_dataframe(self, name: str, yUnit, tUnit=None) -> pl.DataFrame:
         series = self.get_timeseries(name)
         df = pl.DataFrame(
-                {
-                    "value": [val.to_value(yUnit) for val in series.value],
-                }
-            )
+            {
+                "value": [val.to_value(yUnit) for val in series.value],
+            }
+        )
         if "redshift" in series.__dict__:
             df = df.with_columns(pl.Series(name="redshift", values=[val.to_value(1.0) for val in series.redshift]))
         if "time" in series.__dict__:
             df = df.with_columns(pl.Series(name="time", values=[val.to_value(tUnit) for val in series.time]))
         return df
 
-    def cosmology(self) -> dict[str, float]:
+    def cosmology(self) -> Cosmology:
         if self.params["cosmology"] is not None:
-            return self.params["cosmology"]
+            return Cosmology(self.params["cosmology"])
         else:
-            return {"a": 1.0, "h": 0.677}
+            return Cosmology({"a": 1.0, "h": 0.677})
 
     def scale_factor(self) -> pq.Quantity:
         return self.cosmology()["a"] * pq.dimensionless_unscaled
@@ -127,22 +151,12 @@ class SubsweepSimulation(BaseSim):
         return FlatLambdaCDM(H0=H0, Om0=Om0, Ob0=Ob0)
 
     def convertComovingUnit(self, u, v):
-        a = pq.def_unit("a", self.scale_factor().value * pq.dimensionless_unscaled)
-        cpc_over_h = pq.def_unit("cpc/h", pq.pc * self.scale_factor().value / self.little_h)
-        ckpc_over_h = pq.def_unit("ckpc/h", pq.kpc * self.scale_factor().value / self.little_h)
-        cMpc_over_h = pq.def_unit("cMpc/h", pq.Mpc * self.scale_factor().value / self.little_h)
-        h = pq.def_unit("h", self.little_h)
-        cpc = pq.def_unit("cpc", pq.pc * self.scale_factor().value)
-        ckpc = pq.def_unit("ckpc", pq.kpc * self.scale_factor().value)
-        cMpc = pq.def_unit("cMpc", pq.Mpc * self.scale_factor().value)
-        pq.add_enabled_units([a, cpc_over_h, ckpc_over_h, cMpc_over_h, cpc, ckpc, cMpc, h])
-        u = pq.Unit(u)
-        v = pq.Quantity(v)
-        res = v.to(u, cu.with_H0(self.H0))
-        # reset the units
-        setupAstropy()
+        with self.comovingUnits() as _:
+            u = pq.Unit(u)
+            v = pq.Quantity(v)
+            res = v.to(u, cu.with_H0(self.H0))
         return res
-        
+
     def boxSizeForUnit(self, u) -> pq.Quantity:
         return self.convertComovingUnit(u, self.params["box_size"])
 
@@ -151,3 +165,11 @@ class SubsweepSimulation(BaseSim):
 
     def comovingBoxSize(self) -> pq.Quantity:
         return self.boxSizeForUnit("ckpc/h")
+
+    @contextmanager
+    def comovingUnits(self):
+        with self.cosmology().unit_context() as u:
+            try:
+                yield u
+            finally:
+                pass

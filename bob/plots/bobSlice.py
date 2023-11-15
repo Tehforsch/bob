@@ -7,6 +7,7 @@ import astropy.units as pq
 import astropy.cosmology.units as cu
 
 from bob.simulation import Simulation
+from bob.subsweepSimulation import Cosmology
 from bob.snapshot import Snapshot
 from bob import config
 from bob.postprocessingFunctions import SnapFn
@@ -82,6 +83,8 @@ class Slice(SnapFn):
         result.data = result.data.to(self.config["vUnit"], cu.with_H0(snap.H0))
         result.extent = list(extent)
         print(f"Field: {self.field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
+        result.a = sim.scale_factor()
+        result.h = sim.little_h * pq.dimensionless_unscaled
         return result
 
     def transformLog(self, data: pq.Quantity) -> pq.Quantity:
@@ -99,22 +102,24 @@ class Slice(SnapFn):
         print(np.max(data[:, :, 1]))
 
     def plot(self, plt: plt.axes, result: Result) -> plt.Figure:
-        fig = plt.figure()
-        super().showTimeIfDesired(fig, result)
-        xAxis, yAxis = getOtherAxes(self.config["axis"])
-        self.setupLabels()
-        vmin, vmax = self.config["vLim"]
-        if result.data.ndim == 3:
-            # Combined fields: each entry is a color
-            if self.config["log"]:
-                self.transformLog(result.data)
-        print(f"min: {np.min(result.data)}, max: {np.max(result.data)}")
-        # imshow does not seem to support LogNorm for RGB data anymore
-        if self.config["log"] and result.data.ndim != 3:
-            self.image(plt, result.data, result.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
-        else:
-            self.image(plt, result.data, result.extent, vmin=vmin, vmax=vmax, origin="lower")
-        return fig
+        cosmology = Cosmology({"a": result.a.value, "h": result.h.value})
+        with cosmology.unit_context():
+            fig = plt.figure()
+            super().showTimeIfDesired(fig, result)
+            xAxis, yAxis = getOtherAxes(self.config["axis"])
+            self.setupLabels()
+            vmin, vmax = self.config["vLim"]
+            if result.data.ndim == 3:
+                # Combined fields: each entry is a color
+                if self.config["log"]:
+                    self.transformLog(result.data)
+            print(f"min: {np.min(result.data)}, max: {np.max(result.data)}")
+            # imshow does not seem to support LogNorm for RGB data anymore
+            if self.config["log"] and result.data.ndim != 3:
+                self.image(plt, result.data, result.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
+            else:
+                self.image(plt, result.data, result.extent, vmin=vmin, vmax=vmax, origin="lower")
+            return fig
 
 
 def getAxisByName(name: str) -> np.ndarray:

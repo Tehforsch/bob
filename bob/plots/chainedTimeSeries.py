@@ -48,6 +48,7 @@ class ChainedTimeSeries(MultiSetFn):
         labels = self.getLabels()
         plt.plot(result["redshift"], result["value"], linestyle="-")
 
+
 class LuminosityOverTimeSubsweep(ChainedTimeSeries):
     def __init__(self, config: PlotConfig) -> None:
         config.setDefault("yUnit", "s^-1 ckpc^-3 h^-3", override=True)
@@ -59,14 +60,16 @@ class LuminosityOverTimeSubsweep(ChainedTimeSeries):
         if len(sims) > 1:
             raise NotImplementedError("To do this, properly label sims in the df i guess")
         sims = next(iter(sims))
+
         def getDf(sim):
-            L = sim.comovingBoxSize()
-            # uglily multiply by s so we get the time factor out. i dont like astropy units 
-            print(L)
-            one_over_vol = sim.convertComovingUnit(self.config["yUnit"] + " s", L**-3)
-            print(one_over_vol)
-            df = sim.get_timeseries_as_dataframe(self.config["series"], 1 / pq.s)
-            return df.with_columns((pl.col("value") * pl.lit(one_over_vol.value)).alias("value"))
+            with sim.comovingUnits() as _:
+                L = sim.comovingBoxSize()
+                # uglily multiply by s so we get the time factor out. i dont like astropy units
+                print(L)
+                one_over_vol = sim.convertComovingUnit(self.config["yUnit"] + " s", L**-3)
+                print(one_over_vol)
+                df = sim.get_timeseries_as_dataframe(self.config["series"], 1 / pq.s)
+                return df.with_columns((pl.col("value") * pl.lit(one_over_vol.value)).alias("value"))
+
         df = pl.concat([getDf(sim) for sim in sims])
         return df
-    
