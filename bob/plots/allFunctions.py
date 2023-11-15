@@ -66,7 +66,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     Shadowing,
     StrongScaling,
     StrongScalingSpeedup,
-    LuminosityOverTimeSubsweep
+    LuminosityOverTimeSubsweep,
 ]
 
 for function in postprocessingFunctions:

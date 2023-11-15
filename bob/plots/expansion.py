@@ -59,10 +59,11 @@ class Expansion(MultiSetFn):
 
         dfs = [getDf(sims) for sims in sims]
         print(dfs)
+
         def concat(dfs):
             dfs = list(dfs)
             for i in range(1, len(dfs)):
-                finalTimePrev = dfs[i-1].top_k(1, by="time")["time"]
+                finalTimePrev = dfs[i - 1].top_k(1, by="time")["time"]
                 dfs[i] = dfs[i].with_columns((pl.col("time") + pl.lit(finalTimePrev)).alias("time"))
                 print("concat")
             return pl.concat(dfs)
