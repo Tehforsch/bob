@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as u
 import polars as pl
+import itertools
 
 from bob.basicField import BasicField
 from bob.simulation import Simulation
@@ -49,7 +50,6 @@ class Expansion(MultiSetFn):
             df = sim.get_timeseries_as_dataframe("hydrogen_ionization_mass_average", 1.0, "Myr")
             L = u.Quantity(sim.params["box_size"]).to_value(u.kpc)
             pi = 3.1415
-            print(L)
             return df.with_columns(
                 [
                     pl.lit(resolution).alias("resolution"),
@@ -57,7 +57,21 @@ class Expansion(MultiSetFn):
                 ]
             )
 
-        return pl.concat([getDf(sims) for sims in sims])
+        dfs = [getDf(sims) for sims in sims]
+        print(dfs)
+        def concat(dfs):
+            dfs = list(dfs)
+            for i in range(1, len(dfs)):
+                finalTimePrev = dfs[i-1].top_k(1, by="time")["time"]
+                dfs[i] = dfs[i].with_columns((pl.col("time") + pl.lit(finalTimePrev)).alias("time"))
+                print("concat")
+            return pl.concat(dfs)
+
+        # uglily concat extended runs for the same expansion
+        dfs = [concat(group) for (_, group) in itertools.groupby(dfs, key=lambda df: df["resolution"][0])]
+        print(dfs)
+
+        return pl.concat(dfs)
 
     def plot(self, plt: plt.axes, df: Result) -> None:
         print(df)
