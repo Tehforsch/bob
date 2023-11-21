@@ -29,8 +29,8 @@ class TemperatureIonizationHistogram(Histogram):
         self.config.setDefault("maxX", None)
         self.config.setDefault("minY", None)
         self.config.setDefault("maxY", None)
-        self.config.setDefault("xTicks", [])
-        self.config.setDefault("yTicks", [])
+        self.config.setDefault("xTicks", None)
+        self.config.setDefault("yTicks", None)
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         return super().postHistogram(sim, snap, BasicField("ChemicalAbundances", 1), Temperature())

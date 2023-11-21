@@ -1,3 +1,4 @@
+import matplotlib.gridspec as gridspec
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
@@ -20,8 +21,10 @@ class Histogram(SnapFn):
 
     def postHistogram(self, sim: Simulation, snap: Snapshot, fieldX: Field, fieldY: Field) -> Result:
         result = super().post(sim, snap)
+        print(fieldX, fieldY)
         dataX = fieldX.getData(snap).to_value(self.config["xUnit"], cu.with_H0(snap.H0))
         dataY = fieldY.getData(snap).to_value(self.config["yUnit"], cu.with_H0(snap.H0))
+        print(self.config["yUnit"])
         indices = self.filterFunction(snap)
         if indices is not None:
             dataX = dataX[indices]
@@ -45,21 +48,38 @@ class Histogram(SnapFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        fig = plt.figure()
-        ax = fig.add_subplot(1, 1, 1)
-        self.setupLabels()
+        fig = plt.figure(figsize=(6, 6))
+        gs = fig.add_gridspec(2, 2, width_ratios=(4, 1), height_ratios=(1, 4), left=0.1, right=0.9, bottom=0.1, top=0.9, wspace=0.15, hspace=0.15)
+        ax = fig.add_subplot(gs[1, 0])
+        axx = fig.add_subplot(gs[0, 0], sharex=ax)
+        axy = fig.add_subplot(gs[1, 1], sharey=ax)
+        self.setupLabels(ax=ax)
         ax.set_xscale("log")
         ax.set_yscale("log")
         super().showTimeIfDesired(fig, result)
         X, Y = np.meshgrid(result.x_edges, result.y_edges)
-        plt.pcolormesh(X, Y, result.H, norm=colors.LogNorm())
-        if not self.config["empty"]:
-            plt.colorbar()
-        # if self.config["xTicks"] is not []:
-        #     plt.xticks(self.config["xTicks"])
-        # if self.config["yTicks"] is not []:
-        #     plt.yticks(self.config["yTicks"])
-        super().plot(plt, result)
+        xDat = np.sum(result.H, axis=0)
+        yDat = np.sum(result.H, axis=1)
+        ax.pcolormesh(X, Y, result.H, norm=colors.LogNorm())
+        # if not self.config["empty"]:
+        # ax.set_colorbar()
+        if self.config["xTicks"] is not None:
+            ax.xticks(self.config["xTicks"])
+        if self.config["yTicks"] is not None:
+            ax.yticks(self.config["yTicks"])
+
+        xs = 0.5 * (np.diag(X)[1:] + np.diag(X)[0:-1])
+        axx.plot(xs, xDat)
+        # axx.set_xlim(ax.get_xlim())
+        axx.set_xscale("log")
+        axx.set_yscale("log")
+
+        ys = 0.5 * (np.diag(Y)[1:] + np.diag(Y)[0:-1])
+        axy.plot(yDat, ys)
+        # axy.set_ylim(ax.get_ylim())
+        axy.set_xscale("log")
+        axy.set_yscale("log")
+        super().plot(ax, result)
 
     def filterFunction(self, snap):
         return None

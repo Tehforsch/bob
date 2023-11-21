@@ -25,8 +25,8 @@ class TemperatureDensityHistogram(Histogram):
         self.config.setDefault("maxX", None)
         self.config.setDefault("minY", None)
         self.config.setDefault("maxY", None)
-        self.config.setDefault("xTicks", [1e-29, 1e-27, 1e-25, 1e-23])
-        self.config.setDefault("yTicks", [1e2, 1e3, 1e4, 1e5, 1e6, 1e7])
+        self.config.setDefault("xTicks", None)
+        self.config.setDefault("yTicks", None)
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         return super().postHistogram(sim, snap, BasicField("Density"), Temperature())
