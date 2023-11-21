@@ -26,17 +26,19 @@ class Histogram(SnapFn):
         if indices is not None:
             dataX = dataX[indices]
             dataY = dataY[indices]
-            print(indices, indices[0].shape[0], indices[0].shape[0] == 0)
             if indices[0].shape[0] == 0:
                 print("Empty plot due to filter settings!")
                 self.config["empty"] = True
-        minX, minY, maxX, maxY = self.config["minX"], self.config["minY"], self.config["maxX"], self.config["maxY"]
+        if self.config["minX"] is not None:
+            minX, minY, maxX, maxY = self.config["minX"], self.config["minY"], self.config["maxX"], self.config["maxY"]
+        else:
+            minX, minY, maxX, maxY = np.min(dataX), np.min(dataY), np.max(dataX), np.max(dataY)
         binsX = np.logspace(np.log10(minX), np.log10(maxX), num=104)
         binsY = np.logspace(np.log10(minY), np.log10(maxY), num=104)
         if not self.config["empty"]:
             print(np.min(dataX), np.mean(dataX), np.max(dataX))
             print(np.min(dataY), np.mean(dataY), np.max(dataY))
-        result.H, result.x_edges, result.y_edges = np.histogram2d(dataX, dataY, bins=(binsX, binsY), density=True)
+        result.H, result.x_edges, result.y_edges = np.histogram2d(dataX, dataY, bins=(binsX, binsY))
         result.H = result.H.T * pq.dimensionless_unscaled
         result.x_edges = result.x_edges * pq.dimensionless_unscaled
         result.y_edges = result.y_edges * pq.dimensionless_unscaled
@@ -53,10 +55,10 @@ class Histogram(SnapFn):
         plt.pcolormesh(X, Y, result.H, norm=colors.LogNorm())
         if not self.config["empty"]:
             plt.colorbar()
-        if self.config["xTicks"] is not []:
-            plt.xticks(self.config["xTicks"])
-        if self.config["yTicks"] is not []:
-            plt.yticks(self.config["yTicks"])
+        # if self.config["xTicks"] is not []:
+        #     plt.xticks(self.config["xTicks"])
+        # if self.config["yTicks"] is not []:
+        #     plt.yticks(self.config["yTicks"])
         super().plot(plt, result)
 
     def filterFunction(self, snap):
