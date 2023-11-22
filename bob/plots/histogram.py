@@ -48,7 +48,7 @@ class Histogram(SnapFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        fig = plt.figure(figsize=(6, 6))
+        fig = plt.figure(figsize=(7, 7))
         gs = fig.add_gridspec(2, 2, width_ratios=(4, 1), height_ratios=(1, 4), left=0.1, right=0.9, bottom=0.1, top=0.9, wspace=0.15, hspace=0.15)
         ax = fig.add_subplot(gs[1, 0])
         axx = fig.add_subplot(gs[0, 0], sharex=ax)

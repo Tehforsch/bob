@@ -43,11 +43,12 @@ class StrongScaling(MultiSetFn):
             print(sim.folder)
             perf = sim.get_performance_data()
             runtime = pq.Quantity(perf["Stages::Sweep"]["average"]).to_value(pq.s)
+            assert perf["Stages::Sweep"]["num_calls"] == 30
             num_cores = int(perf["num_ranks"])
             num_particles = int(perf["num_particles"])
             num_dirs = int(sim.params["sweep"]["directions"])
             num_levels = int(sim.params["sweep"]["num_timestep_levels"])
-            num_freqs = 5 # i wrote a specific version of the code that actually carries 5 frequencies
+            num_freqs = 5  # i wrote a specific version of the code that actually carries 5 frequencies
             assert num_levels == 1
             entries = {
                 "runtime[s]": runtime,
@@ -62,13 +63,17 @@ class StrongScaling(MultiSetFn):
         return pl.concat(extend(df) for (_, df) in df.groupby("resolution"))
 
     def plot(self, plt: plt.axes, df: Result) -> None:
+        print(df)
         fig, axes = plt.subplots(2, 1, sharex=True)
         ax0, ax1 = axes
         sns.lineplot(y=df["t_task[µs]"], x=df["num_cores"], hue=df["resolution"], ax=ax0)
         sns.lineplot(y=df["t_task_relative"], x=df["num_cores"], hue=df["resolution"], ax=ax1)
+        ax0.set_yscale("log")
+        ax0.set_yticks([1e-1, 1e0, 1e1])
+        ax0.set_ylim([1e-1, 105])
         ax1.set(xlabel="$n$", xscale="log", xlim=self.config["xLim"])
-        ax0.set(ylabel="$t_{\\text{task}}(n)$")
-        ax1.set(ylabel="$t_{\\text{task}}(n) / t_{\\text{task}}(1)$", ylim=[0, 1])
+        ax0.set(ylabel="$t_{\\text{task}}(n) [\\mu s]$")
+        ax1.set(ylabel="$t_{\\text{task}}(1) / t_{\\text{task}}(n)$", ylim=[0, 1])
 
 
 class StrongScalingSpeedup(StrongScaling):

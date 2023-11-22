@@ -37,7 +37,8 @@ class PostprocessingFunction(ABC):
             snap: Snapshot = kwargs["snap"]
             sim: Simulation = kwargs["sim"]
             if sim.can_get_redshift():
-                combined["redshift"] = snap.timeQuantity("z")
+                combined["redshift"] = float(snap.timeQuantity("z"))
+        print(self.config["name"], combined)
         return self.config["name"].format(**combined)
 
     def setupLinePlot(self, ax: Any = None) -> None:
@@ -91,9 +92,9 @@ class PostprocessingFunction(ABC):
         if self.config["time"] == "t":
             time = result.time.to(self.config["timeUnit"]).value
             timeUnit = str(self.config["timeUnit"])
-            fig.suptitle(f"Time: {time:.01f} {timeUnit}", fontsize=12)
+            fig.suptitle(f"Time: {time:.02f} {timeUnit}", fontsize=12)
         else:
-            fig.suptitle(f"Redshift: {result.time:.01f}", fontsize=12)
+            fig.suptitle(f"Redshift: {result.time:.02f}", fontsize=12)
 
     def __repr__(self) -> str:
         return f"{self.name}: {self.config}"
