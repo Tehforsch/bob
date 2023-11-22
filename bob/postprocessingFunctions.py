@@ -14,6 +14,8 @@ from bob.plotConfig import PlotConfig
 
 
 def fillInUnit(label: str, unit: str) -> str:
+    if unit == "":
+        return label.replace("[UNIT]", "")
     if "UNIT" in label:
         return label.replace("UNIT", str(unit).replace("littleh", "h").replace("**", "^").replace("*", "\\cdot"))
     else:
@@ -47,9 +49,13 @@ class PostprocessingFunction(ABC):
         if "yLim" in self.config and self.config["yLim"] is not None:
             plt.ylim(*self.config["yLim"])
 
-    def setupLabels(self) -> None:
-        plt.xlabel(fillInUnit(self.config["xLabel"], str(self.config["xUnit"])))
-        plt.ylabel(fillInUnit(self.config["yLabel"], str(self.config["yUnit"])))
+    def setupLabels(self, ax=None) -> None:
+        if ax is None:
+            plt.xlabel(fillInUnit(self.config["xLabel"], str(self.config["xUnit"])))
+            plt.ylabel(fillInUnit(self.config["yLabel"], str(self.config["yUnit"])))
+        else:
+            ax.set_xlabel(fillInUnit(self.config["xLabel"], str(self.config["xUnit"])))
+            ax.set_ylabel(fillInUnit(self.config["yLabel"], str(self.config["yUnit"])))
 
     def addLine(self, xQuantity: pq.Quantity, yQuantity: pq.Quantity, *args: Any, **kwargs: Any) -> None:
         xUnit = pq.Unit(self.config["xUnit"])

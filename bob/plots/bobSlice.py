@@ -55,14 +55,21 @@ class Slice(SnapFn):
         super().__init__(config)
         self.config.setDefault("axis", "z", choices=["x", "y", "z"])
         self.config.setDefault("field", "Abundance1", choices=[f.niceName for f in allFields])
+        print(self.config["field"])
+        if self.config["field"].lower() == "temperature":
+            self.config.setDefault("colorscale", "Reds")
+        elif self.config["field"].lower() == "ionized_hydrogen_fraction":
+            self.config.setDefault("colorscale", "coolwarm")
+        else:
+            self.config.setDefault("colorscale", "viridis")
         xAxis, yAxis = getOtherAxes(config["axis"])
         self.config.setDefault("xLabel", f"${xAxis} [UNIT]$")
         self.config.setDefault("yLabel", f"${yAxis} [UNIT]$")
-        self.config.setDefault("cLabel", "")
+        self.config.setDefault("cLabel", "{} [${}$]".format(self.field.niceName, str(self.config["vUnit"])))
+        self.config.setDefault("vLim", None)
         self.config.setDefault("xUnit", pq.Mpc)
         self.config.setDefault("yUnit", pq.Mpc)
         self.config.setDefault("vUnit", self.field.unit)
-        self.config.setDefault("vLim", [1e-6, 1e0])
         self.config.setDefault("log", True)
         self.config.setDefault("logmin0", -9)
         self.config.setDefault("logmin1", -9)
@@ -108,7 +115,11 @@ class Slice(SnapFn):
             super().showTimeIfDesired(fig, result)
             xAxis, yAxis = getOtherAxes(self.config["axis"])
             self.setupLabels()
-            vmin, vmax = self.config["vLim"]
+            if self.config["vLim"] is not None:
+                vmin, vmax = self.config["vLim"]
+            else:
+                vmin = np.min(result.data).to_value(self.config["vUnit"])
+                vmax = np.max(result.data).to_value(self.config["vUnit"])
             if result.data.ndim == 3:
                 # Combined fields: each entry is a color
                 if self.config["log"]:
@@ -116,9 +127,9 @@ class Slice(SnapFn):
             print(f"min: {np.min(result.data)}, max: {np.max(result.data)}")
             # imshow does not seem to support LogNorm for RGB data anymore
             if self.config["log"] and result.data.ndim != 3:
-                self.image(plt, result.data, result.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="Reds")
+                self.image(plt, result.data, result.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap=self.config["colorscale"])
             else:
-                self.image(plt, result.data, result.extent, vmin=vmin, vmax=vmax, origin="lower")
+                self.image(plt, result.data, result.extent, vmin=vmin, vmax=vmax, origin="lower", cmap=self.config["colorscale"])
             return fig
 
 
