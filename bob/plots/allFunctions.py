@@ -32,6 +32,7 @@ from bob.plots.convergence import Convergence
 from bob.plots.chainedTimeSeries import ChainedTimeSeries, LuminosityOverTimeSubsweep
 from bob.plots.shadowing import Shadowing
 from bob.plots.strongScaling import StrongScaling, StrongScalingSpeedup
+from bob.plots.periodicAsymmetry import PeriodicAsymmetry
 
 postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     SliceWithStarParticles,
@@ -67,6 +68,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     StrongScaling,
     StrongScalingSpeedup,
     LuminosityOverTimeSubsweep,
+    PeriodicAsymmetry,
 ]
 
 for function in postprocessingFunctions:

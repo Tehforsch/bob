@@ -25,8 +25,40 @@ def extend(df):
     )
 
 
-def getOldResults():
-    df = pl.DataFrame({})
+def getOldResults(runtime, num_cores, resolution):
+    num_particles = 9999999991
+    num_dirs = 84
+    num_freqs = 5
+    df = pl.DataFrame(
+        {
+            "runtime[s]": runtime,
+            "num_cores": num_cores,
+            "resolution": [resolution for _ in runtime],
+            "num_particles": num_particles,
+            "t_task[µs]": [num_cores[i] * runtime[i] * 1e6 / num_particles / num_dirs / num_freqs for i in range(len(runtime))],
+        }
+    )
+    one_core = df.bottom_k(1, by="num_cores")
+    df = df.with_columns((one_core["t_task[µs]"] / pl.col("t_task[µs]")).alias("t_task_relative"))
+    return pl.concat(extend(df) for (_, df) in df.groupby("resolution"))
+
+
+def getOld32():
+    num_cores = [1, 2, 4]
+    runtime = [1.0, 2.0, 3.0]
+    return getOldResults(runtime, num_cores, "$32^3$ (Arepo)")
+
+
+def getOld256():
+    num_cores = [1, 2, 4]
+    runtime = [1.0, 2.0, 3.0]
+    return getOldResults(runtime, num_cores, "$256^3$ (Arepo)")
+
+
+def getOld512():
+    num_cores = [1, 2, 4]
+    runtime = [1.0, 2.0, 3.0]
+    return getOldResults(runtime, num_cores, "$512^3$ (Arepo)")
 
 
 def removeLegendTitle(ax):
@@ -78,6 +110,7 @@ class StrongScaling(MultiSetFn):
 
     def plot(self, plt: plt.axes, df: Result) -> None:
         print(df)
+        df = pl.concat([df, getOld32(), getOld256(), getOld512()])
         df = df.sort(by="num_particles")
         fig, axes = plt.subplots(2, 1, sharex=True)
         ax0, ax1 = axes
