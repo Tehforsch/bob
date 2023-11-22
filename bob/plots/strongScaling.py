@@ -47,12 +47,13 @@ class StrongScaling(MultiSetFn):
             num_particles = int(perf["num_particles"])
             num_dirs = int(sim.params["sweep"]["directions"])
             num_levels = int(sim.params["sweep"]["num_timestep_levels"])
+            num_freqs = 5 # i wrote a specific version of the code that actually carries 5 frequencies
             assert num_levels == 1
             entries = {
                 "runtime[s]": runtime,
                 "num_cores": int(num_cores),
                 "resolution": "${}^3$".format(str(int(float(num_particles + 1) ** (1.0 / 3.0)))),
-                "t_task[µs]": num_cores * runtime * 1e6 / num_particles / num_dirs,
+                "t_task[µs]": num_cores * runtime * 1e6 / num_particles / num_dirs / num_freqs,
             }
             dfs.append(pl.DataFrame(entries))
         df = pl.concat(dfs)
