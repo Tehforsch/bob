@@ -54,6 +54,7 @@ class StrongScaling(MultiSetFn):
                 "runtime[s]": runtime,
                 "num_cores": int(num_cores),
                 "resolution": "${}^3$".format(str(int(float(num_particles + 1) ** (1.0 / 3.0)))),
+                "num_particles": num_particles,
                 "t_task[µs]": num_cores * runtime * 1e6 / num_particles / num_dirs / num_freqs,
             }
             dfs.append(pl.DataFrame(entries))
@@ -78,10 +79,14 @@ class StrongScaling(MultiSetFn):
 
 class StrongScalingSpeedup(StrongScaling):
     def plot(self, plt: plt.axes, df: Result) -> None:
+        df = df.sort(by="resolution")
         fig, axes = plt.subplots(2, 1, sharex=True)
         ax0, ax1 = axes
-        ax0.plot(np.arange(1, 200), np.arange(1, 200), label="ideal", color="black", linestyle="--")
-        ax0.plot(np.arange(96, 1024), np.arange(96, 1024) / 96, label="ideal", color="red", linestyle="--")
+        ax0.plot([], [], label="ideal", color="black", linestyle="--")
+        ax0.plot(np.arange(1, 200), np.arange(1, 200), color="blue", linestyle="--")
+        ax0.plot(np.arange(8, 1024), np.arange(8, 1024) / 8, color="red", linestyle="--")
+        ax0.plot(np.arange(64, 2048), np.arange(64, 2048) / 64, color="green", linestyle="--")
+        ax0.plot(np.arange(512, 2048), np.arange(512, 2048) / 512, color="purple", linestyle="--")
         sns.lineplot(y=df["speedup"], x=df["num_cores"], hue=df["resolution"], ax=ax0)
         sns.lineplot(y=df["efficiency"], x=df["num_cores"], hue=df["resolution"], ax=ax1)
         ax1.set(xlabel="$n$", xscale="log", xlim=self.config["xLim"])
