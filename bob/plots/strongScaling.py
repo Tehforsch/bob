@@ -43,7 +43,7 @@ class StrongScaling(MultiSetFn):
             print(sim.folder)
             perf = sim.get_performance_data()
             runtime = pq.Quantity(perf["Stages::Sweep"]["average"]).to_value(pq.s)
-            assert perf["Stages::Sweep"]["num_calls"] == 30
+            assert perf["Stages::Sweep"]["num_calls"] == 32
             num_cores = int(perf["num_ranks"])
             num_particles = int(perf["num_particles"])
             num_dirs = int(sim.params["sweep"]["directions"])
