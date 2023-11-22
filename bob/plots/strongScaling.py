@@ -25,6 +25,19 @@ def extend(df):
     )
 
 
+def getOldResults():
+    df = pl.DataFrame({})
+
+
+def removeLegendTitle(ax):
+    handles, labels = ax.get_legend_handles_labels()
+    ax.legend(handles=handles[0:], labels=labels[0:])
+
+
+def removeLegend(ax):
+    ax.legend().remove()
+
+
 class StrongScaling(MultiSetFn):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
@@ -65,25 +78,28 @@ class StrongScaling(MultiSetFn):
 
     def plot(self, plt: plt.axes, df: Result) -> None:
         print(df)
+        df = df.sort(by="num_particles")
         fig, axes = plt.subplots(2, 1, sharex=True)
         ax0, ax1 = axes
         sns.lineplot(y=df["t_task[µs]"], x=df["num_cores"], hue=df["resolution"], ax=ax0)
         sns.lineplot(y=df["t_task_relative"], x=df["num_cores"], hue=df["resolution"], ax=ax1)
         ax0.set_yscale("log")
         ax0.set_yticks([1e-1, 1e0, 1e1])
-        ax0.set_ylim([1e-1, 105])
+        ax0.set_ylim([1e-1, 1e1])
         ax1.set(xlabel="$n$", xscale="log", xlim=self.config["xLim"])
         ax0.set(ylabel="$t_{\\text{task}}(n) [\\mu s]$")
         ax1.set(ylabel="$t_{\\text{task}}(1) / t_{\\text{task}}(n)$", ylim=[0, 1])
+        removeLegendTitle(ax0)
+        removeLegend(ax1)
 
 
 class StrongScalingSpeedup(StrongScaling):
     def plot(self, plt: plt.axes, df: Result) -> None:
-        df = df.sort(by="resolution")
+        df = df.sort(by="num_particles")
         fig, axes = plt.subplots(2, 1, sharex=True)
         ax0, ax1 = axes
         ax0.plot([], [], label="ideal", color="black", linestyle="--")
-        ax0.plot(np.arange(1, 200), np.arange(1, 200), color="blue", linestyle="--")
+        ax0.plot(np.arange(1, 200), np.arange(1, 200), color="#1f77b4", linestyle="--")
         ax0.plot(np.arange(8, 1024), np.arange(8, 1024) / 8, color="red", linestyle="--")
         ax0.plot(np.arange(64, 2048), np.arange(64, 2048) / 64, color="green", linestyle="--")
         ax0.plot(np.arange(512, 2048), np.arange(512, 2048) / 512, color="purple", linestyle="--")
@@ -92,3 +108,6 @@ class StrongScalingSpeedup(StrongScaling):
         ax1.set(xlabel="$n$", xscale="log", xlim=self.config["xLim"])
         ax0.set(ylabel="$S(n)$", ylim=[0, 100])
         ax1.set(ylabel="$\\epsilon(n)$", ylim=[0, 1])
+        ax0.set_ylim([0, 50])
+        removeLegendTitle(ax0)
+        removeLegend(ax1)
