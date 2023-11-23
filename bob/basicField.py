@@ -130,6 +130,12 @@ class BasicField(Field):
             return snapshot.mass()
         elif name == "masses":
             return snapshot.mass()
+        elif name == "recombination_rate":
+            return snapshot.recombination_rate()
+        elif name == "collisional_ionization_rate":
+            return snapshot.collisional_ionization_rate()
+        elif name == "photoionization_rate":
+            return snapshot.photoionization_rate()
         else:
             raise NotImplementedError(f"Field {name}")
 

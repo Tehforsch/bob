@@ -23,6 +23,9 @@ allFields = [
     BasicField("ionization_time", None),
     BasicField("photon_rate", None),
     BasicField("source", None),
+    BasicField("recombination_rate", None),
+    BasicField("photoionization_rate", None),
+    BasicField("collisional_ionization_rate", None),
     Temperature(),
     SourceField(),
 ]

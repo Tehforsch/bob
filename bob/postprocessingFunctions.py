@@ -38,7 +38,6 @@ class PostprocessingFunction(ABC):
             sim: Simulation = kwargs["sim"]
             if sim.can_get_redshift():
                 combined["redshift"] = float(snap.timeQuantity("z"))
-        print(self.config["name"], combined)
         return self.config["name"].format(**combined)
 
     def setupLinePlot(self, ax: Any = None) -> None:

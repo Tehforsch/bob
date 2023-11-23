@@ -74,6 +74,15 @@ class SubsweepSnapshot(BaseSnapshot):
     def mass(self) -> pq.Quantity:
         return self.first_snapshot_this_sim.read_dataset("mass")
 
+    def photoionization_rate(self) -> pq.Quantity:
+        return self.read_dataset("photoionization_rate")
+
+    def recombination_rate(self) -> pq.Quantity:
+        return self.read_dataset("recombination_rate")
+
+    def collisional_ionization_rate(self) -> pq.Quantity:
+        return self.read_dataset("collisional_ionization_rate")
+
     def velocity(self) -> pq.Quantity:
         return self.read_dataset("velocity")
 
