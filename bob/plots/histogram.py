@@ -64,9 +64,11 @@ class Histogram(SnapFn):
         # if not self.config["empty"]:
         # ax.set_colorbar()
         if self.config["xTicks"] is not None:
-            ax.xticks(self.config["xTicks"])
+            pass
+            # ax.xticks(self.config["xTicks"])
         if self.config["yTicks"] is not None:
-            ax.yticks(self.config["yTicks"])
+            pass
+            # ax.yticks(self.config["yTicks"])
 
         xs = 0.5 * (np.diag(X)[1:] + np.diag(X)[0:-1])
         axx.plot(xs, xDat)
