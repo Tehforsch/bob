@@ -13,8 +13,9 @@ from bob.plots.histogram import Histogram
 
 class TemperatureRateHistogram(Histogram):
     def __init__(self, config: PlotConfig) -> None:
+        config.setDefault("field", "recombination_rate")
+        config.setDefault("name", "temperature_{field}_{simName}_{snapName}")
         super().__init__(config)
-        self.config.setDefault("field", "recombination_rate")
         self.config.setDefault("xUnit", 1 / pq.s)
         self.config.setDefault("yUnit", pq.K)
         self.config.setDefault("xLabel", "rate")
@@ -25,6 +26,7 @@ class TemperatureRateHistogram(Histogram):
         self.config.setDefault("maxY", None)
         self.config.setDefault("xTicks", None)
         self.config.setDefault("yTicks", None)
+
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
 
