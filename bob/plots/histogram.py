@@ -33,7 +33,7 @@ class Histogram(SnapFn):
                 print("Empty plot due to filter settings!")
                 self.config["empty"] = True
         if self.config["minX"] is not None:
-            minX, minY, maxX, maxY = self.config["minX"], self.config["minY"], self.config["maxX"], self.config["maxY"]
+            minX, minY, maxX, maxY = float(self.config["minX"]), float(self.config["minY"]), float(self.config["maxX"]), float(self.config["maxY"])
         else:
             minX, minY, maxX, maxY = np.min(dataX), np.min(dataY), np.max(dataX), np.max(dataY)
         binsX = np.logspace(np.log10(minX), np.log10(maxX), num=104)

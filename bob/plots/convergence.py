@@ -45,7 +45,7 @@ class Convergence(MultiSetFn):
                     "threshold": pq.Quantity(sim.params["sweep"]["significant_rate_threshold"]).value,
                     "timescale[kyr]": timescale.to_value(pq.kyr),
                     "ratio": timescale.to_value(pq.kyr) / pq.Quantity(sim.params["sweep"]["max_timestep"]).to_value(pq.kyr),
-                    "runtime[s]": pq.Quantity(runtime).to_value(pq.s),
+                    "$t_{\mathrm{run}} / n [s]$": pq.Quantity(runtime).to_value(pq.s) / num_particles,
                 }
                 for i, threshold in enumerate(error_thresholds):
                     converged = abs(finalFraction - convergedFraction) < threshold
@@ -91,7 +91,7 @@ class Convergence(MultiSetFn):
             ax=ax2,
             data=df,
             x="num_particles",
-            y="runtime[s]",
+            y="t_{\mathrm{run}} / n [s]",
             hue="n",
             linewidth=1.2,
             legend=True,
