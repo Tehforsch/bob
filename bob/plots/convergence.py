@@ -73,34 +73,42 @@ class Convergence(MultiSetFn):
         # gs1.update(wspace=0.025, hspace=0.05)
         # ax1 = plt.subplot(111)
         # ax2 = plt.subplot(222)
-        plt.setp(ax1.get_xticklabels(), visible=False)  # GOD I FUCKING HATE MATPLOTLIB WHY IS THIS SO HARD TO FIND
+        plt.setp(ax1.get_xticklabels(), visible=False)
         fig.set_size_inches(3, 4)
         fig.subplots_adjust(wspace=None, hspace=0.05)
 
         xlim = [100, 11240]
         df = df.with_columns((pl.col("trun/n") * 1000).alias("trun/n"))
-        print(df.with_row_count().filter(pl.col("trun/n") > 1.0))
+        df = df.with_row_count()
+        # fix those runs where output was different
+        df = df.with_columns(
+            corrected_for_wrong_run = pl
+            .when(pl.col("row_nr") == 30).then(pl.col("trun/n") / 2)
+            .when(pl.col("row_nr") == 31).then(pl.col("trun/n") / 2)
+            .when(pl.col("row_nr") == 32).then(pl.col("trun/n") / 2)
+            .otherwise(pl.col("trun/n")),
+        )
 
-        sns.lineplot(
+        axlol = sns.lineplot(
             ax=ax1,
             data=df,
             x="num_particles",
             y="dt[kyr]",
             hue="n",
             linewidth=1.2,
-            legend=False,
+            legend=True,
         )
 
-        axlol = sns.lineplot(
+        sns.move_legend(axlol, loc='lower left', bbox_to_anchor=[0.0,-0.05])
+        sns.lineplot(
             ax=ax2,
             data=df,
             x="num_particles",
-            y="trun/n",
+            y="corrected_for_wrong_run",
             hue="n",
             linewidth=1.2,
-            legend=True,
+            legend=False,
         )
-        sns.move_legend(axlol, loc='upper center')
         ax1.set(ylabel="$\\Delta t [\\text{kyr}]$", xscale="log", yscale="log", xlabel=None, xlim=xlim)
-        ax1.xaxis.set_minor_formatter(NullFormatter())  # GOD I FUCKING HATE MATPLOTLIB WHY IS THIS SO HARD TO FIND
-        ax2.set(xlabel="N", ylabel="$t_{\\mathrm{run}} / n$ [ms]", xscale="log", ylim=[0.0, 5], xlim=xlim)
+        ax1.xaxis.set_minor_formatter(NullFormatter())
+        ax2.set(xlabel="N", ylabel="$t_{\\mathrm{run}} / n$ [ms]", xscale="log", ylim=[0.0, 2.5], xlim=xlim)
