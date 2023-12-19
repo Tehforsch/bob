@@ -45,7 +45,7 @@ class Convergence(MultiSetFn):
                     "threshold": pq.Quantity(sim.params["sweep"]["significant_rate_threshold"]).value,
                     "timescale[kyr]": timescale.to_value(pq.kyr),
                     "ratio": timescale.to_value(pq.kyr) / pq.Quantity(sim.params["sweep"]["max_timestep"]).to_value(pq.kyr),
-                    "$t_{\mathrm{run}} / n [s]$": pq.Quantity(runtime).to_value(pq.s) / num_particles,
+                    "trun/n": pq.Quantity(runtime).to_value(pq.s) / num_particles,
                 }
                 for i, threshold in enumerate(error_thresholds):
                     converged = abs(finalFraction - convergedFraction) < threshold
@@ -62,6 +62,8 @@ class Convergence(MultiSetFn):
         dfs = [df.top_k(1, by="dt[kyr]") for df in dfs]
         df = pl.concat(dfs)
         df = df.rename({"num_levels": "n"})
+        df = df.filter(pl.col("num_particles") > 100)
+        df = df.filter(pl.col("n") < 7)
         print(df)
 
         fig = plt.figure()
@@ -75,7 +77,9 @@ class Convergence(MultiSetFn):
         fig.set_size_inches(3, 4)
         fig.subplots_adjust(wspace=None, hspace=0.05)
 
-        xlim = [10, 10240]
+        xlim = [100, 11240]
+        df = df.with_columns((pl.col("trun/n") * 1000).alias("trun/n"))
+        print(df.with_row_count().filter(pl.col("trun/n") > 1.0))
 
         sns.lineplot(
             ax=ax1,
@@ -87,15 +91,16 @@ class Convergence(MultiSetFn):
             legend=False,
         )
 
-        sns.lineplot(
+        axlol = sns.lineplot(
             ax=ax2,
             data=df,
             x="num_particles",
-            y="t_{\mathrm{run}} / n [s]",
+            y="trun/n",
             hue="n",
             linewidth=1.2,
             legend=True,
         )
+        sns.move_legend(axlol, loc='upper center')
         ax1.set(ylabel="$\\Delta t [\\text{kyr}]$", xscale="log", yscale="log", xlabel=None, xlim=xlim)
         ax1.xaxis.set_minor_formatter(NullFormatter())  # GOD I FUCKING HATE MATPLOTLIB WHY IS THIS SO HARD TO FIND
-        ax2.set(xlabel="N", ylabel="\\text{runtime} [\\text{s}]", xscale="log", ylim=[0.0, 15], xlim=xlim)
+        ax2.set(xlabel="N", ylabel="$t_{\\mathrm{run}} / n$ [ms]", xscale="log", ylim=[0.0, 5], xlim=xlim)
