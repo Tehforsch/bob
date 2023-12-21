@@ -50,15 +50,16 @@ class Shadowing(MultiSetFn):
         plt.tight_layout(pad=0.00)
         vmin = 1e-15
         vmax = 1e-8
+        shift = 16
         for ax, d in zip(axes.flat, result.data):
             print(np.min(d), np.max(d))
             xUnit = pq.Unit(self.config["xUnit"])
             yUnit = pq.Unit(self.config["yUnit"])
             extent = (
-                result.extent[0].to_value(xUnit) - 16,
-                result.extent[1].to_value(xUnit) - 16,
-                result.extent[2].to_value(yUnit) - 16,
-                result.extent[3].to_value(yUnit) - 16,
+                result.extent[0].to_value(xUnit) - shift,
+                result.extent[1].to_value(xUnit) - shift,
+                result.extent[2].to_value(yUnit) - shift,
+                result.extent[3].to_value(yUnit) - shift,
             )
             vUnit = pq.Unit(self.config["vUnit"])
             image = ax.imshow(d.to_value(vUnit), extent=extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="BuGn")
@@ -73,20 +74,12 @@ class Shadowing(MultiSetFn):
         axes[1][0].set_ylabel(ylabel)
         axes[2][0].set_ylabel(ylabel)
 
-        axes[0][0].annotate("3 \\text{kyr}", xy=(22, 29), fontsize=15)
-        axes[0][1].annotate("32 \\text{kyr}", xy=(22, 29), fontsize=15)
-        axes[0][2].annotate("48 \\text{kyr}", xy=(22, 29), fontsize=15)
-
-        axes[0][0].annotate("$32^3$", xy=(1.5, 29), fontsize=15)
-        axes[1][0].annotate("$64^3$", xy=(1.5, 29), fontsize=15)
-        axes[2][0].annotate("$128^3$", xy=(1.5, 29), fontsize=15)
-
 
         cbar = fig.colorbar(image, ax=axes.ravel().tolist())
         cbar.set_label(self.config["cLabel"])
 
-        for axes in axes:
-            for ax in axes:
+        for (i, axes) in enumerate(axes):
+            for (j, ax) in enumerate(axes):
                 ax.add_patch(plt.Circle((-14, 0), 0.4, color='white'))
                 ax.add_patch(plt.Circle((0, -14), 0.4, color='white'))
                 ax.add_patch(plt.Circle((0, 0), 4, facecolor='none', edgecolor='black', linestyle="--"))
@@ -99,10 +92,19 @@ class Shadowing(MultiSetFn):
                 y1 = x1 * tan(alpha)
                 ax.plot([-d, maxExtent], [0, y1], color="black")
                 ax.plot([0, y1], [-d, maxExtent], color="black")
-# # upper delimiting line
-# set arrow front from -d,0 to maxExtent,y1 nohead lw 2 dt 1 lc rgb "#000000"
-# # lower delimiting line
-# set arrow front from 0,-d to y1,maxExtent nohead lw 2 dt 1 lc rgb "#000000"
+                if (i, j) == (0, 0):
+                    ax.annotate("3 \\text{kyr}", xy=(-4, 8), fontsize=15)
+                if (i, j) == (0, 1):
+                    ax.annotate("32 \\text{kyr}", xy=(-4, 8), fontsize=15)
+                if (i, j) == (0, 2):
+                    ax.annotate("48 \\text{kyr}", xy=(-4, 8), fontsize=15)
+
+                if (i, j) == (0, 0):
+                    ax.annotate("$32^3$", xy=(-13, -3), fontsize=15)
+                if (i, j) == (1, 0):
+                    ax.annotate("$64^3$", xy=(-13, -3), fontsize=15)
+                if (i, j) == (2, 0):
+                    ax.annotate("$128^3$", xy=(-13, -3), fontsize=15)
 
         return fig
 
