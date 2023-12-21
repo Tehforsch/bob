@@ -6,6 +6,7 @@ from bob.temperature import Temperature
 from bob.combinedField import CombinedField
 from bob.sourceField import SourceField
 from bob.equillibriumIonization import EquillibriumIonization
+from bob.neutralFraction import NeutralFraction
 
 
 def addFields(fields: Iterable[Field]) -> None:
@@ -29,7 +30,8 @@ allFields = [
     BasicField("collisional_ionization_rate", None),
     Temperature(),
     SourceField(),
-    EquillibriumIonization()
+    EquillibriumIonization(),
+    NeutralFraction(),
 ]
 
 addFields(BasicField("ChemicalAbundances", i) for i in range(6))
