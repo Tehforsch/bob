@@ -26,13 +26,19 @@ class PeriodicAsymmetry(MultiSetFn):
                 snap = sim.snapshots[-1]
                 data = snap.ionized_hydrogen_fraction()
                 coords = snap.position()
+                sourcePosX = coords[np.where(snap.source() > 0)][0][0]
+                epsilon = sourcePosX
                 L = sim.boxSize()
-                left = np.where(np.dot(coords, np.array([1.0, 0.0, 0.0])) < L / 2)
-                right = np.where(np.dot(coords, np.array([1.0, 0.0, 0.0])) > L / 2)
-                print(np.mean(coords[left], axis=0) / L)
-                print(np.mean(coords[right], axis=0) / L)
-                left = np.mean(data[left])
-                right = np.mean(data[right])
+                print(L, epsilon)
+                xcoord = np.dot(coords, np.array([1.0, 0.0, 0.0]))
+                right_mask = np.logical_and(xcoord < L / 2 + epsilon, xcoord > epsilon)
+                right_of_source = np.where(right_mask)
+                left_of_source = np.where(np.logical_not(right_mask))
+                print(right_of_source, left_of_source)
+                print(np.mean(coords[right_of_source], axis=0) / L)
+                print(np.mean(coords[left_of_source], axis=0) / L)
+                left = np.mean(data[left_of_source])
+                right = np.mean(data[right_of_source])
                 subdf = pl.DataFrame(
                     {
                         "rel. error": [abs(left - right) / (left + right)],
@@ -45,4 +51,5 @@ class PeriodicAsymmetry(MultiSetFn):
         return df
 
     def plot(self, plt: plt.axes, df: Result) -> None:
+        sns.set_palette("PuBuGn_d")
         sns.lineplot(x=df["n"], y=df["rel. error"], hue=df[delta_t_key], linewidth=1.2)

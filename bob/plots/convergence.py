@@ -111,4 +111,4 @@ class Convergence(MultiSetFn):
         )
         ax1.set(ylabel="$\\Delta t [\\text{kyr}]$", xscale="log", yscale="log", xlabel=None, xlim=xlim)
         ax1.xaxis.set_minor_formatter(NullFormatter())
-        ax2.set(xlabel="N", ylabel="$t_{\\mathrm{run}} / n$ [ms]", xscale="log", ylim=[0.0, 2.5], xlim=xlim)
+        ax2.set(xlabel="N", ylabel="$t_{\\mathrm{run}} / N$ [ms]", xscale="log", ylim=[0.0, 2.5], xlim=xlim)
