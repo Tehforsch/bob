@@ -20,7 +20,26 @@ class EquillibriumIonization(Field):
 
     @property
     def symbol(self) -> str:
-        return "xHII_{eq}"
+        return "$x_{\\mathrm{HII}}_{eq}$"
+
+    @property
+    def unit(self) -> pq.Quantity:
+        return pq.dimensionless_unscaled
+
+
+class EquillibriumNeutralFraction(Field):
+    def getData(self, snapshot: Snapshot) -> np.ndarray:
+        xhii = EquillibriumIonization().getData(snapshot)
+        xhii = np.minimum(np.ones(xhii.shape), xhii.value)
+        return (1.0 - xhii) * pq.dimensionless_unscaled
+
+    @property
+    def niceName(self) -> str:
+        return "equillibrium_neutral_fraction"
+
+    @property
+    def symbol(self) -> str:
+        return "$x_{\\mathrm{HI}}_{eq}$"
 
     @property
     def unit(self) -> pq.Quantity:
