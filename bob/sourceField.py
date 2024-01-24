@@ -16,6 +16,10 @@ class SourceField(Field):
         source = np.zeros(coords.shape[0]) / pq.s
         if type(snapshot) == SubsweepSnapshot:
             source = snapshot.source()
+            mass = snapshot.mass()
+            density = snapshot.density()
+            volume = mass / density
+            source = source / volume
         else:
             type_ = snapshot.sim.params["SX_SOURCES"]
             if type_ == 4:

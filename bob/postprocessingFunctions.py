@@ -49,13 +49,17 @@ class PostprocessingFunction(ABC):
         if "yLim" in self.config and self.config["yLim"] is not None:
             plt.ylim(*self.config["yLim"])
 
-    def setupLabels(self, ax=None) -> None:
+    def setupLabels(self, ax=None, xlabel=True, ylabel=True) -> None:
         if ax is None:
-            plt.xlabel(fillInUnit(self.config["xLabel"], str(self.config["xUnit"])))
-            plt.ylabel(fillInUnit(self.config["yLabel"], str(self.config["yUnit"])))
+            if xlabel:
+                plt.xlabel(fillInUnit(self.config["xLabel"], str(self.config["xUnit"])))
+            if ylabel:
+                plt.ylabel(fillInUnit(self.config["yLabel"], str(self.config["yUnit"])))
         else:
-            ax.set_xlabel(fillInUnit(self.config["xLabel"], str(self.config["xUnit"])))
-            ax.set_ylabel(fillInUnit(self.config["yLabel"], str(self.config["yUnit"])))
+            if xlabel:
+                ax.set_xlabel(fillInUnit(self.config["xLabel"], str(self.config["xUnit"])))
+            if ylabel:
+                ax.set_ylabel(fillInUnit(self.config["yLabel"], str(self.config["yUnit"])))
 
     def addLine(self, xQuantity: pq.Quantity, yQuantity: pq.Quantity, *args: Any, **kwargs: Any) -> None:
         xUnit = pq.Unit(self.config["xUnit"])
@@ -74,9 +78,12 @@ class PostprocessingFunction(ABC):
         yUnit = pq.Unit(self.config["yUnit"])
         extent = (extent[0].to_value(xUnit), extent[1].to_value(xUnit), extent[2].to_value(yUnit), extent[3].to_value(yUnit))
         vUnit = pq.Unit(self.config["vUnit"])
-        image = ax.imshow(image.to_value(vUnit), extent=extent, *args, **kwargs)
-        cbar = plt.colorbar(image)
-        cbar.set_label(self.config["cLabel"])
+        colorbar = kwargs["colorbar"]
+        del kwargs["colorbar"]
+        image = ax.imshow(image.to_value(vUnit), extent=extent, aspect='auto', *args, **kwargs)
+        if colorbar:
+            cbar = plt.colorbar(image)
+            cbar.set_label(self.config["cLabel"])
 
     def scatter(self, xdata: pq.Quantity, ydata: pq.Quantity, *args: Any, **kwargs: Any) -> None:
         xUnit = pq.Unit(self.config["xUnit"])

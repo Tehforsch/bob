@@ -139,8 +139,8 @@ class Plotter:
             config = None
         plots.sort(key=lambda plot: plot.qualifiedName)
         plots = [plot for plot in plots if plotFilters.contains(plot)]
-        for path in [runPlot(self, config, plot) for plot in plots]:
-            # for path in runInPool(runPlot, plots, self, config):
+        # for path in runInPool(runPlot, plots, self, config):
+        for path in (runPlot(self, config, plot) for plot in plots):
             if self.show:
                 showImageInTerminal(path)
 
@@ -223,6 +223,7 @@ class Plotter:
         filepath.parent.mkdir(exist_ok=True)
         plt.savefig(str(filepath), dpi=bob.config.dpi)
         plt.clf()
+        plt.close()
         return filepath
 
 

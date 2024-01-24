@@ -16,17 +16,31 @@ from bob.allFields import allFields, getFieldByName
 from bob.field import Field
 from bob.plotConfig import PlotConfig
 
+def getDefaultCmap(field: str):
+    e = {
+        "temperature": "Reds",
+        "ionized_hydrogen_fraction": "coolwarm",
+        "collisional_ionization_rate": "Purples",
+        "density": "Greys",
+        "equillibrium_neutral_fraction": "Blues",
+        "neutral_hydrogen_fraction": "Blues",
+        "photoionization_rate": "Oranges",
+        "recombination_rate": "autumn",
+    }
+    field = field.lower()
+    if field in e:
+        return e[field]
+    else:
+        print(f"Using default colormap for {field}")
+        return "viridis"
 
 def getDataAtPoints(field: Field, snapshot: Snapshot, points: pq.Quantity) -> np.ndarray:
-    print("Arepo snaps with comoving units don't work because of the following change")
-    # lengthUnit = snapshot.lengthUnit / cu.littleh
     lengthUnit = snapshot.lengthUnit
     coords = snapshot.coordinates.to(lengthUnit, cu.with_H0(snapshot.H0)).value
     points = points.to(snapshot.lengthUnit, cu.with_H0(snapshot.H0))
     tree = cKDTree(coords)
     cellIndices = tree.query(points)[1]
     data = field.getData(snapshot)
-    print(np.max(data))
     return data[cellIndices]
 
 
@@ -56,12 +70,7 @@ class Slice(SnapFn):
         self.config.setDefault("axis", "z", choices=["x", "y", "z"])
         self.config.setDefault("field", "Abundance1", choices=[f.niceName for f in allFields])
         print(self.config["field"])
-        if self.config["field"].lower() == "temperature":
-            self.config.setDefault("colorscale", "Reds")
-        elif self.config["field"].lower() == "ionized_hydrogen_fraction":
-            self.config.setDefault("colorscale", "coolwarm")
-        else:
-            self.config.setDefault("colorscale", "viridis")
+        self.config.setDefault("colorscale", None)
         xAxis, yAxis = getOtherAxes(config["axis"])
         self.config.setDefault("xLabel", f"${xAxis} [UNIT]$")
         self.config.setDefault("yLabel", f"${yAxis} [UNIT]$")
@@ -108,13 +117,12 @@ class Slice(SnapFn):
         print(np.mean(data[:, :, 1]))
         print(np.max(data[:, :, 1]))
 
-    def plot(self, plt: plt.axes, result: Result) -> plt.Figure:
+    def plotData(self, plt: plt.axes, result: Result, colorbar=True):
+        xAxis, yAxis = getOtherAxes(self.config["axis"])
         cosmology = Cosmology({"a": result.a.value, "h": result.h.value})
+        if self.config["colorscale"] is None:
+            self.config["colorscale"] = getDefaultCmap(self.config["field"])
         with cosmology.unit_context():
-            fig = plt.figure()
-            super().showTimeIfDesired(fig, result)
-            xAxis, yAxis = getOtherAxes(self.config["axis"])
-            self.setupLabels()
             if self.config["vLim"] is not None:
                 vmin, vmax = self.config["vLim"]
             else:
@@ -127,10 +135,16 @@ class Slice(SnapFn):
             print(f"min: {np.min(result.data)}, max: {np.max(result.data)}")
             # imshow does not seem to support LogNorm for RGB data anymore
             if self.config["log"] and result.data.ndim != 3:
-                self.image(plt, result.data, result.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap=self.config["colorscale"])
+                self.image(plt, result.data, result.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap=self.config["colorscale"], colorbar=colorbar)
             else:
-                self.image(plt, result.data, result.extent, vmin=vmin, vmax=vmax, origin="lower", cmap=self.config["colorscale"])
-            return fig
+                self.image(plt, result.data, result.extent, vmin=vmin, vmax=vmax, origin="lower", cmap=self.config["colorscale"], colorbar=colorbar)
+
+    def plot(self, plt: plt.axes, result: Result) -> plt.Figure:
+        self.setupLabels()
+        fig = plt.figure()
+        super().showTimeIfDesired(fig, result)
+        self.plotData(plt, result)
+        return fig
 
 
 def getAxisByName(name: str) -> np.ndarray:

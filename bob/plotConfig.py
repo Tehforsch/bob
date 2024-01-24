@@ -41,7 +41,7 @@ class PlotConfig(dict):
 
     def verify(self) -> None:
         for param in self.unmentioned_params:
-            raise ValueError(f"Parameter set from plot config file that does not appear in set defaults: {param}")
+            print("unused: ", param)
         for param in self.required:
             if param not in self:
                 raise ValueError(f"Required parameter not set: {param}")

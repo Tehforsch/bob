@@ -28,7 +28,6 @@ class IonizationRate(MultiSetFn):
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        print(result)
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         ax.set_yscale("log")

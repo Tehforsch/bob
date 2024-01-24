@@ -8,7 +8,6 @@ from bob.result import Result
 from bob.plots.bobSlice import Slice
 from bob.plotConfig import PlotConfig
 
-
 class SourceField(Slice):
     def __init__(self, config: PlotConfig) -> None:
         config.setDefault("field", "Sources")
@@ -21,7 +20,9 @@ class SourceField(Slice):
         unit = result.data.unit
         coordUnit = (result.extent[1] - result.extent[0]) / result.data.shape[0]
         sigma = (self.config["sigma"] / coordUnit).to_value(1)
+        print(result.data)
         result.data = unit * scipy.ndimage.gaussian_filter(result.data.to_value(unit), sigma)
+        print(result.data)
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
