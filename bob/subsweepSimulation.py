@@ -95,7 +95,7 @@ class SubsweepSimulation(BaseSim):
     def get_timeseries(self, name: str) -> TimeSeries:
         return read_time_series(self.outputDir / config.TIME_SERIES_DIR_NAME / f"{name}.yml", name)
 
-    def get_timeseries_as_dataframe(self, name: str, yUnit, tUnit=None) -> pl.DataFrame:
+    def get_timeseries_as_dataframe(self, name: str, yUnit, tUnit=None, filterTrailingValues=False) -> pl.DataFrame:
         series = self.get_timeseries(name)
         df = pl.DataFrame(
             {
@@ -106,6 +106,9 @@ class SubsweepSimulation(BaseSim):
             df = df.with_columns(pl.Series(name="redshift", values=[val.to_value(1.0) for val in series.redshift]))
         if "time" in series.__dict__:
             df = df.with_columns(pl.Series(name="time", values=[val.to_value(tUnit) for val in series.time]))
+        if filterTrailingValues:
+            lastSnapshotTime = max(snap.time for snap in self.snapshots).to_value(tUnit)
+            df = df.filter(pl.col("time") <= lastSnapshotTime)
         return df
 
     def cosmology(self) -> Cosmology:

@@ -75,6 +75,7 @@ class MultiSlice(MultiSetFn):
                 isLeft = j == 0
                 isBottom = i == 2
                 isTop = i == 0
+                print(config["field"])
                 Slice(config).plotData(ax, d, colorbar=isRight)
                 self.setupLabels(ax, xlabel=isBottom, ylabel=isLeft)
                 if isTop:

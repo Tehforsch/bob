@@ -36,7 +36,7 @@ class ChainedTimeSeries(MultiSetFn):
             raise NotImplementedError("To do this, properly label sims in the df i guess")
         skip = 4 # first few data points show the pre-remapping result
         df = pl.concat(
-            [pl.concat([sim.get_timeseries_as_dataframe(self.config["series"], pq.Unit(self.config["yUnit"]))[skip:] for sim in sims]) for sims in sims]
+            [pl.concat([sim.get_timeseries_as_dataframe(self.config["series"], pq.Unit(self.config["yUnit"]), filterTrailingValues=True)[skip:] for sim in sims]) for sims in sims]
         )
         return df
 

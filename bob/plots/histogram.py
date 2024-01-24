@@ -21,10 +21,8 @@ class Histogram(SnapFn):
 
     def postHistogram(self, sim: Simulation, snap: Snapshot, fieldX: Field, fieldY: Field) -> Result:
         result = super().post(sim, snap)
-        print(fieldX, fieldY)
         dataX = fieldX.getData(snap).to_value(self.config["xUnit"], cu.with_H0(snap.H0))
         dataY = fieldY.getData(snap).to_value(self.config["yUnit"], cu.with_H0(snap.H0))
-        print(self.config["yUnit"])
         indices = self.filterFunction(snap)
         if indices is not None:
             dataX = dataX[indices]
