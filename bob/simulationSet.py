@@ -53,10 +53,20 @@ class SimulationSet(list):
             ]
 
 
+def getSims(folders, sim_type):
+    for folder in folders:
+        try:
+            sim = sim_type(folder)
+        except FileNotFoundError:
+            print("skipping sim that probably didnt run:", folder)
+            continue
+        yield sim
+
+
 def getSimsFromFolder(sim_type: Any, sim_set_folder: Path) -> SimulationSet:
     folders = [sim_set_folder / Path(folder) for folder in os.listdir(sim_set_folder) if stringIsInt(folder)]
     folders.sort(key=lambda x: int(str(x.stem)))
-    return SimulationSet(sim_type, (sim_type(folder) for folder in folders))
+    return SimulationSet(sim_type, getSims(folders, sim_type))
 
 
 def joined(simSets: List[SimulationSet]) -> SimulationSet:

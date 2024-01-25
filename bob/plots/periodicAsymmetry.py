@@ -27,16 +27,16 @@ class PeriodicAsymmetry(MultiSetFn):
                 data = snap.ionized_hydrogen_fraction()
                 coords = snap.position()
                 sourcePosX = coords[np.where(snap.source() > 0)][0][0]
-                epsilon = sourcePosX
+                epsilon = sourcePosX * 0.74
                 L = sim.boxSize()
-                print(L, epsilon)
+                # print(L, epsilon)
                 xcoord = np.dot(coords, np.array([1.0, 0.0, 0.0]))
                 right_mask = np.logical_and(xcoord < L / 2 + epsilon, xcoord > epsilon)
                 right_of_source = np.where(right_mask)
                 left_of_source = np.where(np.logical_not(right_mask))
-                print(right_of_source, left_of_source)
-                print(np.mean(coords[right_of_source], axis=0) / L)
-                print(np.mean(coords[left_of_source], axis=0) / L)
+                # print(right_of_source, left_of_source)
+                # print(np.mean(coords[right_of_source], axis=0) / L)
+                # print(np.mean(coords[left_of_source], axis=0) / L)
                 left = np.mean(data[left_of_source])
                 right = np.mean(data[right_of_source])
                 subdf = pl.DataFrame(

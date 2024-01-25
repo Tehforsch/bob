@@ -24,6 +24,7 @@ class IonizationData(Result):
         self.volumeAv: List[pq.Quantity] = []
         self.massAv: List[pq.Quantity] = []
         for sims in simSets:
+            print(sims[0].folder)
             self.addSims(sims)
 
     def addSims(self, sims: List[Simulation]) -> None:
