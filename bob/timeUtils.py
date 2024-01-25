@@ -27,6 +27,8 @@ def lin_interpolated(f: Callable[..., Any]) -> Callable[..., Any]:
             nValues = 500
             minValue = np.min(values)
             maxValue = np.max(values)
+            if minValue == maxValue:
+                return np.ones(values.shape) * f(minValue)
             xs = np.linspace(minValue, maxValue, nValues)
             ys = f(xs)
             assert np.all(np.diff(xs) > 0)

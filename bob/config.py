@@ -39,4 +39,5 @@ def setupAstropy() -> None:
     redshift = pq.def_unit("redshift", cu.redshift)
     littleh = pq.def_unit("littleh", cu.littleh)
     h = pq.def_unit("h", cu.littleh)
-    pq.set_enabled_units([pq.pc, pq.kpc, pq.Mpc, pq.m, pq.cm, pq.K, pq.kg, pq.g, pq.s, pq.yr, pq.Myr, pq.kyr, pq.J, redshift, littleh, h])
+    Gyr = pq.def_unit("Gyr", pq.yr * 1e9)
+    pq.set_enabled_units([pq.pc, pq.kpc, pq.Mpc, pq.m, pq.cm, pq.K, pq.kg, pq.g, pq.s, pq.yr, pq.Myr, pq.kyr, pq.J, redshift, littleh, h, Gyr])
