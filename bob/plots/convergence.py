@@ -82,10 +82,12 @@ class Convergence(MultiSetFn):
         df = df.with_row_count()
         # fix those runs where output was different
         df = df.with_columns(
-            corrected_for_wrong_run = pl
-            .when(pl.col("row_nr") == 30).then(pl.col("trun/n") / 2)
-            .when(pl.col("row_nr") == 31).then(pl.col("trun/n") / 2)
-            .when(pl.col("row_nr") == 32).then(pl.col("trun/n") / 2)
+            corrected_for_wrong_run=pl.when(pl.col("row_nr") == 30)
+            .then(pl.col("trun/n") / 2)
+            .when(pl.col("row_nr") == 31)
+            .then(pl.col("trun/n") / 2)
+            .when(pl.col("row_nr") == 32)
+            .then(pl.col("trun/n") / 2)
             .otherwise(pl.col("trun/n")),
         )
 
@@ -99,7 +101,7 @@ class Convergence(MultiSetFn):
             legend=True,
         )
 
-        sns.move_legend(axlol, loc='lower left', bbox_to_anchor=[0.0,-0.05])
+        sns.move_legend(axlol, loc="lower left", bbox_to_anchor=[0.0, -0.05])
         sns.lineplot(
             ax=ax2,
             data=df,

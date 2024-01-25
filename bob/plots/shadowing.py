@@ -63,8 +63,8 @@ class Shadowing(MultiSetFn):
             )
             vUnit = pq.Unit(self.config["vUnit"])
             image = ax.imshow(d.to_value(vUnit), extent=extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap="BuGn")
-            ax.set_xlim([-14.2,10])
-            ax.set_ylim([-14.2,10])
+            ax.set_xlim([-14.2, 10])
+            ax.set_ylim([-14.2, 10])
         xlabel = "x [\\text{pc}]"
         ylabel = "y [\\text{pc}]"
         axes[2][0].set_xlabel(xlabel)
@@ -74,21 +74,20 @@ class Shadowing(MultiSetFn):
         axes[1][0].set_ylabel(ylabel)
         axes[2][0].set_ylabel(ylabel)
 
-
         cbar = fig.colorbar(image, ax=axes.ravel().tolist())
         cbar.set_label(self.config["cLabel"])
 
-        for (i, axes) in enumerate(axes):
-            for (j, ax) in enumerate(axes):
-                ax.add_patch(plt.Circle((-14, 0), 0.4, color='white'))
-                ax.add_patch(plt.Circle((0, -14), 0.4, color='white'))
-                ax.add_patch(plt.Circle((0, 0), 4, facecolor='none', edgecolor='black', linestyle="--"))
+        for i, axes in enumerate(axes):
+            for j, ax in enumerate(axes):
+                ax.add_patch(plt.Circle((-14, 0), 0.4, color="white"))
+                ax.add_patch(plt.Circle((0, -14), 0.4, color="white"))
+                ax.add_patch(plt.Circle((0, 0), 4, facecolor="none", edgecolor="black", linestyle="--"))
                 maxExtent = 10
                 L = 16.0
                 r = 4.0
                 d = 14.0
-                alpha = acos(sqrt(1- r**2/d**2))
-                x1 = d+maxExtent
+                alpha = acos(sqrt(1 - r**2 / d**2))
+                x1 = d + maxExtent
                 y1 = x1 * tan(alpha)
                 ax.plot([-d, maxExtent], [0, y1], color="black")
                 ax.plot([0, y1], [-d, maxExtent], color="black")

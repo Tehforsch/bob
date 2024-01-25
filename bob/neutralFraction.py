@@ -1,4 +1,3 @@
-
 import numpy as np
 from bob.constants import kB, protonMass, gamma
 from bob.field import Field

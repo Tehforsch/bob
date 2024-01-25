@@ -16,6 +16,7 @@ from bob.allFields import allFields, getFieldByName
 from bob.field import Field
 from bob.plotConfig import PlotConfig
 
+
 def getDefaultCmap(field: str):
     e = {
         "temperature": "Reds",
@@ -33,6 +34,7 @@ def getDefaultCmap(field: str):
     else:
         print(f"Using default colormap for {field}")
         return "viridis"
+
 
 def getDataAtPoints(field: Field, snapshot: Snapshot, points: pq.Quantity) -> np.ndarray:
     lengthUnit = snapshot.lengthUnit
@@ -135,7 +137,15 @@ class Slice(SnapFn):
             print(f"min: {np.min(result.data)}, max: {np.max(result.data)}")
             # imshow does not seem to support LogNorm for RGB data anymore
             if self.config["log"] and result.data.ndim != 3:
-                self.image(plt, result.data, result.extent, norm=colors.LogNorm(vmin=vmin, vmax=vmax), origin="lower", cmap=self.config["colorscale"], colorbar=colorbar)
+                self.image(
+                    plt,
+                    result.data,
+                    result.extent,
+                    norm=colors.LogNorm(vmin=vmin, vmax=vmax),
+                    origin="lower",
+                    cmap=self.config["colorscale"],
+                    colorbar=colorbar,
+                )
             else:
                 self.image(plt, result.data, result.extent, vmin=vmin, vmax=vmax, origin="lower", cmap=self.config["colorscale"], colorbar=colorbar)
 

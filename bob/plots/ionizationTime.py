@@ -138,8 +138,10 @@ class IonizationTime(SetFn):
         (extent, ionizationTime) = getSlice(BasicField("ionization_time"), last_snap, self.config["axis"], 0.5)
         return (extent, shiftBySimAge(ionizationTime, sim))
 
+
 def shiftBySimAge(simTime, sim):
     from bob.timeUtils import redshiftToAge
+
     cosmology = sim.getCosmology()
     z = 1.0 / sim.cosmology()["a"] - 1.0
     age = redshiftToAge(cosmology, np.array([z]))
@@ -147,8 +149,10 @@ def shiftBySimAge(simTime, sim):
     print("a", np.min(time).to_value(pq.Myr), np.max(time).to_value(pq.Myr))
     return time
 
+
 def ageToRedshift(age, sim):
     from bob.timeUtils import ageToRedshift
+
     cosmology = sim.getCosmology()
     mask = np.where(age != np.inf)
     redshift = -np.ones(age.shape) * np.inf

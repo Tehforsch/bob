@@ -8,6 +8,7 @@ from bob.result import Result
 from bob.plots.bobSlice import Slice
 from bob.plotConfig import PlotConfig
 
+
 class SourceField(Slice):
     def __init__(self, config: PlotConfig) -> None:
         config.setDefault("field", "Sources")

@@ -83,7 +83,7 @@ class PostprocessingFunction(ABC):
             del kwargs["colorbar"]
         else:
             colorbar = False
-        image = ax.imshow(image.to_value(vUnit), extent=extent, aspect='auto', *args, **kwargs)
+        image = ax.imshow(image.to_value(vUnit), extent=extent, aspect="auto", *args, **kwargs)
         if colorbar:
             cbar = plt.colorbar(image)
             cbar.set_label(self.config["cLabel"])

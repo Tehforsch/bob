@@ -20,7 +20,6 @@ from bob.plots.bobSlice import Slice
 from bob.basicField import BasicField
 
 
-
 class MultiSlice(MultiSetFn):
     def __init__(self, config: PlotConfig) -> None:
         s = f"{config['field0']}_{config['field1']}_{config['field2']}"
@@ -40,8 +39,10 @@ class MultiSlice(MultiSetFn):
     def iterConfigs(self):
         for i in range(3):
             config = self.config
+
             def s(name):
-                config[name] = self.config[name + str(i)] 
+                config[name] = self.config[name + str(i)]
+
             s("vUnit")
             s("vLim")
             s("field")
@@ -56,18 +57,17 @@ class MultiSlice(MultiSetFn):
             sim = next(sim[0] for sim in simSets if int(str(sim[0].folder)) == entry[0])
             yield (sim, sim.snapshots[entry[1]])
 
-
     def post(self, simSets: MultiSet) -> Result:
         result = Result()
         result.data = []
         for config in self.iterConfigs():
-            for (sim, snap) in self.snapshots(simSets):
+            for sim, snap in self.snapshots(simSets):
                 result.data.append(Slice(config).post(sim, snap))
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> plt.Figure:
-        fig, axs = plt.subplots(3, 3, figsize=(11, 8), sharex=True, sharey=True,constrained_layout=True)
-        for (i, config) in enumerate(self.iterConfigs()):
+        fig, axs = plt.subplots(3, 3, figsize=(11, 8), sharex=True, sharey=True, constrained_layout=True)
+        for i, config in enumerate(self.iterConfigs()):
             for j in range(3):
                 d = result.data[i * 3 + j]
                 ax = axs[i][j]
@@ -79,4 +79,11 @@ class MultiSlice(MultiSetFn):
                 Slice(config).plotData(ax, d, colorbar=isRight)
                 self.setupLabels(ax, xlabel=isBottom, ylabel=isLeft)
                 if isTop:
-                    ax.annotate(self.config[f"title_snap{j}"], xy = (0.5, 0.9), xytext=(0.45, 0.9), xycoords="axes fraction", textcoords="axes fraction", fontsize=15)
+                    ax.annotate(
+                        self.config[f"title_snap{j}"],
+                        xy=(0.5, 0.9),
+                        xytext=(0.45, 0.9),
+                        xycoords="axes fraction",
+                        textcoords="axes fraction",
+                        fontsize=15,
+                    )

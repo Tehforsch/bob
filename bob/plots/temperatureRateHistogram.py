@@ -27,9 +27,7 @@ class TemperatureRateHistogram(Histogram):
         self.config.setDefault("xTicks", None)
         self.config.setDefault("yTicks", None)
 
-
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
-
         return super().postHistogram(sim, snap, BasicField(self.config["field"]), Temperature())
 
     def plot(self, plt: plt.axes, result: Result) -> None:

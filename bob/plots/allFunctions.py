@@ -72,7 +72,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     LuminosityOverTimeSubsweep,
     PeriodicAsymmetry,
     TemperatureRateHistogram,
-    MultiSlice
+    MultiSlice,
 ]
 
 for function in postprocessingFunctions:
