@@ -12,6 +12,7 @@ from bob.plotConfig import PlotConfig
 import bob.config as config
 from bob.util import isclose
 from bob.timeUtils import TimeQuantity
+from bob.subsweepSimulation import Cosmology
 
 
 def toCoarserGrid(velData: pq.Quantity, factor: int) -> pq.Quantity:
@@ -25,6 +26,8 @@ class IonizationTime(SetFn):
         super().__init__(config)
         self.config.setDefault("xUnit", pq.Mpc)
         self.config.setDefault("yUnit", pq.Mpc)
+        self.config.setDefault("colorbar", True)
+        self.config.setDefault("clabel", "z")
         self.config.setDefault("xLabel", "$x [h^{-1} \\mathrm{UNIT}]$")
         self.config.setDefault("yLabel", "$y [h^{-1} \\mathrm{UNIT}]$")
         self.config.setDefault("velocity", True)
@@ -45,78 +48,111 @@ class IonizationTime(SetFn):
         else:
             self.config.setDefault("vUnit", pq.Myr)
             self.config.setDefault("cLabel", "$t [\\mathrm{Myr}]$")
-            self.config.setDefault("vLim", [0.0, 2e2])
+        self.config.setDefault("quotient", None)
 
     def post(self, simSet: SimulationSet) -> Result:
         result = self.getIonizationTimeData(simSet)
-        if self.config["velocity"]:
-            if len(simSet) > 1:
-                raise NotImplementedError("ionization velocity not implemented for multiple sims")
-            snap = simSet[0].snapshots[-1]
-            timeUnit = pq.s
-            if (not isclose(snap.maxExtent[0], snap.maxExtent[1])) or (not isclose(snap.maxExtent[1], snap.maxExtent[2])):
-                raise NotImplementedError("ionization velocity not implemented for non-cubic box")
-            lengthUnit = snap.maxExtent[0] / config.dpi
-            dataUnit = lengthUnit / timeUnit
-            grad = np.gradient(result.time.to_value(timeUnit))
-            result.velX = 1.0 / grad[0]
-            result.velY = 1.0 / grad[1]
-            result.velX[np.isnan(result.velX)] = 0.0
-            result.velY[np.isnan(result.velY)] = 0.0
-            result.velX[np.isinf(result.velX)] = 0.0
-            result.velY[np.isinf(result.velY)] = 0.0
-            result.velX = toCoarserGrid(result.velX, self.config["coarseness"])
-            result.velY = toCoarserGrid(result.velY, self.config["coarseness"])
-            sigma = self.config["smoothingSigma"]
-            result.velX = dataUnit * scipy.ndimage.gaussian_filter(result.velX, sigma)
-            result.velY = dataUnit * scipy.ndimage.gaussian_filter(result.velY, sigma)
-            if self.config["norm"]:
-                norm = np.sqrt(result.velX**2 + result.velY**2)
-                result.velX = result.velX / norm
-                result.velY = result.velY / norm
+        cosmology = simSet[0].cosmology()
+        result.a = cosmology["a"] * pq.dimensionless_unscaled
+        result.h = cosmology["h"] * pq.dimensionless_unscaled
+        snap = simSet[0].snapshots[-1]
+        with cosmology.unit_context():
+            if self.config["velocity"]:
+                timeUnit = pq.s
+                if (not isclose(snap.maxExtent[0], snap.maxExtent[1])) or (not isclose(snap.maxExtent[1], snap.maxExtent[2])):
+                    raise NotImplementedError("ionization velocity not implemented for non-cubic box")
+                lengthUnit = snap.maxExtent[0] / config.dpi
+                dataUnit = lengthUnit / timeUnit
+                grad = np.gradient(result.time.to_value(timeUnit))
+                result.velX = 1.0 / grad[0]
+                result.velY = 1.0 / grad[1]
+                result.velX[np.isnan(result.velX)] = 0.0
+                result.velY[np.isnan(result.velY)] = 0.0
+                result.velX[np.isinf(result.velX)] = 0.0
+                result.velY[np.isinf(result.velY)] = 0.0
+                result.velX = toCoarserGrid(result.velX, self.config["coarseness"])
+                result.velY = toCoarserGrid(result.velY, self.config["coarseness"])
+                sigma = pq.Quantity(self.config["smoothingSigma"]).to_value(lengthUnit)
+                result.velX = dataUnit * scipy.ndimage.gaussian_filter(result.velX, sigma)
+                result.velY = dataUnit * scipy.ndimage.gaussian_filter(result.velY, sigma)
+                if self.config["norm"]:
+                    norm = np.sqrt(result.velX**2 + result.velY**2)
+                    result.velX = result.velX / norm
+                    result.velY = result.velY / norm
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        self.setupLabels()
-        fig, ax = plt.subplots(1, 1)
-        vmin, vmax = self.config["vLim"]
-        # Dont know why exactly but if we dont flip this, the results are in the wrong position
-        result.showTime = np.flip(result.showTime, axis=0)
-        self.image(ax, result.showTime, result.extent, cmap="Reds", vmin=vmin, vmax=vmax)
-        if self.config["velocity"]:
-            (xlen, ylen) = result.showTime.shape
-            xUnit = self.config["xUnit"]
-            yUnit = self.config["yUnit"]
-            X, Y = np.meshgrid(
-                np.linspace(result.extent[0].to_value(xUnit), result.extent[1].to_value(xUnit), xlen // self.config["coarseness"]),
-                np.linspace(result.extent[2].to_value(yUnit), result.extent[3].to_value(yUnit), ylen // self.config["coarseness"]),
-            )
+        cosmology = Cosmology({"a": result.a.value, "h": result.h.value})
+        with cosmology.unit_context():
+            self.setupLabels()
+            fig, ax = plt.subplots(1, 1)
+            if "vLim" in self.config:
+                vmin, vmax = self.config["vLim"]
+            else:
+                vmin, vmax = 0, np.max(result.redshift)
+            # Dont know why exactly but if we dont flip this, the results are in the wrong position
+            result.redshift = np.flip(result.redshift, axis=0)
+            self.image(ax, result.redshift, result.extent, cmap="Reds", vmin=vmin, vmax=vmax, colorbar=self.config["colorbar"])
+            if self.config["velocity"]:
+                (xlen, ylen) = result.redshift.shape
+                xUnit = self.config["xUnit"]
+                yUnit = self.config["yUnit"]
+                X, Y = np.meshgrid(
+                    np.linspace(result.extent[0].to_value(xUnit), result.extent[1].to_value(xUnit), xlen // self.config["coarseness"]),
+                    np.linspace(result.extent[2].to_value(yUnit), result.extent[3].to_value(yUnit), ylen // self.config["coarseness"]),
+                )
 
-            ax.quiver(
-                X,
-                Y,
-                result.velY.to_value(self.config["velUnit"]),
-                result.velX.to_value(self.config["velUnit"]),
-            )
+                ax.quiver(
+                    X,
+                    Y,
+                    result.velY.to_value(self.config["velUnit"]),
+                    result.velX.to_value(self.config["velUnit"]),
+                )
 
     def getIonizationTimeData(self, simSet: SimulationSet) -> Result:
-        if len(simSet) != 1:
-            raise NotImplementedError("No implementation for multiple sims per set for ionizationTime")
-        sim = simSet[0]
+        result = Result()
+        extent = None
+        for sim in simSet:
+            (nextent, data) = self.getIonizationTimeDataForSim(sim)
+            if extent is None:
+                extent = nextent
+            if "time" not in result.__dict__:
+                result.time = data
+            else:
+                # only update the inf values
+                mask = np.where(result.time == np.inf)
+                result.time[mask] = data[mask]
+            mask = np.where(result.time == np.inf)
+            if result.time[mask].shape == (0,):
+                print("No more infinity values. Done")
+                break
+        result.extent = list(extent)
+        # result.time = ionizationTime
+        result.redshift = ageToRedshift(result.time, sim)
+        return result
+
+    def getIonizationTimeDataForSim(self, sim) -> Result:
         if len(sim.snapshots) == 0:
             raise ValueError("No snapshots in sim")
-        snap = sim.snapshots[-1]
-        (extent, ionizationTime) = getSlice(BasicField("IonizationTime"), snap, self.config["axis"], 0.5)
-        result = Result()
-        result.extent = list(extent)
-        ionizationTime = TimeQuantity(sim, ionizationTime)
-        if self.config["time"] == "z":
-            result.showTime = ionizationTime.redshift()
-        else:
-            result.showTime = ionizationTime.time()
-        if self.config["velocity"]:
-            if sim.simType().is_cosmological():
-                result.time = ionizationTime.age()
-            else:
-                result.time = ionizationTime.time()
-        return result
+        last_snap = sim.snapshots[-1]
+        (extent, ionizationTime) = getSlice(BasicField("ionization_time"), last_snap, self.config["axis"], 0.5)
+        return (extent, shiftBySimAge(ionizationTime, sim))
+
+def shiftBySimAge(simTime, sim):
+    from bob.timeUtils import redshiftToAge
+    cosmology = sim.getCosmology()
+    z = 1.0 / sim.cosmology()["a"] - 1.0
+    age = redshiftToAge(cosmology, np.array([z]))
+    time = age + simTime
+    print("a", np.min(time).to_value(pq.Myr), np.max(time).to_value(pq.Myr))
+    return time
+
+def ageToRedshift(age, sim):
+    from bob.timeUtils import ageToRedshift
+    cosmology = sim.getCosmology()
+    mask = np.where(age != np.inf)
+    redshift = -np.ones(age.shape) * np.inf
+    print(np.mean(age[mask]))
+    print(np.mean(ageToRedshift(cosmology, age[mask])))
+    redshift[mask] = ageToRedshift(cosmology, age[mask])
+    return redshift * pq.dimensionless_unscaled

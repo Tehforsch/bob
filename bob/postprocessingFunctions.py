@@ -78,8 +78,11 @@ class PostprocessingFunction(ABC):
         yUnit = pq.Unit(self.config["yUnit"])
         extent = (extent[0].to_value(xUnit), extent[1].to_value(xUnit), extent[2].to_value(yUnit), extent[3].to_value(yUnit))
         vUnit = pq.Unit(self.config["vUnit"])
-        colorbar = kwargs["colorbar"]
-        del kwargs["colorbar"]
+        if "colorbar" in kwargs:
+            colorbar = kwargs["colorbar"]
+            del kwargs["colorbar"]
+        else:
+            colorbar = False
         image = ax.imshow(image.to_value(vUnit), extent=extent, aspect='auto', *args, **kwargs)
         if colorbar:
             cbar = plt.colorbar(image)
