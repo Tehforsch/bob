@@ -61,13 +61,12 @@ class MultiSlice(MultiSetFn):
         result = Result()
         result.data = []
         for config in self.iterConfigs():
-            for (i, (sim, snap)) in enumerate(self.snapshots(simSets)):
+            for i, (sim, snap) in enumerate(self.snapshots(simSets)):
                 result.data.append(Slice(config).post(sim, snap))
                 param = f"title_snap{i}"
                 if self.config[param] is None:
                     redshift = float(snap.timeQuantity("z"))
                     self.config[param] = f"$z={redshift:.2}$"
-
 
         return result
 

@@ -47,7 +47,7 @@ class Ionization(MultiSetFn):
         self.config.setDefault("split", True)
 
     def post(self, simSets: MultiSet) -> Result:
-        for (label, sims) in zip(self.getLabels(), simSets):
+        for label, sims in zip(self.getLabels(), simSets):
             print(label, sims[0].folder)
         data = [IonizationData(sim) for sim in simSets]
         result = Result()
@@ -74,7 +74,7 @@ class Ionization(MultiSetFn):
                 self.addConstraintsToAxis(ax)
 
         for data, color in zip(result.data, itertools.cycle(colors)):
-            for (redshift, neutralVolumeAv, neutralMassAv) in zip(data.redshift, data.volumeAv, data.massAv):
+            for redshift, neutralVolumeAv, neutralMassAv in zip(data.redshift, data.volumeAv, data.massAv):
                 for ax in axes:
                     self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, ax, color)
         # add legend labels

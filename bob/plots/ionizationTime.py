@@ -137,8 +137,16 @@ class IonizationTime(SetFn):
         if len(sim.snapshots) == 0:
             raise ValueError("No snapshots in sim")
         last_snap = sim.snapshots[-1]
-        (extent, ionizationTime) = getSlice(BasicField("ionization_time"), last_snap, self.config["axis"], 0.5)
-        return (extent, shiftBySimAge(ionizationTime, sim))
+        with sim.comovingUnits():
+            (extent, ionizationTime) = getSlice(
+                BasicField("ionization_time"),
+                last_snap,
+                self.config["axis"],
+                0.5,
+                minExtent=self.config["minExtent"],
+                maxExtent=self.config["maxExtent"],
+            )
+            return (extent, shiftBySimAge(ionizationTime, sim))
 
 
 def shiftBySimAge(simTime, sim):

@@ -46,7 +46,11 @@ def getDataAtPoints(field: Field, snapshot: Snapshot, points: pq.Quantity) -> np
     return data[cellIndices]
 
 
-def getSlice(field: Field, snapshot: Snapshot, axisName: str, position: float, minExtent=None, maxExtent=None) -> Tuple[Tuple[float, float, float, float], pq.Quantity]:
+def getSlice(
+    field: Field, snapshot: Snapshot, axisName: str, position: float, minExtent=None, maxExtent=None
+) -> Tuple[Tuple[float, float, float, float], pq.Quantity]:
+    minExtent = readExtentConfig(minExtent)
+    maxExtent = readExtentConfig(maxExtent)
     axis = getAxisByName(axisName)
     axis = np.array(axis)
     center = (snapshot.maxExtent * axis) * position
@@ -66,6 +70,21 @@ def getSlice(field: Field, snapshot: Snapshot, axisName: str, position: float, m
         return (min1, max1, min2, max2), data.reshape((n1, n2))
     else:
         return (min1, max1, min2, max2), data.reshape((n1, n2, 3))
+
+
+def readExtentConfig(entry):
+    if entry is None:
+        return None
+    x = pq.Quantity(entry[0])
+    y = pq.Quantity(entry[1])
+    z = pq.Quantity(entry[2])
+    return x.unit * np.array(
+        [
+            x.to_value(x.unit),
+            y.to_value(y.unit),
+            z.to_value(z.unit),
+        ]
+    )
 
 
 class Slice(SnapFn):
@@ -92,6 +111,8 @@ class Slice(SnapFn):
         self.config.setDefault("logmax2", 0)
         self.config.setDefault("relativePosition", 0.5)
         self.config.setDefault("name", self.name + "_{simName}_{snapName}_{field}_{axis}")
+        self.config.setDefault("minExtent", None)
+        self.config.setDefault("maxExtent", None)
 
     @property
     def field(self) -> Field:
@@ -99,13 +120,22 @@ class Slice(SnapFn):
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
         result = super().post(sim, snap)
-        (extent, result.data) = getSlice(self.field, snap, self.config["axis"], self.config["relativePosition"])
-        result.data = result.data.to(self.config["vUnit"], cu.with_H0(snap.H0))
-        result.extent = list(extent)
-        print(f"Field: {self.field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
         result.a = sim.scale_factor()
         result.h = sim.little_h * pq.dimensionless_unscaled
-        return result
+        cosmology = Cosmology({"a": result.a.value, "h": result.h.value})
+        with cosmology.unit_context():
+            (extent, result.data) = getSlice(
+                self.field,
+                snap,
+                self.config["axis"],
+                self.config["relativePosition"],
+                minExtent=self.config["minExtent"],
+                maxExtent=self.config["maxExtent"],
+            )
+            result.data = result.data.to(self.config["vUnit"], cu.with_H0(snap.H0))
+            result.extent = list(extent)
+            print(f"Field: {self.field.niceName}: min: {np.min(result.data):.2e}, mean: {np.mean(result.data):.2e}, max: {np.max(result.data):.2e}")
+            return result
 
     def transformLog(self, data: pq.Quantity) -> pq.Quantity:
         epsilon = 1e-50
