@@ -24,7 +24,6 @@ class IonizationData(Result):
         self.volumeAv: List[pq.Quantity] = []
         self.massAv: List[pq.Quantity] = []
         for sims in simSets:
-            print(sims[0].folder)
             self.addSims(sims)
 
     def addSims(self, sims: List[Simulation]) -> None:
@@ -52,6 +51,8 @@ class Ionization(MultiSetFn):
         self.config.setDefault("split", True)
 
     def post(self, simSets: MultiSet) -> Result:
+        for (label, sims) in zip(self.getLabels(), simSets):
+            print(label, sims[0].folder)
         result = IonizationData(simSets)
         return result
 
