@@ -49,6 +49,8 @@ class IonizationTime(SetFn):
             self.config.setDefault("vUnit", pq.Myr)
             self.config.setDefault("cLabel", "$t [\\mathrm{Myr}]$")
         self.config.setDefault("quotient", None)
+        self.config.setDefault("minExtent", None)
+        self.config.setDefault("maxExtent", None)
 
     def post(self, simSet: SimulationSet) -> Result:
         result = self.getIonizationTimeData(simSet)

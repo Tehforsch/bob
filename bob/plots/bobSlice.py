@@ -46,15 +46,17 @@ def getDataAtPoints(field: Field, snapshot: Snapshot, points: pq.Quantity) -> np
     return data[cellIndices]
 
 
-def getSlice(field: Field, snapshot: Snapshot, axisName: str, position: float) -> Tuple[Tuple[float, float, float, float], pq.Quantity]:
+def getSlice(field: Field, snapshot: Snapshot, axisName: str, position: float, minExtent=None, maxExtent=None) -> Tuple[Tuple[float, float, float, float], pq.Quantity]:
     axis = getAxisByName(axisName)
     axis = np.array(axis)
     center = (snapshot.maxExtent * axis) * position
     ortho1, ortho2 = findOrthogonalAxes(axis)
-    min1 = np.dot(ortho1, snapshot.minExtent)
-    min2 = np.dot(ortho2, snapshot.minExtent)
-    max1 = np.dot(ortho1, snapshot.maxExtent)
-    max2 = np.dot(ortho2, snapshot.maxExtent)
+    minExtent = snapshot.minExtent if minExtent is None else minExtent
+    maxExtent = snapshot.maxExtent if maxExtent is None else maxExtent
+    min1 = np.dot(ortho1, minExtent)
+    min2 = np.dot(ortho2, minExtent)
+    max1 = np.dot(ortho1, maxExtent)
+    max2 = np.dot(ortho2, maxExtent)
     n1 = config.dpi * 1
     n2 = config.dpi * 1
     p1, p2 = np.meshgrid(np.linspace(min1, max1, n1), np.linspace(min2, max2, n2))
