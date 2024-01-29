@@ -23,30 +23,21 @@ class IonizationData(Result):
         self.redshift: List[pq.Quantity] = []
         self.volumeAv: List[pq.Quantity] = []
         self.massAv: List[pq.Quantity] = []
-        for sims in simSets:
-            self.addSims(sims)
+        self.addSims(simSets)
 
     def addSims(self, sims: List[Simulation]) -> None:
-        data = []
-        num = 0
+        print(sims)
         for sim in sims:
-            lastSnapshotTime = max(snap.time for snap in sim.snapshots)
+            data = []
             for redshift, time, *remainder in sim.get_ionization_data():
-                if time > lastSnapshotTime:
-                    num += 1
-                    continue
                 redshift = redshift
                 scale_factor = 1.0 / (1.0 + redshift)
                 data.append((scale_factor, redshift, *remainder))
 
-        print(f"Filtered {num} trailing values")
-        self.time.append(getArrayQuantity([d[0] for d in data]))
-        self.redshift.append(getArrayQuantity([d[1] for d in data]))
-        self.volumeAv.append((1.0 - np.array([d[2] for d in data])) * pq.dimensionless_unscaled)
-        self.massAv.append((1.0 - np.array([d[3] for d in data])) * pq.dimensionless_unscaled)
-        # print(data)
-        # self.volumeAvRate.append(np.array([d[4] for d in data]) / pq.s)
-        # self.massAvRate.append(np.array([d[5] for d in data]) / pq.s)
+            self.time.append(getArrayQuantity([d[0] for d in data]))
+            self.redshift.append(getArrayQuantity([d[1] for d in data]))
+            self.volumeAv.append((1.0 - np.array([d[2] for d in data])) * pq.dimensionless_unscaled)
+            self.massAv.append((1.0 - np.array([d[3] for d in data])) * pq.dimensionless_unscaled)
 
 
 class Ionization(MultiSetFn):
@@ -59,7 +50,9 @@ class Ionization(MultiSetFn):
     def post(self, simSets: MultiSet) -> Result:
         for (label, sims) in zip(self.getLabels(), simSets):
             print(label, sims[0].folder)
-        result = IonizationData(simSets)
+        data = [IonizationData(sim) for sim in simSets]
+        result = Result()
+        result.data = data
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
@@ -81,11 +74,13 @@ class Ionization(MultiSetFn):
             for ax in axes:
                 self.addConstraintsToAxis(ax)
 
-        for redshift, neutralVolumeAv, neutralMassAv, color in zip(result.redshift, result.volumeAv, result.massAv, itertools.cycle(colors)):
-            for ax in axes:
-                self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, ax, color)
+        for data, color in zip(result.data, itertools.cycle(colors)):
+            for (redshift, neutralVolumeAv, neutralMassAv) in zip(data.redshift, data.volumeAv, data.massAv):
+                print(redshift)
+                for ax in axes:
+                    self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, ax, color)
         # add legend labels
-        for _, label, color in zip(result.redshift, self.getLabels(), self.getColors()):
+        for _, label, color in zip(result.data, self.getLabels(), self.getColors()):
             axes[0].plot([], [], color=color, label=label, linewidth=3)
         axes[0].plot([], [], label="Volume av.", linestyle="-", linewidth=3, color="black")
         axes[0].plot([], [], label="Mass av.", linestyle="--", linewidth=3, color="black")
