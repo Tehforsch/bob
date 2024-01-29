@@ -31,7 +31,7 @@ class MultiSlice(MultiSetFn):
             config.setRequired("vLim" + str(i))
             config.setRequired("vUnit" + str(i))
             config.setRequired("cLabel" + str(i))
-            config.setRequired("title_snap" + str(i))
+            config.setDefault("title_snap" + str(i), None)
         sl = Slice(config)
         self.config = sl.config
         self.config["name"] = name
@@ -61,8 +61,14 @@ class MultiSlice(MultiSetFn):
         result = Result()
         result.data = []
         for config in self.iterConfigs():
-            for sim, snap in self.snapshots(simSets):
+            for (i, (sim, snap)) in enumerate(self.snapshots(simSets)):
                 result.data.append(Slice(config).post(sim, snap))
+                param = f"title_snap{i}"
+                if self.config[param] is None:
+                    redshift = float(snap.timeQuantity("z"))
+                    self.config[param] = f"$z={redshift:.2}$"
+
+
         return result
 
     def plot(self, plt: plt.axes, result: Result) -> plt.Figure:
