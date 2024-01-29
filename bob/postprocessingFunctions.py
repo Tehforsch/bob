@@ -103,7 +103,7 @@ class PostprocessingFunction(ABC):
             timeUnit = str(self.config["timeUnit"])
             fig.suptitle(f"Time: {time:.02f} {timeUnit}", fontsize=12)
         else:
-            fig.suptitle(f"Redshift: {result.time:.02f}", fontsize=12)
+            fig.suptitle(f"$z = {result.time:.02f}$", fontsize=14)
 
     def __repr__(self) -> str:
         return f"{self.name}: {self.config}"

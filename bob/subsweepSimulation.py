@@ -126,7 +126,7 @@ class SubsweepSimulation(BaseSim):
         redshift = mass_av.redshift
         mass_av = mass_av.value
         volume_av = self.get_timeseries("hydrogen_ionization_volume_average").value
-        volume_av_rate = self.get_timeseries("photoionization_rate_volume_average").value
+        volume_av_rate = self.get_timeseries("weighted_photoionization_rate_volume_average").value
         for z, t, m, v, r in zip(redshift, time, mass_av, volume_av, volume_av_rate):
             yield z, t, m, v, r, 0.0
 
