@@ -26,7 +26,6 @@ class IonizationData(Result):
         self.addSims(simSets)
 
     def addSims(self, sims: List[Simulation]) -> None:
-        print(sims)
         for sim in sims:
             data = []
             for redshift, time, *remainder in sim.get_ionization_data():
@@ -76,7 +75,6 @@ class Ionization(MultiSetFn):
 
         for data, color in zip(result.data, itertools.cycle(colors)):
             for (redshift, neutralVolumeAv, neutralMassAv) in zip(data.redshift, data.volumeAv, data.massAv):
-                print(redshift)
                 for ax in axes:
                     self.plotResultsToAxis(redshift, neutralVolumeAv, neutralMassAv, ax, color)
         # add legend labels
