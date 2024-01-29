@@ -60,8 +60,8 @@ class TemperatureOverTime(MeanFieldOverTime):
 
         for sublabel, subcolor in zip(sublabels, subcolors):
             plt.plot([], [], color=subcolor, label=sublabel)
-        plt.legend(loc="lower left")
-        if self.config["time"] == "t":
+        plt.legend(loc="lower right")
+        if self.config["time"] == "z":
             self.addConstraints(plt)
 
     def addConstraints(self, ax: plt.axes) -> None:
