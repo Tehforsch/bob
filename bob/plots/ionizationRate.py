@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import astropy.units as pq
 from astropy.io import ascii
 
+import itertools
 from bob.postprocessingFunctions import MultiSetFn
 from bob.result import Result
 from bob.multiSet import MultiSet
@@ -24,8 +25,13 @@ class IonizationRate(MultiSetFn):
         self.config.setDefault("xLim", [20, 0])
 
     def post(self, simSets: MultiSet) -> Result:
-        result = IonizationData(simSets)
+        for label, sims in zip(self.getLabels(), simSets):
+            print(label, sims[0].folder)
+        data = [IonizationData(sim, skip=5) for sim in simSets]
+        result = Result()
+        result.data = data
         return result
+
 
     def plot(self, plt: plt.axes, result: Result) -> None:
         fig = plt.figure()
@@ -34,11 +40,10 @@ class IonizationRate(MultiSetFn):
         self.setupLinePlot()
         labels = self.getLabels()
         colors = self.getColors()
-        for redshift, volumeRate, massRate, color, label in zip(result.redshift, result.volumeAvRate, result.massAvRate, colors, labels):
-            self.addLine(redshift, volumeRate, color=color, linestyle="-", label=label)
-            self.addLine(redshift, massRate, color=color, linestyle="--", label="")
-        plt.plot([], [], color="black", linestyle="-", label="volume av.")
-        plt.plot([], [], color="black", linestyle="--", label="mass av.")
+        for (data, color, label) in zip(result.data, itertools.cycle(colors), self.getLabels()):
+            for redshift, volumeRate in zip(data.redshift, data.volumeAvRate):
+                self.addLine(redshift, volumeRate, color=color, linestyle="-", label=label)
+        # plt.plot([], [], color="black", linestyle="-", label="volume av.")
         self.addConstraints()
         plt.legend(loc=self.config["legend_loc"])
 
@@ -59,10 +64,10 @@ class IonizationRate(MultiSetFn):
         gammacal11, ermgammacal11, erpgammacal11 = logToLin(lgammacal11, erlgammacal11, erlgammacal11)
 
         plt.errorbar(zcal11, gammacal11, yerr=[ermgammacal11, erpgammacal11], fmt="o", color="r", mec="r", label=r"Calverley+11", capsize=5)
-        plt.errorbar(zfc08, gamfc08 * 1e-12, yerr=e_gamfc08 * 1e-12, fmt="s", color="g", mec="g", label=r"Faucher-Giguere+08", capsize=5)
-        plt.errorbar(
-            zbb13, gambb13 * 1e-12, yerr=[-erpgbb13 * 1e-12, ermgbb13 * 1e-12], fmt="^", color="b", mec="b", label=r"Becker-Bolton+13", capsize=5
-        )
+        # plt.errorbar(zfc08, gamfc08 * 1e-12, yerr=e_gamfc08 * 1e-12, fmt="s", color="g", mec="g", label=r"Faucher-Giguere+08", capsize=5)
+        # plt.errorbar(
+        #     zbb13, gambb13 * 1e-12, yerr=[-erpgbb13 * 1e-12, ermgbb13 * 1e-12], fmt="^", color="b", mec="b", label=r"Becker-Bolton+13", capsize=5
+        # )
         plt.errorbar(
             zdal18, gamdal18 * 1e-12, yerr=[erpdal18 * 1e-12, ermdal18 * 1e-12], fmt="*", color="m", mec="m", label=r"D'Aloisio+18", capsize=5
         )

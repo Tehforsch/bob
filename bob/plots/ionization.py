@@ -18,17 +18,18 @@ from bob.timeUtils import TimeQuantity
 
 
 class IonizationData(Result):
-    def __init__(self, simSets: MultiSet) -> None:
+    def __init__(self, simSets: MultiSet, skip=0) -> None:
         self.time: List[pq.Quantity] = []
         self.redshift: List[pq.Quantity] = []
         self.volumeAv: List[pq.Quantity] = []
         self.massAv: List[pq.Quantity] = []
-        self.addSims(simSets)
+        self.volumeAvRate: List[pq.Quantity] = []
+        self.addSims(simSets, skip)
 
-    def addSims(self, sims: List[Simulation]) -> None:
+    def addSims(self, sims: List[Simulation], skip) -> None:
         for sim in sims:
             data = []
-            for redshift, time, *remainder in sim.get_ionization_data():
+            for redshift, time, *remainder in list(sim.get_ionization_data())[skip:]:
                 redshift = redshift
                 scale_factor = 1.0 / (1.0 + redshift)
                 data.append((scale_factor, redshift, *remainder))
@@ -37,6 +38,7 @@ class IonizationData(Result):
             self.redshift.append(getArrayQuantity([d[1] for d in data]))
             self.volumeAv.append((1.0 - np.array([d[2] for d in data])) * pq.dimensionless_unscaled)
             self.massAv.append((1.0 - np.array([d[3] for d in data])) * pq.dimensionless_unscaled)
+            self.volumeAvRate.append(getArrayQuantity([d[4] for d in data]))
 
 
 class Ionization(MultiSetFn):
