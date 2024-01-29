@@ -28,12 +28,18 @@ class IonizationData(Result):
 
     def addSims(self, sims: List[Simulation]) -> None:
         data = []
+        num = 0
         for sim in sims:
+            lastSnapshotTime = max(snap.time for snap in sim.snapshots)
             for redshift, time, *remainder in sim.get_ionization_data():
+                if time > lastSnapshotTime:
+                    num += 1
+                    continue
                 redshift = redshift
                 scale_factor = 1.0 / (1.0 + redshift)
                 data.append((scale_factor, redshift, *remainder))
 
+        print(f"Filtered {num} trailing values")
         self.time.append(getArrayQuantity([d[0] for d in data]))
         self.redshift.append(getArrayQuantity([d[1] for d in data]))
         self.volumeAv.append((1.0 - np.array([d[2] for d in data])) * pq.dimensionless_unscaled)
