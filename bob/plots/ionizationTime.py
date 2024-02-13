@@ -86,8 +86,8 @@ class IonizationTime(SetFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         cosmology = Cosmology({"a": result.a.value, "h": result.h.value})
         with cosmology.unit_context():
-            self.setupLabels()
             fig, ax = plt.subplots(1, 1)
+            self.setupLabels(ax)
             if "vLim" in self.config:
                 vmin, vmax = self.config["vLim"]
             else:
