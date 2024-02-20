@@ -182,10 +182,10 @@ class Slice(SnapFn):
                 self.image(plt, result.data, result.extent, vmin=vmin, vmax=vmax, origin="lower", cmap=self.config["colorscale"], colorbar=colorbar)
 
     def plot(self, plt: plt.axes, result: Result) -> plt.Figure:
-        self.setupLabels()
-        fig = plt.figure()
+        fig, ax = plt.subplots(1)
+        self.setupLabels(ax)
         super().showTimeIfDesired(fig, result)
-        self.plotData(plt, result)
+        self.plotData(ax, result)
         return fig
 
 
