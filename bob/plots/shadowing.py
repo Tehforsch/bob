@@ -30,7 +30,7 @@ class Shadowing(MultiSetFn):
         config.setDefault("xUnit", "pc")
         config.setDefault("yUnit", "pc")
         config.setDefault("vUnit", "s^-1 cm^-3")
-        config.setDefault("cLabel", "$R [\\text{s}^-1 \\text{cm}^-3]$")
+        config.setDefault("cLabel", "$R [\\text{s}^{-1} \\text{cm}^{-3}]$")
 
     def post(self, sims: MultiSet) -> Result:
         assert len(sims) == 3
@@ -92,18 +92,18 @@ class Shadowing(MultiSetFn):
                 ax.plot([-d, maxExtent], [0, y1], color="black")
                 ax.plot([0, y1], [-d, maxExtent], color="black")
                 if (i, j) == (0, 0):
-                    ax.annotate("3 \\text{kyr}", xy=(-4, 8), fontsize=15)
+                    ax.annotate("3 \\text{kyr}", xy=(-4, 8), fontsize=15, fc="red")
                 if (i, j) == (0, 1):
-                    ax.annotate("32 \\text{kyr}", xy=(-4, 8), fontsize=15)
+                    ax.annotate("32 \\text{kyr}", xy=(-4, 8), fontsize=15, fc="red")
                 if (i, j) == (0, 2):
-                    ax.annotate("48 \\text{kyr}", xy=(-4, 8), fontsize=15)
+                    ax.annotate("48 \\text{kyr}", xy=(-4, 8), fontsize=15, fc="red")
 
                 if (i, j) == (0, 0):
-                    ax.annotate("$32^3$", xy=(-13, -3), fontsize=15)
+                    ax.annotate("$32^3$", xy=(-13, -3), fontsize=15, fc="red")
                 if (i, j) == (1, 0):
-                    ax.annotate("$64^3$", xy=(-13, -3), fontsize=15)
+                    ax.annotate("$64^3$", xy=(-13, -3), fontsize=15, fc="red")
                 if (i, j) == (2, 0):
-                    ax.annotate("$128^3$", xy=(-13, -3), fontsize=15)
+                    ax.annotate("$128^3$", xy=(-13, -3), fontsize=15, fc="red")
 
         return fig
 
