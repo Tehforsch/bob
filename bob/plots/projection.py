@@ -21,6 +21,8 @@ from bob.plots.bobSlice import getDefaultCmap, Slice, readExtentConfig, getAxisB
 
 class Projection(SnapFn):
     def __init__(self, config: PlotConfig) -> None:
+        config.setDefault("statistic", "mean")
+        config.setDefault("name", "projection_{field}_" + config["statistic"] + "_{simName}_{snapName}")
         super().__init__(config)
         self.config.setDefault("field", "ionized_hydrogen_fraction", choices=[f.niceName for f in allFields])
         self.config.setDefault("xLabel", f"$x [UNIT]$")
@@ -29,7 +31,6 @@ class Projection(SnapFn):
         self.config.setDefault("xUnit", pq.Mpc)
         self.config.setDefault("yUnit", pq.Mpc)
         self.config.setDefault("vUnit", pq.dimensionless_unscaled)
-        self.config.setDefault("name", self.name + "_{simName}_{snapName}_{field}")
         self.config.setDefault("width", 0.1 * pq.Mpc)
         self.config.setDefault("position", 0.5)
         self.config.setDefault("vLim", None)
@@ -45,11 +46,11 @@ class Projection(SnapFn):
         coords = snap.coordinates
         center = snap.maxExtent * self.config["position"]
         mask = np.where(np.abs(coords[:, thirdAxis] - center[thirdAxis]) < self.config["width"])
-        data = self.field.getData(snap)[mask]
+        data = self.field.getData(snap)[mask].to_value(self.config["vUnit"])
         coords = coords[mask]
         x = coords[:, firstAxis].to(self.config["xUnit"])
         y = coords[:, secondAxis].to(self.config["yUnit"])
-        result.H, result.x_edges, result.y_edges, binnumber = scipy.stats.binned_statistic_2d(x, y, data, bins=self.config["bins"])
+        result.H, result.x_edges, result.y_edges, binnumber = scipy.stats.binned_statistic_2d(x, y, data, bins=self.config["bins"], statistic="min")
         result.H = result.H.T * pq.dimensionless_unscaled
         result.x_edges = result.x_edges * pq.dimensionless_unscaled
         result.y_edges = result.y_edges * pq.dimensionless_unscaled
@@ -58,6 +59,8 @@ class Projection(SnapFn):
     def plot(self, plt: plt.axes, result: Result) -> None:
         fig, ax = plt.subplots(1)
         self.setupLabels(ax=ax)
+        if self.config["colorscale"] is None:
+            self.config["colorscale"] = getDefaultCmap(self.config["field"])
         super().showTimeIfDesired(fig, result)
         X, Y = np.meshgrid(result.x_edges, result.y_edges)
         xDat = np.sum(result.H, axis=0)
@@ -68,5 +71,6 @@ class Projection(SnapFn):
         else:
             vmin = None
             vmax = None
-        res = ax.pcolormesh(X, Y, result.H, norm=colors.LogNorm(vmin=vmin, vmax=vmax))
+        res = ax.pcolormesh(X, Y, result.H, norm=colors.LogNorm(vmin=vmin, vmax=vmax),
+                            cmap=self.config["colorscale"])
         cbar = fig.colorbar(res)
