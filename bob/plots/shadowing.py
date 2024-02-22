@@ -92,18 +92,18 @@ class Shadowing(MultiSetFn):
                 ax.plot([-d, maxExtent], [0, y1], color="black")
                 ax.plot([0, y1], [-d, maxExtent], color="black")
                 if (i, j) == (0, 0):
-                    ax.annotate("3 \\text{kyr}", xy=(-4, 8), fontsize=15, fc="red")
+                    ax.annotate("3 \\text{kyr}", xy=(-4, 8), fontsize=15, color="red")
                 if (i, j) == (0, 1):
-                    ax.annotate("32 \\text{kyr}", xy=(-4, 8), fontsize=15, fc="red")
+                    ax.annotate("32 \\text{kyr}", xy=(-4, 8), fontsize=15, color="red")
                 if (i, j) == (0, 2):
-                    ax.annotate("48 \\text{kyr}", xy=(-4, 8), fontsize=15, fc="red")
+                    ax.annotate("48 \\text{kyr}", xy=(-4, 8), fontsize=15, color="red")
 
                 if (i, j) == (0, 0):
-                    ax.annotate("$32^3$", xy=(-13, -3), fontsize=15, fc="red")
+                    ax.annotate("$32^3$", xy=(-12, -3), fontsize=15, color="blue")
                 if (i, j) == (1, 0):
-                    ax.annotate("$64^3$", xy=(-13, -3), fontsize=15, fc="red")
+                    ax.annotate("$64^3$", xy=(-12, -3), fontsize=15, color="blue")
                 if (i, j) == (2, 0):
-                    ax.annotate("$128^3$", xy=(-13, -3), fontsize=15, fc="red")
+                    ax.annotate("$128^3$", xy=(-12, -3), fontsize=15, color="blue")
 
         return fig
 
