@@ -28,8 +28,12 @@ class Projection(SnapFn):
         self.config.setDefault("vLim", None)
         self.config.setDefault("xUnit", pq.Mpc)
         self.config.setDefault("yUnit", pq.Mpc)
+        self.config.setDefault("vUnit", pq.dimensionless_unscaled)
         self.config.setDefault("name", self.name + "_{simName}_{snapName}_{field}")
         self.config.setDefault("width", 0.1 * pq.Mpc)
+        self.config.setDefault("position", 0.5)
+        self.config.setDefault("vLim", None)
+        self.config.setDefault("bins", 800)
 
     @property
     def field(self) -> Field:
@@ -39,13 +43,13 @@ class Projection(SnapFn):
         firstAxis, secondAxis, thirdAxis = 0, 1, 2
         result = super().post(sim, snap)
         coords = snap.coordinates
-        center = snap.maxExtent * 0.5
+        center = snap.maxExtent * self.config["position"]
         mask = np.where(np.abs(coords[:, thirdAxis] - center[thirdAxis]) < self.config["width"])
         data = self.field.getData(snap)[mask]
         coords = coords[mask]
         x = coords[:, firstAxis].to(self.config["xUnit"])
         y = coords[:, secondAxis].to(self.config["yUnit"])
-        result.H, result.x_edges, result.y_edges, binnumber = scipy.stats.binned_statistic_2d(x, y, data)
+        result.H, result.x_edges, result.y_edges, binnumber = scipy.stats.binned_statistic_2d(x, y, data, bins=self.config["bins"])
         result.H = result.H.T * pq.dimensionless_unscaled
         result.x_edges = result.x_edges * pq.dimensionless_unscaled
         result.y_edges = result.y_edges * pq.dimensionless_unscaled
@@ -58,4 +62,11 @@ class Projection(SnapFn):
         X, Y = np.meshgrid(result.x_edges, result.y_edges)
         xDat = np.sum(result.H, axis=0)
         yDat = np.sum(result.H, axis=1)
-        ax.pcolormesh(X, Y, result.H, norm=colors.LogNorm())
+        if self.config["vLim"] is not None:
+            vmin = pq.Quantity(self.config["vLim"][0]).to_value(self.config["vUnit"])
+            vmax = pq.Quantity(self.config["vLim"][1]).to_value(self.config["vUnit"])
+        else:
+            vmin = None
+            vmax = None
+        res = ax.pcolormesh(X, Y, result.H, norm=colors.LogNorm(vmin=vmin, vmax=vmax))
+        cbar = fig.colorbar(res)
