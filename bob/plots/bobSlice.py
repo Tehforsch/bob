@@ -39,10 +39,17 @@ def getDefaultCmap(field: str):
 def getDataAtPoints(field: Field, snapshot: Snapshot, points: pq.Quantity) -> np.ndarray:
     lengthUnit = snapshot.lengthUnit
     coords = snapshot.coordinates.to(lengthUnit, cu.with_H0(snapshot.H0)).value
+    density = snapshot.density()
+    proton_mass = pq.kg * 1.67e-27
+    numberdensity = (density / proton_mass).to(1 / pq.cm**3)
+    mask = np.where(numberdensity > 10 * pq.cm**-3)
+    print(coords.shape)
+    coords = coords[mask]
+    print(coords.shape)
     points = points.to(snapshot.lengthUnit, cu.with_H0(snapshot.H0))
     tree = cKDTree(coords)
     cellIndices = tree.query(points)[1]
-    data = field.getData(snapshot)
+    data = field.getData(snapshot)[mask]
     return data[cellIndices]
 
 
