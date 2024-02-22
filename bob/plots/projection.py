@@ -31,7 +31,8 @@ class Projection(SnapFn):
         self.config.setDefault("xUnit", pq.Mpc)
         self.config.setDefault("yUnit", pq.Mpc)
         self.config.setDefault("vUnit", pq.dimensionless_unscaled)
-        self.config.setDefault("width", 0.1 * pq.Mpc)
+        self.config.setRequired("width")
+        self.config.setRequired("widthUnit")
         self.config.setDefault("position", 0.5)
         self.config.setDefault("vLim", None)
         self.config.setDefault("bins", 800)
@@ -42,36 +43,49 @@ class Projection(SnapFn):
         return getFieldByName(self.config["field"])
 
     def post(self, sim: Simulation, snap: Snapshot) -> Result:
-        firstAxis, secondAxis, thirdAxis = 0, 1, 2
         result = super().post(sim, snap)
-        coords = snap.coordinates
-        center = snap.maxExtent * self.config["position"]
-        mask = np.where(np.abs(coords[:, thirdAxis] - center[thirdAxis]) < self.config["width"])
-        data = self.field.getData(snap)[mask].to_value(self.config["vUnit"])
-        coords = coords[mask]
-        x = coords[:, firstAxis].to(self.config["xUnit"])
-        y = coords[:, secondAxis].to(self.config["yUnit"])
-        result.H, result.x_edges, result.y_edges, binnumber = scipy.stats.binned_statistic_2d(x, y, data, bins=self.config["bins"], statistic="min")
-        result.H = result.H.T * pq.dimensionless_unscaled
-        result.x_edges = result.x_edges * pq.dimensionless_unscaled
-        result.y_edges = result.y_edges * pq.dimensionless_unscaled
-        return result
+        result.a = sim.scale_factor()
+        result.h = sim.little_h * pq.dimensionless_unscaled
+        cosmology = Cosmology({"a": result.a.value, "h": result.h.value})
+        with cosmology.unit_context():
+            xUnit = pq.Unit(self.config["xUnit"])
+            yUnit = pq.Unit(self.config["yUnit"])
+            widthUnit = pq.Unit(self.config["widthUnit"])
+            firstAxis, secondAxis, thirdAxis = 0, 1, 2
+            coords = snap.coordinates
+            lUnit = coords.unit
+            center = (snap.maxExtent * self.config["position"]).to(lUnit)
+            width = (self.config["width"] * widthUnit).to(lUnit)
+            mask = np.where(np.abs(coords[:, thirdAxis] - center[thirdAxis]) < width)
+            data = self.field.getData(snap)[mask]
+            data = data.to_value(self.config["vUnit"])
+            print("Filtered field: ", np.min(data), np.mean(data), np.max(data))
+            coords = coords[mask]
+            x = coords[:, firstAxis].to(xUnit)
+            y = coords[:, secondAxis].to(yUnit)
+            result.H, result.x_edges, result.y_edges, binnumber = scipy.stats.binned_statistic_2d(x, y, data, bins=self.config["bins"], statistic="min")
+            result.H = result.H.T * pq.dimensionless_unscaled
+            result.x_edges = result.x_edges * pq.dimensionless_unscaled
+            result.y_edges = result.y_edges * pq.dimensionless_unscaled
+            return result
 
     def plot(self, plt: plt.axes, result: Result) -> None:
-        fig, ax = plt.subplots(1)
-        self.setupLabels(ax=ax)
-        if self.config["colorscale"] is None:
-            self.config["colorscale"] = getDefaultCmap(self.config["field"])
-        super().showTimeIfDesired(fig, result)
-        X, Y = np.meshgrid(result.x_edges, result.y_edges)
-        xDat = np.sum(result.H, axis=0)
-        yDat = np.sum(result.H, axis=1)
-        if self.config["vLim"] is not None:
-            vmin = pq.Quantity(self.config["vLim"][0]).to_value(self.config["vUnit"])
-            vmax = pq.Quantity(self.config["vLim"][1]).to_value(self.config["vUnit"])
-        else:
-            vmin = None
-            vmax = None
-        res = ax.pcolormesh(X, Y, result.H, norm=colors.LogNorm(vmin=vmin, vmax=vmax),
-                            cmap=self.config["colorscale"])
-        cbar = fig.colorbar(res)
+        cosmology = Cosmology({"a": result.a.value, "h": result.h.value})
+        with cosmology.unit_context():
+            fig, ax = plt.subplots(1)
+            self.setupLabels(ax=ax)
+            if self.config["colorscale"] is None:
+                self.config["colorscale"] = getDefaultCmap(self.config["field"])
+            super().showTimeIfDesired(fig, result)
+            X, Y = np.meshgrid(result.x_edges, result.y_edges)
+            xDat = np.sum(result.H, axis=0)
+            yDat = np.sum(result.H, axis=1)
+            if self.config["vLim"] is not None:
+                vmin = pq.Quantity(self.config["vLim"][0]).to_value(self.config["vUnit"])
+                vmax = pq.Quantity(self.config["vLim"][1]).to_value(self.config["vUnit"])
+            else:
+                vmin = None
+                vmax = None
+            res = ax.pcolormesh(X, Y, result.H, norm=colors.LogNorm(vmin=vmin, vmax=vmax),
+                                cmap=self.config["colorscale"])
+            cbar = fig.colorbar(res)
