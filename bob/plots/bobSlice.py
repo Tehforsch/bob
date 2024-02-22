@@ -91,17 +91,16 @@ class Slice(SnapFn):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
         self.config.setDefault("axis", "z", choices=["x", "y", "z"])
-        self.config.setDefault("field", "Abundance1", choices=[f.niceName for f in allFields])
-        print(self.config["field"])
+        self.config.setDefault("field", "ionized_hydrogen_fraction", choices=[f.niceName for f in allFields])
         self.config.setDefault("colorscale", None)
         xAxis, yAxis = getOtherAxes(config["axis"])
         self.config.setDefault("xLabel", f"${xAxis} [UNIT]$")
         self.config.setDefault("yLabel", f"${yAxis} [UNIT]$")
+        self.config.setDefault("vUnit", self.field.unit)
         self.config.setDefault("cLabel", "{} [${}$]".format(self.field.niceName, str(self.config["vUnit"])))
         self.config.setDefault("vLim", None)
         self.config.setDefault("xUnit", pq.Mpc)
         self.config.setDefault("yUnit", pq.Mpc)
-        self.config.setDefault("vUnit", self.field.unit)
         self.config.setDefault("log", True)
         self.config.setDefault("logmin0", -9)
         self.config.setDefault("logmin1", -9)
@@ -113,6 +112,7 @@ class Slice(SnapFn):
         self.config.setDefault("name", self.name + "_{simName}_{snapName}_{field}_{axis}")
         self.config.setDefault("minExtent", None)
         self.config.setDefault("maxExtent", None)
+        self.dataFunction = getSlice
 
     @property
     def field(self) -> Field:
@@ -124,7 +124,7 @@ class Slice(SnapFn):
         result.h = sim.little_h * pq.dimensionless_unscaled
         cosmology = Cosmology({"a": result.a.value, "h": result.h.value})
         with cosmology.unit_context():
-            (extent, result.data) = getSlice(
+            (extent, result.data) = self.dataFunction(
                 self.field,
                 snap,
                 self.config["axis"],
@@ -190,7 +190,7 @@ class Slice(SnapFn):
 
 
 def getAxisByName(name: str) -> np.ndarray:
-    return [np.array([1.0, 0.0, 0.0]), np.array([0.0, 1.0, 0.0]), np.array([0.0, 0.0, 1.0])][["x", "y", "z"].index(name)]
+    return np.array([np.array([1.0, 0.0, 0.0]), np.array([0.0, 1.0, 0.0]), np.array([0.0, 0.0, 1.0])][["x", "y", "z"].index(name)])
 
 
 def getAxisName(axis: np.ndarray) -> str:

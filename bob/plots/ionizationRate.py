@@ -32,7 +32,6 @@ class IonizationRate(MultiSetFn):
         result.data = data
         return result
 
-
     def plot(self, plt: plt.axes, result: Result) -> None:
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
@@ -40,7 +39,7 @@ class IonizationRate(MultiSetFn):
         self.setupLinePlot()
         labels = self.getLabels()
         colors = self.getColors()
-        for (data, color, label) in zip(result.data, itertools.cycle(colors), self.getLabels()):
+        for data, color, label in zip(result.data, itertools.cycle(colors), self.getLabels()):
             for redshift, volumeRate in zip(data.redshift, data.volumeAvRate):
                 self.addLine(redshift, volumeRate, color=color, linestyle="-", label=label)
         # plt.plot([], [], color="black", linestyle="-", label="volume av.")

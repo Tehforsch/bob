@@ -15,7 +15,7 @@ class Slice1d(SnapFn):
     def __init__(self, config: PlotConfig) -> None:
         super().__init__(config)
         self.config.setDefault("axis", "z", choices=["x", "y", "z"])
-        self.config.setDefault("field", "Abundance1", choices=[f.niceName for f in allFields])
+        self.config.setDefault("field", "ionized_hydrogen_fraction", choices=[f.niceName for f in allFields])
         self.config.setDefault("xLabel", "$x [UNIT]$")
         self.config.setDefault("yLabel", "$v [UNIT]$")
         self.config.setDefault("xUnit", pq.Mpc)
