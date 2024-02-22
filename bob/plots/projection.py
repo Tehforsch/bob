@@ -35,6 +35,7 @@ class Projection(SnapFn):
         self.config.setDefault("position", 0.5)
         self.config.setDefault("vLim", None)
         self.config.setDefault("bins", 800)
+        self.config.setDefault("colorscale", None)
 
     @property
     def field(self) -> Field:
