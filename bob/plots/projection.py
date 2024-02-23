@@ -63,7 +63,9 @@ class Projection(SnapFn):
             coords = coords[mask]
             x = coords[:, firstAxis].to(xUnit)
             y = coords[:, secondAxis].to(yUnit)
-            result.H, result.x_edges, result.y_edges, binnumber = scipy.stats.binned_statistic_2d(x, y, data, bins=self.config["bins"], statistic="min")
+            result.H, result.x_edges, result.y_edges, binnumber = scipy.stats.binned_statistic_2d(
+                x, y, data, bins=self.config["bins"], statistic="min"
+            )
             result.H = result.H.T * pq.dimensionless_unscaled
             result.x_edges = result.x_edges * pq.dimensionless_unscaled
             result.y_edges = result.y_edges * pq.dimensionless_unscaled
@@ -86,6 +88,5 @@ class Projection(SnapFn):
             else:
                 vmin = None
                 vmax = None
-            res = ax.pcolormesh(X, Y, result.H, norm=colors.LogNorm(vmin=vmin, vmax=vmax),
-                                cmap=self.config["colorscale"])
+            res = ax.pcolormesh(X, Y, result.H, norm=colors.LogNorm(vmin=vmin, vmax=vmax), cmap=self.config["colorscale"])
             cbar = fig.colorbar(res)
