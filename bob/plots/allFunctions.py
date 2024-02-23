@@ -13,6 +13,7 @@ from bob.plots.bobSlice import Slice
 from bob.plots.slice_1d import Slice1d
 from bob.plots.shadowingVolume import ShadowingVolume
 from bob.plots.temperatureDensityHistogram import TemperatureDensityHistogram
+from bob.plots.densityIonizationHistogram import DensityIonizationHistogram
 from bob.plots.temperatureRateHistogram import TemperatureRateHistogram
 from bob.plots.temperatureIonizationHistogram import TemperatureIonizationHistogram
 from bob.plots.temperatureOverTime import TemperatureOverTime
@@ -51,6 +52,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     Slice1d,
     ShadowingVolume,
     TemperatureDensityHistogram,
+    DensityIonizationHistogram,
     TemperatureIonizationHistogram,
     TemperatureOverTime,
     LuminosityOverTime,
