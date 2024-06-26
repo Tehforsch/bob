@@ -18,7 +18,7 @@
     devShells.python = with pkgs;
     mkShell {
       buildInputs = [
-        texliveSmall
+        texliveFull
         (python3.withPackages (p: with p; [
           numpy
           pyyaml
