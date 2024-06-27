@@ -17,6 +17,7 @@
   in {
     devShells.python = with pkgs;
     mkShell {
+      name = "pybob";
       buildInputs = [
         texliveFull
         (python3.withPackages (p: with p; [
