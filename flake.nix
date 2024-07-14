@@ -15,7 +15,7 @@
     overlays = [ (import rust-overlay) ];
     pkgs = import nixpkgs { inherit system overlays; };
   in {
-    devShells.python = with pkgs;
+    devShells.default = with pkgs;
     mkShell {
       name = "pybob";
       buildInputs = [
