@@ -10,6 +10,7 @@ from bob.plotConfig import PlotConfig
 import polars as pl
 import seaborn as sns
 
+
 class PhotonConservation(MultiSetFn):
     def __init__(self, config: PlotConfig) -> None:
         config.setDefault("quotient", None)
@@ -30,15 +31,24 @@ class PhotonConservation(MultiSetFn):
                 n = sim.params["sweep"]["num_timestep_levels"]
                 final_value = df.top_k(1, by="time")["value"]
                 myr_in_s = (1.0 * pq.Myr).to_value(pq.s)
-                return df.with_columns((pl.lit(n)).alias("n")).with_columns((pl.lit(final_value)).alias("final_value")).with_columns((pl.col("time") / myr_in_s).alias("time_myr"))
+                resolution = int(sim.params["input"]["paths"][0].replace("ics/", "").replace(".hdf5", ""))
+                dt = pq.Quantity(sim.params["sweep"]["max_timestep"]).to_value(pq.s) / myr_in_s
+                df = pl.DataFrame({
+                    "n": n,
+                    "dt": dt,
+                    "resolution": resolution,
+                    "final_value": final_value
+                    })
+                print(df)
+                return df
 
         df = pl.concat([getDf(sim) for sim in sims])
         return df
 
     def plot(self, plt: plt.axes, df: Result) -> None:
-        print(df)
+        df = df
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         self.setupLinePlot()
         labels = self.getLabels()
-        sns.lineplot(x=df["time_myr"], y=df["value"], linestyle="-", hue=df["n"])
+        sns.lineplot(x=df["resolution"], y=df["final_value"], linestyle="-", hue=df["dt"])
