@@ -15,6 +15,7 @@ from bob.util import getArrayQuantity
 from bob.result import Result
 from bob.postprocessingFunctions import MultiSetFn
 from bob.multiSet import MultiSet
+from bob.fieldOverRadius import getDataForRadii
 
 
 def analyticalRTypeExpansion(t: np.ndarray) -> np.ndarray:
@@ -47,6 +48,18 @@ class Expansion(MultiSetFn):
             assert len(sims) == 1
             sim = sims[0]
             resolution = int(sim.params["input"]["paths"][0].replace("ics/", "").replace(".hdf5", ""))
+
+            time = 50 * u.Myr
+            snap = min(sim.snapshots, key=lambda snap: abs(snap.time - time))
+            print("---")
+            print(resolution)
+            print(snap, snap.time.to(u.Myr))
+            xhii = snap.ionized_hydrogen_fraction()
+            radii = np.linspace(0.0, 6.0, 50) * u.kpc
+            xs = getDataForRadii(xhii, np.array([6.4, 6.4, 6.4]) * u.kpc, snap.coordinates, radii)
+            print(radii.to(u.kpc))
+            print(xs.to(1.0))
+
             df = sim.get_timeseries_as_dataframe("hydrogen_ionization_mass_average", 1.0, "Myr")
             L = u.Quantity(sim.params["box_size"]).to_value(u.kpc)
             pi = 3.1415
