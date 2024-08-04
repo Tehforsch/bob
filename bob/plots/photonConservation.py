@@ -43,12 +43,15 @@ def getDf(sim):
         final_value = df.top_k(1, by="time")["value"]
         myr_in_s = (1.0 * pq.Myr).to_value(pq.s)
         resolution = int(sim.params["input"]["paths"][0].replace("ics/", "").replace(".hdf5", ""))
+        limiter = sim.params["sweep"]["limit_absorption"]
+
         dt = pq.Quantity(sim.params["sweep"]["max_timestep"]).to_value(pq.s) / myr_in_s
         df = pl.DataFrame({
             "n": n,
             "dt": dt,
             "resolution": resolution,
-            "final_value": final_value
+            "final_value": final_value,
+            "limiter": limiter
             })
         print(df)
         return df

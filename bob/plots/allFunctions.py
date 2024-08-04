@@ -38,6 +38,7 @@ from bob.plots.periodicAsymmetry import PeriodicAsymmetry
 from bob.plots.multiSlice import MultiSlice
 from bob.plots.projection import Projection
 from bob.plots.photonConservation import PhotonConservation
+from bob.plots.photonConservation import PhotonConservationN
 
 postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     SliceWithStarParticles,
@@ -79,6 +80,7 @@ postprocessingFunctions: List[Type[PostprocessingFunction]] = [
     MultiSlice,
     Projection,
     PhotonConservation,
+    PhotonConservationN,
 ]
 
 for function in postprocessingFunctions:
