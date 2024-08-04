@@ -1,3 +1,4 @@
+import numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as pq
 from bob.postprocessingFunctions import MultiSetFn
@@ -8,8 +9,9 @@ from bob.util import getArrayQuantity
 
 from bob.plotConfig import PlotConfig
 import polars as pl
-import seaborn as sns
 
+def makeQ(series):
+    return pq.dimensionless_unscaled * np.array(series)
 
 class PhotonConservation(MultiSetFn):
     def __init__(self, config: PlotConfig) -> None:
@@ -17,8 +19,8 @@ class PhotonConservation(MultiSetFn):
         super().__init__(config)
         config.setDefault("xUnit", "1.0", override=True)
         config.setDefault("yUnit", "1.0", override=True)
-        config.setDefault("xLabel", "t [Myr]")
-        config.setDefault("yLabel", "y")
+        config.setDefault("xLabel", "n")
+        config.setDefault("yLabel", "L(n)")
 
     def post(self, sims: MultiSet) -> Result:
         if len(sims) > 1:
@@ -29,12 +31,35 @@ class PhotonConservation(MultiSetFn):
         return df
 
     def plot(self, plt: plt.axes, df: Result) -> None:
-        df = df
+        df = df.with_columns(pl.Series(name="final_value", values= df["final_value"] / 2**2))
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         self.setupLinePlot()
         labels = self.getLabels()
-        sns.lineplot(x=df["resolution"], y=df["final_value"], linestyle="-", hue=df["dt"])
+        colors = self.getColors()
+        plt.ylim(0.0, 0.10)
+        # ITS FUCKING MATPLOTLIB TIME AGAIN. DONT YOU JUST LOVE IT? EVERYBODY PUT YOUR HANDS UP IN THE AIR
+        ax.set_xscale("log")
+        plt.tick_params(
+            axis='x',          # changes apply to the x-axis
+            which='minor',      # both major and minor ticks are affected
+            bottom=False,      # ticks along the bottom edge are off
+            top=False,         # ticks along the top edge are off
+            labelbottom=False) # labels along the bottom edge are off
+        resolutions = [16, 32, 64, 128]
+        ax.set_xticks(resolutions, [f"${resolution}^3$" for resolution in resolutions])
+        for (color, timestep) in zip(colors, [0.00002, 0.00005, 0.0001, 0.0002, 0.0004, 0.0008]):
+            label = f"${int(timestep * 1000000)} \; \\mathrm{{yr}}$"
+            print(label)
+            sub = df.filter(pl.col("dt") == timestep)
+            df1 = sub.filter(pl.col("limiter") == True)
+            df2 = sub.filter(pl.col("limiter") == False)
+            print(df1, df2)
+            self.addLine(makeQ(df1["resolution"]), makeQ(df1["final_value"]), label=label, color= color)
+            self.addLine(makeQ(df2["resolution"]), makeQ(df2["final_value"]), label="", color= color, linestyle="--")
+        self.addLine(makeQ([]), makeQ([]), label="Limiter", color= "black")
+        self.addLine(makeQ([]), makeQ([]), label="No Limiter", color= "black", linestyle="--")
+        plt.legend(ncol = 2, labelspacing=0.25)
 
 def getDf(sim):
     with sim.comovingUnits() as _:
@@ -74,9 +99,31 @@ class PhotonConservationN(PhotonConservation):
         return df
 
     def plot(self, plt: plt.axes, df: Result) -> None:
-        df = df
+        df = df.with_columns(pl.Series(name="final_value", values= df["final_value"] / 2**2))
         fig = plt.figure()
         ax = fig.add_subplot(1, 1, 1)
         self.setupLinePlot()
         labels = self.getLabels()
-        sns.lineplot(x=df["resolution"], y=df["final_value"], linestyle="-", hue=df["n"])
+        colors = self.getColors()
+        plt.ylim(0.0, 0.05)
+        # ITS FUCKING MATPLOTLIB TIME AGAIN. DONT YOU JUST LOVE IT? EVERYBODY PUT YOUR HANDS UP IN THE AIR
+        plt.tick_params(
+            axis='x',          # changes apply to the x-axis
+            which='minor',      # both major and minor ticks are affected
+            bottom=False,      # ticks along the bottom edge are off
+            top=False,         # ticks along the top edge are off
+            labelbottom=False) # labels along the bottom edge are off
+        ns = [1, 2, 3, 4, 5, 6, 7]
+        ax.set_xticks(ns)
+        for (color, timestep) in zip(colors, [0.000025, 0.00005, 0.0001, 0.0002, 0.0004]):
+            label = f"${int(timestep * 1000000)} \; \\mathrm{{yr}}$"
+            print(label)
+            sub = df.filter(pl.col("dt") == timestep)
+            df1 = sub.filter(pl.col("limiter") == True)
+            df2 = sub.filter(pl.col("limiter") == False)
+            print(df1, df2)
+            self.addLine(makeQ(df1["n"]), makeQ(df1["final_value"]), label=label, color= color)
+            self.addLine(makeQ(df2["n"]), makeQ(df2["final_value"]), label="", color= color, linestyle="--")
+        self.addLine(makeQ([]), makeQ([]), label="Limiter", color= "black")
+        self.addLine(makeQ([]), makeQ([]), label="No Limiter", color= "black", linestyle="--")
+        plt.legend()
