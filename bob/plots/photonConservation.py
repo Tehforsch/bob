@@ -19,8 +19,8 @@ class PhotonConservation(MultiSetFn):
         super().__init__(config)
         config.setDefault("xUnit", "1.0", override=True)
         config.setDefault("yUnit", "1.0", override=True)
-        config.setDefault("xLabel", "n")
-        config.setDefault("yLabel", "L(n)")
+        config.setDefault("xLabel", "$N_{\\mathrm{cell}}$")
+        config.setDefault("yLabel", "$\\xi(N_{\\mathrm{cell}})$")
 
     def post(self, sims: MultiSet) -> Result:
         if len(sims) > 1:
@@ -59,7 +59,8 @@ class PhotonConservation(MultiSetFn):
             self.addLine(makeQ(df2["resolution"]), makeQ(df2["final_value"]), label="", color= color, linestyle="--")
         self.addLine(makeQ([]), makeQ([]), label="Limiter", color= "black")
         self.addLine(makeQ([]), makeQ([]), label="No Limiter", color= "black", linestyle="--")
-        plt.legend(ncol = 2, labelspacing=0.25)
+        l = plt.legend(ncol = 2, labelspacing=0.15, title="$\\Delta t_{\\mathrm{max}}$", loc=(0, 0.66), columnspacing=0.8)
+        l.get_title().set_position((-100, 0)) # -10 is a guess
 
 def getDf(sim):
     with sim.comovingUnits() as _:
@@ -84,11 +85,11 @@ def getDf(sim):
 class PhotonConservationN(PhotonConservation):
     def __init__(self, config: PlotConfig) -> None:
         config.setDefault("quotient", None)
-        super().__init__(config)
         config.setDefault("xUnit", "1.0", override=True)
         config.setDefault("yUnit", "1.0", override=True)
-        config.setDefault("xLabel", "t [Myr]")
-        config.setDefault("yLabel", "y")
+        config.setDefault("xLabel", "n")
+        config.setDefault("yLabel", "$\\xi(n)$")
+        super().__init__(config)
 
     def post(self, sims: MultiSet) -> Result:
         if len(sims) > 1:
@@ -124,6 +125,4 @@ class PhotonConservationN(PhotonConservation):
             print(df1, df2)
             self.addLine(makeQ(df1["n"]), makeQ(df1["final_value"]), label=label, color= color)
             self.addLine(makeQ(df2["n"]), makeQ(df2["final_value"]), label="", color= color, linestyle="--")
-        self.addLine(makeQ([]), makeQ([]), label="Limiter", color= "black")
-        self.addLine(makeQ([]), makeQ([]), label="No Limiter", color= "black", linestyle="--")
-        plt.legend()
+        plt.legend(title="$\\Delta t_{\\mathrm{max}}$")
